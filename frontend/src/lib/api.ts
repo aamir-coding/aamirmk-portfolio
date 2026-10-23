@@ -1,0 +1,37 @@
+export interface HealthStatus {
+  status: string;
+  ready: boolean;
+}
+
+export const getApiBaseUrl = (): string => {
+  return import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+};
+
+export async function fetchHealth(signal?: AbortSignal): Promise<HealthStatus> {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/api/health`, {
+    method: "GET",
+    signal,
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Health check failed with HTTP ${response.status}`);
+  }
+
+  const data = (await response.json()) as unknown;
+  if (
+    typeof data === "object" &&
+    data !== null &&
+    "status" in data &&
+    "ready" in data &&
+    typeof (data as { status: unknown }).status === "string" &&
+    typeof (data as { ready: unknown }).ready === "boolean"
+  ) {
+    return data as HealthStatus;
+  }
+
+  throw new Error("Invalid response schema from health endpoint");
+}
