@@ -34,18 +34,28 @@
 - [x] .gitignore, AGENTS.md created
 
 ## Next Step
-- [ ] User: install Python 3.12+ (currently 3.10.0)
-- [ ] User: share Groq Limits page numbers for `openai/gpt-oss-120b`
-- [ ] User: enable GitHub Actions (Settings → Actions → General → Allow all)
-- [ ] Copy implementation plan to docs/
-- [ ] Create .env.example
-- [ ] Initial commit
-- [ ] Begin Phase 0 brief
+- [ ] Phase 0 brief → wait for approval → build
+
+## Resolved
+- [x] Python 3.13.17 installed and on PATH ✅
+- [x] Groq limits confirmed (see below) ✅
+- [x] GitHub Actions enabled ✅
+- [x] Implementation plan copied to docs/ ✅
+- [x] .env.example created ✅
+- [x] Initial commit done ✅
+
+## Groq Rate Limits (authoritative, from user's Limits page)
+
+| Model | RPM | RPD | TPM | TPD |
+|-------|-----|-----|-----|-----|
+| `openai/gpt-oss-120b` | 30 | 1,000 | 8,000 | 200,000 |
+| `openai/gpt-oss-20b` | 30 | 1,000 | 8,000 | 200,000 |
+
+Both models share the same limits. The 20b model is cheaper for utility calls.
 
 ## Open Questions
-1. **Python version**: User says 3.15.1 installed but system shows 3.10.0. Needs resolution.
-2. **Groq rate limits**: Need actual numbers from user's Limits page for `openai/gpt-oss-120b`.
-3. **Phone number**: resume.tex contains a phone number. Excluded from knowledge base per hard rules unless user approves.
+1. **Phone number**: resume.tex contains a phone number. Excluded from knowledge base per hard rules unless user approves.
+2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-- Cannot start Phase 0 backend work until Python 3.12+ is confirmed on PATH.
+None.

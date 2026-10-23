@@ -18,7 +18,7 @@ Identity: "I'm an AI assistant trained on Aamir's verified résumé, projects, a
 ## Stack (fixed — do not deviate without explicit approval)
 
 - Backend: Python 3.12+, FastAPI, Pydantic v2, pydantic-settings, Uvicorn (single worker)
-- LLM: Groq API (free tier), `openai/gpt-oss-120b`, via `groq` SDK async client
+- LLM: Groq API (free tier), `openai/gpt-oss-120b` (main) + `openai/gpt-oss-20b` (utility), via `groq` SDK async client
 - Retrieval: Markdown/YAML facts, BM25 + fastembed ONNX embeddings, numpy
 - Storage: External Supabase Postgres (Phase 9+), SQLAlchemy 2, Alembic
 - Frontend: React, Vite, TypeScript, plain CSS with design tokens

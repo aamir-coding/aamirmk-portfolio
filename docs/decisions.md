@@ -23,11 +23,11 @@ C. Hybrid — introduces itself as assistant, then uses Aamir's name naturally
 **Date:** 2026-10-23  
 **Context:** Need to choose Groq models for main answers and utility calls.  
 **Options:**  
-A. `openai/gpt-oss-120b` for answers, `llama-3.1-8b-instant` for utility  
-B. `openai/gpt-oss-120b` for everything  
-C. `llama-3.3-70b-versatile` for answers, small model for utility  
-**Choice:** B — Single model for now  
-**Why:** User reports it's the only one working currently. Model IDs are in config so we can split later. Risk: utility calls eat from the same quota.
+A. `openai/gpt-oss-120b` for everything  
+B. `openai/gpt-oss-120b` for answers, `openai/gpt-oss-20b` for utility  
+**Choice:** B — Use 120b for main chat, 20b for utility (query rewriting, JD extraction)  
+**Why:** Both have the same rate limits (30 RPM, 1K RPD, 8K TPM, 200K TPD), but the 20b model is cheaper per token. Using two models also provides failover: if one model's quota is hit, the other has its own limits. Model IDs in config.  
+**Updated:** 2026-10-23 — user confirmed 20b also exists and works.
 
 ---
 
