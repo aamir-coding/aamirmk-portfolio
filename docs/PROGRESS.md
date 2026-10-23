@@ -1,14 +1,14 @@
 # Progress Tracker
 
 ## Current Phase
-**Setup** — Scaffolding and repo initialization
+**Phase 0: Environment, repo and a deployed walking skeleton** — Code complete, ready for deployment & review
 
 ## Phase Status
 
 | Phase | Status | Branch | Tag |
 |-------|--------|--------|-----|
-| Setup | 🟡 In Progress | `main` | — |
-| P0: Skeleton | ⬜ Not Started | — | — |
+| Setup | 🟢 Complete | `main` | — |
+| P0: Skeleton | 🟡 Ready for Deployment / Review | `phase-0-skeleton` | — |
 | P1: Chat endpoint | ⬜ Not Started | — | — |
 | P3: Streaming + UI | ⬜ Not Started | — | — |
 | P4: Design system (minimal) | ⬜ Not Started | — | — |
@@ -27,14 +27,23 @@
 - [x] Implementation plan read and understood
 - [x] Setup briefing delivered and decisions made
 - [x] Assistant voice: third person
-- [x] Model: `openai/gpt-oss-120b` (single model for now)
+- [x] Model: `openai/gpt-oss-120b` (main) + `openai/gpt-oss-20b` (utility)
 - [x] Postgres: Supabase (deferred to Phase 9)
-- [x] Git repo initialized
-- [x] Directory structure created
-- [x] .gitignore, AGENTS.md created
+- [x] Git repo initialized and initial commit on main
+- [x] Branch `phase-0-skeleton` created
+- [x] Backend FastAPI app with `GET /api/health`, settings, CORS, request ID middleware
+- [x] Backend test suite with 7 passing pytest tests
+- [x] Frontend React + TypeScript SPA scaffold with health client
+- [x] Frontend test suite with 7 passing Vitest tests
+- [x] GitHub Actions CI pipeline (.github/workflows/ci.yml)
+- [x] Deployment configurations created (render.yaml, frontend/vercel.json)
 
 ## Next Step
-- [ ] Phase 0 brief → wait for approval → build
+- [ ] Push branch to remote and trigger CI
+- [ ] Deploy backend on Render using render.yaml
+- [ ] Deploy frontend on Vercel
+- [ ] Verify live connectivity and measure cold-start time
+- [ ] Teach-back & review before tagging `phase-0-done`
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
