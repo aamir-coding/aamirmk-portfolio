@@ -45,7 +45,7 @@
 ## Open Questions
 1. **Python version**: User says 3.15.1 installed but system shows 3.10.0. Needs resolution.
 2. **Groq rate limits**: Need actual numbers from user's Limits page for `openai/gpt-oss-120b`.
-3. **Phone number**: resume.tex contains +91 8904816279. Excluded from knowledge base per hard rules unless user approves.
+3. **Phone number**: resume.tex contains a phone number. Excluded from knowledge base per hard rules unless user approves.
 
 ## Blockers
 - Cannot start Phase 0 backend work until Python 3.12+ is confirmed on PATH.
