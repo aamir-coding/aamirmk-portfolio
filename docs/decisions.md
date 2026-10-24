@@ -60,3 +60,25 @@ C. Defer decision
 **Options:** AGENTS.md vs CLAUDE.md  
 **Choice:** AGENTS.md  
 **Why:** Standard convention, read natively by the agent tools.
+
+
+---
+
+### DRN-006: CORS Configuration Architecture
+
+**Date:** 2026-10-24  
+**Context:** The frontend (hosted on Vercel) and backend (hosted on Render) reside on distinct origins. We need robust CORS handling without wildcard exposures.  
+**Options:**  
+A. Wildcard `allow_origins=["*"]`  
+B. Explicit allowlist loaded via environment variables and parsed in `Settings`  
+**Choice:** B — Explicit allowlist  
+**Why:** Security best practice. Prevents unauthorized cross-origin requests while facilitating local development (`localhost:5173`) and production deployment (`*.vercel.app`).
+
+---
+
+### DRN-007: Request Tracing via X-Request-ID
+
+**Date:** 2026-10-24  
+**Context:** Need structured traceability across request lifecycles and error logs.  
+**Choice:** Middleware generating UUIDv4 or propagating client-supplied `X-Request-ID`.  
+**Why:** Enables end-to-end correlation between client errors, server logs, and frontend status reporting.

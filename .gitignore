@@ -40,6 +40,7 @@ pnpm-debug.log*
 # Frontend build
 frontend/dist/
 frontend/.vercel/
+*.tsbuildinfo
 
 # Backend index (built at deploy time)
 backend/index/
