@@ -1,14 +1,18 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 0: Environment, repo and a deployed walking skeleton** — Code complete, ready for deployment & review
+**Phase 0: Environment, repo and a deployed walking skeleton** — Review & Teach-back
+
+## Live Deployments
+- **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
+- **Frontend (Vercel)**: `https://aamirmk-portfolio.vercel.app/`
 
 ## Phase Status
 
 | Phase | Status | Branch | Tag |
 |-------|--------|--------|-----|
 | Setup | 🟢 Complete | `main` | — |
-| P0: Skeleton | 🟡 Ready for Deployment / Review | `phase-0-skeleton` | — |
+| P0: Skeleton | 🟡 Review & Teach-back | `main` | `phase-0-done` (pending approval) |
 | P1: Chat endpoint | ⬜ Not Started | — | — |
 | P3: Streaming + UI | ⬜ Not Started | — | — |
 | P4: Design system (minimal) | ⬜ Not Started | — | — |
@@ -30,20 +34,22 @@
 - [x] Model: `openai/gpt-oss-120b` (main) + `openai/gpt-oss-20b` (utility)
 - [x] Postgres: Supabase (deferred to Phase 9)
 - [x] Git repo initialized and initial commit on main
-- [x] Branch `phase-0-skeleton` created
+- [x] Branch `phase-0-skeleton` created and merged via PR #1 to `main`
 - [x] Backend FastAPI app with `GET /api/health`, settings, CORS, request ID middleware
-- [x] Backend test suite with 7 passing pytest tests
+- [x] Backend test suite with 10 passing pytest tests
 - [x] Frontend React + TypeScript SPA scaffold with health client
 - [x] Frontend test suite with 7 passing Vitest tests
-- [x] GitHub Actions CI pipeline (.github/workflows/ci.yml)
-- [x] Deployment configurations created (render.yaml, frontend/vercel.json)
+- [x] GitHub Actions CI pipeline (.github/workflows/ci.yml) tested and passing in cloud
+- [x] Backend deployed live on Render free web service
+- [x] Frontend deployed live on Vercel Hobby
+- [x] Live CORS verification: Vercel origin accepted, unlisted origin rejected
+- [x] Warm response time measured (~530ms)
 
 ## Next Step
-- [ ] Push branch to remote and trigger CI
-- [ ] Deploy backend on Render using render.yaml
-- [ ] Deploy frontend on Vercel
-- [ ] Verify live connectivity and measure cold-start time
-- [ ] Teach-back & review before tagging `phase-0-done`
+- [ ] Measure cold-start time (after 20 min idle)
+- [ ] Complete Phase 0 teach-back questions
+- [ ] Tag `phase-0-done` upon user approval
+- [ ] Present Phase 1 brief
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
