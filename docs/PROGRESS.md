@@ -44,6 +44,15 @@
 - [x] Frontend deployed live on Vercel Hobby
 - [x] Live CORS verification: Vercel origin accepted, unlisted origin rejected
 - [x] Warm response time measured (~530ms)
+- [x] Cold-start time measured: 4 runs recorded — 23.1s, 32.9s, 22.7s, 22.4s (avg ~25s, peak ~33s)
+
+## Measured Cold-Start Benchmarks (Render Free Tier)
+- **Idle Timeout**: 15 minutes
+- **Run 1**: 23.15s
+- **Run 2 (Peak 19:30 IST)**: 32.93s
+- **Run 3**: 22.71s
+- **Run 4**: 22.39s
+- **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
 - [ ] Measure cold-start time (after 20 min idle)
