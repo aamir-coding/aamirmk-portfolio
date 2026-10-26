@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 0: Environment, repo and a deployed walking skeleton** — Review & Teach-back
+**Phase 1: FastAPI backend and first Groq chat endpoint** — Ready to begin (new chat)
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -9,23 +9,23 @@
 
 ## Phase Status
 
-| Phase | Status | Branch | Tag |
-|-------|--------|--------|-----|
-| Setup | 🟢 Complete | `main` | — |
-| P0: Skeleton | 🟡 Review & Teach-back | `main` | `phase-0-done` (pending approval) |
-| P1: Chat endpoint | ⬜ Not Started | — | — |
-| P3: Streaming + UI | ⬜ Not Started | — | — |
-| P4: Design system (minimal) | ⬜ Not Started | — | — |
-| P7: Safety (first-share) | ⬜ Not Started | — | — |
-| — Gate 1: Shareable link — | | | |
-| P2: RAG | ⬜ Not Started | — | — |
-| P5: Citations + gen UI | ⬜ Not Started | — | — |
-| P4: Design system (full) | ⬜ Not Started | — | — |
-| P6: Fit report | ⬜ Not Started | — | — |
-| P8: Evals | ⬜ Not Started | — | — |
-| P7: Safety (rest) | ⬜ Not Started | — | — |
-| P10: Production | ⬜ Not Started | — | — |
-| P9: Handoff + analytics | ⬜ Not Started | — | — |
+| Phase | Status | Branch | Tag | Study Guide |
+|-------|--------|--------|-----|-------------|
+| Setup | 🟢 Complete | `main` | — | — |
+| P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
+| P1: Chat endpoint | 🟡 Next Up | `phase-1-chat` | — | — |
+| P3: Streaming + UI | ⬜ Not Started | — | — | — |
+| P4: Design system (minimal) | ⬜ Not Started | — | — | — |
+| P7: Safety (first-share) | ⬜ Not Started | — | — | — |
+| — Gate 1: Shareable link — | | | | |
+| P2: RAG | ⬜ Not Started | — | — | — |
+| P5: Citations + gen UI | ⬜ Not Started | — | — | — |
+| P4: Design system (full) | ⬜ Not Started | — | — | — |
+| P6: Fit report | ⬜ Not Started | — | — | — |
+| P8: Evals | ⬜ Not Started | — | — | — |
+| P7: Safety (rest) | ⬜ Not Started | — | — | — |
+| P10: Production | ⬜ Not Started | — | — | — |
+| P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
 ## What's Done
 - [x] Implementation plan read and understood
@@ -45,6 +45,10 @@
 - [x] Live CORS verification: Vercel origin accepted, unlisted origin rejected
 - [x] Warm response time measured (~530ms)
 - [x] Cold-start time measured: 4 runs recorded — 23.1s, 32.9s, 22.7s, 22.4s (avg ~25s, peak ~33s)
+- [x] Teach-back completed and verified
+- [x] Tag `phase-0-done` created and pushed to origin
+- [x] Study guide written: `docs/study-guides/phase-00-foundations.md`
+- [x] AGENTS.md updated with explicit skill usage rules and session kickoff protocol
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -55,10 +59,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-- [ ] Measure cold-start time (after 20 min idle)
-- [ ] Complete Phase 0 teach-back questions
-- [ ] Tag `phase-0-done` upon user approval
-- [ ] Present Phase 1 brief
+1. Start a new chat for Phase 1.
+2. Present Phase 1 brief: `POST /api/chat` with `openai/gpt-oss-120b`, thin `llm.py` adapter, system prompt from file, context-stuffed resume, fake LLM test fixtures.
+3. Wait for approval, create branch `phase-1-chat`.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
