@@ -12,9 +12,10 @@ import logging
 from dataclasses import dataclass
 from typing import Protocol
 
+from fastapi import Depends
 from groq import AsyncGroq
 
-from app.settings import Settings
+from app.settings import Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -143,3 +144,8 @@ class FakeLLM:
             completion_tokens=5,
             total_tokens=15,
         )
+
+
+def get_llm_client(settings: Settings = Depends(get_settings)) -> LLMClient:
+    """Dependency provider returning production LLM client."""
+    return GroqLLM(settings)
