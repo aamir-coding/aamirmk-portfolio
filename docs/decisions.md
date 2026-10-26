@@ -82,3 +82,28 @@ B. Explicit allowlist loaded via environment variables and parsed in `Settings`
 **Context:** Need structured traceability across request lifecycles and error logs.  
 **Choice:** Middleware generating UUIDv4 or propagating client-supplied `X-Request-ID`.  
 **Why:** Enables end-to-end correlation between client errors, server logs, and frontend status reporting.
+
+---
+
+### DRN-008: Deep LLM Adapter Interface (Protocol Seam)
+
+**Date:** 2026-10-26  
+**Context:** Need an abstraction over the Groq API that decouples FastAPI endpoint logic from SDK internals, ensures deterministic test isolation without live API keys, and provides a clear extension point for tool loops and model failover.  
+**Options:**  
+A. Direct SDK calls inside endpoint handlers  
+B. Generic multi-provider wrapper framework (e.g. LiteLLM, LangChain)  
+C. Thin in-house protocol `LLMClient` with a single `complete()` method  
+**Choice:** C — Thin in-house protocol `LLMClient`  
+**Why:** Complies with no-LangChain hard rule and deep-module engineering standard. `GroqLLM` encapsulates `AsyncGroq`, timeout/retry, token counting, and error mapping. `FakeLLM` satisfies the identical protocol for sub-second, zero-cost CI tests. Injected via FastAPI `Depends`.
+
+---
+
+### DRN-009: Context-Stuffed System Prompt Baseline (Phase 1)
+
+**Date:** 2026-10-26  
+**Context:** Need to ground conversational responses in verified facts prior to building Phase 2 hybrid RAG.  
+**Options:**  
+A. Early RAG prototype with chunks and vector store  
+B. Context stuffing full résumé markdown into the system prompt  
+**Choice:** B — Context stuffing full résumé into system prompt  
+**Why:** Résumé context is ~1,380 prompt tokens, fitting comfortably within Groq's 8,000 TPM limit for `openai/gpt-oss-120b`. Enables immediate end-to-end conversational capability and prompt verification (third-person persona, honest "I don't know" fallback) without adding retrieval complexity prematurely. Excludes phone number per hard safety rules.
