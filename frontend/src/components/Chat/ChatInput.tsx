@@ -44,50 +44,59 @@ export function ChatInput({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
+    } else if (e.key === "Escape" && isStreaming) {
+      e.preventDefault();
+      onStop();
     }
   };
 
   return (
-    <form className="chat-input-form" onSubmit={handleSubmit}>
-      <label htmlFor="chat-user-input" className="sr-only">
-        Ask a question about Aamir's background
-      </label>
-      <textarea
-        id="chat-user-input"
-        ref={textareaRef}
-        className="chat-textarea"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={
-          isStreaming
-            ? "Assistant is responding..."
-            : "Ask about Aamir's experience, stack, or projects (Enter to send, Shift+Enter for newline)..."
-        }
-        rows={2}
-        disabled={disabled}
-        aria-disabled={disabled}
-      />
-      <div className="chat-input-actions">
-        {isStreaming ? (
-          <button
-            type="button"
-            className="btn btn-stop"
-            onClick={onStop}
-            aria-label="Stop generation"
-          >
-            Stop
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={disabled || !input.trim()}
-            aria-label="Send message"
-          >
-            Send
-          </button>
-        )}
+    <form className="chat-input-form-wrapper" onSubmit={handleSubmit}>
+      <div className="chat-input-row">
+        <label htmlFor="chat-user-input" className="sr-only">
+          Ask a question about Aamir's background
+        </label>
+        <textarea
+          id="chat-user-input"
+          ref={textareaRef}
+          className="chat-textarea"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={
+            isStreaming
+              ? "Assistant dispatch in progress..."
+              : "Ask about Aamir's experience, stack, or projects (Enter to send, Shift+Enter for newline)..."
+          }
+          rows={2}
+          disabled={disabled}
+          aria-disabled={disabled}
+        />
+        <div className="chat-input-actions">
+          {isStreaming ? (
+            <button
+              type="button"
+              className="btn btn-stop"
+              onClick={onStop}
+              aria-label="Stop generation"
+            >
+              Stop
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={disabled || !input.trim()}
+              aria-label="Send message"
+            >
+              Send
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="chat-input-helper">
+        <span>Enter to dispatch inquiry • Shift+Enter for newline</span>
+        {isStreaming && <span className="helper-active">Streaming active • Esc to stop</span>}
       </div>
     </form>
   );

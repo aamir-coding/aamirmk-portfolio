@@ -18,8 +18,11 @@ export const MessageItem = React.memo(function MessageItem({
       aria-label={`${isUser ? "User" : "Assistant"} message`}
     >
       <header className="chat-message-header">
+        <span className="chat-message-badge">
+          {isUser ? "INQUIRY" : "DISPATCH"}
+        </span>
         <span className="chat-message-author">
-          {isUser ? "You" : "Assistant"}
+          {isUser ? "Recruiter" : "Aamir.AI"}
         </span>
         <time className="chat-message-time">{message.timestamp}</time>
       </header>
