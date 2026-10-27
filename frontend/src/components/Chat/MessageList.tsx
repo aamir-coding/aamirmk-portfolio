@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import type { ChatMessage } from "../../hooks/useChat";
 import { MessageItem } from "./MessageItem";
-import { StarterChips } from "./StarterChips";
+import { CoverState } from "../Cover/CoverState";
 
 export interface MessageListProps {
   messages: ChatMessage[];
@@ -23,18 +23,7 @@ export function MessageList({
   if (messages.length === 0) {
     return (
       <div className="chat-empty-state" aria-label="Welcome and suggestions">
-        <section className="chat-intro">
-          <h2 className="chat-intro-title">Aamir Mohammed Khan</h2>
-          <p className="chat-intro-subtitle">
-            AI Systems & Full-Stack Engineer
-          </p>
-          <p className="chat-intro-body">
-            I’m an AI digital assistant trained exclusively on Aamir’s verified
-            résumé, technical projects, and engineering experience. Ask me about
-            his stack, architecture decisions, or measurable impact.
-          </p>
-        </section>
-        <StarterChips onSelect={onSelectPrompt} disabled={isStreaming} />
+        <CoverState onSelectPrompt={onSelectPrompt} disabled={isStreaming} />
       </div>
     );
   }
