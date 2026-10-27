@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7: Safety (first-share)** — Complete, awaiting Gate 1 review and approval (Band 1: Gate 1)
+**Band 1 / Gate 1: Complete** — Public shareable link active and hardened. Next: Phase 2 (Knowledge Base & RAG)
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -16,9 +16,9 @@
 | P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
 | P3: Streaming + UI | 🟢 Complete | `main` | `phase-3-done` | [`phase-03-streaming-ui.md`](study-guides/phase-03-streaming-ui.md) |
 | P4: Design system (minimal) | 🟢 Complete | `main` | `phase-4-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
-| P7: Safety (first-share) | 🟢 Complete | `phase-7-safety` | `phase-7-done` (pending) | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
-| — Gate 1: Shareable link — | 🟡 Ready for verification | — | — | — |
-| P2: RAG | ⬜ Not Started | — | — | — |
+| P7: Safety (first-share) | 🟢 Complete | `main` | `phase-7-done` | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
+| — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
+| P2: RAG | ⬜ Next Up (Band 2) | — | — | — |
 | P5: Citations + gen UI | ⬜ Not Started | — | — | — |
 | P4: Design system (full) | ⬜ Not Started | — | — | — |
 | P6: Fit report | ⬜ Not Started | — | — | — |
@@ -108,9 +108,8 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Deliver Phase 7 teach-back questions.
-2. Tag `phase-7-done` and push to remote upon user approval.
-3. Conduct Gate 1 verification (shareable link readiness).
+1. Present Gate 1 summary and shareable link status.
+2. Deliver Phase 2 (Knowledge Base & Hybrid RAG) brief upon approval.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
