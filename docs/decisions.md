@@ -168,3 +168,41 @@ A. Multi-route SPA with separate `/` and `/chat` paths and route transitions
 B. Unified shell state machine with smooth in-place Cover-to-Chat transition and header reset control  
 **Choice:** B — Unified shell state machine  
 **Why:** Eliminates client-side router overhead and layout shift (CLS). Provides an intuitive "← Dossier Overview" control that allows recruiters to return to the executive profile at any time without losing context.
+
+
+---
+
+### DRN-015: Proxy-Aware Sliding Window Rate Limiting Architecture
+
+**Date:** 2026-10-27  
+**Context:** Groq free-tier has a 30 RPM limit. We must prevent any individual visitor or scraper from exhausting the API or disrupting service for others, while correctly resolving real client IPs behind cloud reverse proxies (Render load balancers).  
+**Options:**  
+A. Direct socket IP extraction (`request.client.host`) and fixed-window bucket counters  
+B. Proxy-aware IP extraction with RFC header parsing (`X-Forwarded-For` chain, `CF-Connecting-IP`) and in-memory sliding-window limiter (`app.safety.rate_limiter`)  
+**Choice:** B — Proxy-aware extraction with sliding-window limiter  
+**Why:** Fixed windows allow boundary bursts (e.g. 20 requests in 2 seconds across a minute boundary). Sliding windows enforce a strict rolling rate (10 RPM per IP, with 15 burst allowance). Standard RFC headers (`Retry-After`, `X-RateLimit-*`) provide clear client feedback, and periodic stale key eviction guarantees zero memory leaks.
+
+---
+
+### DRN-016: Two-Tier Prompt Injection Defense & Delimiter Isolation
+
+**Date:** 2026-10-27  
+**Context:** Untrusted user inquiries could attempt prompt injection (e.g. "ignore previous instructions", "reveal system prompt", DAN jailbreaks, XML breakout).  
+**Options:**  
+A. Upstream LLM moderation call (e.g. Llama Guard)  
+B. System prompt instructions only  
+C. Pre-call deterministic regex guardrails + structural XML delimiter boundary fencing (`<user_inquiry>`)  
+**Choice:** C — Pre-call deterministic regex + structural XML fencing  
+**Why:** Upstream LLM classification consumes API quota, introduces 500ms+ latency, and adds financial cost. System prompt instructions alone remain vulnerable to jailbreaks. Deterministic regex rejects known imperative override patterns at 0 token cost and sub-millisecond speed, while XML delimiter fencing prevents prompt leakage without false-positives on legitimate recruiter inquiries about prompt engineering or systems architecture.
+
+---
+
+### DRN-017: Global UTC-Rollover Daily Quota Guard
+
+**Date:** 2026-10-27  
+**Context:** Groq free tier imposes hard daily limits (1,000 RPD, 200,000 TPD). Traffic surges or repeated testing could drain the account and break the assistant for everyone.  
+**Options:**  
+A. External database or Redis tracking  
+B. In-memory `DailyQuotaGuard` with UTC-midnight calendar rollover and proactive 80% safety cap (800 RPD / 180,000 TPD)  
+**Choice:** B — In-memory `DailyQuotaGuard` with UTC rollover  
+**Why:** Avoids adding external database dependencies prior to Phase 9. Protects the developer account from total depletion, fails open safely on server restarts, and returns standard HTTP 429 errors with `Retry-After` seconds to UTC midnight when capacity is reached.
