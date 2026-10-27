@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7: Safety (first-share)** — Ready to begin (Band 1: Gate 1)
+**Phase 7: Safety (first-share)** — Complete, awaiting Gate 1 review and approval (Band 1: Gate 1)
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -15,9 +15,9 @@
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
 | P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
 | P3: Streaming + UI | 🟢 Complete | `main` | `phase-3-done` | [`phase-03-streaming-ui.md`](study-guides/phase-03-streaming-ui.md) |
-| P4: Design system (minimal) | 🟢 Complete | `phase-4-design-system` | `phase-4-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
-| P7: Safety (first-share) | 🟡 Next Up | — | — | — |
-| — Gate 1: Shareable link — | | | | |
+| P4: Design system (minimal) | 🟢 Complete | `main` | `phase-4-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
+| P7: Safety (first-share) | 🟢 Complete | `phase-7-safety` | `phase-7-done` (pending) | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
+| — Gate 1: Shareable link — | 🟡 Ready for verification | — | — | — |
 | P2: RAG | ⬜ Not Started | — | — | — |
 | P5: Citations + gen UI | ⬜ Not Started | — | — | — |
 | P4: Design system (full) | ⬜ Not Started | — | — | — |
@@ -87,6 +87,17 @@
 - [x] Phase 4: 26 frontend Vitest tests and 52 backend Pytest tests 100% green
 - [x] Phase 4: Architectural decisions DRN-013 and DRN-014 recorded in `docs/decisions.md`
 - [x] Phase 4: Comprehensive study guide written in `docs/study-guides/phase-04-design-system.md`
+- [x] Phase 7: Reverse-proxy-aware client IP extraction (`app.safety.ip`) with anti-spoofing and IPv4/IPv6 validation
+- [x] Phase 7: In-memory sliding-window rate limiter (`app.safety.rate_limiter`) enforcing 10 req/min with automatic stale eviction
+- [x] Phase 7: Standard RFC rate limit response headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`, `Retry-After`)
+- [x] Phase 7: Global daily quota guard (`app.safety.quota`) tracking 800 RPD / 180,000 TPD with UTC midnight calendar rollover
+- [x] Phase 7: Pre-call prompt injection regex guardrails (`app.safety.guardrails`) rejecting attacks at 0 LLM token cost with zero false positives on legitimate queries
+- [x] Phase 7: Delimiter XML boundary hardening (`<user_inquiry>`) in `system.txt` isolating instructions from user query data
+- [x] Phase 7: Integrated safety dependencies across `POST /api/chat` and `POST /api/chat/stream`
+- [x] Phase 7: Frontend chat error handling for 429 rate limit and daily quota exhaustion
+- [x] Phase 7: 104 backend Pytest tests (100% green, 0 API cost) and 27 frontend Vitest tests (100% green)
+- [x] Phase 7: Architectural decisions DRN-015, DRN-016, and DRN-017 recorded in `docs/decisions.md`
+- [x] Phase 7: Comprehensive study guide written in `docs/study-guides/phase-07-safety-rate-limiting.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -97,9 +108,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Deliver Phase 4 teach-back questions.
-2. Tag `phase-4-done` and push to remote upon approval.
-3. Deliver Phase 7 (first-share safety, rate limiting & quota guards) brief to reach Gate 1 (shareable link).
+1. Deliver Phase 7 teach-back questions.
+2. Tag `phase-7-done` and push to remote upon user approval.
+3. Conduct Gate 1 verification (shareable link readiness).
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
