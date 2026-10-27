@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 1: FastAPI backend and first Groq chat endpoint** — Ready to begin (new chat)
+**Phase 1: FastAPI backend and first Groq chat endpoint** — Review & Teach-back
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -13,8 +13,8 @@
 |-------|--------|--------|-----|-------------|
 | Setup | 🟢 Complete | `main` | — | — |
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
-| P1: Chat endpoint | 🟡 Next Up | `phase-1-chat` | — | — |
-| P3: Streaming + UI | ⬜ Not Started | — | — | — |
+| P1: Chat endpoint | 🟢 Complete | `phase-1-chat` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
+| P3: Streaming + UI | 🟡 Next Up | — | — | — |
 | P4: Design system (minimal) | ⬜ Not Started | — | — | — |
 | P7: Safety (first-share) | ⬜ Not Started | — | — | — |
 | — Gate 1: Shareable link — | | | | |
@@ -49,6 +49,17 @@
 - [x] Tag `phase-0-done` created and pushed to origin
 - [x] Study guide written: `docs/study-guides/phase-00-foundations.md`
 - [x] AGENTS.md updated with explicit skill usage rules and session kickoff protocol
+- [x] Phase 1: `groq==1.7.0` pinned in requirements and installed
+- [x] Phase 1: Async LLM adapter `app/llm.py` with `LLMClient` protocol and `FakeLLM`
+- [x] Phase 1: System prompt with context-stuffed résumé markdown (phone number excluded)
+- [x] Phase 1: Strict Pydantic models `ChatRequest` and `ChatResponse` with input trimming
+- [x] Phase 1: `POST /api/chat` route mounted with `Depends(get_llm_client)`
+- [x] Phase 1: Error translation for rate limits (429), auth (500), upstream unavailable (503)
+- [x] Phase 1: 40 backend pytest tests passing in 0.42s (all using fake LLM, 0 API cost)
+- [x] Phase 1: 7 frontend vitest tests passing
+- [x] Phase 1: Real Groq live smoke test verified against `openai/gpt-oss-120b` (1.53s latency, 1,381 prompt tokens)
+- [x] Phase 1: Architectural decisions DRN-008 and DRN-009 recorded in `docs/decisions.md`
+- [x] Phase 1: Study guide written in `docs/study-guides/phase-01-fastapi-chat.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes

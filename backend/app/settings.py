@@ -25,7 +25,8 @@ class Settings(BaseSettings):
     LLM_MODEL_UTILITY: str = "openai/gpt-oss-20b"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        # Try backend/.env first, then repo-root .env (for monorepo layout)
+        env_file=(".env", "../.env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )

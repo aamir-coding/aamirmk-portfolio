@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.api.chat import router as chat_router
 from app.api.health import router as health_router
 from app.settings import Settings, get_settings
 
@@ -134,6 +135,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Mount API routers
     app.include_router(health_router, prefix="/api")
+    app.include_router(chat_router, prefix="/api")
 
     return app
 
