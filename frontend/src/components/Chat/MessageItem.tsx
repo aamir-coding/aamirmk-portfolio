@@ -39,7 +39,7 @@ export const MessageItem = React.memo(function MessageItem({
             </span>
           )}
         </p>
-        {message.status === "error" && (
+        {message.status === "error" && !message.content && (
           <p className="chat-message-error" role="alert">
             Generation interrupted or failed.
           </p>

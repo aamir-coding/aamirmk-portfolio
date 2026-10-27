@@ -43,9 +43,11 @@ describe("useChat hook", () => {
     expect(result.current.isStreaming).toBe(false);
   });
 
-  it("handles streaming errors cleanly", async () => {
+  it("handles streaming errors cleanly with inline error content", async () => {
     vi.spyOn(sseModule, "streamChat").mockImplementation(async (opts) => {
-      opts.callbacks.onError("Rate limit reached");
+      opts.callbacks.onError(
+        "Rate limit reached. Please wait 15 seconds before sending another message."
+      );
     });
 
     const { result } = renderHook(() => useChat());
@@ -54,9 +56,36 @@ describe("useChat hook", () => {
       await result.current.sendMessage("Hello");
     });
 
-    expect(result.current.error).toBe("Rate limit reached");
+    expect(result.current.error).toBe(
+      "Rate limit reached. Please wait 15 seconds before sending another message."
+    );
     expect(result.current.isStreaming).toBe(false);
     expect(result.current.messages[1]?.status).toBe("error");
+    expect(result.current.messages[1]?.content).toBe(
+      "Rate limit reached. Please wait 15 seconds before sending another message."
+    );
+  });
+
+  it("handles daily quota exhaustion cleanly", async () => {
+    vi.spyOn(sseModule, "streamChat").mockImplementation(async (opts) => {
+      opts.callbacks.onError(
+        "Daily assistant conversation capacity reached. Feel free to connect directly with Aamir."
+      );
+    });
+
+    const { result } = renderHook(() => useChat());
+
+    await act(async () => {
+      await result.current.sendMessage("Hello");
+    });
+
+    expect(result.current.error).toContain(
+      "Daily assistant conversation capacity reached"
+    );
+    expect(result.current.messages[1]?.status).toBe("error");
+    expect(result.current.messages[1]?.content).toContain(
+      "connect directly with Aamir"
+    );
   });
 
   it("ignores empty or whitespace messages", async () => {
@@ -76,7 +105,6 @@ describe("useChat hook", () => {
     vi.spyOn(sseModule, "streamChat").mockImplementation(async (opts) => {
       capturedSignal = opts.signal;
       opts.callbacks.onToken("Partial...");
-      // Simulate long wait
       return new Promise((resolve) => setTimeout(resolve, 500));
     });
 

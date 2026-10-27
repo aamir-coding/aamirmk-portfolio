@@ -137,6 +137,7 @@ export function useChat(): UseChatReturn {
                       status: "error",
                       content:
                         msg.content ||
+                        errMsg ||
                         "An error occurred while generating the response.",
                     }
                   : msg
