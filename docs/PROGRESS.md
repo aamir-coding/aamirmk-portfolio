@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 3: Streaming and the frontend chat MVP** — Ready to begin (new chat)
+**Phase 3: Streaming and the frontend chat MVP** — Complete (awaiting review & merge)
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -14,8 +14,8 @@
 | Setup | 🟢 Complete | `main` | — | — |
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
 | P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
-| P3: Streaming + UI | 🟡 Next Up | — | — | — |
-| P4: Design system (minimal) | ⬜ Not Started | — | — | — |
+| P3: Streaming + UI | 🟢 Complete | `phase-3-streaming-chat` | `phase-3-done` (pending merge) | [`phase-03-streaming-ui.md`](study-guides/phase-03-streaming-ui.md) |
+| P4: Design system (minimal) | 🟡 Next Up | — | — | — |
 | P7: Safety (first-share) | ⬜ Not Started | — | — | — |
 | — Gate 1: Shareable link — | | | | |
 | P2: RAG | ⬜ Not Started | — | — | — |
@@ -60,6 +60,19 @@
 - [x] Phase 1: Real Groq live smoke test verified against `openai/gpt-oss-120b` (1.53s latency, 1,381 prompt tokens)
 - [x] Phase 1: Architectural decisions DRN-008 and DRN-009 recorded in `docs/decisions.md`
 - [x] Phase 1: Study guide written in `docs/study-guides/phase-01-fastapi-chat.md`
+- [x] Phase 3: Extended `LLMClient` protocol with `stream(messages) -> AsyncIterator[str]`
+- [x] Phase 3: Implemented `GroqLLM.stream()` with `AsyncGroq(stream=True)` and `FakeLLM.stream()` token slicing
+- [x] Phase 3: Mounted `POST /api/chat/stream` SSE endpoint with Starlette `StreamingResponse` and event framing (`token`, `done`, `error`)
+- [x] Phase 3: Built zero-dependency `streamChat` client in `frontend/src/lib/sse.ts` over `fetch` + `ReadableStream` reader with packet chunk accumulator
+- [x] Phase 3: Built `useChat` hook managing message states, active token appending, and `AbortController` cancellation
+- [x] Phase 3: Created accessible chat interface components: `MessageList`, `MessageItem` (memoized with `React.memo`), `ChatInput` with multi-line support, and `StarterChips`
+- [x] Phase 3: Added Render free-tier cold-start UX: optimistic background health check with >2.5s latency warning and status pill
+- [x] Phase 3: Verified bundle budget: initial JS is 73.16 KB gzipped (<200 KB budget), CSS is 2.00 KB gzipped
+- [x] Phase 3: 51 backend pytest tests passing (0.59s) with 0 API cost
+- [x] Phase 3: 22 frontend vitest tests passing (4.06s)
+- [x] Phase 3: Live Groq streaming smoke test against `openai/gpt-oss-120b` verified: 0.58s TTFT, 0.61s total duration
+- [x] Phase 3: Architectural decisions DRN-010, DRN-011, and DRN-012 recorded in `docs/decisions.md`
+- [x] Phase 3: Comprehensive study guide written in `docs/study-guides/phase-03-streaming-ui.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -70,9 +83,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Start a new chat for Phase 1.
-2. Present Phase 1 brief: `POST /api/chat` with `openai/gpt-oss-120b`, thin `llm.py` adapter, system prompt from file, context-stuffed resume, fake LLM test fixtures.
-3. Wait for approval, create branch `phase-1-chat`.
+1. Deliver teach-back with 3 questions to verify user's mental model.
+2. Await user's explicit approval to tag `phase-3-done`, merge into `main`, and push to remote.
+3. Move to Phase 4 (Minimal Design System & Cover State) per Band 1 execution order.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
