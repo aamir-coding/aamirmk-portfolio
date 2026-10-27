@@ -68,11 +68,15 @@
 - [x] Phase 3: Created accessible chat interface components: `MessageList`, `MessageItem` (memoized with `React.memo`), `ChatInput` with multi-line support, and `StarterChips`
 - [x] Phase 3: Added Render free-tier cold-start UX: optimistic background health check with >2.5s latency warning and status pill
 - [x] Phase 3: Verified bundle budget: initial JS is 73.16 KB gzipped (<200 KB budget), CSS is 2.00 KB gzipped
-- [x] Phase 3: 51 backend pytest tests passing (0.59s) with 0 API cost
-- [x] Phase 3: 22 frontend vitest tests passing (4.06s)
+- [x] Phase 3: 52 backend pytest tests passing with 0 API cost
+- [x] Phase 3: 22 frontend vitest tests passing
 - [x] Phase 3: Live Groq streaming smoke test against `openai/gpt-oss-120b` verified: 0.58s TTFT, 0.61s total duration
 - [x] Phase 3: Architectural decisions DRN-010, DRN-011, and DRN-012 recorded in `docs/decisions.md`
 - [x] Phase 3: Comprehensive study guide written in `docs/study-guides/phase-03-streaming-ui.md`
+- [x] Phase 3: Fixed trailing slash bug on baseUrl and normalized consecutive slashes via ASGI middleware
+- [x] Phase 3: CI 100% green on GitHub Actions with ruff format check and all test suites
+- [x] Phase 3: Verified end-to-end on live Vercel frontend and live Render backend
+- [x] Added 2 new skills to repository: `agent-browser` and `diagnosing-bugs` (8 skills total)
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -83,9 +87,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Deliver teach-back with 3 questions to verify user's mental model.
-2. Await user's explicit approval to tag `phase-3-done`, merge into `main`, and push to remote.
-3. Move to Phase 4 (Minimal Design System & Cover State) per Band 1 execution order.
+1. Start a new chat for Phase 4.
+2. Present Phase 4 brief: Design system, dossier visual direction and cover state (minimal Band 1 requirements).
+3. Wait for approval, create branch `phase-4-design-system`.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅

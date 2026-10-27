@@ -76,15 +76,16 @@ Band 4: P9
 
 ## Phase Loop & Skills Protocol
 
-Every phase strictly follows this 6-step loop. The 6 installed skills in `.agents/skills/` MUST be actively leveraged at their designated steps:
+Every phase strictly follows this 6-step loop. The 8 installed skills in `.agents/skills/` MUST be actively leveraged at their designated steps:
 
 1. **Brief**: Re-read the phase in `docs/implementation-plan.md`. Present a short phase brief (goal, 3-8 small reviewable increments, files, tests, risks, what you need from user). Wait for approval.
 2. **Build**: Work on branch `phase-N-short-name`, test-first where practical, small conventional commits.
    - For React/frontend increments: Always consult `.agents/skills/vercel-react-best-practices/SKILL.md` (bundle budgets, re-render avoidance, cleanup).
    - For UI/CSS increments (Phase 4, Phase 3 chat UI): Always consult `.agents/skills/frontend-design/SKILL.md` (editorial dossier direction, CSS variables, typography, anti-generic AI UI).
    - For deep module abstractions (`llm.py`, `retriever.py`, tool loop): Consult `.agents/skills/codebase-design/SKILL.md`.
+   - For debugging bugs, regressions, or unexpected test/runtime failures: Consult `.agents/skills/diagnosing-bugs/SKILL.md`.
 3. **Decisions**: Log non-obvious choices and trade-offs in `docs/decisions.md`.
-4. **Review**: Run all test suites. Verify every "Done when" item with real output evidence. Run a read-only architecture review using `.agents/skills/improve-codebase-architecture/SKILL.md` and `.agents/skills/codebase-design/SKILL.md`.
+4. **Review**: Run all test suites. Verify every "Done when" item with real output evidence. Run a read-only architecture review using `.agents/skills/improve-codebase-architecture/SKILL.md` and `.agents/skills/codebase-design/SKILL.md`. For live browser UI verification and QA dogfooding, use `.agents/skills/agent-browser/SKILL.md`.
 5. **Teach-back & Study Guide**:
    - Deliver interactive teach-back with 3 questions to verify user's mental model.
    - Create or update the deep interview study guide in `docs/study-guides/phase-N-<topic>.md` covering the theoretical concepts, line-by-line codebase connections, placement Q&A, and official doc links. Consult `.agents/skills/teach/SKILL.md`.
