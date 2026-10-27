@@ -95,8 +95,7 @@ class TestFakeLLM:
     async def test_stream_custom_chunks(self) -> None:
         fake = FakeLLM(stream_chunks=["Hel", "lo ", "world"])
         chunks: list[str] = [
-            chunk
-            async for chunk in fake.stream([Message(role="user", content="hi")])
+            chunk async for chunk in fake.stream([Message(role="user", content="hi")])
         ]
         assert chunks == ["Hel", "lo ", "world"]
 
