@@ -101,6 +101,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         request_id = getattr(request.state, "request_id", None)
+        headers = dict(exc.headers) if exc.headers else {}
+        if request_id:
+            headers["X-Request-ID"] = request_id
+
         return JSONResponse(
             status_code=exc.status_code,
             content={
@@ -110,7 +114,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     "request_id": request_id,
                 }
             },
-            headers={"X-Request-ID": request_id} if request_id else None,
+            headers=headers if headers else None,
         )
 
     @app.exception_handler(RequestValidationError)

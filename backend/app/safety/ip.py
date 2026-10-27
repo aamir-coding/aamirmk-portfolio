@@ -78,8 +78,15 @@ def extract_client_ip(
 def get_client_ip(request: Request) -> str:
     """FastAPI dependency or helper to retrieve the client IP from Request."""
     client_host = request.client.host if request.client else None
-    settings: Any = getattr(request.app.state, "settings", None)
-    trust_proxy = getattr(settings, "TRUST_PROXY_HEADERS", True) if settings else True
+    trust_proxy = True
+    try:
+        app = request.app
+        settings: Any = getattr(app.state, "settings", None)
+        if settings is not None:
+            trust_proxy = getattr(settings, "TRUST_PROXY_HEADERS", True)
+    except (KeyError, AttributeError):
+        pass
+
     return extract_client_ip(
         headers=request.headers,
         client_host=client_host,
