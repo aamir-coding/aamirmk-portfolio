@@ -7,7 +7,7 @@ import logging
 import uuid
 from collections.abc import AsyncIterator
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 
 from app.llm import (
@@ -21,6 +21,20 @@ from app.llm import (
 )
 from app.models import ChatRequest, ChatResponse, TokenUsage
 from app.prompt_loader import SYSTEM_PROMPT
+from app.safety.guardrails import (
+    SAFE_REFUSAL_MESSAGE,
+    check_prompt_injection,
+    format_safe_user_message,
+)
+from app.safety.quota import (
+    DailyQuotaGuard,
+    check_daily_quota,
+    get_quota_guard,
+)
+from app.safety.rate_limiter import (
+    RateLimitResult,
+    check_rate_limit,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,14 +49,40 @@ router = APIRouter(tags=["chat"])
 )
 async def chat(
     request: ChatRequest,
+    response: Response,
     llm: LLMClient = Depends(get_llm_client),
+    rate_limit: RateLimitResult = Depends(check_rate_limit),
+    _quota: None = Depends(check_daily_quota),
+    quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
 ) -> ChatResponse:
     """Process user message using LLM grounded with system prompt context."""
     conv_id = request.conversation_id or uuid.uuid4().hex
 
+    # Attach rate limit visibility headers to successful response
+    response.headers["X-RateLimit-Limit"] = str(rate_limit.limit)
+    response.headers["X-RateLimit-Remaining"] = str(rate_limit.remaining)
+    response.headers["X-RateLimit-Reset"] = str(rate_limit.reset_seconds)
+
+    # 1. Guard against adversarial prompt injections (0 LLM token cost)
+    injection_check = check_prompt_injection(request.message)
+    if not injection_check.is_safe:
+        return ChatResponse(
+            reply=SAFE_REFUSAL_MESSAGE,
+            conversation_id=conv_id,
+            model="guardrails",
+            usage=TokenUsage(
+                prompt_tokens=0,
+                completion_tokens=0,
+                total_tokens=0,
+            ),
+        )
+
+    # 2. Format user query with XML boundary fencing
+    safe_user_content = format_safe_user_message(request.message)
+
     messages = [
         Message(role="system", content=SYSTEM_PROMPT),
-        Message(role="user", content=request.message),
+        Message(role="user", content=safe_user_content),
     ]
 
     try:
@@ -72,6 +112,9 @@ async def chat(
             detail="An error occurred while communicating with the AI service.",
         ) from exc
 
+    # 3. Track actual consumed tokens against daily quota
+    await quota_guard.record_usage(tokens=completion.total_tokens)
+
     return ChatResponse(
         reply=completion.content,
         conversation_id=conv_id,
@@ -92,23 +135,59 @@ async def chat(
 async def chat_stream(
     request: ChatRequest,
     llm: LLMClient = Depends(get_llm_client),
+    rate_limit: RateLimitResult = Depends(check_rate_limit),
+    _quota: None = Depends(check_daily_quota),
+    quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
 ) -> StreamingResponse:
     """Stream user message using LLM via Server-Sent Events (SSE)."""
     conv_id = request.conversation_id or uuid.uuid4().hex
 
+    headers = {
+        "Cache-Control": "no-cache, no-transform",
+        "Connection": "keep-alive",
+        "X-Accel-Buffering": "no",
+        "X-RateLimit-Limit": str(rate_limit.limit),
+        "X-RateLimit-Remaining": str(rate_limit.remaining),
+        "X-RateLimit-Reset": str(rate_limit.reset_seconds),
+    }
+
+    # 1. Guard against adversarial prompt injections (0 LLM token cost)
+    injection_check = check_prompt_injection(request.message)
+    if not injection_check.is_safe:
+
+        async def refusal_generator() -> AsyncIterator[str]:
+            payload = json.dumps({"token": SAFE_REFUSAL_MESSAGE})
+            yield f"event: token\ndata: {payload}\n\n"
+            done_payload = json.dumps({"conversation_id": conv_id})
+            yield f"event: done\ndata: {done_payload}\n\n"
+
+        return StreamingResponse(
+            refusal_generator(),
+            media_type="text/event-stream",
+            headers=headers,
+        )
+
+    # 2. Format user query with XML boundary fencing
+    safe_user_content = format_safe_user_message(request.message)
+
     messages = [
         Message(role="system", content=SYSTEM_PROMPT),
-        Message(role="user", content=request.message),
+        Message(role="user", content=safe_user_content),
     ]
 
     async def event_generator() -> AsyncIterator[str]:
+        tokens_emitted = 0
         try:
             async for token in llm.stream(messages):
+                tokens_emitted += 1
                 payload = json.dumps({"token": token})
                 yield f"event: token\ndata: {payload}\n\n"
 
             done_payload = json.dumps({"conversation_id": conv_id})
             yield f"event: done\ndata: {done_payload}\n\n"
+
+            # 3. Track tokens (estimated ~1400 prompt + generated tokens)
+            await quota_guard.record_usage(tokens=1400 + tokens_emitted)
         except LLMRateLimitError as exc:
             logger.warning("[%s] Groq rate limit during stream: %s", conv_id, exc)
             err_payload = json.dumps(
@@ -134,11 +213,6 @@ async def chat_stream(
             )
             yield f"event: error\ndata: {err_payload}\n\n"
 
-    headers = {
-        "Cache-Control": "no-cache, no-transform",
-        "Connection": "keep-alive",
-        "X-Accel-Buffering": "no",
-    }
     return StreamingResponse(
         event_generator(),
         media_type="text/event-stream",

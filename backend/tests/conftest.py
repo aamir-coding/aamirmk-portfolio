@@ -4,6 +4,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from app.safety.quota import get_quota_guard
+from app.safety.rate_limiter import get_rate_limiter
 from app.settings import Settings
 
 
@@ -15,6 +17,18 @@ def test_settings() -> Settings:
         DEBUG=True,
         CORS_ORIGINS=["http://localhost:5173", "https://portfolio.test"],
     )
+
+
+@pytest.fixture(autouse=True)
+def reset_safety_state(test_settings: Settings) -> Generator[None]:
+    """Ensure in-memory safety rate limits and quotas are clean for each test."""
+    limiter = get_rate_limiter(settings=test_settings)
+    limiter.reset()
+    quota = get_quota_guard(settings=test_settings)
+    quota.reset()
+    yield
+    limiter.reset()
+    quota.reset()
 
 
 @pytest.fixture
