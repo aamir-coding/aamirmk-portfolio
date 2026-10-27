@@ -142,3 +142,29 @@ A. Generic loading spinners without explanation
 B. Background health check on page load with latency timer (>2.5s) triggering a transparent status pill and notice banner  
 **Choice:** B — Background health check & latency-triggered status pill  
 **Why:** Sets honest recruiter expectations upfront. The application immediately displays "Waking Up (Render ~25s)" if the initial connection takes > 2.5s, reassuring visitors that the service is booting rather than broken.
+
+
+---
+
+### DRN-013: Minimal Editorial Dossier Design System Architecture
+
+**Date:** 2026-10-27  
+**Context:** Need a distinctive, professional visual system that presents Aamir's verified technical portfolio without falling into generic AI chatbot aesthetics (e.g. rounded SaaS cards, purple/teal glow gradients, Anthropic terracotta clones) while strictly adhering to our <200 KB gzipped bundle budget.  
+**Options:**  
+A. External UI / CSS component libraries (Tailwind, Radix, Shadcn)  
+B. CSS-in-JS framework (Emotion, Styled Components)  
+C. In-house pure CSS design tokens (`tokens.css` + `chat.css`)  
+**Choice:** C — In-house pure CSS design tokens  
+**Why:** Maintains zero runtime dependencies, strictly preserves our bundle budget (73.74 KB gzipped JS, 3.30 KB gzipped CSS), and gives complete control over light/dark theme variables, hairline dossier borders, fluid typography scales, and WCAG accessibility standards.
+
+---
+
+### DRN-014: Cover State Hero & Graceful Mode Orchestration
+
+**Date:** 2026-10-27  
+**Context:** Recruiters arriving at the portfolio need an immediate, authoritative overview of Aamir's identity, verified technical stack, and suggested inquiry directives before entering an active conversation transcript.  
+**Options:**  
+A. Multi-route SPA with separate `/` and `/chat` paths and route transitions  
+B. Unified shell state machine with smooth in-place Cover-to-Chat transition and header reset control  
+**Choice:** B — Unified shell state machine  
+**Why:** Eliminates client-side router overhead and layout shift (CLS). Provides an intuitive "← Dossier Overview" control that allows recruiters to return to the executive profile at any time without losing context.

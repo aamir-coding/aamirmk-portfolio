@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 4: Design system (minimal) & Cover State** — Ready to begin
+**Phase 7: Safety (first-share)** — Ready to begin (Band 1: Gate 1)
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -15,8 +15,8 @@
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
 | P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
 | P3: Streaming + UI | 🟢 Complete | `main` | `phase-3-done` | [`phase-03-streaming-ui.md`](study-guides/phase-03-streaming-ui.md) |
-| P4: Design system (minimal) | 🟡 Next Up | — | — | — |
-| P7: Safety (first-share) | ⬜ Not Started | — | — | — |
+| P4: Design system (minimal) | 🟢 Complete | `phase-4-design-system` | `phase-4-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
+| P7: Safety (first-share) | 🟡 Next Up | — | — | — |
 | — Gate 1: Shareable link — | | | | |
 | P2: RAG | ⬜ Not Started | — | — | — |
 | P5: Citations + gen UI | ⬜ Not Started | — | — | — |
@@ -77,6 +77,16 @@
 - [x] Phase 3: CI 100% green on GitHub Actions with ruff format check and all test suites
 - [x] Phase 3: Verified end-to-end on live Vercel frontend and live Render backend
 - [x] Added 2 new skills to repository: `agent-browser` and `diagnosing-bugs` (8 skills total)
+- [x] Phase 4: In-house CSS design tokens architecture (`tokens.css`) with light/dark theme variables
+- [x] Phase 4: Distinctive Editorial Dossier visual direction (ink/paper, hairline borders, restrained cobalt)
+- [x] Phase 4: `CoverState` hero landing view with verified credentials, identity, and competency cards
+- [x] Phase 4: Smooth Cover-to-Chat transition state machine with "← Dossier Overview" reset capability
+- [x] Phase 4: Polished message transcripts with monospace role badges (`INQUIRY` / `DISPATCH`) and streaming cursor
+- [x] Phase 4: Mobile-first responsive hardening with `100dvh` dynamic viewports, safe area insets, and iOS zoom prevention
+- [x] Phase 4: Bundle budget verified: 73.74 KB gzipped JS (<200 KB budget), 3.30 KB gzipped CSS
+- [x] Phase 4: 26 frontend Vitest tests and 52 backend Pytest tests 100% green
+- [x] Phase 4: Architectural decisions DRN-013 and DRN-014 recorded in `docs/decisions.md`
+- [x] Phase 4: Comprehensive study guide written in `docs/study-guides/phase-04-design-system.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -87,9 +97,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Start a new chat for Phase 4.
-2. Present Phase 4 brief: Design system, dossier visual direction and cover state (minimal Band 1 requirements).
-3. Wait for approval, create branch `phase-4-design-system`.
+1. Deliver Phase 4 teach-back questions.
+2. Tag `phase-4-done` and push to remote upon approval.
+3. Deliver Phase 7 (first-share safety, rate limiting & quota guards) brief to reach Gate 1 (shareable link).
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
