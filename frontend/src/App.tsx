@@ -20,7 +20,10 @@ export function App() {
     sendMessage,
     stopStreaming,
     clearError,
+    resetChat,
   } = useChat();
+
+  const isCoverState = messages.length === 0;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -66,7 +69,20 @@ export function App() {
           <h1>Aamir Mohammed Khan</h1>
           <p>AI Digital Assistant — Conversational Portfolio</p>
         </div>
-        <StatusIndicator state={serverState} errorMessage={healthError} />
+        <div className="header-controls">
+          {!isCoverState && (
+            <button
+              type="button"
+              className="btn-header-reset"
+              onClick={resetChat}
+              disabled={isStreaming}
+              aria-label="Return to candidate dossier overview"
+            >
+              ← Dossier Overview
+            </button>
+          )}
+          <StatusIndicator state={serverState} errorMessage={healthError} />
+        </div>
       </header>
 
       {serverState === "warming" && (
@@ -96,7 +112,11 @@ export function App() {
           <button
             type="button"
             className="btn btn-secondary"
-            style={{ minHeight: "auto", padding: "0.2rem 0.5rem", fontSize: "0.75rem" }}
+            style={{
+              minHeight: "auto",
+              padding: "0.2rem 0.5rem",
+              fontSize: "0.75rem",
+            }}
             onClick={clearError}
           >
             Dismiss
@@ -104,7 +124,9 @@ export function App() {
         </div>
       )}
 
-      <main className="chat-shell">
+      <main
+        className={`chat-shell ${isCoverState ? "mode-cover" : "mode-transcript"}`}
+      >
         <div className="chat-content">
           <MessageList
             messages={messages}

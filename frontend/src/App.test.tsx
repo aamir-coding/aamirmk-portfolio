@@ -95,4 +95,45 @@ describe("<App />", () => {
       ).toBeInTheDocument();
     });
   });
+
+  it("shows '← Dossier Overview' button during active chat and resets to CoverState on click", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
+      opts.callbacks.onToken("Aamir is specialized in distributed LLM architectures.");
+      opts.callbacks.onDone({ conversation_id: "conv-app-3" });
+    });
+
+    render(<App />);
+
+    // Initially in Cover State
+    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Return to candidate dossier overview/i })
+    ).not.toBeInTheDocument();
+
+    // Trigger an inquiry
+    const chip = screen.getByRole("button", {
+      name: /What is Aamir's experience with FastAPI and LLM systems\?/i,
+    });
+    fireEvent.click(chip);
+
+    // Wait for message to stream in and reset button to appear
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /Return to candidate dossier overview/i })
+      ).toBeInTheDocument();
+    });
+
+    // Click the reset button
+    const resetBtn = screen.getByRole("button", {
+      name: /Return to candidate dossier overview/i,
+    });
+    fireEvent.click(resetBtn);
+
+    // Should return to Cover State
+    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Return to candidate dossier overview/i })
+    ).not.toBeInTheDocument();
+  });
 });
