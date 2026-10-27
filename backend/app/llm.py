@@ -1,6 +1,7 @@
 """Thin async LLM adapter — the seam between the app and Groq.
 
-Interface: a single `complete(messages) → AssistantMessage` method.
+Interface: `complete(messages) -> AssistantMessage`
+           and `stream(messages) -> AsyncIterator[str]`.
 Implementation details hidden behind the seam: API key, model selection,
 client lifecycle, timeouts, error mapping. Tests inject a FakeLLM that
 satisfies the same protocol — no real Groq calls in CI.
@@ -9,6 +10,7 @@ satisfies the same protocol — no real Groq calls in CI.
 from __future__ import annotations
 
 import logging
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -69,6 +71,8 @@ class LLMClient(Protocol):
 
     async def complete(self, messages: list[Message]) -> AssistantMessage: ...
 
+    async def stream(self, messages: list[Message]) -> AsyncIterator[str]: ...
+
 
 # ── Real adapter ───────────────────────────────────────────────────────
 
@@ -106,6 +110,26 @@ class GroqLLM:
             total_tokens=usage.total_tokens if usage else 0,
         )
 
+    async def stream(self, messages: list[Message]) -> AsyncIterator[str]:
+        """Stream assistant response token by token from Groq."""
+        try:
+            response_stream = await self._client.chat.completions.create(
+                model=self._model,
+                messages=[{"role": m.role, "content": m.content} for m in messages],
+                temperature=0.4,
+                max_completion_tokens=1024,
+                stream=True,
+            )
+        except Exception as exc:
+            self._map_error(exc)
+
+        try:
+            async for chunk in response_stream:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        except Exception as exc:
+            self._map_error(exc)
+
     def _map_error(self, exc: Exception) -> None:
         """Translate Groq SDK exceptions into our domain errors."""
         from groq import AuthenticationError, RateLimitError
@@ -130,13 +154,19 @@ class FakeLLM:
         self,
         reply: str = "Fake reply",
         model: str = "fake-model",
+        stream_chunks: list[str] | None = None,
+        error_to_raise: Exception | None = None,
     ) -> None:
         self.reply = reply
         self.model = model
+        self.stream_chunks = stream_chunks
+        self.error_to_raise = error_to_raise
         self.last_messages: list[Message] = []
 
     async def complete(self, messages: list[Message]) -> AssistantMessage:
         self.last_messages = list(messages)
+        if self.error_to_raise is not None:
+            raise self.error_to_raise
         return AssistantMessage(
             content=self.reply,
             model=self.model,
@@ -144,6 +174,18 @@ class FakeLLM:
             completion_tokens=5,
             total_tokens=15,
         )
+
+    async def stream(self, messages: list[Message]) -> AsyncIterator[str]:
+        self.last_messages = list(messages)
+        if self.error_to_raise is not None:
+            raise self.error_to_raise
+        if self.stream_chunks is not None:
+            for chunk in self.stream_chunks:
+                yield chunk
+        else:
+            words = self.reply.split(" ")
+            for i, word in enumerate(words):
+                yield word + (" " if i < len(words) - 1 else "")
 
 
 def get_llm_client(settings: Settings = Depends(get_settings)) -> LLMClient:

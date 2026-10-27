@@ -81,6 +81,36 @@ class TestFakeLLM:
         result = await fake.complete([Message(role="user", content="hi")])
         assert result.model == "custom-model-v2"
 
+    async def test_stream_default_chunks(self) -> None:
+        fake = FakeLLM(reply="Aamir is an engineer")
+        messages = [Message(role="user", content="Who is Aamir?")]
+        chunks: list[str] = []
+        async for chunk in fake.stream(messages):
+            chunks.append(chunk)
+
+        assert "".join(chunks) == "Aamir is an engineer"
+        assert len(fake.last_messages) == 1
+        assert fake.last_messages[0].content == "Who is Aamir?"
+
+    async def test_stream_custom_chunks(self) -> None:
+        fake = FakeLLM(stream_chunks=["Hel", "lo ", "world"])
+        chunks: list[str] = [
+            chunk
+            async for chunk in fake.stream([Message(role="user", content="hi")])
+        ]
+        assert chunks == ["Hel", "lo ", "world"]
+
+    async def test_stream_raises_configured_error(self) -> None:
+        fake = FakeLLM(error_to_raise=LLMRateLimitError("Rate limit exceeded"))
+        with pytest.raises(LLMRateLimitError, match="Rate limit"):
+            async for _ in fake.stream([Message(role="user", content="hi")]):
+                pass
+
+    async def test_complete_raises_configured_error(self) -> None:
+        fake = FakeLLM(error_to_raise=LLMAuthError("Invalid API key"))
+        with pytest.raises(LLMAuthError, match="Invalid API key"):
+            await fake.complete([Message(role="user", content="hi")])
+
 
 # ── Error hierarchy tests ─────────────────────────────────────────────
 

@@ -1,5 +1,6 @@
-"""Tests for POST /api/chat endpoint using FakeLLM dependency override."""
+"""Tests for POST /api/chat and POST /api/chat/stream endpoints using FakeLLM."""
 
+import json
 from collections.abc import Generator
 
 import pytest
@@ -17,6 +18,27 @@ from app.llm import (
 from app.main import create_app
 from app.prompt_loader import SYSTEM_PROMPT
 from app.settings import Settings
+
+
+def parse_sse_events(text: str) -> list[tuple[str, dict]]:
+    """Parse SSE event stream into a list of (event_type, payload_dict)."""
+    events = []
+    current_event = "message"
+    for block in text.strip().split("\n\n"):
+        if not block.strip():
+            continue
+        event_name = current_event
+        data_payload = None
+        for line in block.split("\n"):
+            line = line.strip()
+            if line.startswith("event:"):
+                event_name = line.replace("event:", "", 1).strip()
+            elif line.startswith("data:"):
+                raw_data = line.replace("data:", "", 1).strip()
+                data_payload = json.loads(raw_data)
+        if data_payload is not None:
+            events.append((event_name, data_payload))
+    return events
 
 
 @pytest.fixture
@@ -38,6 +60,9 @@ def chat_client(
     app.dependency_overrides.clear()
 
 
+# ── Non-streaming /chat tests ─────────────────────────────────────────
+
+
 def test_chat_success(chat_client: tuple[TestClient, FakeLLM]) -> None:
     client, fake = chat_client
     response = client.post(
@@ -52,7 +77,6 @@ def test_chat_success(chat_client: tuple[TestClient, FakeLLM]) -> None:
     assert data["conversation_id"] is not None
     assert data["usage"]["total_tokens"] == 15
 
-    # Verify FakeLLM received correct messages
     assert len(fake.last_messages) == 2
     assert fake.last_messages[0].role == "system"
     assert fake.last_messages[0].content == SYSTEM_PROMPT
@@ -120,6 +144,10 @@ def test_chat_handles_rate_limit(test_settings: Settings) -> None:
         async def complete(self, messages: list[Message]) -> None:
             raise LLMRateLimitError("TPM exceeded")
 
+        async def stream(self, messages: list[Message]):
+            raise LLMRateLimitError("TPM exceeded")
+            yield ""
+
     app = create_app(settings=test_settings)
     app.dependency_overrides[get_llm_client] = lambda: RateLimitedLLM()
 
@@ -135,6 +163,10 @@ def test_chat_handles_auth_error(test_settings: Settings) -> None:
     class AuthFailingLLM:
         async def complete(self, messages: list[Message]) -> None:
             raise LLMAuthError("Invalid API key")
+
+        async def stream(self, messages: list[Message]):
+            raise LLMAuthError("Invalid API key")
+            yield ""
 
     app = create_app(settings=test_settings)
     app.dependency_overrides[get_llm_client] = lambda: AuthFailingLLM()
@@ -152,6 +184,10 @@ def test_chat_handles_upstream_unavailable(test_settings: Settings) -> None:
         async def complete(self, messages: list[Message]) -> None:
             raise LLMUnavailableError("503 Service Unavailable")
 
+        async def stream(self, messages: list[Message]):
+            raise LLMUnavailableError("503 Service Unavailable")
+            yield ""
+
     app = create_app(settings=test_settings)
     app.dependency_overrides[get_llm_client] = lambda: UnavailableLLM()
 
@@ -161,3 +197,120 @@ def test_chat_handles_upstream_unavailable(test_settings: Settings) -> None:
         data = response.json()
         assert data["error"]["code"] == 503
         assert "unavailable" in data["error"]["message"].lower()
+
+
+# ── Streaming /chat/stream tests ──────────────────────────────────────
+
+
+def test_chat_stream_success(chat_client: tuple[TestClient, FakeLLM]) -> None:
+    client, fake = chat_client
+    response = client.post(
+        "/api/chat/stream",
+        json={"message": "Who is Aamir?"},
+    )
+
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers["content-type"]
+    assert response.headers.get("Cache-Control") == "no-cache, no-transform"
+
+    events = parse_sse_events(response.text)
+    token_events = [p for ev, p in events if ev == "token"]
+    done_events = [p for ev, p in events if ev == "done"]
+
+    assert len(token_events) > 0
+    reconstructed = "".join(p["token"] for p in token_events)
+    assert reconstructed == "Aamir has built full-stack and LLM applications."
+
+    assert len(done_events) == 1
+    assert done_events[0]["conversation_id"] is not None
+
+    assert len(fake.last_messages) == 2
+    assert fake.last_messages[0].role == "system"
+    assert fake.last_messages[1].role == "user"
+
+
+def test_chat_stream_preserves_conversation_id(
+    chat_client: tuple[TestClient, FakeLLM],
+) -> None:
+    client, _ = chat_client
+    response = client.post(
+        "/api/chat/stream",
+        json={
+            "message": "Who is Aamir?",
+            "conversation_id": "stream-session-99",
+        },
+    )
+
+    assert response.status_code == 200
+    events = parse_sse_events(response.text)
+    done_events = [p for ev, p in events if ev == "done"]
+    assert len(done_events) == 1
+    assert done_events[0]["conversation_id"] == "stream-session-99"
+
+
+def test_chat_stream_rejects_empty_message(
+    chat_client: tuple[TestClient, FakeLLM],
+) -> None:
+    client, _ = chat_client
+    response = client.post("/api/chat/stream", json={"message": "   "})
+
+    assert response.status_code == 422
+    data = response.json()
+    assert data["error"]["code"] == 422
+    assert "Validation error" in data["error"]["message"]
+
+
+def test_chat_stream_propagates_request_id(
+    chat_client: tuple[TestClient, FakeLLM],
+) -> None:
+    client, _ = chat_client
+    response = client.post(
+        "/api/chat/stream",
+        json={"message": "Hi"},
+        headers={"X-Request-ID": "stream-trace-123"},
+    )
+
+    assert response.status_code == 200
+    assert response.headers.get("X-Request-ID") == "stream-trace-123"
+
+
+def test_chat_stream_handles_rate_limit(test_settings: Settings) -> None:
+    fake = FakeLLM(error_to_raise=LLMRateLimitError("Rate limit exceeded"))
+    app = create_app(settings=test_settings)
+    app.dependency_overrides[get_llm_client] = lambda: fake
+
+    with TestClient(app, base_url="http://testserver") as client:
+        response = client.post("/api/chat/stream", json={"message": "Hi"})
+        assert response.status_code == 200
+        events = parse_sse_events(response.text)
+        error_events = [p for ev, p in events if ev == "error"]
+        assert len(error_events) == 1
+        assert "Rate limit" in error_events[0]["detail"]
+
+
+def test_chat_stream_handles_auth_error(test_settings: Settings) -> None:
+    fake = FakeLLM(error_to_raise=LLMAuthError("Invalid key"))
+    app = create_app(settings=test_settings)
+    app.dependency_overrides[get_llm_client] = lambda: fake
+
+    with TestClient(app, base_url="http://testserver") as client:
+        response = client.post("/api/chat/stream", json={"message": "Hi"})
+        assert response.status_code == 200
+        events = parse_sse_events(response.text)
+        error_events = [p for ev, p in events if ev == "error"]
+        assert len(error_events) == 1
+        assert "authentication failure" in error_events[0]["detail"]
+
+
+def test_chat_stream_handles_unavailable(test_settings: Settings) -> None:
+    fake = FakeLLM(error_to_raise=LLMUnavailableError("Service down"))
+    app = create_app(settings=test_settings)
+    app.dependency_overrides[get_llm_client] = lambda: fake
+
+    with TestClient(app, base_url="http://testserver") as client:
+        response = client.post("/api/chat/stream", json={"message": "Hi"})
+        assert response.status_code == 200
+        events = parse_sse_events(response.text)
+        error_events = [p for ev, p in events if ev == "error"]
+        assert len(error_events) == 1
+        assert "unavailable" in error_events[0]["detail"]
