@@ -664,3 +664,96 @@ body {
     color: #fef3c7;
   }
 }
+
+/* ==========================================================================
+   Mobile-First Responsive Polish & Viewport Hardening
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .app-container {
+    padding: var(--space-2) var(--space-2) max(var(--space-2), env(safe-area-inset-bottom));
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .app-header {
+    padding-bottom: var(--space-2);
+    margin-bottom: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .header-title-group h1 {
+    font-size: var(--text-lg);
+  }
+
+  .header-title-group p {
+    font-size: 0.7rem;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .chat-shell {
+    border-radius: var(--radius-md);
+  }
+
+  .chat-content {
+    padding: var(--space-3);
+  }
+
+  .dossier-name {
+    font-size: var(--text-xl);
+  }
+
+  .dossier-meta-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .dossier-meta-card {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .starter-chips-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .starter-chip {
+    padding: var(--space-3);
+    min-height: 44px;
+  }
+
+  .chat-message-user {
+    max-width: 92%;
+  }
+
+  .chat-message-assistant {
+    max-width: 100%;
+  }
+
+  .chat-message-body {
+    padding: var(--space-3);
+  }
+
+  .chat-input-container {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .chat-textarea {
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .chat-input-helper {
+    font-size: 0.7rem;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
