@@ -12,8 +12,10 @@ describe("api client", () => {
     globalThis.fetch = originalFetch;
   });
 
-  it("resolves API base URL correctly", () => {
-    expect(getApiBaseUrl()).toBeTruthy();
+  it("resolves API base URL without trailing slash", () => {
+    const url = getApiBaseUrl();
+    expect(url).toBeTruthy();
+    expect(url.endsWith("/")).toBe(false);
   });
 
   it("fetches and parses healthy status", async () => {

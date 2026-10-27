@@ -71,6 +71,14 @@ def test_cors_preflight_options_request(client: TestClient) -> None:
     assert "GET" in response.headers.get("access-control-allow-methods", "")
 
 
+def test_double_slash_path_normalized(client: TestClient) -> None:
+    """Requests with duplicate consecutive slashes are normalized cleanly."""
+    response = client.get("http://testserver//api/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "ready": True}
+
+
 def test_404_returns_consistent_json_error(client: TestClient) -> None:
     """Unknown endpoints return formatted JSON error with code and request ID."""
     response = client.get("/api/nonexistent-route")

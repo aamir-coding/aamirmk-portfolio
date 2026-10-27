@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 import uuid
 from collections.abc import AsyncGenerator
@@ -9,12 +10,27 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.chat import router as chat_router
 from app.api.health import router as health_router
 from app.settings import Settings, get_settings
 
 logger = logging.getLogger("app")
+
+
+class NormalizePathMiddleware:
+    """Pure ASGI middleware that normalizes duplicate slashes in request paths."""
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http":
+            path = scope.get("path", "")
+            if "//" in path:
+                scope["path"] = re.sub(r"/+", "/", path)
+        await self.app(scope, receive, send)
 
 
 @asynccontextmanager
@@ -42,6 +58,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+
+    # Pure ASGI path normalization middleware (runs before routing)
+    app.add_middleware(NormalizePathMiddleware)
 
     # Request ID and access logging middleware
     @app.middleware("http")

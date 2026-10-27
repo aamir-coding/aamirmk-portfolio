@@ -4,7 +4,8 @@ export interface HealthStatus {
 }
 
 export const getApiBaseUrl = (): string => {
-  return import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  const url = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  return url.replace(/\/+$/, "");
 };
 
 export async function fetchHealth(signal?: AbortSignal): Promise<HealthStatus> {

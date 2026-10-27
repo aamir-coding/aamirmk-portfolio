@@ -61,7 +61,8 @@ export async function streamChat({
   callbacks,
   baseUrl = getApiBaseUrl(),
 }: StreamChatOptions): Promise<void> {
-  const endpoint = `${baseUrl}/api/chat/stream`;
+  const cleanBase = baseUrl.replace(/\/+$/, "");
+  const endpoint = `${cleanBase}/api/chat/stream`;
 
   try {
     const response = await fetch(endpoint, {
