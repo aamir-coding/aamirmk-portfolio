@@ -1,0 +1,147 @@
+/* ==========================================================================
+   Editorial Dossier Design Tokens
+   Authoritative semantic variables for light and dark modes.
+   ========================================================================== */
+
+:root {
+  /* Surfaces & Backgrounds - Light Dossier (Technical Paper) */
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-muted: #e2e8f0;
+  
+  /* Text & Inks */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-inverse: #f8fafc;
+  
+  /* Hairline Dossier Borders */
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-active: #94a3b8;
+  
+  /* Accents - Restrained Technical Cobalt */
+  --accent-cobalt: #2563eb;
+  --accent-cobalt-hover: #1d4ed8;
+  --accent-cobalt-subtle: #eff6ff;
+  
+  /* Legacy/Semantic Aliases for Chat Components */
+  --accent-blue: var(--accent-cobalt);
+  --accent-blue-hover: var(--accent-cobalt-hover);
+  --accent-red: #dc2626;
+  --accent-red-hover: #b91c1c;
+  --accent-ink: var(--text-primary);
+  
+  /* Status Semantics */
+  --status-ready: #059669;
+  --status-ready-bg: #ecfdf5;
+  --status-warming: #d97706;
+  --status-warming-bg: #fffbeb;
+  --status-error: #dc2626;
+  --status-error-bg: #fef2f2;
+  
+  /* Typographic Families */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "Cascadia Code", Menlo, Monaco, Consolas, monospace;
+  
+  /* Type Scale */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+
+  /* Leading */
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Font Weights */
+  --font-regular: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Spacing Scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Crisp Dossier Radii */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 9999px;
+
+  /* Elevation & Shadows */
+  --shadow-subtle: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-dossier: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Surfaces & Backgrounds - Dark Dossier (Obsidian Slate) */
+    --bg-page: #090d16;
+    --bg-surface: #111827;
+    --bg-subtle: #1e293b;
+    --bg-muted: #334155;
+    
+    /* Text & Inks */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-inverse: #0f172a;
+    
+    /* Hairline Dossier Borders */
+    --border-subtle: #1e293b;
+    --border-strong: #334155;
+    --border-active: #475569;
+    
+    /* Accents - Restrained Technical Cobalt */
+    --accent-cobalt: #3b82f6;
+    --accent-cobalt-hover: #60a5fa;
+    --accent-cobalt-subtle: #1e293b;
+    
+    --accent-blue: var(--accent-cobalt);
+    --accent-blue-hover: var(--accent-cobalt-hover);
+    --accent-red: #ef4444;
+    --accent-red-hover: #f87171;
+    --accent-ink: var(--text-primary);
+    
+    /* Status Semantics */
+    --status-ready: #10b981;
+    --status-ready-bg: #064e3b;
+    --status-warming: #f59e0b;
+    --status-warming-bg: #451a03;
+    --status-error: #ef4444;
+    --status-error-bg: #450a0a;
+
+    /* Elevation & Shadows */
+    --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-dossier: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Accessible reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
