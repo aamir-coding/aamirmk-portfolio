@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 3: Streaming and the frontend chat MVP** — Complete (awaiting review & merge)
+**Phase 4: Design system (minimal) & Cover State** — Ready to begin
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -14,7 +14,7 @@
 | Setup | 🟢 Complete | `main` | — | — |
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
 | P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
-| P3: Streaming + UI | 🟢 Complete | `phase-3-streaming-chat` | `phase-3-done` (pending merge) | [`phase-03-streaming-ui.md`](study-guides/phase-03-streaming-ui.md) |
+| P3: Streaming + UI | 🟢 Complete | `main` | `phase-3-done` | [`phase-03-streaming-ui.md`](study-guides/phase-03-streaming-ui.md) |
 | P4: Design system (minimal) | 🟡 Next Up | — | — | — |
 | P7: Safety (first-share) | ⬜ Not Started | — | — | — |
 | — Gate 1: Shareable link — | | | | |
