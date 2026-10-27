@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 1: FastAPI backend and first Groq chat endpoint** — Review & Teach-back
+**Phase 3: Streaming and the frontend chat MVP** — Ready to begin (new chat)
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
@@ -13,7 +13,7 @@
 |-------|--------|--------|-----|-------------|
 | Setup | 🟢 Complete | `main` | — | — |
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
-| P1: Chat endpoint | 🟢 Complete | `phase-1-chat` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
+| P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
 | P3: Streaming + UI | 🟡 Next Up | — | — | — |
 | P4: Design system (minimal) | ⬜ Not Started | — | — | — |
 | P7: Safety (first-share) | ⬜ Not Started | — | — | — |
