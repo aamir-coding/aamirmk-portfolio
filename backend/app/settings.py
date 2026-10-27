@@ -24,6 +24,14 @@ class Settings(BaseSettings):
     LLM_MODEL_MAIN: str = "openai/gpt-oss-120b"
     LLM_MODEL_UTILITY: str = "openai/gpt-oss-20b"
 
+    # Safety, Rate Limiting & Quota Guards (Phase 7)
+    TRUST_PROXY_HEADERS: bool = True
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_REQUESTS_PER_MINUTE: int = 10
+    RATE_LIMIT_BURST: int = 15
+    QUOTA_DAILY_REQUEST_LIMIT: int = 800
+    QUOTA_DAILY_TOKEN_LIMIT: int = 180000
+
     model_config = SettingsConfigDict(
         # Try backend/.env first, then repo-root .env (for monorepo layout)
         env_file=(".env", "../.env"),

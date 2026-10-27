@@ -14,6 +14,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.chat import router as chat_router
 from app.api.health import router as health_router
+from app.safety.ip import get_client_ip
 from app.settings import Settings, get_settings
 
 logger = logging.getLogger("app")
@@ -74,13 +75,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         response.headers["X-Request-ID"] = request_id
 
-        # Read client IP (honoring X-Forwarded-For if available)
-        forwarded_for = request.headers.get("x-forwarded-for")
-        client_ip = (
-            forwarded_for.split(",")[0].strip()
-            if forwarded_for
-            else (request.client.host if request.client else "unknown")
-        )
+        client_ip = get_client_ip(request)
 
         logger.info(
             "[%s] %s %s status=%d duration=%.2fms ip=%s",
