@@ -1,58 +1,127 @@
 import { useEffect, useState } from "react";
-import { fetchHealth, type HealthStatus } from "./lib/api";
+import { fetchHealth } from "./lib/api";
+import { useChat } from "./hooks/useChat";
+import { MessageList } from "./components/Chat/MessageList";
+import { ChatInput } from "./components/Chat/ChatInput";
+import {
+  StatusIndicator,
+  type ServerState,
+} from "./components/StatusIndicator";
+import "./styles/chat.css";
 
 export function App() {
-  const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [serverState, setServerState] = useState<ServerState>("checking");
+  const [healthError, setHealthError] = useState<string | null>(null);
+
+  const {
+    messages,
+    isStreaming,
+    error,
+    sendMessage,
+    stopStreaming,
+    clearError,
+  } = useChat();
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function checkHealth() {
+    // If health check takes > 2.5s, signal to the user that Render is warming up
+    const warmingTimer = setTimeout(() => {
+      setServerState("warming");
+    }, 2500);
+
+    async function checkBackend() {
       try {
-        setLoading(true);
-        setError(null);
-        const data = await fetchHealth(controller.signal);
-        setHealth(data);
+        await fetchHealth(controller.signal);
+        clearTimeout(warmingTimer);
+        setServerState("ready");
+        setHealthError(null);
       } catch (err) {
         if (!controller.signal.aborted) {
-          setError(err instanceof Error ? err.message : "Failed to connect to API");
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
+          clearTimeout(warmingTimer);
+          setServerState("error");
+          setHealthError(
+            err instanceof Error ? err.message : "Failed to connect to backend"
+          );
         }
       }
     }
 
-    void checkHealth();
+    void checkBackend();
 
     return () => {
+      clearTimeout(warmingTimer);
       controller.abort();
     };
   }, []);
 
-  return (
-    <main style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Aamir Mohammed Khan</h1>
-      <p style={{ color: "#666" }}>AI Digital Assistant Portfolio — Walking Skeleton</p>
+  const handleSelectPrompt = (prompt: string) => {
+    void sendMessage(prompt);
+  };
 
-      <section style={{ marginTop: "2rem", padding: "1rem", border: "1px solid #ddd", borderRadius: "8px" }} aria-live="polite">
-        <h2>System Status</h2>
-        {loading && <p>Checking backend connectivity...</p>}
-        {error && (
-          <p style={{ color: "#d9411e" }}>
-            <strong>Connection notice:</strong> {error}
-          </p>
-        )}
-        {health && (
-          <p style={{ color: "#0f766e" }}>
-            <strong>Status:</strong> {health.status.toUpperCase()} (Ready: {health.ready ? "Yes" : "No"})
-          </p>
-        )}
-      </section>
-    </main>
+  return (
+    <div className="app-container">
+      <header className="app-header">
+        <div className="header-title-group">
+          <h1>Aamir Mohammed Khan</h1>
+          <p>AI Digital Assistant — Conversational Portfolio</p>
+        </div>
+        <StatusIndicator state={serverState} errorMessage={healthError} />
+      </header>
+
+      {serverState === "warming" && (
+        <div
+          className="banner-notice warning"
+          role="status"
+          aria-live="polite"
+        >
+          <span>
+            <strong>Render free tier notice:</strong> Backend is cold starting
+            from idle. This typically takes ~25s on the initial request.
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div
+          className="banner-notice warning"
+          role="alert"
+          style={{ cursor: "pointer" }}
+          onClick={clearError}
+          title="Click to dismiss"
+        >
+          <span>
+            <strong>Notice:</strong> {error}
+          </span>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={{ minHeight: "auto", padding: "0.2rem 0.5rem", fontSize: "0.75rem" }}
+            onClick={clearError}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <main className="chat-shell">
+        <div className="chat-content">
+          <MessageList
+            messages={messages}
+            isStreaming={isStreaming}
+            onSelectPrompt={handleSelectPrompt}
+          />
+        </div>
+
+        <div className="chat-input-container">
+          <ChatInput
+            onSend={(text) => void sendMessage(text)}
+            onStop={stopStreaming}
+            isStreaming={isStreaming}
+          />
+        </div>
+      </main>
+    </div>
   );
 }
 

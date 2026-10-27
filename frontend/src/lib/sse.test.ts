@@ -29,7 +29,7 @@ describe("parseSSEBuffer", () => {
     const { events, remaining } = parseSSEBuffer(raw);
 
     expect(events).toHaveLength(1);
-    expect(events[0].data).toBe('{"token": "first"}');
+    expect(events[0]?.data).toBe('{"token": "first"}');
     expect(remaining).toBe('event: token\ndata: {"token": "par');
   });
 
