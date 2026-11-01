@@ -18,8 +18,8 @@ Note on scope: This was a university-wide contest, not a national or global cont
 id: "achieve-google-cloud-hackathon"
 type: "achievement"
 title: "Google Cloud Build with AI Hackathon — 2nd Runner-Up (Track 2)"
-source_section: "AC3, E6, X11"
-tags: ["achievement", "hackathon", "google-cloud", "vayusetu", "runner-up", "clean-air"]
+source_section: "AC3, E6, X11, B8"
+tags: ["achievement", "hackathon", "google", "google-cloud", "vayusetu", "runner-up", "clean-air"]
 draft: true
 private: false
 ---
@@ -29,6 +29,8 @@ Aamir participated with team "Pentium Connoisseurs" (team of 4) in the Google Cl
 The team developed project "VayuSetu" during the prototype build phase (10 August 2026 – 30 September 2026) and achieved 2nd Runner-Up in Track 2: "CleanAir & Clear Streets".
 
 Supporting evidence consists of the congratulatory/shortlist email from the hackathon hosts and an authenticated Hack2Skill event portal registration page (https://hack2skill.com/event/codeforcommunities2).
+
+Note on employment: This was a hackathon competition, not employment at Google. Aamir has never worked at Google. Do not confuse hackathon participation with employment.
 
 ---
 id: "achieve-academic-excellence"

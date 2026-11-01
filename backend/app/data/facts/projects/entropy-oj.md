@@ -17,14 +17,14 @@ The project was developed as Aamir Mohammed Khan's individual assignment during 
 ---
 id: "proj-entropy-oj-stack"
 type: "project"
-title: "Entropy Online Judge — Stack and Architecture"
+title: "Entropy Online Judge — Technologies, Stack and Architecture"
 source_section: "J4, J5 (Project A)"
-tags: ["entropy-oj", "react", "typescript", "nodejs", "express", "mongodb", "redis", "bullmq", "azure", "architecture"]
+tags: ["entropy-oj", "technologies", "tech-stack", "react", "typescript", "nodejs", "express", "mongodb", "redis", "bullmq", "azure", "architecture"]
 draft: true
 private: false
 ---
 
-**Stack:**
+**Technologies and Tech Stack:**
 
 - React 19, TypeScript, and Vite for an interactive responsive coding workspace.
 - Monaco Editor for in-browser code editing.
@@ -116,6 +116,8 @@ The hardest bug in Entropy-OJ was an intermittent submission delay: the UI showe
 The investigation process: Aamir compared the API enqueue logs with worker behaviour at different times. The worker was idle until the job arrived, and the relevant enqueue events were separated by the 2m12s gap with a Redis connection timeout. This shifted the investigation from compiler speed or VM issues to the server-to-Redis network connection (which crosses cloud boundaries from Render to Azure).
 
 The fix: Aamir configured TCP keep-alive at 30-second intervals on the server-side Redis connection and increased the Azure public-IP idle timeout to 30 minutes as an additional safeguard. A subsequent test appeared to process promptly. This is a practical debugging example involving logs, timing analysis, networking, and asynchronous job flow across cloud boundaries.
+
+Note on unverified metrics: Aamir did NOT measure or claim a 35% API latency reduction. The verified bug fix resolved the 2m12s Redis ETIMEDOUT connection delay. Do not claim "35% faster".
 
 ---
 id: "proj-entropy-oj-interview-qa"

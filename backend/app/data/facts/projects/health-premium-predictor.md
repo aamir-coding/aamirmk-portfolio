@@ -1,14 +1,14 @@
 ---
 id: "proj-health-premium-overview"
 type: "project"
-title: "Health Premium Predictor — Overview"
+title: "Health Premium Predictor — Machine Learning (ML) Project Overview"
 source_section: "J1, J2, J3 (Project C)"
-tags: ["health-premium-predictor", "machine-learning", "xgboost", "streamlit", "regression", "solo"]
+tags: ["health-premium-predictor", "ml", "machine-learning", "xgboost", "streamlit", "regression", "solo", "ml-project"]
 draft: true
 private: false
 ---
 
-The Health Premium Predictor is a machine-learning web application that estimates health-insurance premiums using an XGBoost regression model and an interactive Streamlit interface. It was developed completely solo by Aamir Mohammed Khan, who owns everything in the project.
+The Health Premium Predictor is Aamir's primary machine learning (ML) project, built completely solo by Aamir Mohammed Khan. It is an educational ML web application that estimates health-insurance premiums using an XGBoost regression model and an interactive Streamlit interface. Aamir owns everything in the project.
 
 The project demonstrates how structured user inputs (such as age, health factors, and lifestyle data) can be passed through a regression pipeline to estimate a premium. It is an educational prediction tool, not a guarantee of an actual insurer's quote.
 

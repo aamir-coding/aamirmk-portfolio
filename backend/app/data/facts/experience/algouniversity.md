@@ -62,6 +62,8 @@ Aamir compared queue logs and timestamps, found a Redis `ETIMEDOUT` error, and i
 
 The fix involved configuring TCP keep-alive at 30-second intervals on the server-side Redis connection and increasing the Azure public-IP idle timeout to 30 minutes as an additional safeguard. After redeployment, a subsequent test appeared to process promptly.
 
+Note on unverified metrics: Aamir did NOT measure or claim a 35% API latency reduction. The measured improvement was resolving the 2-minute-12-second Redis ETIMEDOUT connection delay. Do not claim "35% faster".
+
 The lesson learned: "My first instinct was to investigate the worker and VM because that was where execution happened. The worker was actually idle, so that explanation did not fit all the evidence. I compared logs and timing across the queue boundary, found a Redis timeout, and applied a targeted connection-level fix. I learned not to diagnose a distributed-system issue from the visible symptom alone; I should trace the request path and test assumptions before changing more components."
 
 ---
@@ -105,3 +107,17 @@ If Aamir were to redo or continue the Entropy-OJ project, he would focus on maki
 - Reconsider whether stronger isolation (e.g., container/VM boundary) is appropriate for the threat model.
 
 These are proposed future improvements, not claims of work already completed.
+
+---
+id: "exp-algouniversity-concurrency"
+type: "experience"
+title: "AlgoUniversity Externship — Concurrency Limits and Load Testing"
+source_section: "X4, J7"
+tags: ["entropy-oj", "concurrency", "load-testing", "worker-concurrency", "bullmq", "redis", "limits", "throughput"]
+draft: true
+private: false
+---
+
+In Entropy-OJ, Redis and BullMQ are used to decouple long-running judge executions from the HTTP request path. Worker concurrency is configured to 2 in the BullMQ settings, and the worker uses process semaphores, active-process tracking, lock renewal, and stale-job recovery.
+
+Actual maximum concurrent submissions tested: formal high-concurrency load testing and throughput benchmarks have not been completed. Do not claim high concurrency without degradation or load-test results without evidence. Configured worker concurrency (2) is a configuration limit, not a proven load-test benchmark.

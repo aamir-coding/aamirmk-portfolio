@@ -186,14 +186,16 @@ chunks:
   # ---------- Skills NOT Claimed ----------
   - id: skill-not-claimed
     type: skill
-    title: "Skills Not Claimed"
-    source_section: "S3, S1, B10"
-    tags: ["not-claimed", "boundaries", "kubernetes", "terraform", "kafka", "aws", "cursor"]
+    title: "Skills and Experience Not Claimed"
+    source_section: "S3, S1, B8, B10"
+    tags: ["not-claimed", "boundaries", "kubernetes", "terraform", "kafka", "aws", "google", "employment", "cursor"]
     draft: true
     private: false
     content: |
-      The following skills are NOT claimed and must not be attributed to Aamir without new evidence:
+      The following skills and affiliations are NOT claimed and must not be attributed to Aamir without new evidence:
 
+      - Google employment: Aamir has NEVER worked at Google. His only Google association is participating in the Google Cloud 'Build with AI: Code for Communities' hackathon with team project VayuSetu (2nd Runner-Up). Mentorship and hackathons must never be represented as Google employment.
+      - Apple / ByteDance employment: never worked at Apple or ByteDance.
       - Kubernetes: no hands-on experience.
       - Terraform: no hands-on experience.
       - Kafka: no hands-on experience.
@@ -207,4 +209,4 @@ chunks:
       - Model fine-tuning: no hands-on evidence.
       - Cloud certifications: none.
 
-      None of these are "basic" or "in progress" — they are confirmed as "none" per S3. Aamir's suggested ramp-up approach is: learn core concepts from official documentation, build a scoped exercise, add tests, deploy if appropriate, then document limitations.
+      None of these are "basic" or "in progress" — they are confirmed as "none" per S3 and B10. Aamir's suggested ramp-up approach is: learn core concepts from official documentation, build a scoped exercise, add tests, deploy if appropriate, then document limitations.
