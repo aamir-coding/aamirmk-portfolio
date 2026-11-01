@@ -50,3 +50,25 @@ class FakeRetriever:
                 )
             )
         return results
+
+
+_retriever_instance: Retriever | None = None
+
+
+def get_retriever() -> Retriever:
+    """FastAPI dependency supplying the active Retriever instance."""
+    global _retriever_instance
+    if _retriever_instance is None:
+        from app.retrieval.hybrid import HybridRetriever
+        from app.retrieval.loader import FactLoader
+
+        loader = FactLoader()
+        chunks = loader.load_all(include_private=False, include_unindexed=False)
+        _retriever_instance = HybridRetriever(chunks=chunks)
+    return _retriever_instance
+
+
+def set_retriever(retriever: Retriever | None) -> None:
+    """Set or override the active Retriever instance."""
+    global _retriever_instance
+    _retriever_instance = retriever

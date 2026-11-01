@@ -20,7 +20,8 @@ from app.llm import (
     get_llm_client,
 )
 from app.models import ChatRequest, ChatResponse, TokenUsage
-from app.prompt_loader import SYSTEM_PROMPT
+from app.prompt_loader import build_system_prompt
+from app.retrieval.retriever import Retriever, get_retriever
 from app.safety.guardrails import (
     SAFE_REFUSAL_MESSAGE,
     check_prompt_injection,
@@ -51,11 +52,12 @@ async def chat(
     request: ChatRequest,
     response: Response,
     llm: LLMClient = Depends(get_llm_client),
+    retriever: Retriever = Depends(get_retriever),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     _quota: None = Depends(check_daily_quota),
     quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
 ) -> ChatResponse:
-    """Process user message using LLM grounded with system prompt context."""
+    """Process user message using LLM grounded with retrieved context chunks."""
     conv_id = request.conversation_id or uuid.uuid4().hex
 
     # Attach rate limit visibility headers to successful response
@@ -77,11 +79,15 @@ async def chat(
             ),
         )
 
-    # 2. Format user query with XML boundary fencing
+    # 2. Retrieve relevant factual context chunks
+    retrieved_chunks = await retriever.retrieve(request.message, top_k=4)
+    system_prompt = build_system_prompt(retrieved_chunks)
+
+    # 3. Format user query with XML boundary fencing
     safe_user_content = format_safe_user_message(request.message)
 
     messages = [
-        Message(role="system", content=SYSTEM_PROMPT),
+        Message(role="system", content=system_prompt),
         Message(role="user", content=safe_user_content),
     ]
 
@@ -112,7 +118,7 @@ async def chat(
             detail="An error occurred while communicating with the AI service.",
         ) from exc
 
-    # 3. Track actual consumed tokens against daily quota
+    # 4. Track actual consumed tokens against daily quota
     await quota_guard.record_usage(tokens=completion.total_tokens)
 
     return ChatResponse(
@@ -135,6 +141,7 @@ async def chat(
 async def chat_stream(
     request: ChatRequest,
     llm: LLMClient = Depends(get_llm_client),
+    retriever: Retriever = Depends(get_retriever),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     _quota: None = Depends(check_daily_quota),
     quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
@@ -167,11 +174,15 @@ async def chat_stream(
             headers=headers,
         )
 
-    # 2. Format user query with XML boundary fencing
+    # 2. Retrieve relevant factual context chunks
+    retrieved_chunks = await retriever.retrieve(request.message, top_k=4)
+    system_prompt = build_system_prompt(retrieved_chunks)
+
+    # 3. Format user query with XML boundary fencing
     safe_user_content = format_safe_user_message(request.message)
 
     messages = [
-        Message(role="system", content=SYSTEM_PROMPT),
+        Message(role="system", content=system_prompt),
         Message(role="user", content=safe_user_content),
     ]
 
@@ -186,8 +197,11 @@ async def chat_stream(
             done_payload = json.dumps({"conversation_id": conv_id})
             yield f"event: done\ndata: {done_payload}\n\n"
 
-            # 3. Track tokens (estimated ~1400 prompt + generated tokens)
-            await quota_guard.record_usage(tokens=1400 + tokens_emitted)
+            # 4. Track tokens (estimated prompt + generated tokens)
+            estimated_prompt_tokens = max(len(system_prompt) // 4, 100)
+            await quota_guard.record_usage(
+                tokens=estimated_prompt_tokens + tokens_emitted
+            )
         except LLMRateLimitError as exc:
             logger.warning("[%s] Groq rate limit during stream: %s", conv_id, exc)
             err_payload = json.dumps(
