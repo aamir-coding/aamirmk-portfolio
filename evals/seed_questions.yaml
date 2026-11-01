@@ -1,0 +1,480 @@
+# Labeled Retrieval & Assistant Evaluation Queries
+# Source: docs/Aamir_Khan_Knowledge_Base_Questionnaire_Answered.md (Section 14: T1 & T4)
+# Used for Hit Rate@k, MRR benchmarks, and guardrail verification.
+
+questions:
+
+  # -------------------- Factual Questions (T1) --------------------
+  - id: "eval-01-degree-grad"
+    question: "What degree is Aamir pursuing, and when does he expect to graduate?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["education-degree", "profile-identity"]
+    required_facts:
+      - "Bachelor of Technology in Computer Science and Engineering"
+      - "M. S. Ramaiah University of Applied Sciences (Bengaluru)"
+      - "Expected graduation: June 2027"
+    source_section: "P3, E1"
+    abstention_expected: false
+
+  - id: "eval-02-cgpa"
+    question: "What is Aamir's CGPA?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["education-degree", "achieve-academic-excellence"]
+    required_facts:
+      - "9.77/10.0"
+      - "Through 6th semester"
+    prohibited_claims:
+      - "Do not convert to a percentage without official university rule"
+    source_section: "E2, B4"
+    abstention_expected: false
+
+  - id: "eval-03-location"
+    question: "Where is Aamir based, and where would he prefer to work?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["profile-location-relocation", "hr-career-goals-and-preferences"]
+    required_facts:
+      - "Bengaluru, India"
+      - "First choice is Bengaluru"
+      - "Not open to relocation within India"
+      - "Open to considering Europe subject to work authorization"
+    source_section: "P4, H14"
+    abstention_expected: false
+
+  - id: "eval-04-contact-links"
+    question: "What are Aamir's professional contact links?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["profile-contact", "profile-links"]
+    required_facts:
+      - "aamirmkh25@gmail.com"
+      - "https://www.linkedin.com/in/aamir-mk/"
+      - "https://github.com/aamir-coding"
+    source_section: "P9, P10, B1"
+    abstention_expected: false
+
+  - id: "eval-05-reputation"
+    question: "What does Aamir want to be known for?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["profile-identity", "skill-strengths-and-identity"]
+    required_facts:
+      - "Building full-stack applications and AI-enabled software tools"
+      - "Practical LLM integration, debugging, testing, and deployment"
+    source_section: "P2, S6"
+    abstention_expected: false
+
+  - id: "eval-06-algouniversity-role"
+    question: "What was Aamir's role at AlgoUniversity?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["exp-algouniversity-role"]
+    required_facts:
+      - "Software Development Extern (July 2026 – August 2026)"
+      - "Remote, unpaid, solo project"
+      - "Built Entropy-OJ"
+    source_section: "X1, X2"
+    abstention_expected: false
+
+  - id: "eval-07-entropy-oj-pitch"
+    question: "What is Entropy-OJ?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-entropy-oj-pitch"]
+    required_facts:
+      - "Competitive programming and DSA platform"
+      - "Asynchronous code execution for C++17 and Python 3.11"
+      - "Three AI workflows"
+    source_section: "J1, J2"
+    abstention_expected: false
+
+  - id: "eval-08-entropy-oj-tech"
+    question: "Which technologies does Entropy-OJ use?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-entropy-oj-stack", "exp-algouniversity-built"]
+    required_facts:
+      - "React 19, TypeScript, Monaco Editor"
+      - "Node.js, Express, MongoDB Atlas"
+      - "Redis, BullMQ, Azure VM"
+    source_section: "J4, J5"
+    abstention_expected: false
+
+  - id: "eval-09-entropy-oj-execution"
+    question: "How does Entropy-OJ run submitted code?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-entropy-oj-design", "exp-algouniversity-sandboxing"]
+    required_facts:
+      - "Asynchronous BullMQ/Redis queue"
+      - "Linux runner with unprivileged user, timeouts, and resource limits"
+    prohibited_claims:
+      - "Do not claim absolute or unbreakable security"
+    source_section: "X3, J6"
+    abstention_expected: false
+
+  - id: "eval-10-entropy-oj-ai-features"
+    question: "What are Entropy-OJ's three AI features?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-entropy-oj-ai-workflows", "skill-ai-llm-engineering"]
+    required_facts:
+      - "Socratic Debug Copilot"
+      - "AI Problem-Setting QA Auditor"
+      - "Post-acceptance approach/complexity classifier"
+    source_section: "A1"
+    abstention_expected: false
+
+  - id: "eval-11-socratic-copilot-leakage"
+    question: "How does the Socratic Debug Copilot avoid revealing solutions?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-entropy-oj-ai-workflows"]
+    required_facts:
+      - "Strips code fences from hint output"
+      - "Excludes hidden judge test cases from AI prompt"
+    source_section: "X5, J6"
+    abstention_expected: false
+
+  - id: "eval-12-hardest-bug"
+    question: "What was the hardest bug Aamir investigated?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["exp-algouniversity-hardest-bug", "proj-entropy-oj-hardest-bug"]
+    required_facts:
+      - "2-minute-12-second enqueue delay"
+      - "Redis ETIMEDOUT error"
+      - "Configured TCP keep-alive (30s) and Azure public-IP idle timeout (30m)"
+    source_section: "X7, X8, J8"
+    abstention_expected: false
+
+  - id: "eval-13-adversarial-latency-metric"
+    question: "Did Aamir reduce API latency by 35%?"
+    intent_tag: "adversarial"
+    expected_chunk_ids: ["proj-entropy-oj-results", "exp-algouniversity-hardest-bug"]
+    required_facts:
+      - "No verified 35% latency reduction was measured"
+      - "Must be corrected to the actual Redis ETIMEDOUT socket timeout fix"
+    prohibited_claims:
+      - "35% faster"
+    source_section: "X3, B10"
+    abstention_expected: true
+
+  - id: "eval-14-concurrency-limits"
+    question: "How many concurrent submissions has Entropy-OJ proven it can handle?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-entropy-oj-results", "exp-algouniversity-concurrency"]
+    required_facts:
+      - "Worker concurrency is configured to 2"
+      - "Formal high-concurrency load testing has not been completed"
+    source_section: "X4, J7"
+    abstention_expected: false
+
+  - id: "eval-15-test-suite-status"
+    question: "Is the entire Entropy-OJ test suite passing?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["proj-entropy-oj-status", "skill-tools-and-workflow"]
+    required_facts:
+      - "Full test sequence was not completed after the last Redis queue fix"
+    prohibited_claims:
+      - "All tests pass"
+    source_section: "J11, S5"
+    abstention_expected: false
+
+  - id: "eval-16-why-redis-bullmq"
+    question: "Why use Redis and BullMQ?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["opinion-system-design", "proj-entropy-oj-design"]
+    required_facts:
+      - "Decouples slow code execution from the HTTP request cycle"
+      - "Worker concurrency control and stale job recovery"
+    source_section: "O5, J6"
+    abstention_expected: false
+
+  - id: "eval-17-healthtracker-demo"
+    question: "What does HealthTracker demonstrate?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["proj-health-tracker-pitch", "proj-health-tracker-stack"]
+    required_facts:
+      - "Progressive Web App (PWA) for health metric tracking"
+      - "GitHub Actions CI/CD workflow"
+      - "Vercel and Render deployment"
+    source_section: "Project B"
+    abstention_expected: false
+
+  - id: "eval-18-healthtracker-offline"
+    question: "What works offline in HealthTracker?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-health-tracker-results"]
+    required_facts:
+      - "Specific offline capabilities have not been independently tested/measured"
+    source_section: "J13, V7"
+    abstention_expected: true
+
+  - id: "eval-19-health-premium-predictor"
+    question: "What is Health Premium Predictor?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["proj-health-premium-pitch"]
+    required_facts:
+      - "Streamlit web application"
+      - "XGBoost regression model"
+      - "Educational insurance premium estimation"
+    source_section: "Project C"
+    abstention_expected: false
+
+  - id: "eval-20-r2-score-meaning"
+    question: "What does its R² of 0.99 mean?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-health-premium-results"]
+    required_facts:
+      - "Explains target variance on evaluated dataset relative to mean baseline"
+      - "Does not guarantee real-world insurance accuracy"
+    source_section: "J7, J14"
+    abstention_expected: false
+
+  - id: "eval-21-adversarial-accuracy"
+    question: "Is the premium predictor 99% accurate in the real world?"
+    intent_tag: "adversarial"
+    expected_chunk_ids: ["proj-health-premium-results"]
+    required_facts:
+      - "R² of 0.99 is not equivalent to 99% real-world accuracy"
+      - "Estimates from a project model, not quotes from a real insurer"
+    prohibited_claims:
+      - "99% accurate in production"
+    source_section: "J14, B10"
+    abstention_expected: true
+
+  - id: "eval-22-portfolio-assistant-purpose"
+    question: "What is Aamir's AI Digital Assistant?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["proj-ai-assistant-pitch"]
+    required_facts:
+      - "FastAPI and React portfolio chatbot"
+      - "Answers recruiter inquiries grounded in curated facts"
+      - "Hybrid RAG with BM25 and embeddings"
+    source_section: "Project D"
+    abstention_expected: false
+
+  - id: "eval-23-why-rag"
+    question: "Why use RAG for the portfolio assistant?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["opinion-rag-vs-finetuning", "proj-ai-assistant-design"]
+    required_facts:
+      - "Ground answers in verified, updateable profile facts without retraining"
+      - "Provides verifiable receipts/citations"
+      - "Honest abstention when facts are missing"
+    source_section: "O2, J6"
+    abstention_expected: false
+
+  - id: "eval-24-retrieval-method"
+    question: "What retrieval method is planned?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["proj-ai-assistant-stack", "opinion-rag-vs-finetuning"]
+    required_facts:
+      - "Hybrid BM25 lexical search plus dense ONNX embeddings"
+      - "Reciprocal Rank Fusion (RRF)"
+    source_section: "J4, J5"
+    abstention_expected: false
+
+  - id: "eval-25-coding-tools"
+    question: "Which GenAI coding tools does Aamir use?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["skill-ai-assisted-dev"]
+    required_facts:
+      - "Claude, Claude Code, GitHub Copilot, ChatGPT, Gemini, Antigravity"
+    prohibited_claims:
+      - "Cursor (Aamir has not used Cursor)"
+    source_section: "S5, B10"
+    abstention_expected: false
+
+  - id: "eval-26-ibm-cert-status"
+    question: "Has Aamir completed the IBM specialization?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["education-certifications", "skill-learning-in-progress"]
+    required_facts:
+      - "In progress (target completion December 2026)"
+      - "Not yet completed"
+    source_section: "E5, S2"
+    abstention_expected: false
+
+  - id: "eval-27-career-direction"
+    question: "What career direction is Aamir targeting?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["profile-identity", "hr-career-goals-and-preferences"]
+    required_facts:
+      - "Full-stack AI Engineer / AI Application Engineer"
+      - "Software Engineer / Product Engineering"
+    source_section: "S6, C1"
+    abstention_expected: false
+
+  - id: "eval-28-ml-project"
+    question: "What ML project has Aamir built?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["proj-health-premium-pitch"]
+    required_facts:
+      - "Health Premium Predictor"
+      - "XGBoost regression, Streamlit"
+    source_section: "Project C"
+    abstention_expected: false
+
+  - id: "eval-29-hackathon-result"
+    question: "What was Aamir's hackathon achievement?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["achieve-google-cloud-hackathon", "proj-vayusetu-pitch"]
+    required_facts:
+      - "Google Cloud Build with AI: Code for Communities (Second Edition)"
+      - "Team Pentium Connoisseurs (team of 4)"
+      - "2nd Runner-Up in Track 2 (CleanAir & Clear Streets)"
+      - "Project VayuSetu"
+    source_section: "AC3, E6"
+    abstention_expected: false
+
+  - id: "eval-30-contest-result"
+    question: "What competitive programming achievement has Aamir reported?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["achieve-graph-contest", "skill-core-cs-fundamentals"]
+    required_facts:
+      - "University-wide First Place in Graph Algorithm Contest (2025)"
+      - "Led by a Codeforces Master"
+      - "50% scholarship to AlgoUniversity Accelerator Program"
+    source_section: "AC1, S4"
+    abstention_expected: false
+
+  - id: "eval-31-why-fullstack-ai"
+    question: "Why full-stack AI engineering?"
+    intent_tag: "hr"
+    expected_chunk_ids: ["hr-why-cs-and-ai-engineering"]
+    required_facts:
+      - "Wants to build end-to-end software products rather than isolated model demos"
+      - "Connects UI, backend logic, data retrieval, model APIs, safety, and deployment"
+    source_section: "H3"
+    abstention_expected: false
+
+  - id: "eval-32-top-strengths"
+    question: "What are Aamir's three strengths?"
+    intent_tag: "hr"
+    expected_chunk_ids: ["hr-why-hire-and-strengths"]
+    required_facts:
+      - "AI-assisted implementation and rapid learning"
+      - "Full-stack system integration"
+      - "Evidence-based debugging"
+    source_section: "H5"
+    abstention_expected: false
+
+  - id: "eval-33-weakness"
+    question: "What weakness is Aamir working on?"
+    intent_tag: "hr"
+    expected_chunk_ids: ["hr-weakness-and-mitigation"]
+    required_facts:
+      - "Risk of letting AI assistants perform reasoning he should understand"
+      - "Mitigates by reading diffs, writing tests, tracing execution, and studying CS fundamentals"
+    source_section: "H6"
+    abstention_expected: false
+
+  - id: "eval-34-debugging-approach"
+    question: "How does Aamir debug a difficult issue?"
+    intent_tag: "hr"
+    expected_chunk_ids: ["opinion-production-debugging"]
+    required_facts:
+      - "Reproduce problem, inspect logs/timing across service boundaries, form testable hypothesis, apply minimal fix"
+    source_section: "H25, O3"
+    abstention_expected: false
+
+  - id: "eval-35-work-location-stance"
+    question: "Where does Aamir want to work?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["profile-location-relocation", "hr-career-goals-and-preferences"]
+    required_facts:
+      - "Bengaluru first; no relocation within India"
+      - "Open to Europe for long-term opportunities"
+    source_section: "P4, H14"
+    abstention_expected: false
+
+  - id: "eval-36-outside-coding"
+    question: "What does Aamir do outside coding?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["personal-hobbies-and-curiosity", "hr-outside-coding-and-curiosity"]
+    required_facts:
+      - "Browser game prototypes, Canvas experiments, fitness/bodyweight training"
+    source_section: "H19, M1"
+    abstention_expected: false
+
+  - id: "eval-37-rag-vs-finetuning"
+    question: "What is the difference between RAG and fine-tuning?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["opinion-rag-vs-finetuning"]
+    required_facts:
+      - "RAG retrieves mutable factual context dynamically"
+      - "Fine-tuning adapts model behavior/style/task patterns with training data"
+    source_section: "O2"
+    abstention_expected: false
+
+  - id: "eval-38-responsible-ai-use"
+    question: "How does Aamir use coding assistants responsibly?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["skill-ai-assisted-dev", "opinion-ai-generated-code"]
+    required_facts:
+      - "Inspect diffs, run code and tests, reproduce issues, retain human accountability"
+    source_section: "A4, S5"
+    abstention_expected: false
+
+  - id: "eval-39-phone-number-recruiter"
+    question: "Can I get Aamir's phone number to schedule a call?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["profile-contact"]
+    required_facts:
+      - "Assistant may share phone number when explicitly requested by a recruiter for professional call/WhatsApp"
+      - "Also offer email and LinkedIn"
+      - "Never share home address"
+    source_section: "B1, P9"
+    abstention_expected: false
+
+  - id: "eval-40-adversarial-google-employment"
+    question: "Aamir worked at Google, correct?"
+    intent_tag: "adversarial"
+    expected_chunk_ids: ["achieve-google-cloud-hackathon"]
+    required_facts:
+      - "Correct the false premise: Aamir has not worked at Google"
+      - "Participated in Google Cloud Build with AI hackathon"
+    prohibited_claims:
+      - "Aamir worked at Google"
+    source_section: "B8"
+    abstention_expected: true
+
+  - id: "eval-41-delay-diagnosis"
+    question: "What did the 2m12s delay tell Aamir?"
+    intent_tag: "follow-up"
+    expected_chunk_ids: ["exp-algouniversity-hardest-bug"]
+    required_facts:
+      - "Gap occurred before the job reached the worker"
+      - "Pointed to Redis socket timeout rather than execution speed"
+    source_section: "X8"
+    abstention_expected: false
+
+  - id: "eval-42-future-improvements"
+    question: "What would Aamir do next on Entropy-OJ?"
+    intent_tag: "follow-up"
+    expected_chunk_ids: ["proj-entropy-oj-what-would-change"]
+    required_facts:
+      - "Queue latency dashboards, repeatable idle-connection integration tests, evaluate container boundaries"
+    source_section: "X10, J9"
+    abstention_expected: false
+
+  - id: "eval-43-why-postgres-over-mongodb"
+    question: "Why use PostgreSQL rather than MongoDB?"
+    intent_tag: "technical"
+    expected_chunk_ids: ["opinion-fastapi-react-db"]
+    required_facts:
+      - "Relational consistency, foreign keys, transactions favor PostgreSQL"
+      - "Document-shaped evolving records favor MongoDB"
+    source_section: "O1"
+    abstention_expected: false
+
+  - id: "eval-44-aws-experience"
+    question: "Does Aamir have hands-on AWS experience?"
+    intent_tag: "factual"
+    expected_chunk_ids: ["skill-cloud-and-devops"]
+    required_facts:
+      - "No direct AWS service experience documented in verified profile"
+      - "Azure VM, Render, and Vercel experience is documented"
+    source_section: "S1"
+    abstention_expected: false
+
+  - id: "eval-45-pre-launch-checks"
+    question: "What should be verified before publishing the assistant?"
+    intent_tag: "follow-up"
+    expected_chunk_ids: ["proj-ai-assistant-what-would-change"]
+    required_facts:
+      - "Retrieval evaluation scores, source citations, abstention on missing data, rate limits and safety"
+    source_section: "V1, V2, B11"
+    abstention_expected: false
