@@ -4,7 +4,7 @@
 **Band 2 / Phase 2: Hybrid RAG Complete** — 100% Hit Rate@5, 0.8778 MRR, 9.39ms latency, 227MB RAM. Next: User Approval & Phase 5 (Source Citations and Generative UI)
 
 ## Live Deployments
-- **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
+- **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
 - **Frontend (Vercel)**: `https://aamirmk-portfolio.vercel.app/`
 
 ## Phase Status
