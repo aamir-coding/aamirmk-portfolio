@@ -310,3 +310,52 @@ C. In-house zero-dependency regex tokenizer (`FormattedMessage`) + mobile bottom
 1. **Bundle Budget Preserved:** Initial JS bundle remains featherweight at **77.35 KB gzipped** (well under the 200 KB ceiling). Zero external markdown or parsing dependencies.
 2. **Editorial Typographic Scale:** Formats code blocks, quotes, lists, bold accents, and inline code with strict 72ch line-length constraints, high contrast, and smooth streaming cursor attachment.
 3. **Mobile-First UX:** Automatically transforms the architectural inspection modal into a native-feeling bottom sheet on screens <= 640px while maintaining full keyboard trapping and Escape key dismissal on desktop.
+
+
+---
+
+### DRN-025: Bundled Instant Answers & SessionStorage Hydration for Zero-Latency Cold-Start UX
+
+**Date:** 2026-11-02  
+**Context:** Render's free tier spins down idle backend web services after 15 minutes of inactivity. When a recruiter opens the portfolio and clicks an initial prompt suggestion (e.g., "Who is Aamir?", "Tell me about his AI Engineer background"), the container spin-up takes 30–50 seconds. Waiting almost a minute on a first click degrades user trust and engagement. Additionally, refreshing the browser or navigating tabs wiped the active conversation history, frustrating recruiters conducting multi-turn explorations.  
+**Options:**  
+A. Display an indefinite loading spinner while the backend wakes up; do not persist chat across page reloads  
+B. Keep the container warm 24/7 with an external cron service (violates zero-cost free-tier constraints)  
+C. Client-side bundled instant answers for canonical starter prompts (`frontend/src/data/instantAnswers.ts`), paired with `sessionStorage` chat history persistence and a global `Ctrl+K` / `Cmd+K` keyboard shortcut.  
+**Choice:** C — Bundled instant answers + `sessionStorage` conversation hydration + `Ctrl+K` hotkey  
+**Why:**  
+1. **0ms Perceived Latency:** Recruiters who click high-intent prompt chips receive immediate, authoritative dossier summaries and project previews instantly, without waiting for the server spin-up.
+2. **Tab-Scoped History Persistence:** Using `sessionStorage` restores the conversation transcript seamlessly on browser reload while strictly scoping user chat data to the active tab session (cleared automatically on tab/window close, preserving visitor privacy).
+3. **Power-User Ergonomics:** Registering a global `Ctrl+K` / `Cmd+K` listener focuses the chat input from anywhere in the document, matching modern developer-tool conventions.
+
+---
+
+### DRN-026: Zod Runtime Boundary Contracts & Non-Blocking SSE Heartbeats
+
+**Date:** 2026-11-02  
+**Context:** In a decoupled FastAPI + React architecture, TypeScript interfaces exist purely at compile-time and vanish after compilation. If backend response schemas drift or yield unexpected fields, the frontend can experience unhandled runtime exceptions. Furthermore, cloud reverse proxies (Render, Cloudflare, AWS ALB) aggressively terminate idle HTTP/1.1 and HTTP/2 streaming connections after 15–30 seconds of inactivity if no bytes are transferred (e.g. while the LLM engine queues or processes reasoning tokens).  
+**Options:**  
+A. Rely solely on static TypeScript types and let proxy timeouts trigger generic client-side fetch retries  
+B. Use heavy WebSocket protocols with client-server ping/pong frames  
+C. Zod runtime boundary validation on the frontend (`contracts.ts`) + FastAPI asynchronous SSE comment heartbeats (`: ping\n\n`) every 15 seconds during stream idle periods.  
+**Choice:** C — Zod runtime boundary validation + non-blocking SSE comment heartbeats  
+**Why:**  
+1. **Fail-Safe Runtime Deserialization:** Zod schemas (`ChatSourcesEventSchema`, `ChatCardEventSchema`, `ChatTokenEventSchema`, `ChatDoneEventSchema`) validate every event frame arriving across the network. If malformed data arrives, safe fallbacks prevent entire application crashes.
+2. **Proxy Keep-Alive Without Stream Pollution:** Per the W3C Server-Sent Events specification, lines starting with a colon (`:`) are comments and are ignored by compliant SSE parsers. Emitting `: ping\n\n` periodically keeps intermediate TCP sockets and Cloudflare reverse proxies alive without polluting user transcripts or client state.
+3. **Contract Parity Test Suite:** Backed by `backend/tests/test_contracts.py` ensuring Pydantic models and frontend schemas remain strictly synchronized across commits.
+
+---
+
+### DRN-027: Protected In-Process Dev Retrieval Inspection Endpoint & Source URL Lineage
+
+**Date:** 2026-11-02  
+**Context:** Evaluating and tuning hybrid retrieval (BM25 + dense ONNX embeddings with Reciprocal Rank Fusion) requires deep visibility into chunk scores, rank fusion weights, and raw retrieved passages. Triggering a full chat completion for retrieval inspection wastes LLM tokens and adds latency. However, exposing internal retrieval endpoints in production could leak private drafting notes or unreleased project data. Furthermore, retrieved citations previously lacked canonical `source_url` metadata, leaving recruiters unable to click directly into Aamir's GitHub repositories or live project demos from source chips.  
+**Options:**  
+A. Log retrieval rankings to standard server stdout only  
+B. Expose an unauthenticated public `/api/debug/retrieve` endpoint across all environments  
+C. Mount a dedicated `GET /api/debug/retrieve` endpoint protected by environment guards (`ENVIRONMENT != "production"`, returning 404 in production), and enrich all 75 fact chunks with verified `source_url` metadata pointing to live repositories.  
+**Choice:** C — Environment-guarded dev retrieval inspection endpoint + enriched `source_url` fact metadata  
+**Why:**  
+1. **Zero Production Attack Surface:** In production (`ENVIRONMENT=production`), the debug route is completely disabled and returns an immediate 404 Not Found response, preserving security and preventing reconnaissance.
+2. **Fast Diagnostic & Eval Loop:** In development/staging, developers can instantly test queries against the full hybrid retrieval pipeline (`top_k`, reciprocal rank scores, chunk IDs) in sub-20ms without invoking the LLM.
+3. **Verifiable Lineage:** Every source citation now links directly to verified GitHub repositories, papers, or project documentation, satisfying the core portfolio rule: "Every claim has a receipt."
