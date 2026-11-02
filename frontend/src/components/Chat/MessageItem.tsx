@@ -3,6 +3,7 @@ import type { ChatMessage, ProjectCardData } from "../../lib/types";
 import { SourceChips } from "./SourceChips";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectModal } from "./ProjectModal";
+import { FormattedMessage } from "./FormattedMessage";
 
 export interface MessageItemProps {
   message: ChatMessage;
@@ -53,33 +54,23 @@ export const MessageItem = React.memo(function MessageItem({
           </div>
         )}
 
-        {message.content && (
-          <p className="chat-message-text">
-            {message.content}
-            {message.status === "streaming" && (
-              <span
-                className="streaming-cursor"
-                aria-hidden="true"
-                data-testid="streaming-cursor"
-              >
-                ▍
-              </span>
-            )}
-          </p>
-        )}
-        {message.status === "streaming" &&
-          !message.content &&
-          (!message.cards || message.cards.length === 0) && (
-            <p className="chat-message-text">
-              <span
-                className="streaming-cursor"
-                aria-hidden="true"
-                data-testid="streaming-cursor"
-              >
-                ▍
-              </span>
-            </p>
-          )}
+        {message.content ? (
+          <FormattedMessage
+            content={message.content}
+            isStreaming={message.status === "streaming"}
+          />
+        ) : message.status === "streaming" &&
+          (!message.cards || message.cards.length === 0) ? (
+          <div className="chat-message-text">
+            <span
+              className="streaming-cursor"
+              aria-hidden="true"
+              data-testid="streaming-cursor"
+            >
+              ▍
+            </span>
+          </div>
+        ) : null}
         {message.status === "error" && !message.content && (
           <p className="chat-message-error" role="alert">
             Generation interrupted or failed.

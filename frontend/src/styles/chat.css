@@ -534,6 +534,112 @@ body {
   max-width: 72ch;
 }
 
+/* ==========================================================================
+   Editorial Prose Typography & Formatted Markdown Elements
+   ========================================================================== */
+
+.chat-prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 72ch;
+  line-height: var(--leading-relaxed);
+  color: var(--text-primary);
+}
+
+.prose-paragraph {
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+.prose-strong {
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.prose-inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 1px 5px;
+  background-color: var(--bg-code-inline);
+  color: var(--text-code-inline);
+  border: 1px solid var(--border-code-inline);
+  border-radius: var(--radius-sm);
+  word-break: break-word;
+}
+
+.prose-link {
+  color: var(--accent-cobalt);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: var(--font-medium);
+  transition: color var(--transition-fast);
+}
+
+.prose-link:hover {
+  color: var(--accent-cobalt-hover);
+}
+
+.prose-list {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.prose-list li {
+  line-height: var(--leading-relaxed);
+}
+
+.prose-code-wrapper {
+  margin: var(--space-2) 0;
+  background-color: var(--bg-code-block);
+  border: 1px solid var(--border-code-block);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.prose-code-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--space-1) var(--space-3);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-code-block);
+}
+
+.prose-code-lang {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prose-code-block {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-code-block);
+}
+
+.prose-quote {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--bg-quote);
+  border-left: 3px solid var(--border-quote);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.prose-quote p {
+  margin: 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
 .chat-message-error {
   margin: var(--space-2) 0 0 0;
   font-size: var(--text-xs);
