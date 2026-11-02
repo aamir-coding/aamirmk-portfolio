@@ -1184,7 +1184,7 @@ body {
   position: relative;
   z-index: 1001;
   background-color: var(--bg-page);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   max-width: 720px;
   width: 100%;
@@ -1352,6 +1352,39 @@ body {
   .header-controls {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .btn-header-reset,
+  .btn-theme-toggle {
+    min-height: 36px;
+    padding: 6px 10px;
+  }
+
+  .dossier-external-links {
+    gap: var(--space-2);
+  }
+
+  .dossier-external-link {
+    padding: 6px 10px;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .modal-portal {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .project-modal {
+    max-width: 100%;
+    max-height: 90vh;
+    max-height: 90dvh;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
   }
 
   .chat-shell {
