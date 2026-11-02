@@ -18,7 +18,7 @@
 | P4: Design system (minimal) | 🟢 Complete | `main` | `phase-4-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
 | P7: Safety (first-share) | 🟢 Complete | `main` | `phase-7-done` | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
 | — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
-| P2: RAG | 🟢 Complete | `phase-2-rag` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
+| P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
 | P5: Citations + gen UI | ⬜ Next Up (Band 2) | — | — | — |
 | P4: Design system (full) | ⬜ Not Started | — | — | — |
 | P6: Fit report | ⬜ Not Started | — | — | — |
