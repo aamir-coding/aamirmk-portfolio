@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 10
     RATE_LIMIT_BURST: int = 15
+    FIT_RATE_LIMIT_DAILY: int = 5
     QUOTA_DAILY_REQUEST_LIMIT: int = 800
     QUOTA_DAILY_TOKEN_LIMIT: int = 180000
 

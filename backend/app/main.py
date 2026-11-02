@@ -14,6 +14,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.chat import router as chat_router
 from app.api.debug import router as debug_router
+from app.api.fit import router as fit_router
 from app.api.health import router as health_router
 from app.safety.ip import get_client_ip
 from app.settings import Settings, get_settings
@@ -165,6 +166,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Mount API routers
     app.include_router(health_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")
+    app.include_router(fit_router, prefix="/api")
     app.include_router(debug_router, prefix="/api")
 
     return app
