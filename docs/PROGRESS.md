@@ -23,7 +23,7 @@ Next: Band 3 / Phase 6 (JD Fit Report).
 | P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
 | P5: Citations + gen UI | 🟢 Complete | `main` | `phase-5-done` | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
 | P4: Design system (full) | 🟢 Complete | `main` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
-| **Bands 1 & 2 Parity Backfill** | 🟢 Complete | `backfill-spec-gaps` | — | — |
+| **Bands 1 & 2 Parity Backfill** | 🟢 Complete | `main` | `backfill-parity-done` | [`phase-parity-backfill.md`](study-guides/phase-parity-backfill.md) |
 | P6: Fit report | ⬜ Next Up (Band 3) | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
