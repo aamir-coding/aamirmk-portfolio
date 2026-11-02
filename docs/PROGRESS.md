@@ -1,7 +1,9 @@
 # Progress Tracker
 
 ## Current Phase
-**Band 2 / Phase 4: Design System (Full) & Editorial Dossier Direction** — 🟢 Complete. Delivered three-state theme engine (system/light/dark), zero-dependency markdown prose formatter, expanded candidate credentials ribbon, copy response control, and mobile bottom-sheet modal ergonomics. Next: Phase 6 (JD Fit Report).
+**Bands 1 & 2 Architectural Specification Parity Backfill** — 🟢 Complete. Full backfill completed across all 8 phases of Bands 1 and 2: bundled instant cold-start answers, `sessionStorage` persistence, `Ctrl+K` shortcut, runtime Zod boundary contracts, 15s SSE heartbeats, `source_url` fact receipts, dev `GET /api/debug/retrieve`, 23-vector adversarial attack suite, production security headers (CSP, nosniff, DENY), Open Graph social metadata, SVG favicon, and `<noscript>` fallback.
+
+Next: Band 3 / Phase 6 (JD Fit Report).
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -10,7 +12,7 @@
 ## Phase Status
 
 | Phase | Status | Branch | Tag | Study Guide |
-|-------|--------|--------|-----|-------------|
+|---|---|---|---|---|
 | Setup | 🟢 Complete | `main` | — | — |
 | P0: Skeleton | 🟢 Complete | `main` | `phase-0-done` | [`phase-00-foundations.md`](study-guides/phase-00-foundations.md) |
 | P1: Chat endpoint | 🟢 Complete | `main` | `phase-1-done` | [`phase-01-fastapi-chat.md`](study-guides/phase-01-fastapi-chat.md) |
@@ -21,6 +23,7 @@
 | P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
 | P5: Citations + gen UI | 🟢 Complete | `main` | `phase-5-done` | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
 | P4: Design system (full) | 🟢 Complete | `main` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
+| **Bands 1 & 2 Parity Backfill** | 🟢 Complete | `backfill-spec-gaps` | — | — |
 | P6: Fit report | ⬜ Next Up (Band 3) | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
@@ -132,12 +135,17 @@
 - [x] Phase 4 (Full): One-click response copy button on assistant messages with accessible live feedback ("Copied ✓")
 - [x] Phase 4 (Full): Tactile micro-interactions (`-1px` lifts, hairline transitions) on cards, starter chips, and external links
 - [x] Phase 4 (Full): Mobile-first `100dvh` hardening with bottom-sheet modal drawer on screens <= 640px and safe-area inset protection
-- [x] Phase 4 (Full): Production bundle budget strictly maintained: JS is 77.35 KB gzipped (<200 KB budget), CSS is 5.04 KB gzipped
-- [x] Phase 4 (Full): Architectural decisions DRN-023 and DRN-024 recorded in `docs/decisions.md`
-- [x] Phase 4 (Full): Comprehensive study guide expanded in `docs/study-guides/phase-04-design-system.md`
 - [x] Phase 4 (Full): Hardened markdown table UX/UI with dynamic '#' compact column shrink-wrapping (40px), natural header text wrapping, and mobile horizontal scrolling
 - [x] Phase 4 (Full): Full inline tokenizer parsing for `<br>` line breaks in table cells, bold-italic, safe HTML tags (`<b>`, `<i>`, `<code>`, `<del>`), and footnote italics
-- [x] Phase 4 (Full): 72 frontend Vitest tests and 190 backend Pytest tests 100% green; bundle 78.42 KB gzipped JS (<200 KB budget)
+- [x] **Parity Backfill (P3)**: Bundled verified `answers.json` for 0ms instant cold-start responses before backend wakes
+- [x] **Parity Backfill (P3)**: Added `sessionStorage` chat history persistence and global `Ctrl/Cmd+K` keyboard shortcut
+- [x] **Parity Backfill (P3)**: Added Zod boundary contract validation (`contracts.ts`) and contract test suite
+- [x] **Parity Backfill (P3)**: Added periodic 15s SSE comment keep-alive heartbeat (`: heartbeat\n\n`) during slow upstream waits
+- [x] **Parity Backfill (P2)**: Enriched fact chunks with verified `source_url` receipts and recomputed `.npz` embeddings matrix
+- [x] **Parity Backfill (P2)**: Mounted dev inspection endpoint `GET /api/debug/retrieve?q=` (protected in production)
+- [x] **Parity Backfill (P7)**: Expanded adversarial attack suite to 23 payloads and added production security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, and CSP)
+- [x] **Parity Backfill (P4 Full)**: Added Open Graph social metadata, custom monograph SVG favicon, and static `<noscript>` fallback
+- [x] **Full Test Suite**: 204 backend pytest tests (100% green) + 88 frontend Vitest tests (100% green); bundle 106.55 KB gzipped JS (<200 KB budget)
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -161,7 +169,7 @@
 ## Groq Rate Limits (authoritative, from user's Limits page)
 
 | Model | RPM | RPD | TPM | TPD |
-|-------|-----|-----|-----|-----|
+|---|---|---|---|---|
 | `openai/gpt-oss-120b` | 30 | 1,000 | 8,000 | 200,000 |
 | `openai/gpt-oss-20b` | 30 | 1,000 | 8,000 | 200,000 |
 
