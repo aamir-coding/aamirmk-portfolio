@@ -158,8 +158,9 @@ Next: Band 3 / Phase 8 (Evals).
 - [x] **Phase 6**: Added typed SSE streaming client `streamFitReport()` in `frontend/src/lib/sse.ts` and `fetchFitPresets()` in `frontend/src/lib/api.ts`
 - [x] **Phase 6**: Built `useFitReport` hook (`frontend/src/hooks/useFitReport.ts`) managing multi-step streaming lifecycle and abort controllers
 - [x] **Phase 6**: Built accessible UI components: `FitProgressStepper`, `FitReportCard`, `FitReportModal`, and entry points in `CoverState`, `StarterChips`, and header
-- [x] **Phase 6**: Verified bundle budget: 111.66 KB gzipped JS (<200 KB budget), 7.19 KB gzipped CSS
-- [x] **Phase 6**: Full test suite passing: 225 backend tests (177 unit + 48 evals, 100% green, 0 API cost) + 114 frontend Vitest tests (100% green)
+- [x] **Phase 6**: Verified bundle budget: 112.17 KB gzipped JS (<200 KB budget), 7.54 KB gzipped CSS
+- [x] **Phase 6**: Full test suite passing: 226 backend tests (178 unit + 48 evals, 100% green, 0 API cost) + 115 frontend Vitest tests (100% green)
+- [x] **Phase 6**: Added pre-evaluated golden benchmarks (`backend/app/fit/golden_benchmarks.py`) pre-seeding pipeline cache and `GET /api/fit/presets` with instant preview, match expectation badges, collapsible JD preview, and live re-run capability
 - [x] **Phase 6**: Architectural decision DRN-028 recorded in `docs/decisions.md`
 - [x] **Phase 6**: Comprehensive study guide written in `docs/study-guides/phase-06-jd-fit-report.md`
 

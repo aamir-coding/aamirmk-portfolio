@@ -239,3 +239,17 @@ When clicked:
 - [frontend/src/components/Fit/FitProgressStepper.tsx](file:///d:/AI_Engineer/aamirmkh-portfolio/frontend/src/components/Fit/FitProgressStepper.tsx) — Real-time progress bar, percentage tracker, and pipeline stage indicators.
 - [frontend/src/components/Fit/FitReportCard.tsx](file:///d:/AI_Engineer/aamirmkh-portfolio/frontend/src/components/Fit/FitReportCard.tsx) — Score metrics, verified citations, anti-overclaiming warning banners, and "Ask in chat" action buttons.
 - [frontend/src/hooks/useFitReport.ts](file:///d:/AI_Engineer/aamirmkh-portfolio/frontend/src/hooks/useFitReport.ts) — React hook managing fit evaluation lifecycle, presets loading, abort controllers, and error handling.
+
+---
+
+## 8. Pre-Evaluated Golden Benchmarks & Transparent Zero-Cost Exploration
+
+To allow recruiters to instantly explore the JD Fit Report without burning Groq LLM tokens or hitting free-tier rate limits, Phase 6 incorporates **pre-evaluated golden benchmarks**:
+- **Authoritative Snapshots (`golden_benchmarks.py`):** 4 real-world roles across the candidate spectrum (Full-Stack AI Engineer, Backend Python Engineer, GenAI Developer, and Embedded Firmware Engineer) are pre-evaluated with verified SHA-256 hashes matching `FitRequest.compute_hash()`.
+- **Pre-Seeded In-Memory Cache:** On server startup, `FitPipeline` seeds its internal cache with these 4 golden reports.
+- **GET /api/fit/presets Endpoint:** Returns the curated roles along with their serialized golden reports.
+- **Instant UI Preview & Transparency:** When a recruiter selects a sample role, `useFitReport` loads the report instantly (0ms latency, 0 Groq tokens). The report renders with:
+  1. A distinct badge: `[VERIFIED GOLDEN BENCHMARK (CACHED SNAPSHOT)]`.
+  2. A collapsible `“📄 View Evaluated Job Description”` preview allowing recruiters to inspect the exact input text analyzed.
+  3. A `“🔄 Re-Run Live Pipeline”` button that bypasses the pre-seeded cache and executes the live 5-stage SSE pipeline against Groq, proving the pipeline is functional and objective.
+- **Custom JDs:** Pasting a custom JD always executes the full live 5-stage SSE pipeline.
