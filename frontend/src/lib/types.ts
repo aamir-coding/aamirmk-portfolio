@@ -1,5 +1,5 @@
 /**
- * Domain types for conversational messages, citations, generative UI cards, and JD Fit reports.
+ * Core TypeScript domain models for the AI Digital Assistant Portfolio.
  */
 
 export interface SourceCitation {
@@ -25,6 +25,12 @@ export interface ProjectCardData {
   architecture_details: string;
 }
 
+export interface InstantAnswer {
+  reply: string;
+  sources?: SourceCitation[];
+  cards?: ProjectCardData[];
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -35,10 +41,7 @@ export interface ChatMessage {
   cards?: ProjectCardData[];
 }
 
-export interface InstantAnswer {
-  reply: string;
-  sources?: SourceCitation[];
-}
+// ── Phase 6 Fit Report Types ────────────────────────────────────────────
 
 export interface FitRequirement {
   id: string;
@@ -91,4 +94,5 @@ export interface SampleJobDescription {
   company: string;
   match_expectation: string;
   text: string;
+  report?: FitReport | null;
 }

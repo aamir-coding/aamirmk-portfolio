@@ -22,3 +22,7 @@ def test_load_sample_jds_loads_all_curated_roles() -> None:
         req = FitRequest(jd_text=jd.text, role_title=jd.title)
         assert len(req.jd_text) >= 50
         assert len(req.compute_hash()) == 64
+        # Every sample JD must have a pre-evaluated golden report
+        assert jd.report is not None
+        assert jd.report.jd_hash == req.compute_hash()
+        assert jd.report.score.overall_fit == jd.match_expectation

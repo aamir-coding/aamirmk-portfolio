@@ -6,6 +6,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.fit.golden_benchmarks import GOLDEN_BENCHMARK_REPORTS
+from app.fit.models import FitReport
+
 
 @dataclass(frozen=True, slots=True)
 class SampleJobDescription:
@@ -16,6 +19,7 @@ class SampleJobDescription:
     company: str
     match_expectation: str  # "Strong Match", "Partial Match", "Low Match"
     text: str
+    report: FitReport | None = None
 
 
 def _find_sample_jds_dir() -> Path:
@@ -32,7 +36,10 @@ def _find_sample_jds_dir() -> Path:
 
 
 def load_sample_jds() -> list[SampleJobDescription]:
-    """Load all curated sample job descriptions from disk."""
+    """Load all curated sample job descriptions from disk.
+
+    Includes pre-evaluated golden reports for 1-click evaluation.
+    """
     sample_dir = _find_sample_jds_dir()
     if not sample_dir.is_dir():
         return []
@@ -56,6 +63,7 @@ def load_sample_jds() -> list[SampleJobDescription]:
         title = role_match.group(1).strip() if role_match else stem
         company = company_match.group(1).strip() if company_match else "Tech Co"
         expectation = expectations.get(stem, "Partial Match")
+        report = GOLDEN_BENCHMARK_REPORTS.get(stem)
 
         jds.append(
             SampleJobDescription(
@@ -64,6 +72,7 @@ def load_sample_jds() -> list[SampleJobDescription]:
                 company=company,
                 match_expectation=expectation,
                 text=raw_text,
+                report=report,
             )
         )
 

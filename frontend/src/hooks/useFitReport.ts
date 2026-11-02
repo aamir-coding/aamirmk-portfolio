@@ -12,6 +12,8 @@ export interface UseFitReportReturn {
   error: string | null;
   presets: SampleJobDescription[];
   isLoadingPresets: boolean;
+  activePreset: SampleJobDescription | null;
+  loadPreset: (preset: SampleJobDescription) => void;
   submit: (jdText: string, roleTitle?: string) => Promise<void>;
   abort: () => void;
   reset: () => void;
@@ -24,6 +26,7 @@ export function useFitReport(): UseFitReportReturn {
   const [error, setError] = useState<string | null>(null);
   const [presets, setPresets] = useState<SampleJobDescription[]>([]);
   const [isLoadingPresets, setIsLoadingPresets] = useState<boolean>(false);
+  const [activePreset, setActivePreset] = useState<SampleJobDescription | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -73,8 +76,24 @@ export function useFitReport(): UseFitReportReturn {
     setReport(null);
     setError(null);
     setProgress(null);
+    setActivePreset(null);
     setStatus("idle");
   }, [abort]);
+
+  const loadPreset = useCallback(
+    (preset: SampleJobDescription) => {
+      abort();
+      setError(null);
+      setProgress(null);
+      setActivePreset(preset);
+
+      if (preset.report) {
+        setReport(preset.report);
+        setStatus("completed");
+      }
+    },
+    [abort]
+  );
 
   const submit = useCallback(
     async (jdText: string, roleTitle?: string) => {
@@ -144,6 +163,8 @@ export function useFitReport(): UseFitReportReturn {
     error,
     presets,
     isLoadingPresets,
+    activePreset,
+    loadPreset,
     submit,
     abort,
     reset,

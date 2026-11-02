@@ -46,7 +46,14 @@ class FitPipeline:
         self._llm = llm
         self._retriever = retriever
         self._settings = settings or get_settings()
-        self._cache = cache if cache is not None else {}
+        if cache is not None:
+            self._cache = cache
+        else:
+            from app.fit.golden_benchmarks import GOLDEN_BENCHMARK_REPORTS
+
+            self._cache = {
+                rep.jd_hash: rep for rep in GOLDEN_BENCHMARK_REPORTS.values()
+            }
 
     async def run(self, request: FitRequest) -> AsyncIterator[dict[str, Any]]:
         """Execute the 5-stage pipeline and yield SSE progress & completion frames."""

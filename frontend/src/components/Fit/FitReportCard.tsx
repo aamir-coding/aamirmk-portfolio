@@ -1,17 +1,22 @@
-import type { FitReport, JudgedRequirement } from "../../lib/types";
+import type { FitReport, JudgedRequirement, SampleJobDescription } from "../../lib/types";
 
 export interface FitReportCardProps {
   report: FitReport;
+  activePreset?: SampleJobDescription | null;
   onAskGap?: (requirementText: string) => void;
   onReset?: () => void;
+  onRerunLive?: () => void;
 }
 
 export function FitReportCard({
   report,
+  activePreset,
   onAskGap,
   onReset,
+  onRerunLive,
 }: FitReportCardProps) {
   const { score } = report;
+  const isBenchmark = Boolean(activePreset?.report || report.cached);
 
   const mustHaves = report.requirements.filter(
     (r) => r.requirement.importance === "must_have"
@@ -110,6 +115,41 @@ export function FitReportCard({
 
   return (
     <article className="fit-report-card" aria-label={`Job Fit Report: ${report.role_title}`}>
+      {isBenchmark && (
+        <div className="fit-benchmark-banner" role="status">
+          <div className="fit-benchmark-meta">
+            <span className="fit-benchmark-icon" aria-hidden="true">⚡</span>
+            <div className="fit-benchmark-details">
+              <strong>VERIFIED GOLDEN BENCHMARK (CACHED SNAPSHOT)</strong>
+              <span>
+                Pre-evaluated against Aamir's verified dossier to preserve free-tier compute.
+              </span>
+            </div>
+          </div>
+          {onRerunLive && activePreset && (
+            <button
+              type="button"
+              className="btn-fit-rerun"
+              onClick={onRerunLive}
+              title="Re-run live against Groq LLM and hybrid RAG"
+            >
+              🔄 Re-Run Live Pipeline
+            </button>
+          )}
+        </div>
+      )}
+
+      {activePreset?.text && (
+        <details className="fit-jd-preview-details">
+          <summary className="fit-jd-preview-summary">
+            📄 View Evaluated Job Description ({activePreset.title})
+          </summary>
+          <div className="fit-jd-preview-body">
+            <pre className="fit-jd-preview-text">{activePreset.text}</pre>
+          </div>
+        </details>
+      )}
+
       <header className="fit-report-header">
         <div className="fit-header-meta">
           <span className="fit-tag">EVALUATION DOSSIER</span>
@@ -161,13 +201,13 @@ export function FitReportCard({
         )}
       </section>
 
-      {onReset && (
-        <footer className="fit-report-footer">
+      <footer className="fit-report-footer">
+        {onReset && (
           <button type="button" className="btn btn-secondary" onClick={onReset}>
-            ← Analyze Another Job Description
+            ← Analyze Custom Job Description
           </button>
-        </footer>
-      )}
+        )}
+      </footer>
     </article>
   );
 }

@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { FitReportCard } from "./FitReportCard";
-import type { FitReport } from "../../lib/types";
+import type { FitReport, SampleJobDescription } from "../../lib/types";
 
 const mockReport: FitReport = {
   role_title: "Senior AI Engineer",
   jd_hash: "a".repeat(64),
+  cached: true,
   score: {
     overall_fit: "Strong Match",
     must_have_strong: 3,
@@ -61,6 +62,15 @@ const mockReport: FitReport = {
   ],
 };
 
+const mockPreset: SampleJobDescription = {
+  id: "sample-1",
+  title: "Senior AI Engineer",
+  company: "AI Labs",
+  match_expectation: "Strong Match",
+  text: "Full job description text with requirements.",
+  report: mockReport,
+};
+
 describe("<FitReportCard />", () => {
   it("renders role title, overall fit badge, headline, and score metrics", () => {
     render(<FitReportCard report={mockReport} />);
@@ -99,6 +109,24 @@ describe("<FitReportCard />", () => {
     expect(screen.getByText(/Extrapolates from async Redis/i)).toBeInTheDocument();
   });
 
+  it("renders verified golden benchmark banner and JD preview when activePreset is present", () => {
+    const handleRerun = vi.fn();
+    render(
+      <FitReportCard
+        report={mockReport}
+        activePreset={mockPreset}
+        onRerunLive={handleRerun}
+      />
+    );
+
+    expect(screen.getByText(/VERIFIED GOLDEN BENCHMARK \(CACHED SNAPSHOT\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/View Evaluated Job Description/i)).toBeInTheDocument();
+
+    const rerunBtn = screen.getByRole("button", { name: /Re-Run Live Pipeline/i });
+    fireEvent.click(rerunBtn);
+    expect(handleRerun).toHaveBeenCalledTimes(1);
+  });
+
   it("triggers onAskGap when clicking ask gap action button", () => {
     const handleAskGap = vi.fn();
     render(<FitReportCard report={mockReport} onAskGap={handleAskGap} />);
@@ -110,11 +138,11 @@ describe("<FitReportCard />", () => {
     expect(handleAskGap).toHaveBeenCalledWith("Kubernetes orchestration in high-scale production");
   });
 
-  it("triggers onReset when clicking analyze another job description button", () => {
+  it("triggers onReset when clicking analyze custom job description button", () => {
     const handleReset = vi.fn();
     render(<FitReportCard report={mockReport} onReset={handleReset} />);
 
-    const resetBtn = screen.getByRole("button", { name: /Analyze Another Job Description/i });
+    const resetBtn = screen.getByRole("button", { name: /Analyze Custom Job Description/i });
     fireEvent.click(resetBtn);
 
     expect(handleReset).toHaveBeenCalledTimes(1);

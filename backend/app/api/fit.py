@@ -53,8 +53,11 @@ def set_fit_pipeline(pipeline: FitPipeline | None) -> None:
     "/fit/presets",
     summary="Get curated sample job descriptions for quick evaluation",
 )
-async def get_fit_presets() -> list[dict[str, str]]:
-    """Return curated sample JDs for 1-click recruiter evaluation."""
+async def get_fit_presets() -> list[dict[str, Any]]:
+    """Return curated sample JDs with pre-evaluated golden reports.
+
+    Enables 1-click exploration without burning Groq tokens.
+    """
     samples = load_sample_jds()
     return [
         {
@@ -63,6 +66,7 @@ async def get_fit_presets() -> list[dict[str, str]]:
             "company": s.company,
             "match_expectation": s.match_expectation,
             "text": s.text,
+            "report": s.report.model_dump() if s.report else None,
         }
         for s in samples
     ]

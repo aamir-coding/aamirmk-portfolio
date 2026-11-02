@@ -44,6 +44,8 @@ describe("<FitReportModal />", () => {
     error: null,
     presets: mockPresets,
     isLoadingPresets: false,
+    activePreset: null,
+    loadPreset: vi.fn(),
     submit: vi.fn(),
     abort: vi.fn(),
     reset: vi.fn(),
@@ -75,7 +77,13 @@ describe("<FitReportModal />", () => {
     expect(screen.getByRole("button", { name: /Analyze Alignment/i })).toBeDisabled();
   });
 
-  it("loads preset into textarea and enables submission button", () => {
+  it("loads preset into state and calls loadPreset on click", () => {
+    const loadPresetMock = vi.fn();
+    vi.mocked(useFitReportModule.useFitReport).mockReturnValue({
+      ...defaultHookState,
+      loadPreset: loadPresetMock,
+    });
+
     render(
       <FitReportModal isOpen={true} onClose={vi.fn()} onAskGap={vi.fn()} />
     );
@@ -83,14 +91,10 @@ describe("<FitReportModal />", () => {
     const presetBtn = screen.getByText("Full-Stack AI Engineer");
     fireEvent.click(presetBtn);
 
-    const textarea = screen.getByPlaceholderText(/Paste complete job requirements/i) as HTMLTextAreaElement;
-    expect(textarea.value).toContain("We are seeking a Full-Stack AI Engineer");
-
-    const submitBtn = screen.getByRole("button", { name: /Analyze Alignment/i });
-    expect(submitBtn).toBeEnabled();
+    expect(loadPresetMock).toHaveBeenCalledWith(mockPresets[0]);
   });
 
-  it("calls submit when form is submitted", () => {
+  it("calls submit when custom form is submitted", () => {
     const submitMock = vi.fn();
     vi.mocked(useFitReportModule.useFitReport).mockReturnValue({
       ...defaultHookState,
@@ -101,8 +105,12 @@ describe("<FitReportModal />", () => {
       <FitReportModal isOpen={true} onClose={vi.fn()} onAskGap={vi.fn()} />
     );
 
-    const presetBtn = screen.getByText("Full-Stack AI Engineer");
-    fireEvent.click(presetBtn);
+    const textarea = screen.getByPlaceholderText(/Paste complete job requirements/i);
+    fireEvent.change(textarea, {
+      target: {
+        value: "We are seeking a Full-Stack AI Engineer with 3+ years of experience in FastAPI and React.",
+      },
+    });
 
     const submitBtn = screen.getByRole("button", { name: /Analyze Alignment/i });
     fireEvent.click(submitBtn);
@@ -110,7 +118,7 @@ describe("<FitReportModal />", () => {
     expect(submitMock).toHaveBeenCalledTimes(1);
     expect(submitMock).toHaveBeenCalledWith(
       expect.stringContaining("We are seeking a Full-Stack AI Engineer"),
-      "Full-Stack AI Engineer (Strong Match)"
+      ""
     );
   });
 

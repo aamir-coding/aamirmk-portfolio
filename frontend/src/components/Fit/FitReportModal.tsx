@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useFitReport } from "../../hooks/useFitReport";
+import type { SampleJobDescription } from "../../lib/types";
 import { FitProgressStepper } from "./FitProgressStepper";
 import { FitReportCard } from "./FitReportCard";
 
@@ -25,6 +26,8 @@ export function FitReportModal({
     report,
     error,
     presets,
+    activePreset,
+    loadPreset,
     submit,
     abort,
     reset,
@@ -56,9 +59,18 @@ export function FitReportModal({
 
   if (!isOpen) return null;
 
-  const handleSelectPreset = (presetText: string, presetTitle: string) => {
-    setJdText(presetText);
-    setRoleTitle(presetTitle);
+  const handleSelectPreset = (preset: SampleJobDescription) => {
+    setJdText(preset.text);
+    setRoleTitle(preset.title);
+    loadPreset(preset);
+  };
+
+  const handleRerunLive = () => {
+    if (activePreset) {
+      void submit(activePreset.text, activePreset.title);
+    } else if (jdText) {
+      void submit(jdText, roleTitle);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -120,8 +132,10 @@ export function FitReportModal({
           {status === "completed" && report ? (
             <FitReportCard
               report={report}
+              activePreset={activePreset}
               onAskGap={handleAskGapBridge}
               onReset={handleModalReset}
+              onRerunLive={handleRerunLive}
             />
           ) : status === "streaming" ? (
             <FitProgressStepper progress={progress} onAbort={abort} />
@@ -129,22 +143,34 @@ export function FitReportModal({
             <form onSubmit={handleSubmit} className="fit-form">
               {presets.length > 0 && (
                 <div className="fit-presets-container" aria-label="Sample Job Description Presets">
-                  <span className="fit-presets-label">1-Click Sample Roles:</span>
+                  <div className="fit-presets-header">
+                    <span className="fit-presets-label">1-Click Verified Benchmarks (Instant):</span>
+                    <span className="fit-presets-subtext">Pre-evaluated against dossier to save compute</span>
+                  </div>
                   <div className="fit-presets-list">
-                    {presets.map((preset) => (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        className="fit-preset-chip"
-                        onClick={() => handleSelectPreset(preset.text, preset.title)}
-                        title={`Load sample role: ${preset.title} (${preset.match_expectation})`}
-                      >
-                        {preset.title.split("(")[0]?.trim()}
-                      </button>
-                    ))}
+                    {presets.map((preset) => {
+                      const expectation = preset.match_expectation.toLowerCase();
+                      const isLowMatch = expectation.includes("low");
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          className={`fit-preset-chip ${isLowMatch ? "preset-chip-low" : ""}`}
+                          onClick={() => handleSelectPreset(preset)}
+                          title={`Explore ${preset.title}: ${preset.match_expectation}`}
+                        >
+                          <span className="preset-chip-title">{preset.title.split("(")[0]?.trim()}</span>
+                          <span className="preset-chip-badge">{preset.match_expectation}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
+
+              <div className="fit-divider-or" aria-hidden="true">
+                <span>OR ANALYZE CUSTOM JOB DESCRIPTION</span>
+              </div>
 
               <div className="fit-form-field">
                 <label htmlFor="fit-role-title" className="fit-field-label">

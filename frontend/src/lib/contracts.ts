@@ -110,6 +110,7 @@ export const SampleJobDescriptionSchema = z.object({
   company: z.string().optional().default(""),
   match_expectation: z.string(),
   text: z.string().min(1),
+  report: FitReportSchema.nullable().optional(),
 });
 
 export type ValidatedSourceCitation = z.infer<typeof SourceCitationSchema>;
