@@ -104,8 +104,17 @@ export const FitErrorPayloadSchema = z.object({
   message: z.string().min(1),
 });
 
+export const SampleJobDescriptionSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  company: z.string().optional().default(""),
+  match_expectation: z.string(),
+  text: z.string().min(1),
+});
+
 export type ValidatedSourceCitation = z.infer<typeof SourceCitationSchema>;
 export type ValidatedProjectCardData = z.infer<typeof ProjectCardDataSchema>;
 export type ValidatedDonePayload = z.infer<typeof DoneEventPayloadSchema>;
 export type ValidatedFitReport = z.infer<typeof FitReportSchema>;
 export type ValidatedFitProgressData = z.infer<typeof FitProgressDataSchema>;
+export type ValidatedSampleJobDescription = z.infer<typeof SampleJobDescriptionSchema>;

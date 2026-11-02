@@ -9,6 +9,7 @@ import {
   StatusIndicator,
   type ServerState,
 } from "./components/StatusIndicator";
+import { FitReportModal } from "./components/Fit/FitReportModal";
 import answersData from "./data/answers.json";
 import type { InstantAnswer } from "./lib/types";
 import "./styles/chat.css";
@@ -18,6 +19,7 @@ const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
 export function App() {
   const [serverState, setServerState] = useState<ServerState>("checking");
   const [healthError, setHealthError] = useState<string | null>(null);
+  const [isFitModalOpen, setIsFitModalOpen] = useState(false);
   const { theme, resolvedTheme, cycleTheme } = useTheme();
 
   const {
@@ -75,6 +77,15 @@ export function App() {
     void sendMessage(prompt);
   };
 
+  const handleOpenFitModal = () => {
+    setIsFitModalOpen(true);
+  };
+
+  const handleAskGap = (gapText: string) => {
+    setIsFitModalOpen(false);
+    void sendMessage(`How does Aamir plan to ramp up on: ${gapText}?`);
+  };
+
   return (
     <div className="app-container">
       <header className="app-header">
@@ -83,6 +94,14 @@ export function App() {
           <p>AI Digital Assistant — Conversational Portfolio</p>
         </div>
         <div className="header-controls">
+          <button
+            type="button"
+            className="btn-header-fit"
+            onClick={handleOpenFitModal}
+            aria-label="Evaluate Job Description Alignment"
+          >
+            ⚡ Role Fit
+          </button>
           {!isCoverState && (
             <button
               type="button"
@@ -151,6 +170,7 @@ export function App() {
             messages={messages}
             isStreaming={isStreaming}
             onSelectPrompt={handleSelectPrompt}
+            onOpenFitModal={handleOpenFitModal}
           />
         </div>
 
@@ -162,6 +182,14 @@ export function App() {
           />
         </div>
       </main>
+
+      {isFitModalOpen && (
+        <FitReportModal
+          isOpen={isFitModalOpen}
+          onClose={() => setIsFitModalOpen(false)}
+          onAskGap={handleAskGap}
+        />
+      )}
     </div>
   );
 }

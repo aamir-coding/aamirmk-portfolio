@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { fetchHealth, getApiBaseUrl } from "./api";
+import { fetchHealth, fetchFitPresets, getApiBaseUrl } from "./api";
 
 describe("api client", () => {
   const originalFetch = globalThis.fetch;
@@ -51,5 +51,39 @@ describe("api client", () => {
     } as unknown as Response);
 
     await expect(fetchHealth()).rejects.toThrow("Invalid response schema from health endpoint");
+  });
+
+  it("fetches and validates fit presets list", async () => {
+    const mockPresets = [
+      {
+        id: "preset-1",
+        title: "Full-Stack AI Engineer",
+        company: "AI Labs",
+        match_expectation: "strong",
+        text: "Sample job description with requirements.",
+      },
+    ];
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockPresets,
+    } as unknown as Response);
+
+    const result = await fetchFitPresets();
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe("preset-1");
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/fit/presets"),
+      expect.objectContaining({ method: "GET" })
+    );
+  });
+
+  it("throws descriptive error when fit presets endpoint fails", async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 502,
+    } as unknown as Response);
+
+    await expect(fetchFitPresets()).rejects.toThrow("Failed to fetch fit presets: HTTP 502");
   });
 });

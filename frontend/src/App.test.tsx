@@ -8,6 +8,7 @@ describe("<App />", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     sessionStorage.clear();
+    vi.spyOn(api, "fetchFitPresets").mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -226,6 +227,22 @@ describe("<App />", () => {
       expect(
         screen.queryByRole("dialog", { name: /Entropy Online Judge/i })
       ).not.toBeInTheDocument();
+    });
+  });
+
+  it("opens Job Description Fit Report modal when '⚡ Role Fit' is clicked", async () => {
+    vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
+    vi.spyOn(api, "fetchFitPresets").mockResolvedValue([]);
+    render(<App />);
+
+    const fitBtn = screen.getByRole("button", {
+      name: /Evaluate Job Description Alignment/i,
+    });
+    fireEvent.click(fitBtn);
+
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      expect(screen.getByText("Job Description Fit Report")).toBeInTheDocument();
     });
   });
 });

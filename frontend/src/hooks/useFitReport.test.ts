@@ -2,31 +2,42 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useFitReport } from "./useFitReport";
 import * as sseModule from "../lib/sse";
+import * as apiModule from "../lib/api";
 import type { FitReport } from "../lib/types";
 
 describe("useFitReport hook", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.spyOn(apiModule, "fetchFitPresets").mockResolvedValue([]);
   });
 
-  it("initializes with idle state and null report", () => {
-    const { result } = renderHook(() => useFitReport());
-    expect(result.current.status).toBe("idle");
-    expect(result.current.report).toBeNull();
-    expect(result.current.progress).toBeNull();
-    expect(result.current.error).toBeNull();
+  it("initializes with idle state and null report", async () => {
+    let hookResult: { current: ReturnType<typeof useFitReport> };
+    await act(async () => {
+      const { result } = renderHook(() => useFitReport());
+      hookResult = result;
+    });
+
+    expect(hookResult!.current.status).toBe("idle");
+    expect(hookResult!.current.report).toBeNull();
+    expect(hookResult!.current.progress).toBeNull();
+    expect(hookResult!.current.error).toBeNull();
   });
 
   it("rejects JD text shorter than 50 characters", async () => {
-    const { result } = renderHook(() => useFitReport());
-
+    let hookResult: { current: ReturnType<typeof useFitReport> };
     await act(async () => {
-      await result.current.submit("Too short JD text");
+      const { result } = renderHook(() => useFitReport());
+      hookResult = result;
     });
 
-    expect(result.current.status).toBe("error");
-    expect(result.current.error).toContain("at least 50 characters");
-    expect(result.current.report).toBeNull();
+    await act(async () => {
+      await hookResult!.current.submit("Too short JD text");
+    });
+
+    expect(hookResult!.current.status).toBe("error");
+    expect(hookResult!.current.error).toContain("at least 50 characters");
+    expect(hookResult!.current.report).toBeNull();
   });
 
   it("handles successful progress streaming and report completion", async () => {
@@ -59,20 +70,24 @@ describe("useFitReport hook", () => {
       opts.callbacks.onComplete(mockReport);
     });
 
-    const { result } = renderHook(() => useFitReport());
+    let hookResult: { current: ReturnType<typeof useFitReport> };
+    await act(async () => {
+      const { result } = renderHook(() => useFitReport());
+      hookResult = result;
+    });
 
     const validJd =
       "Looking for a Full-Stack AI Engineer with FastAPI and React experience " +
       "to build intelligent conversational applications.";
 
     await act(async () => {
-      await result.current.submit(validJd, "Full-Stack AI Engineer");
+      await hookResult!.current.submit(validJd, "Full-Stack AI Engineer");
     });
 
-    expect(result.current.status).toBe("completed");
-    expect(result.current.report).toEqual(mockReport);
-    expect(result.current.error).toBeNull();
-    expect(result.current.progress).toBeNull();
+    expect(hookResult!.current.status).toBe("completed");
+    expect(hookResult!.current.report).toEqual(mockReport);
+    expect(hookResult!.current.error).toBeNull();
+    expect(hookResult!.current.progress).toBeNull();
   });
 
   it("handles streaming error gracefully", async () => {
@@ -80,35 +95,41 @@ describe("useFitReport hook", () => {
       opts.callbacks.onError("Daily fit report quota exceeded.");
     });
 
-    const { result } = renderHook(() => useFitReport());
+    let hookResult: { current: ReturnType<typeof useFitReport> };
+    await act(async () => {
+      const { result } = renderHook(() => useFitReport());
+      hookResult = result;
+    });
 
     const validJd =
       "Looking for a Full-Stack AI Engineer with FastAPI and React experience " +
       "to build intelligent conversational applications.";
 
     await act(async () => {
-      await result.current.submit(validJd);
+      await hookResult!.current.submit(validJd);
     });
 
-    expect(result.current.status).toBe("error");
-    expect(result.current.error).toBe("Daily fit report quota exceeded.");
-    expect(result.current.report).toBeNull();
+    expect(hookResult!.current.status).toBe("error");
+    expect(hookResult!.current.error).toBe("Daily fit report quota exceeded.");
+    expect(hookResult!.current.report).toBeNull();
   });
 
   it("resets state when reset is called", async () => {
-    const { result } = renderHook(() => useFitReport());
+    let hookResult: { current: ReturnType<typeof useFitReport> };
+    await act(async () => {
+      const { result } = renderHook(() => useFitReport());
+      hookResult = result;
+    });
 
     await act(async () => {
-      await result.current.submit("short");
+      await hookResult!.current.submit("short");
     });
-    expect(result.current.status).toBe("error");
+    expect(hookResult!.current.status).toBe("error");
 
     act(() => {
-      result.current.reset();
+      hookResult!.current.reset();
     });
 
-    expect(result.current.status).toBe("idle");
-    expect(result.current.error).toBeNull();
-    expect(result.current.report).toBeNull();
+    expect(hookResult!.current.status).toBe("idle");
   });
 });

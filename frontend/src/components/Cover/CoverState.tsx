@@ -2,11 +2,13 @@ import { StarterChips } from "../Chat/StarterChips";
 
 export interface CoverStateProps {
   onSelectPrompt: (prompt: string) => void;
+  onOpenFitModal?: () => void;
   disabled?: boolean;
 }
 
 export function CoverState({
   onSelectPrompt,
+  onOpenFitModal,
   disabled = false,
 }: CoverStateProps) {
   return (
@@ -93,8 +95,32 @@ export function CoverState({
         </div>
       </div>
 
+      {onOpenFitModal && (
+        <div className="dossier-fit-cta-box" aria-label="Job Description Fit Analysis">
+          <div className="dossier-fit-cta-text">
+            <span className="dossier-fit-cta-title">JOB DESCRIPTION FIT ANALYSIS</span>
+            <span className="dossier-fit-cta-desc">
+              Paste any job description to evaluate verified requirement match, gaps, and ramp-up notes.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="btn-fit-action"
+            onClick={onOpenFitModal}
+            disabled={disabled}
+            aria-label="Open Job Description Fit Report dialog"
+          >
+            ⚡ Analyze Role Fit →
+          </button>
+        </div>
+      )}
+
       <div className="dossier-inquiries">
-        <StarterChips onSelect={onSelectPrompt} disabled={disabled} />
+        <StarterChips
+          onSelect={onSelectPrompt}
+          onOpenFitModal={onOpenFitModal}
+          disabled={disabled}
+        />
       </div>
     </section>
   );

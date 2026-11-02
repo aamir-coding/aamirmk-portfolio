@@ -7,12 +7,14 @@ export interface MessageListProps {
   messages: ChatMessage[];
   isStreaming: boolean;
   onSelectPrompt: (prompt: string) => void;
+  onOpenFitModal?: () => void;
 }
 
 export function MessageList({
   messages,
   isStreaming,
   onSelectPrompt,
+  onOpenFitModal,
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -23,7 +25,11 @@ export function MessageList({
   if (messages.length === 0) {
     return (
       <div className="chat-empty-state" aria-label="Welcome and suggestions">
-        <CoverState onSelectPrompt={onSelectPrompt} disabled={isStreaming} />
+        <CoverState
+          onSelectPrompt={onSelectPrompt}
+          onOpenFitModal={onOpenFitModal}
+          disabled={isStreaming}
+        />
       </div>
     );
   }

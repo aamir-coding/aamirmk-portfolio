@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { getApiBaseUrl } from "../lib/api";
+import { fetchFitPresets } from "../lib/api";
 import { streamFitReport } from "../lib/sse";
 import type { FitProgressData, FitReport, SampleJobDescription } from "../lib/types";
 
@@ -30,15 +30,14 @@ export function useFitReport(): UseFitReportReturn {
   // Load presets on mount
   useEffect(() => {
     let isMounted = true;
-    const fetchPresets = async () => {
+    const controller = new AbortController();
+
+    const loadPresets = async () => {
       setIsLoadingPresets(true);
       try {
-        const res = await fetch(`${getApiBaseUrl()}/api/fit/presets`);
-        if (res.ok) {
-          const data = await res.json();
-          if (isMounted && Array.isArray(data)) {
-            setPresets(data);
-          }
+        const data = await fetchFitPresets(controller.signal);
+        if (isMounted) {
+          setPresets(data);
         }
       } catch {
         // Silently tolerate preset load failure
@@ -49,9 +48,11 @@ export function useFitReport(): UseFitReportReturn {
       }
     };
 
-    fetchPresets();
+    void loadPresets();
+
     return () => {
       isMounted = false;
+      controller.abort();
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
@@ -99,28 +100,39 @@ export function useFitReport(): UseFitReportReturn {
         percent: 0,
       });
 
-      await streamFitReport({
-        jdText: jdText.trim(),
-        roleTitle: roleTitle?.trim(),
-        signal: controller.signal,
-        callbacks: {
-          onProgress: (p) => {
-            setProgress(p);
+      try {
+        await streamFitReport({
+          jdText: jdText.trim(),
+          roleTitle: roleTitle?.trim() || undefined,
+          signal: controller.signal,
+          callbacks: {
+            onProgress: (p) => {
+              setProgress(p);
+            },
+            onComplete: (rep) => {
+              setReport(rep);
+              setStatus("completed");
+              setProgress(null);
+            },
+            onError: (err) => {
+              setError(err || "An error occurred during fit evaluation.");
+              setStatus("error");
+              setProgress(null);
+            },
           },
-          onComplete: (r) => {
-            setReport(r);
-            setStatus("completed");
-            setProgress(null);
-            abortControllerRef.current = null;
-          },
-          onError: (errMsg) => {
-            setError(errMsg);
-            setStatus("error");
-            setProgress(null);
-            abortControllerRef.current = null;
-          },
-        },
-      });
+        });
+      } catch (err: unknown) {
+        if (controller.signal.aborted) {
+          // Intentionally aborted
+          return;
+        }
+        const message = err instanceof Error ? err.message : "Fit evaluation failed";
+        setError(message);
+        setStatus("error");
+        setProgress(null);
+      } finally {
+        abortControllerRef.current = null;
+      }
     },
     []
   );
