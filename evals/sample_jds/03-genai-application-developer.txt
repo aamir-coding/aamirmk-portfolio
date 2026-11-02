@@ -1,0 +1,22 @@
+Role: Generative AI Application Developer
+Company: Enterprise Intelligence Systems
+Location: Hybrid / Remote
+
+About the Role:
+We are looking for an AI Application Developer to integrate generative AI models and intelligent agent workflows into enterprise enterprise software.
+
+Responsibilities:
+- Build and evaluate production LLM application pipelines using prompt engineering, structured JSON schemas, and function calling.
+- Design and benchmark hybrid vector retrieval and semantic search over domain-specific corpora.
+- Monitor and optimize LLM token consumption, rate limits, and request latency across upstream providers.
+- Maintain and deploy production services on cloud infrastructure.
+
+Requirements (Must-Have):
+- Strong proficiency in Python or TypeScript for backend application development.
+- Hands-on experience with LLM APIs, prompt engineering, structured JSON schema output, and tool calling.
+- Demonstrated experience building semantic search, hybrid retrieval, and chunking strategies.
+- Minimum 2 years of production hands-on experience designing and operating AWS cloud infrastructure (ECS, Lambda, S3, IAM).
+
+Nice-to-Have:
+- Hands-on experience with Kubernetes cluster operations, Helm charts, and container orchestration.
+- Experience with automated LLM eval suites measuring Hit Rate, Recall@K, and LLM-as-judge scoring.

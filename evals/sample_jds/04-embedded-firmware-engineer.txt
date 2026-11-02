@@ -1,0 +1,23 @@
+Role: Embedded Systems & Firmware Engineer (C / C++)
+Company: EdgeRobotics Automation
+Location: Onsite / Bangalore
+
+About the Role:
+We are developing next-generation autonomous robotics controllers and need an Embedded Systems Engineer to write bare-metal and real-time operating system firmware for our custom hardware platforms.
+
+Responsibilities:
+- Write robust, low-level firmware in C and embedded C++ for ARM Cortex-M microcontrollers.
+- Implement low-level hardware device drivers for serial protocols including I2C, SPI, UART, and CAN bus.
+- Develop real-time multi-threaded tasks on FreeRTOS with deterministic scheduling constraints.
+- Debug board bring-up issues using oscilloscopes, logic analyzers, and JTAG/SWD emulators.
+- Read hardware schematics and interface directly with electrical engineering teams.
+
+Requirements (Must-Have):
+- Deep expertise in bare-metal embedded C and C++ programming for resource-constrained microcontrollers.
+- Hands-on experience developing under Real-Time Operating Systems (FreeRTOS, Zephyr).
+- Direct experience configuring low-level serial peripherals: SPI, I2C, UART, DMA controllers.
+- Proven track record of board bring-up and physical hardware lab debugging with oscilloscopes.
+
+Nice-to-Have:
+- Experience designing PCB schematics and layout using KiCAD or Altium Designer.
+- Familiarity with motor control algorithms (PID controllers, PWM signal generation).

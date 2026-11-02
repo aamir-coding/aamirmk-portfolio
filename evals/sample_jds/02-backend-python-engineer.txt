@@ -1,0 +1,24 @@
+Role: Backend Software Engineer (Python / FastAPI)
+Company: CloudScale Infrastructure
+Location: Remote
+
+About the Role:
+We are looking for a Backend Software Engineer to help scale our core data processing and API services. You will work closely with frontend engineers and infrastructure teams to deliver high-throughput, low-latency web services.
+
+Responsibilities:
+- Design, implement, and maintain high-performance asynchronous RESTful APIs using Python and FastAPI.
+- Architect relational database schemas, write optimized SQL queries, and manage database migrations using PostgreSQL.
+- Build asynchronous job queues and background workers for heavy task processing.
+- Write thorough unit and integration tests with pytest, maintaining high test coverage and CI reliability.
+- Containerize application components with Docker and participate in deployment workflows.
+
+Requirements (Must-Have):
+- Strong programming background in Python with experience in FastAPI or Django.
+- Hands-on experience with PostgreSQL, relational data modeling, and query performance.
+- Experience implementing background workers and caching using Redis and asynchronous queue frameworks.
+- Proficiency in Docker containerization and Git-based collaborative workflows.
+- Rigorous testing mindset with experience writing unit and integration tests using pytest.
+
+Nice-to-Have:
+- Experience deploying and configuring cloud virtual machines (Microsoft Azure or AWS).
+- Understanding of reverse-proxy routing, CORS policies, and rate-limiting middleware.

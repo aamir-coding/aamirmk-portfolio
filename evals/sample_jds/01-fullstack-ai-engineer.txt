@@ -1,0 +1,25 @@
+Role: Full-Stack AI Engineer
+Company: Applied AI Technologies
+Location: Remote / Hybrid
+
+About the Role:
+We are seeking a Full-Stack AI Engineer to design and build our next-generation conversational AI platform. You will build user-facing intelligent interfaces, implement robust backend services, and engineer end-to-end LLM application pipelines.
+
+Responsibilities:
+- Build fast, responsive web interfaces in React and TypeScript with real-time streaming UX.
+- Develop asynchronous backend microservices and REST APIs using Python (FastAPI).
+- Implement Retrieval-Augmented Generation (RAG) pipelines combining dense vector embeddings and keyword search.
+- Design reliable tool-calling and function dispatch loops interfacing with high-throughput LLM APIs.
+- Containerize application services using Docker for automated cloud deployment.
+- Implement security guardrails against prompt injection and enforce strict token and rate limits.
+
+Requirements (Must-Have):
+- Strong proficiency in Python and async web frameworks (FastAPI preferred).
+- Hands-on experience developing single-page web applications with React, TypeScript, and modern CSS.
+- Demonstrated experience building RAG workflows, embedding generation, and semantic retrieval.
+- Practical experience with function calling, structured LLM outputs, and streaming protocols (SSE / WebSockets).
+- Hands-on containerization experience with Docker.
+
+Nice-to-Have:
+- Experience building automated evaluation suites for LLM retrieval and response accuracy.
+- Familiarity with client-side accessibility (WCAG), keyboard navigation, and bundle size optimization.
