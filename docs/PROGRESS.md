@@ -20,7 +20,7 @@
 | — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
 | P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
 | P5: Citations + gen UI | 🟢 Complete | `main` | `phase-5-done` | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
-| P4: Design system (full) | 🟢 Complete | `phase-4-editorial-dossier` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
+| P4: Design system (full) | 🟢 Complete | `main` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
 | P6: Fit report | ⬜ Next Up (Band 3) | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
