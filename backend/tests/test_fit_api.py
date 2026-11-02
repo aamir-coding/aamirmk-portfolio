@@ -100,9 +100,7 @@ def test_post_fit_streaming_success() -> None:
         "Recommended for interview."
     )
 
-    fake_llm = FakeLLM(
-        canned_replies=[extraction_json, judging_json, summary_text]
-    )
+    fake_llm = FakeLLM(canned_replies=[extraction_json, judging_json, summary_text])
     fake_retriever = FakeRetriever(
         default_facts=[
             FactChunk(

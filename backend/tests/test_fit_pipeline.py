@@ -105,9 +105,7 @@ async def test_fit_pipeline_end_to_end_success(
         "A technical architecture interview is recommended."
     )
 
-    fake_llm = FakeLLM(
-        canned_replies=[extraction_json, judging_json, summary_text]
-    )
+    fake_llm = FakeLLM(canned_replies=[extraction_json, judging_json, summary_text])
 
     pipeline = FitPipeline(llm=fake_llm, retriever=fake_retriever)
     request = FitRequest(
@@ -241,9 +239,7 @@ async def test_fit_pipeline_handles_llm_error_gracefully(
     fake_retriever: FakeRetriever,
 ) -> None:
     """Verify rate limit or provider error yields error frame without crashing."""
-    fake_llm = FakeLLM(
-        error_to_raise=LLMRateLimitError("Groq 429 rate limit exceeded")
-    )
+    fake_llm = FakeLLM(error_to_raise=LLMRateLimitError("Groq 429 rate limit exceeded"))
     pipeline = FitPipeline(llm=fake_llm, retriever=fake_retriever)
 
     req = FitRequest(

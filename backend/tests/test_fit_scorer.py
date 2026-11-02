@@ -207,9 +207,7 @@ class TestDeterministicScoring:
         )
 
         judged = [
-            JudgedRequirement(
-                requirement=req1, verdict="strong", explanation="Python"
-            ),
+            JudgedRequirement(requirement=req1, verdict="strong", explanation="Python"),
             JudgedRequirement(
                 requirement=req2, verdict="partial", explanation="TS working"
             ),

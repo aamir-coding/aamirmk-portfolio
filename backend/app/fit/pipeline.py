@@ -105,8 +105,8 @@ class FitPipeline:
                     "percent": 50,
                 },
             }
-            retrieved_by_req, all_valid_chunk_ids = (
-                await self._retrieve_evidence(extraction.requirements)
+            retrieved_by_req, all_valid_chunk_ids = await self._retrieve_evidence(
+                extraction.requirements
             )
 
             # Step 4: Batched LLM judging with main model
@@ -182,9 +182,7 @@ class FitPipeline:
                 },
             }
 
-    async def _extract_requirements(
-        self, request: FitRequest
-    ) -> RequirementExtraction:
+    async def _extract_requirements(self, request: FitRequest) -> RequirementExtraction:
         """Call utility model to extract structured requirements with retry."""
         messages = build_extraction_messages(request.jd_text, request.role_title)
 
@@ -196,9 +194,7 @@ class FitPipeline:
                     response_format={"type": "json_object"},
                 )
                 data = json.loads(reply.content)
-                role_title = request.role_title or data.get(
-                    "role_title", "Target Role"
-                )
+                role_title = request.role_title or data.get("role_title", "Target Role")
                 raw_reqs = data.get("requirements", [])
                 if not raw_reqs:
                     raise ValueError("Empty requirements list from extractor.")
@@ -228,15 +224,11 @@ class FitPipeline:
                         )
                     )
 
-                return RequirementExtraction(
-                    role_title=role_title, requirements=reqs
-                )
+                return RequirementExtraction(role_title=role_title, requirements=reqs)
             except LLMError:
                 raise
             except Exception as exc:
-                logger.warning(
-                    "Extraction attempt %d failed: %s", attempt + 1, exc
-                )
+                logger.warning("Extraction attempt %d failed: %s", attempt + 1, exc)
                 if attempt == 0:
                     messages.append(
                         Message(
@@ -328,9 +320,7 @@ class FitPipeline:
                             JudgedRequirement(
                                 requirement=req,
                                 verdict=verdict,
-                                evidence_chunk_ids=[
-                                    str(cid) for cid in evidence_ids
-                                ],
+                                evidence_chunk_ids=[str(cid) for cid in evidence_ids],
                                 explanation=explanation,
                                 ramp_up=ramp_up,
                             )
@@ -348,9 +338,7 @@ class FitPipeline:
             except LLMError:
                 raise
             except Exception as exc:
-                logger.warning(
-                    "Judging batch failed: %s; assigning safe gaps", exc
-                )
+                logger.warning("Judging batch failed: %s; assigning safe gaps", exc)
                 for req in batch:
                     judged_list.append(
                         JudgedRequirement(
