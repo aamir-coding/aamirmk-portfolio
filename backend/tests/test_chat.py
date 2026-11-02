@@ -579,3 +579,26 @@ def test_chat_stream_summons_project_card_via_tool_call(
         assert len(done_events) == 1
         assert len(done_events[0]["cards"]) == 1
         assert done_events[0]["cards"][0]["id"] == "ai-digital-assistant"
+
+
+@pytest.mark.asyncio
+async def test_stream_with_heartbeat_emits_comment_when_delayed():
+    """Verify that slow upstreams trigger periodic comment keep-alives."""
+    import asyncio
+
+    from app.api.chat import stream_with_heartbeat
+
+    async def slow_generator():
+        await asyncio.sleep(0.08)
+        yield "token_1"
+        await asyncio.sleep(0.08)
+        yield "token_2"
+
+    items = []
+    async for item in stream_with_heartbeat(slow_generator(), heartbeat_interval=0.03):
+        items.append(item)
+
+    heartbeats = [it for it in items if it == ": heartbeat\n\n"]
+    tokens = [it for it in items if it != ": heartbeat\n\n"]
+    assert len(heartbeats) >= 2
+    assert tokens == ["token_1", "token_2"]

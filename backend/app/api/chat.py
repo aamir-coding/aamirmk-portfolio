@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import uuid
 from collections.abc import AsyncIterator
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
@@ -44,6 +46,35 @@ from app.tools.registry import ToolRegistry, get_tool_registry
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["chat"])
+
+
+async def stream_with_heartbeat(
+    stream: AsyncIterator[Any],
+    heartbeat_interval: float = 15.0,
+) -> AsyncIterator[Any]:
+    """Yield items from stream, or periodic heartbeat comment if idle."""
+    anext_task: asyncio.Task[Any] | None = None
+    stream_iter = aiter(stream)
+    try:
+        while True:
+            if anext_task is None:
+                anext_task = asyncio.create_task(stream_iter.__anext__())
+            done, _ = await asyncio.wait(
+                {anext_task},
+                timeout=heartbeat_interval,
+            )
+            if done:
+                try:
+                    item = anext_task.result()
+                    anext_task = None
+                    yield item
+                except StopAsyncIteration:
+                    break
+            else:
+                yield ": heartbeat\n\n"
+    finally:
+        if anext_task is not None and not anext_task.done():
+            anext_task.cancel()
 
 
 def extract_citations(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
@@ -282,7 +313,12 @@ async def chat_stream(
 
             # Stream Turn 1: checks for tool calls or direct text
             detected_tool_calls: list[ToolCall] = []
-            async for item in llm.stream(messages, tools=tool_schemas):
+            async for item in stream_with_heartbeat(
+                llm.stream(messages, tools=tool_schemas)
+            ):
+                if isinstance(item, str) and item.startswith(":"):
+                    yield item
+                    continue
                 if isinstance(item, ToolCall):
                     detected_tool_calls.append(item)
                 else:
@@ -321,7 +357,10 @@ async def chat_stream(
                     )
 
                 # Turn 2: stream verbal explanation
-                async for token in llm.stream(messages):
+                async for token in stream_with_heartbeat(llm.stream(messages)):
+                    if isinstance(token, str) and token.startswith(":"):
+                        yield token
+                        continue
                     if isinstance(token, str):
                         tokens_emitted += 1
                         payload = json.dumps({"token": token})

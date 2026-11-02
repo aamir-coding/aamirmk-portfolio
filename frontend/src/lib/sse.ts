@@ -1,5 +1,12 @@
 import { getApiBaseUrl } from "./api";
 import type { ProjectCardData, SourceCitation } from "./types";
+import {
+  SourcesEventPayloadSchema,
+  CardEventPayloadSchema,
+  TokenEventPayloadSchema,
+  DoneEventPayloadSchema,
+  ErrorEventPayloadSchema,
+} from "./contracts";
 
 export interface StreamChatCallbacks {
   onToken: (token: string) => void;
@@ -61,22 +68,25 @@ export function parseSSEBuffer(buffer: string): {
   return { events, remaining };
 }
 
+/**
+ * Streams conversation completion from FastAPI backend using Server-Sent Events (SSE) over POST.
+ * Zero external client dependencies (pure fetch + ReadableStream).
+ */
 export async function streamChat({
   message,
   conversationId,
   signal,
   callbacks,
-  baseUrl = getApiBaseUrl(),
+  baseUrl,
 }: StreamChatOptions): Promise<void> {
-  const cleanBase = baseUrl.replace(/\/+$/, "");
-  const endpoint = `${cleanBase}/api/chat/stream`;
+  const base = baseUrl ?? getApiBaseUrl();
+  const url = `${base}/api/chat/stream`;
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Accept: "text/event-stream",
       },
       body: JSON.stringify({
         message,
@@ -86,15 +96,15 @@ export async function streamChat({
     });
 
     if (!response.ok) {
-      let errorMessage = `Request failed with HTTP ${response.status}`;
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
       try {
         const errorJson = (await response.json()) as {
           error?: { message?: string };
           detail?: string | unknown;
         };
-        if (errorJson?.error?.message) {
+        if (errorJson.error?.message) {
           errorMessage = errorJson.error.message;
-        } else if (errorJson?.detail) {
+        } else if (errorJson.detail) {
           errorMessage =
             typeof errorJson.detail === "string"
               ? errorJson.detail
@@ -118,36 +128,36 @@ export async function streamChat({
 
     const dispatchEvent = (event: string, data: string) => {
       try {
-        const parsed = JSON.parse(data) as Record<string, unknown>;
-        if (event === "sources" && Array.isArray(parsed.sources)) {
-          callbacks.onSources?.(parsed.sources as SourceCitation[]);
-        } else if (
-          event === "card" &&
-          parsed.card &&
-          typeof parsed.card === "object"
-        ) {
-          callbacks.onCard?.(parsed.card as ProjectCardData);
-        } else if (event === "token" && typeof parsed.token === "string") {
-          callbacks.onToken(parsed.token);
+        const parsed = JSON.parse(data);
+        if (event === "sources") {
+          const res = SourcesEventPayloadSchema.safeParse(parsed);
+          if (res.success) {
+            callbacks.onSources?.(res.data.sources);
+          }
+        } else if (event === "card") {
+          const res = CardEventPayloadSchema.safeParse(parsed);
+          if (res.success) {
+            callbacks.onCard?.(res.data.card);
+          }
+        } else if (event === "token") {
+          const res = TokenEventPayloadSchema.safeParse(parsed);
+          if (res.success) {
+            callbacks.onToken(res.data.token);
+          }
         } else if (event === "done") {
-          callbacks.onDone({
-            conversation_id:
-              typeof parsed.conversation_id === "string"
-                ? parsed.conversation_id
-                : "",
-            sources: Array.isArray(parsed.sources)
-              ? (parsed.sources as SourceCitation[])
-              : undefined,
-            cards: Array.isArray(parsed.cards)
-              ? (parsed.cards as ProjectCardData[])
-              : undefined,
-          });
+          const res = DoneEventPayloadSchema.safeParse(parsed);
+          if (res.success) {
+            callbacks.onDone({
+              conversation_id: res.data.conversation_id,
+              sources: res.data.sources,
+              cards: res.data.cards,
+            });
+          }
         } else if (event === "error") {
-          const detail =
-            typeof parsed.detail === "string"
-              ? parsed.detail
-              : "An error occurred during streaming";
-          callbacks.onError(detail);
+          const res = ErrorEventPayloadSchema.safeParse(parsed);
+          callbacks.onError(
+            res.success ? res.data.detail : "An error occurred during streaming"
+          );
         }
       } catch {
         // Ignore JSON parse errors for non-JSON comments or keep-alives
