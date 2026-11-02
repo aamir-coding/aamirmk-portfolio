@@ -262,7 +262,7 @@ function parseBlocks(markdown: string): Block[] {
     }
 
     // 3. Horizontal Rule (---, ***, ___)
-    if (/^(\-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
       blocks.push({ type: "hr" });
       i++;
       continue;
@@ -375,7 +375,7 @@ function parseBlocks(markdown: string): Block[] {
       if (
         t === "" ||
         t.startsWith("```") ||
-        /^(\-{3,}|\*{3,}|_{3,})$/.test(t) ||
+        /^(-{3,}|\*{3,}|_{3,})$/.test(t) ||
         /^#{1,4}\s+/.test(t) ||
         (t.includes("|") && i + 1 < lines.length && isTableSeparator(lines[i + 1] ?? "")) ||
         /^[-*]\s+/.test(t) ||
