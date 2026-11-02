@@ -359,3 +359,22 @@ C. Mount a dedicated `GET /api/debug/retrieve` endpoint protected by environment
 1. **Zero Production Attack Surface:** In production (`ENVIRONMENT=production`), the debug route is completely disabled and returns an immediate 404 Not Found response, preserving security and preventing reconnaissance.
 2. **Fast Diagnostic & Eval Loop:** In development/staging, developers can instantly test queries against the full hybrid retrieval pipeline (`top_k`, reciprocal rank scores, chunk IDs) in sub-20ms without invoking the LLM.
 3. **Verifiable Lineage:** Every source citation now links directly to verified GitHub repositories, papers, or project documentation, satisfying the core portfolio rule: "Every claim has a receipt."
+
+
+---
+
+### DRN-028: Fixed-Stage Pipeline vs. Free-Roaming Agent for JD Fit Evaluation
+
+**Date:** 2026-11-02  
+**Context:** When a recruiter pastes a job description to assess candidate fit, we could either give an LLM agent free-roaming search and tool-calling capabilities, or execute a deterministic, multi-stage pipeline. A free-roaming agent risks unpredictable execution times (15–60s), unbounded token consumption, looping, and hallucinations where the model overclaims candidate qualifications to sound helpful.  
+**Options:**  
+A. Autonomous tool-calling agent with retrieval loop  
+B. Single-prompt stuffed evaluation (paste entire JD + all candidate facts into one prompt)  
+C. Deterministic 5-stage pipeline: structured requirement extraction, per-requirement hybrid retrieval, batched LLM judging, deterministic anti-overclaiming invariant enforcement, and executive summary synthesis.  
+**Choice:** C — Deterministic 5-stage pipeline  
+**Why:**  
+1. **Predictable Latency & Bounded Cost:** Extraction uses the lightweight utility model (`openai/gpt-oss-20b`) with structured JSON schema. Per-requirement hybrid retrieval runs concurrently across threads. Judging is batched into a single completion, keeping the entire pipeline within ~3–6 seconds.
+2. **Anti-Overclaiming Invariant:** The judge cannot invent matches. If the model claims `strong` or `partial` alignment for a requirement but cites no valid retrieved evidence chunk ID, the deterministic scorer (`scorer.py`) automatically downgrades the verdict to `gap` and marks `downgraded = True`.
+3. **Honest Ramp-Up Narratives:** Known gaps (Kubernetes, AWS/GCP, Kafka, C++, LangChain) are grounded in verified ramp-up narratives in `skills.yaml` (`skill-ramp-up-narratives`), turning potential rejection points into credible engineering growth narratives.
+4. **Idempotent SHA-256 Caching:** Identical job descriptions produce an identical SHA-256 hash, returning cached evaluations in sub-10ms without consuming daily LLM quotas.
+5. **Fit Rate Limiting:** A dedicated daily quota (`FIT_RATE_LIMIT_DAILY = 5` per client IP) protects Groq free-tier rate limits from automated abuse.
