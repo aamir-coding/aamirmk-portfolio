@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchHealth } from "./lib/api";
 import { useChat } from "./hooks/useChat";
+import { useTheme } from "./hooks/useTheme";
 import { MessageList } from "./components/Chat/MessageList";
 import { ChatInput } from "./components/Chat/ChatInput";
+import { ThemeToggle } from "./components/ThemeToggle";
 import {
   StatusIndicator,
   type ServerState,
@@ -12,6 +14,7 @@ import "./styles/chat.css";
 export function App() {
   const [serverState, setServerState] = useState<ServerState>("checking");
   const [healthError, setHealthError] = useState<string | null>(null);
+  const { theme, resolvedTheme, cycleTheme } = useTheme();
 
   const {
     messages,
@@ -81,6 +84,11 @@ export function App() {
               ← Dossier Overview
             </button>
           )}
+          <ThemeToggle
+            theme={theme}
+            resolvedTheme={resolvedTheme}
+            onCycle={cycleTheme}
+          />
           <StatusIndicator state={serverState} errorMessage={healthError} />
         </div>
       </header>
