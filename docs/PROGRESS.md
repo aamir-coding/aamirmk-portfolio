@@ -1,9 +1,9 @@
 # Progress Tracker
 
 ## Current Phase
-**Bands 1 & 2 Architectural Specification Parity Backfill** — 🟢 Complete. Full backfill completed across all 8 phases of Bands 1 and 2: bundled instant cold-start answers, `sessionStorage` persistence, `Ctrl+K` shortcut, runtime Zod boundary contracts, 15s SSE heartbeats, `source_url` fact receipts, dev `GET /api/debug/retrieve`, 23-vector adversarial attack suite, production security headers (CSP, nosniff, DENY), Open Graph social metadata, SVG favicon, and `<noscript>` fallback.
+**Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Band 3 / Phase 6 (JD Fit Report).
+Next: Band 3 / Phase 8 (Evals).
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -24,8 +24,8 @@ Next: Band 3 / Phase 6 (JD Fit Report).
 | P5: Citations + gen UI | 🟢 Complete | `main` | `phase-5-done` | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
 | P4: Design system (full) | 🟢 Complete | `main` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
 | **Bands 1 & 2 Parity Backfill** | 🟢 Complete | `main` | `backfill-parity-done` | [`phase-parity-backfill.md`](study-guides/phase-parity-backfill.md) |
-| P6: Fit report | ⬜ Next Up (Band 3) | — | — | — |
-| P8: Evals | ⬜ Not Started | — | — | — |
+| **P6: Fit report** | 🟢 Complete | `phase-6-jd-fit-report` | `phase-6-done` | [`phase-06-jd-fit-report.md`](study-guides/phase-06-jd-fit-report.md) |
+| P8: Evals | ⬜ Next Up (Band 3) | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -145,7 +145,23 @@ Next: Band 3 / Phase 6 (JD Fit Report).
 - [x] **Parity Backfill (P2)**: Mounted dev inspection endpoint `GET /api/debug/retrieve?q=` (protected in production)
 - [x] **Parity Backfill (P7)**: Expanded adversarial attack suite to 23 payloads and added production security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, and CSP)
 - [x] **Parity Backfill (P4 Full)**: Added Open Graph social metadata, custom monograph SVG favicon, and static `<noscript>` fallback
-- [x] **Full Test Suite**: 204 backend pytest tests (100% green) + 88 frontend Vitest tests (100% green); bundle 106.55 KB gzipped JS (<200 KB budget)
+- [x] **Phase 6**: Strict Pydantic models in `backend/app/fit/models.py` (`FitRequest`, `Requirement`, `JudgedRequirement`, `FitScoreSummary`, `FitReport`)
+- [x] **Phase 6**: Deterministic anti-overclaiming invariant scorer in `backend/app/fit/scorer.py` (`validate_and_downgrade_verdicts` and `compute_fit_summary`)
+- [x] **Phase 6**: Enriched `skills.yaml` with verified gap ramp-up narratives (`skill-ramp-up-narratives` chunk covering Kubernetes, AWS/GCP, Kafka, C++, LangChain)
+- [x] **Phase 6**: Regenerated `backend/app/retrieval/facts_embeddings.npz` (104.5 KB, covering 76 chunks)
+- [x] **Phase 6**: Curated 4 realistic market sample JDs in `evals/sample_jds/` with preset loader `backend/app/fit/sample_jds.py`
+- [x] **Phase 6**: Implemented `FitPipeline` deep module (`backend/app/fit/pipeline.py`) with utility model extraction, concurrent hybrid retrieval pool, batched judging, and SHA-256 caching
+- [x] **Phase 6**: Extended `LLMClient` protocol (`backend/app/llm.py`) with `model` override and `response_format={"type": "json_object"}`
+- [x] **Phase 6**: Mounted `POST /api/fit` SSE streaming and `GET /api/fit/presets` in `backend/app/api/fit.py`
+- [x] **Phase 6**: Added daily IP fit rate limiter (`FIT_RATE_LIMIT_DAILY = 5`) in `backend/app/safety/rate_limiter.py`
+- [x] **Phase 6**: Added Zod boundary contracts (`FitReportSchema`, `FitProgressDataSchema`, `SampleJobDescriptionSchema`) in `frontend/src/lib/contracts.ts`
+- [x] **Phase 6**: Added typed SSE streaming client `streamFitReport()` in `frontend/src/lib/sse.ts` and `fetchFitPresets()` in `frontend/src/lib/api.ts`
+- [x] **Phase 6**: Built `useFitReport` hook (`frontend/src/hooks/useFitReport.ts`) managing multi-step streaming lifecycle and abort controllers
+- [x] **Phase 6**: Built accessible UI components: `FitProgressStepper`, `FitReportCard`, `FitReportModal`, and entry points in `CoverState`, `StarterChips`, and header
+- [x] **Phase 6**: Verified bundle budget: 111.66 KB gzipped JS (<200 KB budget), 7.19 KB gzipped CSS
+- [x] **Phase 6**: Full test suite passing: 225 backend tests (177 unit + 48 evals, 100% green, 0 API cost) + 114 frontend Vitest tests (100% green)
+- [x] **Phase 6**: Architectural decision DRN-028 recorded in `docs/decisions.md`
+- [x] **Phase 6**: Comprehensive study guide written in `docs/study-guides/phase-06-jd-fit-report.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -156,7 +172,9 @@ Next: Band 3 / Phase 6 (JD Fit Report).
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Ready for Band 3 / Phase 6 (Job Description Fit Report). Start new chat session with Phase 6 kickoff prompt.
+1. Deliver Phase 6 interactive teach-back with 3 questions to verify user's mental model per protocol.
+2. Tag `phase-6-done` and push branch `phase-6-jd-fit-report` to remote.
+3. Stop and await user's explicit "approved" before moving to Band 3 / Phase 8.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
