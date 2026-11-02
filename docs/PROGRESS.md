@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Band 2 / Phase 4: Design System (Full) & Editorial Dossier Direction** — Phase 5 completed and tagged `phase-5-done`. Next: Complete full editorial dossier visual identity, typography system, responsive layout, dark/light themes, and polished card components.
+**Band 2 / Phase 4: Design System (Full) & Editorial Dossier Direction** — 🟢 Complete. Delivered three-state theme engine (system/light/dark), zero-dependency markdown prose formatter, expanded candidate credentials ribbon, copy response control, and mobile bottom-sheet modal ergonomics. Next: Phase 6 (JD Fit Report).
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -20,8 +20,8 @@
 | — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
 | P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
 | P5: Citations + gen UI | 🟢 Complete | `main` | `phase-5-done` | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
-| P4: Design system (full) | ⬜ Next Up (Band 2) | — | — | — |
-| P6: Fit report | ⬜ Not Started | — | — | — |
+| P4: Design system (full) | 🟢 Complete | `phase-4-editorial-dossier` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
+| P6: Fit report | ⬜ Next Up (Band 3) | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
@@ -125,6 +125,17 @@
 - [x] Phase 5: Verified real Groq tool dispatch against `openai/gpt-oss-120b` (0.96s non-streaming, 0.66s streaming)
 - [x] Phase 5: Architectural decisions DRN-020 and DRN-021 recorded in `docs/decisions.md`
 - [x] Phase 5: Comprehensive study guide written in `docs/study-guides/phase-05-citations-generative-ui.md`
+- [x] Phase 4 (Full): Three-state theme engine (`system`, `light`, `dark`) with synchronous pre-hydration FOUC elimination in `index.html`
+- [x] Phase 4 (Full): Accessible `ThemeToggle` component with resolved OS preference indicator
+- [x] Phase 4 (Full): Hand-built zero-dependency markdown prose formatter `FormattedMessage` for bold, code, links, bullet/numbered lists, quotes, and code blocks
+- [x] Phase 4 (Full): Expanded `CoverState` hero with verified candidate credentials ribbon (AMU B.Tech 9.77 CGPA, Aligarh, Available for Hire) and external touchpoints (GitHub, LinkedIn, Email)
+- [x] Phase 4 (Full): One-click response copy button on assistant messages with accessible live feedback ("Copied ✓")
+- [x] Phase 4 (Full): Tactile micro-interactions (`-1px` lifts, hairline transitions) on cards, starter chips, and external links
+- [x] Phase 4 (Full): Mobile-first `100dvh` hardening with bottom-sheet modal drawer on screens <= 640px and safe-area inset protection
+- [x] Phase 4 (Full): Production bundle budget strictly maintained: JS is 77.35 KB gzipped (<200 KB budget), CSS is 5.04 KB gzipped
+- [x] Phase 4 (Full): 64 frontend Vitest tests and 190 backend Pytest tests 100% green
+- [x] Phase 4 (Full): Architectural decisions DRN-023 and DRN-024 recorded in `docs/decisions.md`
+- [x] Phase 4 (Full): Comprehensive study guide expanded in `docs/study-guides/phase-04-design-system.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -135,8 +146,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Kick off Phase 4 (Full Design System & Editorial Dossier Direction) on branch `phase-4-editorial-dossier`.
-2. Present Phase 4 brief and obtain user approval before implementing.
+1. Present Phase 4 teach-back to Aamir with 3 mental model verification questions.
+2. Obtain approval, merge `phase-4-editorial-dossier` to `main`, tag `phase-4-editorial-done`, and push to remote.
+3. Prepare brief for Band 3 / Phase 6 (JD Fit Report).
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅

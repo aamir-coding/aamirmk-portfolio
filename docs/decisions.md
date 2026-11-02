@@ -278,3 +278,35 @@ C. Precompute fact chunk embeddings offline (`facts_embeddings.npz`, 103 KB), en
 2. **Speed:** Eliminates the 12-second CPU freeze on boot/first-query. Retrieval latency stays at 16.39 ms average on CPU.
 3. **Retrieval Quality Preserved:** Retains 100.0% Hit Rate@5 and 0.8778 MRR with zero accuracy degradation.
 4. **Resilience:** Model download happens during Render build time; zero network downloads or unauthenticated HuggingFace requests occur inside HTTP request handling.
+
+---
+
+### DRN-023: Three-State Theme Engine (System / Light / Dark) with Pre-Hydration FOUC Prevention
+
+**Date:** 2026-11-02  
+**Context:** The minimal Phase 4 implementation only responded to `@media (prefers-color-scheme: dark)`. Recruiters evaluating the portfolio couldn't manually toggle themes, test both palettes, or override system defaults. Furthermore, client-side React theme state can cause a Flash of Unstyled Content (FOUC) if theme tokens are swapped after hydration.  
+**Options:**  
+A. Rely on an external React theming library (e.g. `next-themes` or custom Context provider)  
+B. OS media query only without user override  
+C. In-house CSS token bridge (`[data-theme="light"]`, `[data-theme="dark"]`, `@media (prefers-color-scheme: dark)`) paired with `useTheme` hook, local storage persistence, and a synchronous pre-hydration `<script>` in `index.html`.  
+**Choice:** C — In-house CSS token bridge with pre-hydration script  
+**Why:**
+1. **Zero Runtime Overhead:** Theme switching occurs via CSS custom properties on `:root` without triggering React component tree re-renders or hydration waterfalls.
+2. **Zero FOUC:** An inline vanilla script in `index.html` inspects `localStorage` and sets `data-theme` prior to DOM paint, completely eliminating visual flicker on cold reloads.
+3. **Accessible Three-State Cycle:** Supports `system` (auto OS detection), `dark`, and `light` modes with clear `aria-label` indicators and keyboard navigability.
+
+---
+
+### DRN-024: Zero-Dependency Editorial Prose Formatter & Mobile Bottom-Sheet Ergonomics
+
+**Date:** 2026-11-02  
+**Context:** Assistant completions contain structured markdown formatting (code blocks, inline code, bold highlights, bullet lists, numbered sequences, blockquotes). Rendering raw text within a single `<p>` tag diminished technical authority, while pulling in heavy markdown libraries (e.g., `marked`, `react-markdown`, `remark`) would inflate bundle size and risk breaking our <200 KB gzipped budget. Furthermore, large architectural modals centered on mobile screens felt cramped and awkward.  
+**Options:**  
+A. Import `react-markdown` and syntax highlighter (~35–50 KB gzipped)  
+B. Leave responses as plain unformatted whitespace pre-wrap  
+C. In-house zero-dependency regex tokenizer (`FormattedMessage`) + mobile bottom-sheet modal drawer (`100dvh`).  
+**Choice:** C — Zero-dependency tokenizer + mobile bottom-sheet modal  
+**Why:**
+1. **Bundle Budget Preserved:** Initial JS bundle remains featherweight at **77.35 KB gzipped** (well under the 200 KB ceiling). Zero external markdown or parsing dependencies.
+2. **Editorial Typographic Scale:** Formats code blocks, quotes, lists, bold accents, and inline code with strict 72ch line-length constraints, high contrast, and smooth streaming cursor attachment.
+3. **Mobile-First UX:** Automatically transforms the architectural inspection modal into a native-feeling bottom sheet on screens <= 640px while maintaining full keyboard trapping and Escape key dismissal on desktop.
