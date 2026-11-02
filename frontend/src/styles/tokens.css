@@ -36,6 +36,7 @@
   --border-code-block: #1e293b;
   --bg-quote: #f8fafc;
   --border-quote: #2563eb;
+  --bg-table-zebra: rgba(15, 23, 42, 0.02);
 
   /* Legacy/Semantic Aliases for Chat Components */
   --accent-blue: var(--accent-cobalt);
@@ -137,6 +138,7 @@
     --border-code-block: #1e293b;
     --bg-quote: #111827;
     --border-quote: #3b82f6;
+    --bg-table-zebra: rgba(255, 255, 255, 0.03);
 
     --accent-blue: var(--accent-cobalt);
     --accent-blue-hover: var(--accent-cobalt-hover);
@@ -191,6 +193,7 @@
   --border-code-block: #1e293b;
   --bg-quote: #111827;
   --border-quote: #3b82f6;
+  --bg-table-zebra: rgba(255, 255, 255, 0.03);
 
   --accent-blue: var(--accent-cobalt);
   --accent-blue-hover: var(--accent-cobalt-hover);
