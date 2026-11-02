@@ -1,0 +1,212 @@
+# Skills and AI/LLM experience — sourced from sections S1-S6, A1-A5
+# Levels: strong | working | basic | learning | none (per S1 conventions)
+# "Working" means used in coursework/project work; it does not imply expert-level knowledge.
+# draft: true — all chunks require Aamir's review before promotion.
+
+chunks:
+
+  # ---------- AI-Assisted Development ----------
+  - id: skill-ai-assisted-dev
+    type: skill
+    title: "AI-Assisted Development Tools"
+    source_section: "S5, A4, J15"
+    tags: ["ai-tools", "development-workflow", "claude", "copilot", "chatgpt", "gemini", "antigravity"]
+    draft: true
+    private: false
+    content: |
+      Aamir uses the following AI coding assistants in his development workflow: Claude, Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity. He has NOT used Cursor — do not list it.
+
+      Typical AI-assisted tasks include exploring unfamiliar codebases, implementing features, debugging, generating tests, refactoring, and reviewing code alternatives. His workflow principle is to use agents to accelerate work while inspecting changes, understanding the approach, running the application and relevant tests, reproducing bugs, and verifying results before accepting a change.
+
+      Aamir does not treat AI output as automatically correct. He inspects diffs, reasons about the approach, runs code, reproduces failures, checks edge cases and security, and consults documentation when uncertain. He remains responsible for understanding and validating what ships. He does not claim that he independently understands every generated line by default; he keeps working until he can explain and verify the code relevant to a feature.
+
+      The AI Digital Assistant portfolio project is being developed with help from AI coding agents. Aamir's role involves setting requirements, steering implementation, reviewing generated changes, debugging integrations, and verifying actual behaviour.
+
+  # ---------- AI/LLM Engineering ----------
+  - id: skill-ai-llm-engineering
+    type: skill
+    title: "AI/LLM Engineering Skills"
+    source_section: "A1, A2, A3, A5"
+    tags: ["rag", "embeddings", "tool-calling", "prompt-injection", "evaluations", "llm"]
+    draft: true
+    private: false
+    content: |
+      Aamir's AI/LLM engineering skill levels (honestly assessed):
+
+      - RAG: learning/working. Currently preparing the portfolio knowledge base and retrieval workflow. Not production-expert level.
+      - Embeddings: learning/working. Intended as part of hybrid retrieval for the portfolio assistant. Embedding model and evaluation details are pending.
+      - Tool calling: working exposure through LLM application design in Entropy-OJ and the portfolio assistant plan. Exact tools currently shipped must be verified.
+      - Prompt-injection defence: working/learning. Defensive design is part of the assistant plan. Concrete controls should be described only if implemented and tested.
+      - Evaluations: learning/working. The assistant needs a labelled retrieval/answer question set. Entropy-OJ has test files/output handling, but comprehensive LLM evals with results are not claimed.
+      - Fine-tuning: no hands-on evidence available.
+      - Agents: learning/working exposure to coding agents and tool-calling workflows. Using an AI coding agent is not the same as having built a general-purpose autonomous-agent system.
+
+      Entropy-OJ documents three AI workflows: (1) Socratic Debug Copilot with progressive hints and code-block stripping, (2) AI Problem-Setting QA Auditor for reviewing problem statements and judge packages, and (3) Post-acceptance approach/complexity classifier as an asynchronous background job. These use Gemini Flash, Groq, and OpenRouter as providers with a fallback design. Verified evaluation pass rates are not known.
+
+      Aamir distinguishes a full-stack AI engineer (building the product around AI: UI, backend, APIs, retrieval, tool calling, evaluation, safety, deployment) from an ML engineer (data pipelines, model training/evaluation, serving). He is primarily aiming toward full-stack AI/software engineering.
+
+  # ---------- Programming Languages ----------
+  - id: skill-programming-languages
+    type: skill
+    title: "Programming Languages"
+    source_section: "S1"
+    tags: ["python", "typescript", "javascript", "cpp", "java", "c", "sql", "html", "css"]
+    draft: true
+    private: false
+    content: |
+      Aamir's programming language proficiency (self-assessed levels from S1):
+
+      - Python: working. Used in Django project, ML projects (Health Premium Predictor), and general development work.
+      - TypeScript: working. Used in Entropy-OJ React/TypeScript frontend.
+      - JavaScript: working. Used in browser games and full-stack web development.
+      - C++: working for DSA practice. Used for data structures and algorithms practice. Do not call him a professional C++ developer or claim a C++ application project.
+      - Java: basic. College coursework only; coded in Java for OOP concepts. No substantial independent Java application.
+      - C: basic. College coursework only; no substantial independent C application.
+      - SQL: working. Used in database-backed applications and PostgreSQL projects.
+      - HTML: working. Web interfaces and server-rendered Django pages.
+      - CSS: working. Web UI styling and responsive application work.
+
+  # ---------- Frameworks and Libraries ----------
+  - id: skill-frameworks-libraries
+    type: skill
+    title: "Frameworks and Libraries"
+    source_section: "S1"
+    tags: ["react", "node", "express", "fastapi", "django", "streamlit", "scikit-learn", "pandas", "tailwind", "xgboost"]
+    draft: true
+    private: false
+    content: |
+      Aamir's framework and library proficiency:
+
+      - React: working. Used in Entropy-OJ and AI portfolio frontend work.
+      - Node.js: working. Used in Entropy-OJ backend.
+      - Express: working. Used in Entropy-OJ API server.
+      - FastAPI: working. Used in the AI Digital Assistant portfolio project.
+      - Django: working (via project). Used in the Secure Online Auction System project with PostgreSQL.
+      - Streamlit: working. Used in the Health Premium Predictor interface.
+      - scikit-learn: basic/working. ML preprocessing/evaluation context; exact APIs used should be confirmed from the repository.
+      - Pandas: working. Used in Health Premium Prediction and Credit Risk Prediction projects for data manipulation.
+      - Tailwind CSS: basic. Used in college coursework.
+      - XGBoost: working. Used for regression in the Health Premium Predictor project.
+      - Monaco Editor: used in Entropy-OJ for in-browser code editing.
+      - BullMQ: working. Used in Entropy-OJ for asynchronous job queuing.
+
+  # ---------- Databases ----------
+  - id: skill-databases
+    type: skill
+    title: "Database Skills"
+    source_section: "S1"
+    tags: ["mongodb", "postgresql", "mysql", "redis"]
+    draft: true
+    private: false
+    content: |
+      Aamir's database proficiency:
+
+      - MongoDB: working. Used in Entropy-OJ (MongoDB Atlas) and HealthTracker projects.
+      - PostgreSQL: working. Used in the Django auction project and possibly assistant persistence.
+      - MySQL: basic to working. Studied extensively in college coursework and hands-on assignments, and used for interview preparation.
+      - Redis: working. Used in Entropy-OJ for job queue (with BullMQ) and was central to the connection/debugging investigation involving TCP keep-alive and Azure idle timeout configuration.
+
+  # ---------- Cloud / DevOps / Tools ----------
+  - id: skill-cloud-devops-tools
+    type: skill
+    title: "Cloud, DevOps, and Development Tools"
+    source_section: "S1, S5"
+    tags: ["docker", "linux", "azure", "github-actions", "git", "vscode", "rest-api"]
+    draft: true
+    private: false
+    content: |
+      Aamir's cloud, DevOps, and tooling proficiency:
+
+      - Docker: working. Used in Entropy-OJ worker deployment configuration.
+      - Linux: basic to working exposure. Linux-based runner/process limits and cloud debugging, but not Linux administration expertise.
+      - Azure: working. Entropy-OJ execution layer (sandboxed worker and broker) runs on an Azure Virtual Machine.
+      - GitHub Actions: working. CI workflow associated with HealthTracker; actual jobs and current results should be verified.
+      - Git/GitHub: working. Used for source control, staging, committing, and pushing updates (including the Entropy-OJ Redis connection fix).
+      - REST APIs: working. Entropy-OJ backend/API and application integrations.
+      - Microservices: basic/working exposure. Separate frontend/API/worker components in Entropy-OJ; do not overstate distributed-systems depth.
+      - Editor/IDE: Visual Studio Code.
+
+  # ---------- Core CS ----------
+  - id: skill-core-cs
+    type: skill
+    title: "Core Computer Science Fundamentals"
+    source_section: "S1, E4"
+    tags: ["dsa", "os", "dbms", "cn", "system-design", "algorithms"]
+    draft: true
+    private: false
+    content: |
+      Aamir's core CS proficiency:
+
+      - Data Structures and Algorithms (DSA): working. High level of practice using Python as the primary language. Daily effort to reach similar levels with C++. First place in a university-wide graph-algorithm contest. Active on LeetCode, HackerRank, GeeksforGeeks, and other platforms.
+      - Operating Systems (OS): basic/coursework. Academic exposure and practical Linux process/resource-limit exposure through Entropy-OJ; no kernel-level expertise claimed.
+      - Database Management Systems (DBMS): working/coursework. Covered through coursework and database-backed projects.
+      - Computer Networks (CN): basic/coursework. Academic coursework only; no specialist networking role claimed.
+      - System Design: learning/working exposure. Multi-component application architecture and trade-off discussions through Entropy-OJ; continuing to strengthen operational and system-design depth.
+
+      Relevant coursework: Data Structures and Algorithms, Programming/OOP Fundamentals, Database Management Systems, Operating Systems, Computer Networks, System Architecture and Programming, Modern Application Development, Software Development Fundamentals (Agile methodology), Compilers, Graph Theory and Cryptography.
+
+  # ---------- Strongest Skills Summary ----------
+  - id: skill-strongest-summary
+    type: skill
+    title: "Strongest Skills and Professional Identity"
+    source_section: "S6, H5"
+    tags: ["strengths", "identity", "ai-assisted-dev", "debugging", "full-stack"]
+    draft: true
+    private: false
+    content: |
+      Aamir's strongest current areas are:
+
+      1. AI-assisted full-stack development — using Claude/Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity for implementation, codebase exploration, refactoring, and debugging, while working to understand and verify changes.
+      2. Integrating LLM capabilities into applications — Entropy-OJ has three AI workflows (Socratic Debug Copilot, AI QA Auditor, complexity classifier); the portfolio assistant uses RAG.
+      3. Practical debugging and problem-solving across application and deployment boundaries — traced a delayed-submission issue through logs and enqueue timestamps, found a Redis timeout, and applied a connection-level mitigation.
+
+      Aamir wants to be known as a full-stack AI/software engineer who uses AI tools effectively while understanding, validating, and taking responsibility for the software he ships.
+
+  # ---------- Currently Learning ----------
+  - id: skill-currently-learning
+    type: skill
+    title: "Skills Currently Being Learned"
+    source_section: "S2, E5, A5"
+    tags: ["learning", "coursera", "ibm", "deeplearning-ai", "columbia", "rag", "neural-networks"]
+    draft: true
+    private: false
+    content: |
+      Aamir is actively learning the following (all in progress, none completed):
+
+      - Generative AI for Software Developers Specialization (IBM/Coursera) — strengthening practical GenAI knowledge for software design, coding, testing, and delivery. Target completion: December 2026.
+      - Neural Networks and Deep Learning (DeepLearning.AI/Coursera) — in progress.
+      - Building Customized LLMs with OpenAI (Columbia University/Columbia Plus) — in progress.
+      - AI Cybersecurity & Governance (Columbia University/Columbia Plus) — in progress.
+      - Prompt Engineering & Programming with OpenAI (Columbia University/Columbia Plus) — in progress.
+      - RAG and knowledge-base engineering — currently preparing the portfolio assistant's knowledge base and retrieval workflow, learning chunking, metadata, hybrid retrieval, evaluation, source attribution, and abstention.
+      - AI application engineering — continuing to practise tool calling, structured outputs, safe prompting, evaluation, and provider fallbacks through Entropy-OJ and the portfolio assistant.
+
+      Future learning goals include: RAG design/evaluation, hybrid retrieval/reranking, reliable tool calling, prompt-injection testing, structured-output validation, latency/cost management, tracing/observability, and deployment. He also wants to deepen core CS/software engineering fundamentals.
+
+  # ---------- Skills NOT Claimed ----------
+  - id: skill-not-claimed
+    type: skill
+    title: "Skills and Experience Not Claimed"
+    source_section: "S3, S1, B8, B10"
+    tags: ["not-claimed", "boundaries", "kubernetes", "terraform", "kafka", "aws", "google", "employment", "cursor"]
+    draft: true
+    private: false
+    content: |
+      The following skills and affiliations are NOT claimed and must not be attributed to Aamir without new evidence:
+
+      - Google employment: Aamir has NEVER worked at Google. His only Google association is participating in the Google Cloud 'Build with AI: Code for Communities' hackathon with team project VayuSetu (2nd Runner-Up). Mentorship and hackathons must never be represented as Google employment.
+      - Apple / ByteDance employment: never worked at Apple or ByteDance.
+      - Kubernetes: no hands-on experience.
+      - Terraform: no hands-on experience.
+      - Kafka: no hands-on experience.
+      - Spring Boot: no hands-on experience.
+      - Go: no hands-on experience.
+      - GraphQL: no hands-on experience.
+      - React Native: no hands-on experience.
+      - AWS: no specific AWS service use is established. However, Aamir has worked with Azure services, so some skills are transferable.
+      - Cursor: Aamir has NOT used Cursor. Do not list it as a tool.
+      - Advanced MLOps: not evidenced.
+      - Model fine-tuning: no hands-on evidence.
+      - Cloud certifications: none.
+
+      None of these are "basic" or "in progress" — they are confirmed as "none" per S3 and B10. Aamir's suggested ramp-up approach is: learn core concepts from official documentation, build a scoped exercise, add tests, deploy if appropriate, then document limitations.

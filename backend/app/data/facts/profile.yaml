@@ -1,0 +1,94 @@
+# Profile — Identity and Logistics
+# Source: Aamir_Khan_Knowledge_Base_Questionnaire_Answered.md, Section 1 (P1–P12)
+# All chunks are DRAFT until Aamir reviews and approves.
+
+chunks:
+
+  - id: "profile-identity"
+    type: "profile"
+    title: "Identity and Professional Summary"
+    source_section: "P1, P2, P3, P11"
+    tags: ["identity", "introduction", "status"]
+    draft: true
+    private: false
+    content: |
+      Aamir Mohammed Khan is a B.Tech Computer Science and Engineering student at M. S. Ramaiah University of Applied Sciences (MSRUAS) in Bengaluru, India. He is currently in his 4th year as of October 2026, with an expected graduation in June 2027.
+
+      Aamir builds full-stack applications and AI-enabled software tools, combining practical product engineering with LLM integration, debugging, testing, and deployment.
+
+      Recruiters should call him Aamir. Pronouns: he/him.
+
+  - id: "profile-location-relocation"
+    type: "profile"
+    title: "Location and Relocation Preferences"
+    source_section: "P4, P5, P8"
+    tags: ["location", "relocation", "work-mode", "work-authorisation"]
+    draft: true
+    private: false
+    content: |
+      Aamir is based in Bengaluru, India, and Bengaluru is his first-choice work location. Within India, he is not open to relocating. He is open to considering Europe for a longer-term opportunity, subject to role fit and work-authorisation arrangements. Foreign work authorisation has not been confirmed.
+
+      Work mode preference: open to onsite or hybrid in Bengaluru, and remote everywhere depending on the role, team, and learning opportunity. No university constraints prevent him from taking up internships or full-time roles, except certain afternoons during exam dates (once or twice for remaining semesters).
+
+      Aamir is eligible to work in India without sponsorship. He is open to international roles, particularly longer-term opportunities in Europe, subject to work-permit or sponsorship requirements.
+
+  - id: "profile-work-availability"
+    type: "profile"
+    title: "Work Availability and Start Date"
+    source_section: "P3, P5, P6"
+    tags: ["availability", "internship", "full-time", "graduation"]
+    draft: true
+    private: false
+    content: |
+      Aamir's expected graduation is June 2027. He is open to internships or full-time roles before graduation — available from October 2026 onward. His university allows students to take up internships and job roles full-time without constraints, apart from certain afternoons during exam dates.
+
+  - id: "profile-contact"
+    type: "profile"
+    title: "Contact Information"
+    source_section: "P9, P12"
+    tags: ["contact", "email", "linkedin"]
+    draft: true
+    private: false
+    content: |
+      Preferred public contact channels: email, LinkedIn, or WhatsApp.
+
+      Email: aamirmkh25@gmail.com
+      LinkedIn: https://www.linkedin.com/in/aamir-mk/
+
+      Aamir aims to respond to genuine professional enquiries within one business day. To schedule a meeting, contact him through email, LinkedIn, or WhatsApp.
+
+      Note: Aamir's phone number is available through the assistant's contact-sharing policy at runtime only and is not indexed here.
+
+  - id: "profile-links"
+    type: "profile"
+    title: "Portfolio Links and Projects"
+    source_section: "P10"
+    tags: ["links", "github", "projects", "live-apps"]
+    draft: true
+    private: false
+    content: |
+      GitHub profile: https://github.com/aamir-coding
+      LinkedIn: https://www.linkedin.com/in/aamir-mk
+
+      Live applications:
+      - Entropy-OJ: https://entropy-oj.vercel.app
+      - Health Premium Predictor: https://health-prem-prediction.streamlit.app
+      - AI Digital Assistant portfolio: https://aamirmk-portfolio.vercel.app
+      - HealthTracker: https://health-tracker-alpha-one.vercel.app
+
+      Repositories:
+      - Health Premium Predictor: https://github.com/aamir-coding/health-prem-predict
+      - AI Digital Assistant: https://github.com/aamir-coding/aamirmk-portfolio
+      - HealthTracker: https://github.com/aamir-coding/health-tracker
+
+  - id: "profile-communication"
+    type: "profile"
+    title: "Languages and Timezone"
+    source_section: "P7, P12"
+    tags: ["languages", "timezone", "communication"]
+    draft: true
+    private: false
+    content: |
+      Aamir communicates in English in technical and professional contexts (fluent), backed by outstanding grades in Class 10, Class 12, and university. Hindi: conversational level. The assistant responds in English by default.
+
+      Time zone: India Standard Time (IST, UTC+05:30).

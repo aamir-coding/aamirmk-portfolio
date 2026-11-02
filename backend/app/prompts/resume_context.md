@@ -26,7 +26,7 @@ Bachelor of Technology in Computer Science and Engineering — CGPA: 9.77/10.0
 
 ## Experience
 
-### AlgoUniversity — Software Development Extern (Remote, July 2026–September 2026)
+### AlgoUniversity — Software Development Extern (Remote, July 2026–August 2026)
 Live App: https://entropy-oj.vercel.app
 
 - Built a responsive coding workspace with React 19, TypeScript, and Monaco Editor, including mobile navigation, split-pane editing, compiler diagnostics, and submission history.

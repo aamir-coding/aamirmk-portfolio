@@ -1,10 +1,10 @@
 # Progress Tracker
 
 ## Current Phase
-**Band 1 / Gate 1: Complete** — Public shareable link active and hardened. Next: Phase 2 (Knowledge Base & RAG)
+**Band 2 / Phase 2: Hybrid RAG Complete** — 100% Hit Rate@5, 0.8778 MRR, 9.39ms latency, 227MB RAM. Next: User Approval & Phase 5 (Source Citations and Generative UI)
 
 ## Live Deployments
-- **Backend (Render)**: `https://aamirmk-portfolio.onrender.com/api/health`
+- **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
 - **Frontend (Vercel)**: `https://aamirmk-portfolio.vercel.app/`
 
 ## Phase Status
@@ -18,8 +18,8 @@
 | P4: Design system (minimal) | 🟢 Complete | `main` | `phase-4-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
 | P7: Safety (first-share) | 🟢 Complete | `main` | `phase-7-done` | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
 | — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
-| P2: RAG | ⬜ Next Up (Band 2) | — | — | — |
-| P5: Citations + gen UI | ⬜ Not Started | — | — | — |
+| P2: RAG | 🟢 Complete | `phase-2-rag` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
+| P5: Citations + gen UI | ⬜ Next Up (Band 2) | — | — | — |
 | P4: Design system (full) | ⬜ Not Started | — | — | — |
 | P6: Fit report | ⬜ Not Started | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
@@ -98,6 +98,22 @@
 - [x] Phase 7: 104 backend Pytest tests (100% green, 0 API cost) and 27 frontend Vitest tests (100% green)
 - [x] Phase 7: Architectural decisions DRN-015, DRN-016, and DRN-017 recorded in `docs/decisions.md`
 - [x] Phase 7: Comprehensive study guide written in `docs/study-guides/phase-07-safety-rate-limiting.md`
+- [x] Phase 2: Curated 75 verified fact chunks across 9 categories + 1 boundary policy from answered questionnaire
+- [x] Phase 2: Built `FactChunk` and `RetrievedChunk` Pydantic v2 models and `FactLoader` with frontmatter parsing
+- [x] Phase 2: Documented 17 knowledge gaps/unverified metrics in `docs/knowledge-todo.md`
+- [x] Phase 2: Implemented in-house Okapi BM25 index with Robertson-Spärck Jones non-negative IDF and technical compound tokenization
+- [x] Phase 2: Integrated FastEmbed ONNX runtime with `BAAI/bge-small-en-v1.5` (~130MB ONNX, 384 dimensions) and NumPy cosine dot products
+- [x] Phase 2: Passed Memory Gate in 512MB container simulation (227.75 MB total WorkingSet, >284 MB headroom)
+- [x] Phase 2: Implemented Cormack's Reciprocal Rank Fusion ($k=60$) combining BM25 and dense results off-thread via `asyncio.to_thread`
+- [x] Phase 2: Built `@runtime_checkable` `Retriever` protocol with `FakeRetriever` and FastAPI dependency injection (`get_retriever`)
+- [x] Phase 2: Dynamic system prompt context augmentation in `POST /api/chat` and `POST /api/chat/stream` (`top_k=4`) preserving guardrails and quota
+- [x] Phase 2: Built automated retrieval eval suite `evals/test_retrieval.py` against 45 labeled queries from `evals/seed_questions.yaml`
+- [x] Phase 2: Hit Rate@5: 100.00% (45/45 queries, target >= 90%)
+- [x] Phase 2: MRR: 0.8778 (target >= 0.8000)
+- [x] Phase 2: CPU Retrieval Latency: 9.39 ms average, p95 11.01 ms (target < 25 ms)
+- [x] Phase 2: Total test suite: 175 tests passed (127 backend + 48 evals, 100% green, 0 API cost)
+- [x] Phase 2: Architectural decisions DRN-018 and DRN-019 recorded in `docs/decisions.md`
+- [x] Phase 2: Comprehensive study guide written in `docs/study-guides/phase-02-hybrid-rag.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -108,8 +124,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Present Gate 1 summary and shareable link status.
-2. Deliver Phase 2 (Knowledge Base & Hybrid RAG) brief upon approval.
+1. Deliver Phase 2 teach-back (3 questions).
+2. Obtain user approval to tag `phase-2-done` and merge to `main`.
+3. Present Phase 5 brief (Source Citations and Generative UI cards).
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅

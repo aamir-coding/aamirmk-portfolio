@@ -206,3 +206,34 @@ A. External database or Redis tracking
 B. In-memory `DailyQuotaGuard` with UTC-midnight calendar rollover and proactive 80% safety cap (800 RPD / 180,000 TPD)  
 **Choice:** B — In-memory `DailyQuotaGuard` with UTC rollover  
 **Why:** Avoids adding external database dependencies prior to Phase 9. Protects the developer account from total depletion, fails open safely on server restarts, and returns standard HTTP 429 errors with `Retry-After` seconds to UTC midnight when capacity is reached.
+
+
+---
+
+### DRN-018: Structured Knowledge Base Frontmatter & Chunking Strategy
+
+**Date:** 2026-11-01  
+**Context:** The assistant previously stuffed Aamir's entire plain-text résumé into the system prompt (~1,380 tokens per request). This bloated prompt size, risked hallucinating beyond the résumé, prevented fine-grained source attribution, and made it impossible to distinguish between public factual chunks and sensitive runtime policies (such as salary deflections and the recruiter phone-sharing policy).  
+**Options:**  
+A. Fixed character/sentence sliding-window chunking without metadata  
+B. Single monolithic Markdown knowledge file with section header splitting  
+C. Curated frontmatter chunks (YAML frontmatter + Markdown content) parsed into immutable Pydantic `FactChunk` models, with draft flags, explicit semantic tags, and private/unindexed segregation.  
+**Choice:** C — Curated frontmatter chunks with Pydantic validation  
+**Why:** Preserves complete conceptual units (e.g. whole debugging stories, full HR Q&As, project architectures) without chopping sentences mid-thought. Enables granular source section mapping (e.g. `X7`, `J8`, `B1`), allows unverified metrics to be identified in `knowledge-todo.md`, and enables `boundaries.md` to be loaded as prompt instructions while strictly excluded from the public retrieval index.
+
+---
+
+### DRN-019: In-Process Hybrid Retrieval (BM25 + fastembed ONNX + RRF) behind Retriever Protocol
+
+**Date:** 2026-11-01  
+**Context:** Need a fast, accurate retrieval system that can run entirely within Render's free tier 512 MB RAM limit, handle exact technical keyword recall (`ETIMEDOUT`, `BullMQ`, `Monaco Editor`, `9.77`) alongside semantic intent ("What did Aamir do at his internship?"), and remain 100% offline and deterministic in CI without external vector database SaaS costs or credentials.  
+**Options:**  
+A. External Vector DB SaaS (Qdrant Cloud / Pinecone) via remote API  
+B. Full PyTorch / Transformers in-process embedding pipeline (~1.5+ GB RAM)  
+C. In-process hybrid engine: custom Okapi BM25 ($k_1=1.5, b=0.75$) + FastEmbed ONNX runtime (`BAAI/bge-small-en-v1.5`, 384 dimensions) + Cormack's Reciprocal Rank Fusion ($k=60$) behind an async `@runtime_checkable` `Retriever` protocol seam.  
+**Choice:** C — In-process hybrid retrieval with Protocol seam  
+**Why:**
+1. **Memory Gate Passed:** Total container WorkingSet after loading the ONNX model and indexing all 75 facts is 227.75 MB (<50% of Render's 512 MB cap, leaving >284 MB headroom).
+2. **Speed:** Average retrieval latency is 9.39 ms on CPU (p95 11.01 ms), well below the 25 ms ceiling.
+3. **Retrieval Quality:** Achieves 100.0% Hit Rate@5 (45/45 queries) and 0.8778 MRR on the labeled evaluation set.
+4. **Architectural Seam:** Clean dependency injection via `get_retriever()` enables `FakeRetriever` in unit tests (0.68s execution) and allows plugging in an external `QdrantRetriever` after Gate 2 without modifying a single line of endpoint code.
