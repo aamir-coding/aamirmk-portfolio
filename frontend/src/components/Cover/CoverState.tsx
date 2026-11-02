@@ -21,6 +21,47 @@ export function CoverState({
         </div>
         <h2 className="dossier-name">Aamir Mohammed Khan</h2>
         <p className="dossier-role">AI Systems & Full-Stack Engineer</p>
+
+        <div className="dossier-credentials-ribbon" aria-label="Candidate Credentials">
+          <span className="dossier-credential-pill">
+            AMU B.Tech (CGPA 9.77/10)
+          </span>
+          <span className="dossier-credential-pill">
+            Aligarh, India
+          </span>
+          <span className="dossier-credential-pill dossier-credential-available">
+            <span className="credential-dot" aria-hidden="true" />
+            Available for Hire
+          </span>
+        </div>
+
+        <nav className="dossier-external-links" aria-label="Direct Candidate Links">
+          <a
+            href="https://github.com/aamir-coding"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dossier-external-link"
+            title="Aamir's GitHub profile"
+          >
+            GitHub ↗
+          </a>
+          <a
+            href="https://www.linkedin.com/in/aamir-mk/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="dossier-external-link"
+            title="Aamir's LinkedIn profile"
+          >
+            LinkedIn ↗
+          </a>
+          <a
+            href="mailto:aamirmkh25@gmail.com"
+            className="dossier-external-link"
+            title="Email Aamir directly"
+          >
+            aamirmkh25@gmail.com ↗
+          </a>
+        </nav>
       </div>
 
       <div className="dossier-statement">

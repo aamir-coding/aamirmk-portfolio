@@ -21,6 +21,28 @@ describe("<CoverState />", () => {
     expect(screen.getByText(/Suggested Inquiries/i)).toBeInTheDocument();
   });
 
+  it("renders verified candidate credentials ribbon and external touchpoints", () => {
+    const onSelectPrompt = vi.fn();
+    render(<CoverState onSelectPrompt={onSelectPrompt} />);
+
+    expect(
+      screen.getByText(/AMU B\.Tech \(CGPA 9\.77\/10\)/i)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Aligarh, India/i)).toBeInTheDocument();
+    expect(screen.getByText(/Available for Hire/i)).toBeInTheDocument();
+
+    const githubLink = screen.getByRole("link", { name: /GitHub ↗/i });
+    expect(githubLink).toHaveAttribute("href", "https://github.com/aamir-coding");
+
+    const linkedInLink = screen.getByRole("link", { name: /LinkedIn ↗/i });
+    expect(linkedInLink).toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
+
+    const emailLink = screen.getByRole("link", {
+      name: /aamirmkh25@gmail\.com ↗/i,
+    });
+    expect(emailLink).toHaveAttribute("href", "mailto:aamirmkh25@gmail.com");
+  });
+
   it("calls onSelectPrompt when a starter chip is clicked", () => {
     const onSelectPrompt = vi.fn();
     render(<CoverState onSelectPrompt={onSelectPrompt} />);

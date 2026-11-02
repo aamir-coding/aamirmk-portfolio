@@ -301,6 +301,67 @@ body {
   font-weight: var(--font-medium);
 }
 
+.dossier-credentials-ribbon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.dossier-credential-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 2px 8px;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.dossier-credential-available {
+  border-color: rgba(5, 150, 105, 0.3);
+  background-color: var(--status-ready-bg);
+  color: var(--status-ready);
+}
+
+.credential-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--status-ready);
+  display: inline-block;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.dossier-external-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.dossier-external-link {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  color: var(--accent-cobalt);
+  text-decoration: none;
+  padding: 3px 8px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  transition: all var(--transition-fast);
+}
+
+.dossier-external-link:hover {
+  background-color: var(--accent-cobalt-subtle);
+  border-color: var(--accent-cobalt);
+  transform: translateY(-1px);
+}
+
 .dossier-statement {
   padding: var(--space-3) var(--space-4);
   background-color: var(--bg-subtle);
