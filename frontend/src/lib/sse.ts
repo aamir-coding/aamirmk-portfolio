@@ -1,9 +1,16 @@
 import { getApiBaseUrl } from "./api";
+import type { ProjectCardData, SourceCitation } from "./types";
 
 export interface StreamChatCallbacks {
   onToken: (token: string) => void;
-  onDone: (data: { conversation_id: string }) => void;
+  onDone: (data: {
+    conversation_id: string;
+    sources?: SourceCitation[];
+    cards?: ProjectCardData[];
+  }) => void;
   onError: (error: string) => void;
+  onSources?: (sources: SourceCitation[]) => void;
+  onCard?: (card: ProjectCardData) => void;
 }
 
 export interface StreamChatOptions {
@@ -101,13 +108,51 @@ export async function streamChat({
     }
 
     if (!response.body) {
-      callbacks.onError("No response body received from server");
+      callbacks.onError("ReadableStream not supported by environment");
       return;
     }
 
     const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8");
+    const decoder = new TextDecoder();
     let buffer = "";
+
+    const dispatchEvent = (event: string, data: string) => {
+      try {
+        const parsed = JSON.parse(data) as Record<string, unknown>;
+        if (event === "sources" && Array.isArray(parsed.sources)) {
+          callbacks.onSources?.(parsed.sources as SourceCitation[]);
+        } else if (
+          event === "card" &&
+          parsed.card &&
+          typeof parsed.card === "object"
+        ) {
+          callbacks.onCard?.(parsed.card as ProjectCardData);
+        } else if (event === "token" && typeof parsed.token === "string") {
+          callbacks.onToken(parsed.token);
+        } else if (event === "done") {
+          callbacks.onDone({
+            conversation_id:
+              typeof parsed.conversation_id === "string"
+                ? parsed.conversation_id
+                : "",
+            sources: Array.isArray(parsed.sources)
+              ? (parsed.sources as SourceCitation[])
+              : undefined,
+            cards: Array.isArray(parsed.cards)
+              ? (parsed.cards as ProjectCardData[])
+              : undefined,
+          });
+        } else if (event === "error") {
+          const detail =
+            typeof parsed.detail === "string"
+              ? parsed.detail
+              : "An error occurred during streaming";
+          callbacks.onError(detail);
+        }
+      } catch {
+        // Ignore JSON parse errors for non-JSON comments or keep-alives
+      }
+    };
 
     while (true) {
       const { done, value } = await reader.read();
@@ -118,54 +163,14 @@ export async function streamChat({
       buffer = remaining;
 
       for (const { event, data } of events) {
-        try {
-          const parsed = JSON.parse(data) as Record<string, unknown>;
-          if (event === "token" && typeof parsed.token === "string") {
-            callbacks.onToken(parsed.token);
-          } else if (event === "done") {
-            callbacks.onDone({
-              conversation_id:
-                typeof parsed.conversation_id === "string"
-                  ? parsed.conversation_id
-                  : "",
-            });
-          } else if (event === "error") {
-            const detail =
-              typeof parsed.detail === "string"
-                ? parsed.detail
-                : "An error occurred during streaming";
-            callbacks.onError(detail);
-          }
-        } catch {
-          // Ignore JSON parse errors for non-JSON comments or keep-alives
-        }
+        dispatchEvent(event, data);
       }
     }
 
     if (buffer.trim()) {
       const { events } = parseSSEBuffer(buffer + "\n\n");
       for (const { event, data } of events) {
-        try {
-          const parsed = JSON.parse(data) as Record<string, unknown>;
-          if (event === "token" && typeof parsed.token === "string") {
-            callbacks.onToken(parsed.token);
-          } else if (event === "done") {
-            callbacks.onDone({
-              conversation_id:
-                typeof parsed.conversation_id === "string"
-                  ? parsed.conversation_id
-                  : "",
-            });
-          } else if (event === "error") {
-            const detail =
-              typeof parsed.detail === "string"
-                ? parsed.detail
-                : "An error occurred during streaming";
-            callbacks.onError(detail);
-          }
-        } catch {
-          // ignore
-        }
+        dispatchEvent(event, data);
       }
     }
   } catch (err: unknown) {

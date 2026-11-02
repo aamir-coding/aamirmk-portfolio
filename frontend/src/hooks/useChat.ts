@@ -1,13 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { streamChat } from "../lib/sse";
+import type { ChatMessage, ProjectCardData, SourceCitation } from "../lib/types";
 
-export interface ChatMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  status: "pending" | "streaming" | "done" | "error";
-  timestamp: string;
-}
+export type { ChatMessage };
 
 export interface UseChatReturn {
   messages: ChatMessage[];
@@ -91,6 +86,8 @@ export function useChat(): UseChatReturn {
         content: "",
         status: "streaming",
         timestamp,
+        sources: [],
+        cards: [],
       };
 
       setMessages((prev) => [...prev, userMessage, assistantMessage]);
@@ -104,7 +101,23 @@ export function useChat(): UseChatReturn {
         conversationId: conversationId ?? undefined,
         signal: controller.signal,
         callbacks: {
-          onToken: (token) => {
+          onSources: (sources: SourceCitation[]) => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId ? { ...msg, sources } : msg
+              )
+            );
+          },
+          onCard: (card: ProjectCardData) => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === assistantMessageId
+                  ? { ...msg, cards: [...(msg.cards || []), card] }
+                  : msg
+              )
+            );
+          },
+          onToken: (token: string) => {
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -120,14 +133,25 @@ export function useChat(): UseChatReturn {
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
-                  ? { ...msg, status: "done" }
+                  ? {
+                      ...msg,
+                      status: "done",
+                      sources:
+                        msg.sources && msg.sources.length > 0
+                          ? msg.sources
+                          : data.sources || [],
+                      cards:
+                        msg.cards && msg.cards.length > 0
+                          ? msg.cards
+                          : data.cards || [],
+                    }
                   : msg
               )
             );
             setIsStreaming(false);
             abortControllerRef.current = null;
           },
-          onError: (errMsg) => {
+          onError: (errMsg: string) => {
             setError(errMsg);
             setMessages((prev) =>
               prev.map((msg) =>
@@ -138,7 +162,7 @@ export function useChat(): UseChatReturn {
                       content:
                         msg.content ||
                         errMsg ||
-                        "An error occurred while generating the response.",
+                        "Generation failed. Please try again.",
                     }
                   : msg
               )
@@ -149,7 +173,7 @@ export function useChat(): UseChatReturn {
         },
       });
     },
-    [conversationId, isStreaming]
+    [isStreaming, conversationId]
   );
 
   return {

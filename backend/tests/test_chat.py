@@ -14,7 +14,7 @@ from app.llm import (
     LLMAuthError,
     LLMRateLimitError,
     LLMUnavailableError,
-    Message,
+    ToolCall,
     get_llm_client,
 )
 from app.main import create_app
@@ -107,6 +107,10 @@ def test_chat_success(
     assert data["model"] == "fake-gpt-120b"
     assert data["conversation_id"] is not None
     assert data["usage"]["total_tokens"] == 15
+    assert len(data["sources"]) == 1
+    assert data["sources"][0]["chunk_id"] == "exp-algouniversity-role"
+    assert data["sources"][0]["source_section"] == "X1, X2"
+    assert data["sources"][0]["source_url"] == "https://entropy-oj.vercel.app"
 
     assert len(fake.last_messages) == 2
     assert fake.last_messages[0].role == "system"
@@ -178,16 +182,9 @@ def test_chat_propagates_request_id(
 def test_chat_handles_rate_limit(
     test_settings: Settings, fake_retriever: FakeRetriever
 ) -> None:
-    class RateLimitedLLM:
-        async def complete(self, messages: list[Message]) -> None:
-            raise LLMRateLimitError("TPM exceeded")
-
-        async def stream(self, messages: list[Message]):
-            raise LLMRateLimitError("TPM exceeded")
-            yield ""
-
+    fake = FakeLLM(error_to_raise=LLMRateLimitError("TPM exceeded"))
     app = create_app(settings=test_settings)
-    app.dependency_overrides[get_llm_client] = lambda: RateLimitedLLM()
+    app.dependency_overrides[get_llm_client] = lambda: fake
     app.dependency_overrides[get_retriever] = lambda: fake_retriever
 
     with TestClient(app, base_url="http://testserver") as client:
@@ -201,16 +198,9 @@ def test_chat_handles_rate_limit(
 def test_chat_handles_auth_error(
     test_settings: Settings, fake_retriever: FakeRetriever
 ) -> None:
-    class AuthFailingLLM:
-        async def complete(self, messages: list[Message]) -> None:
-            raise LLMAuthError("Invalid API key")
-
-        async def stream(self, messages: list[Message]):
-            raise LLMAuthError("Invalid API key")
-            yield ""
-
+    fake = FakeLLM(error_to_raise=LLMAuthError("Invalid API key"))
     app = create_app(settings=test_settings)
-    app.dependency_overrides[get_llm_client] = lambda: AuthFailingLLM()
+    app.dependency_overrides[get_llm_client] = lambda: fake
     app.dependency_overrides[get_retriever] = lambda: fake_retriever
 
     with TestClient(app, base_url="http://testserver") as client:
@@ -224,16 +214,9 @@ def test_chat_handles_auth_error(
 def test_chat_handles_upstream_unavailable(
     test_settings: Settings, fake_retriever: FakeRetriever
 ) -> None:
-    class UnavailableLLM:
-        async def complete(self, messages: list[Message]) -> None:
-            raise LLMUnavailableError("503 Service Unavailable")
-
-        async def stream(self, messages: list[Message]):
-            raise LLMUnavailableError("503 Service Unavailable")
-            yield ""
-
+    fake = FakeLLM(error_to_raise=LLMUnavailableError("503 Service Unavailable"))
     app = create_app(settings=test_settings)
-    app.dependency_overrides[get_llm_client] = lambda: UnavailableLLM()
+    app.dependency_overrides[get_llm_client] = lambda: fake
     app.dependency_overrides[get_retriever] = lambda: fake_retriever
 
     with TestClient(app, base_url="http://testserver") as client:
@@ -261,8 +244,13 @@ def test_chat_stream_success(
     assert response.headers.get("Cache-Control") == "no-cache, no-transform"
 
     events = parse_sse_events(response.text)
+    sources_events = [p for ev, p in events if ev == "sources"]
     token_events = [p for ev, p in events if ev == "token"]
     done_events = [p for ev, p in events if ev == "done"]
+
+    assert len(sources_events) == 1
+    assert len(sources_events[0]["sources"]) == 1
+    assert sources_events[0]["sources"][0]["chunk_id"] == "exp-algouniversity-role"
 
     assert len(token_events) > 0
     reconstructed = "".join(p["token"] for p in token_events)
@@ -270,6 +258,7 @@ def test_chat_stream_success(
 
     assert len(done_events) == 1
     assert done_events[0]["conversation_id"] is not None
+    assert done_events[0]["sources"][0]["chunk_id"] == "exp-algouniversity-role"
 
     assert len(fake.last_messages) == 2
     assert fake.last_messages[0].role == "system"
@@ -445,3 +434,148 @@ def test_chat_enforces_rate_limit_429(
         assert data["error"]["code"] == 429
         assert "Rate limit reached" in data["error"]["message"]
         assert "Retry-After" in rejected.headers
+
+
+def test_chat_sources_deduplicated(test_settings: Settings, fake_llm: FakeLLM) -> None:
+    chunk1 = FactChunk(
+        id="chunk-1",
+        type="project",
+        title="Project One",
+        content="First content",
+        source_section="J1",
+        source_url="https://example.com/1",
+    )
+    # Duplicate chunk with same id
+    chunk1_dup = FactChunk(
+        id="chunk-1",
+        type="project",
+        title="Project One Duplicate",
+        content="First content duplicate",
+        source_section="J1",
+        source_url="https://example.com/1",
+    )
+    chunk2 = FactChunk(
+        id="chunk-2",
+        type="skill",
+        title="Skill Two",
+        content="Second content",
+        source_section="S2",
+        source_url=None,
+    )
+
+    retriever = FakeRetriever(
+        canned_chunks=[
+            RetrievedChunk(chunk=chunk1, score=0.9, rank=1, retrieval_method="hybrid"),
+            RetrievedChunk(
+                chunk=chunk1_dup, score=0.85, rank=2, retrieval_method="hybrid"
+            ),
+            RetrievedChunk(chunk=chunk2, score=0.8, rank=3, retrieval_method="hybrid"),
+        ]
+    )
+
+    app = create_app(settings=test_settings)
+    app.dependency_overrides[get_llm_client] = lambda: fake_llm
+    app.dependency_overrides[get_retriever] = lambda: retriever
+
+    with TestClient(app, base_url="http://testserver") as client:
+        # Non-streaming
+        res = client.post("/api/chat", json={"message": "Tell me about your work"})
+        assert res.status_code == 200
+        sources = res.json()["sources"]
+        assert len(sources) == 2
+        assert sources[0]["chunk_id"] == "chunk-1"
+        assert sources[1]["chunk_id"] == "chunk-2"
+
+        # Streaming
+        stream_res = client.post(
+            "/api/chat/stream", json={"message": "Tell me about your work"}
+        )
+        assert stream_res.status_code == 200
+        events = parse_sse_events(stream_res.text)
+        sources_events = [p for ev, p in events if ev == "sources"]
+        assert len(sources_events) == 1
+        stream_sources = sources_events[0]["sources"]
+        assert len(stream_sources) == 2
+        assert stream_sources[0]["chunk_id"] == "chunk-1"
+        assert stream_sources[1]["chunk_id"] == "chunk-2"
+
+
+def test_chat_summons_project_card_via_tool_call(
+    test_settings: Settings, fake_retriever: FakeRetriever
+) -> None:
+    tool_calling_llm = FakeLLM(
+        reply="Entropy-OJ is Aamir's competitive programming platform.",
+        tool_calls=[
+            ToolCall(
+                id="call-entropy-1",
+                name="show_project_card",
+                arguments='{"project_id": "entropy-oj"}',
+            )
+        ],
+    )
+    app = create_app(settings=test_settings)
+    app.dependency_overrides[get_llm_client] = lambda: tool_calling_llm
+    app.dependency_overrides[get_retriever] = lambda: fake_retriever
+
+    with TestClient(app, base_url="http://testserver") as client:
+        res = client.post("/api/chat", json={"message": "Tell me about Entropy-OJ"})
+        assert res.status_code == 200
+        data = res.json()
+        assert (
+            data["reply"] == "Entropy-OJ is Aamir's competitive programming platform."
+        )
+        assert len(data["cards"]) == 1
+        card = data["cards"][0]
+        assert card["id"] == "entropy-oj"
+        assert card["title"] == "Entropy Online Judge"
+        assert "React 19" in card["tech_stack"]
+        assert card["live_url"] == "https://entropy-oj.vercel.app"
+        assert "System Architecture" in card["architecture_details"]
+
+
+def test_chat_stream_summons_project_card_via_tool_call(
+    test_settings: Settings, fake_retriever: FakeRetriever
+) -> None:
+    tool_calling_llm = FakeLLM(
+        reply="AI Assistant is Aamir's portfolio project.",
+        tool_calls=[
+            ToolCall(
+                id="call-ai-1",
+                name="show_project_card",
+                arguments='{"project_id": "ai-digital-assistant"}',
+            )
+        ],
+    )
+    app = create_app(settings=test_settings)
+    app.dependency_overrides[get_llm_client] = lambda: tool_calling_llm
+    app.dependency_overrides[get_retriever] = lambda: fake_retriever
+
+    with TestClient(app, base_url="http://testserver") as client:
+        res = client.post(
+            "/api/chat/stream", json={"message": "Show me the AI Assistant project"}
+        )
+        assert res.status_code == 200
+        events = parse_sse_events(res.text)
+
+        # Verify sources event
+        sources_events = [p for ev, p in events if ev == "sources"]
+        assert len(sources_events) == 1
+
+        # Verify card event
+        card_events = [p for ev, p in events if ev == "card"]
+        assert len(card_events) == 1
+        card = card_events[0]["card"]
+        assert card["id"] == "ai-digital-assistant"
+        assert card["title"] == "AI Digital Assistant Portfolio"
+
+        # Verify token streaming followed the card event
+        token_events = [p for ev, p in events if ev == "token"]
+        assert len(token_events) > 0
+        reconstructed = "".join(p["token"] for p in token_events)
+        assert "AI Assistant is Aamir's portfolio project." in reconstructed
+
+        # Verify done event contains both sources and cards
+        done_events = [p for ev, p in events if ev == "done"]
+        assert len(done_events) == 1
+        assert len(done_events[0]["cards"]) == 1
+        assert done_events[0]["cards"][0]["id"] == "ai-digital-assistant"

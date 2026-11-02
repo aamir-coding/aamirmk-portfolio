@@ -10,10 +10,8 @@ from app.llm import (
     LLMRateLimitError,
     LLMUnavailableError,
     Message,
+    ToolCall,
 )
-
-# asyncio_mode = "auto" in pyproject.toml — no @pytest.mark.asyncio needed
-
 
 # ── Value object tests ────────────────────────────────────────────────
 
@@ -29,6 +27,16 @@ class TestMessage:
         with pytest.raises(AttributeError):
             msg.role = "user"  # type: ignore[misc]
 
+    def test_message_with_tool_metadata(self) -> None:
+        tc = ToolCall(id="call_1", name="show_project_card", arguments='{"id":"test"}')
+        msg = Message(role="assistant", content="", tool_calls=[tc])
+        assert msg.tool_calls == [tc]
+
+        tool_resp = Message(
+            role="tool", content="ok", tool_call_id="call_1", name="show_project_card"
+        )
+        assert tool_resp.tool_call_id == "call_1"
+
 
 class TestAssistantMessage:
     def test_assistant_message_fields(self) -> None:
@@ -42,12 +50,14 @@ class TestAssistantMessage:
         assert reply.content == "Hi there"
         assert reply.model == "test-model"
         assert reply.total_tokens == 15
+        assert reply.tool_calls == []
 
 
 # ── FakeLLM tests ─────────────────────────────────────────────────────
 
 
 class TestFakeLLM:
+    @pytest.mark.asyncio
     async def test_returns_canned_reply(self) -> None:
         fake = FakeLLM(reply="I know about Aamir")
         result = await fake.complete([Message(role="user", content="Who is Aamir?")])
@@ -56,6 +66,7 @@ class TestFakeLLM:
         assert result.content == "I know about Aamir"
         assert result.model == "fake-model"
 
+    @pytest.mark.asyncio
     async def test_captures_messages(self) -> None:
         fake = FakeLLM()
         messages = [
@@ -68,6 +79,7 @@ class TestFakeLLM:
         assert fake.last_messages[0].role == "system"
         assert fake.last_messages[1].content == "Tell me about Aamir"
 
+    @pytest.mark.asyncio
     async def test_returns_usage_metadata(self) -> None:
         fake = FakeLLM()
         result = await fake.complete([Message(role="user", content="hi")])
@@ -76,39 +88,84 @@ class TestFakeLLM:
         assert result.completion_tokens == 5
         assert result.total_tokens == 15
 
+    @pytest.mark.asyncio
     async def test_custom_model_name(self) -> None:
         fake = FakeLLM(model="custom-model-v2")
         result = await fake.complete([Message(role="user", content="hi")])
         assert result.model == "custom-model-v2"
 
+    @pytest.mark.asyncio
     async def test_stream_default_chunks(self) -> None:
         fake = FakeLLM(reply="Aamir is an engineer")
         messages = [Message(role="user", content="Who is Aamir?")]
         chunks: list[str] = []
         async for chunk in fake.stream(messages):
-            chunks.append(chunk)
+            if isinstance(chunk, str):
+                chunks.append(chunk)
 
         assert "".join(chunks) == "Aamir is an engineer"
         assert len(fake.last_messages) == 1
         assert fake.last_messages[0].content == "Who is Aamir?"
 
+    @pytest.mark.asyncio
     async def test_stream_custom_chunks(self) -> None:
         fake = FakeLLM(stream_chunks=["Hel", "lo ", "world"])
         chunks: list[str] = [
-            chunk async for chunk in fake.stream([Message(role="user", content="hi")])
+            chunk
+            async for chunk in fake.stream([Message(role="user", content="hi")])
+            if isinstance(chunk, str)
         ]
         assert chunks == ["Hel", "lo ", "world"]
 
+    @pytest.mark.asyncio
     async def test_stream_raises_configured_error(self) -> None:
         fake = FakeLLM(error_to_raise=LLMRateLimitError("Rate limit exceeded"))
         with pytest.raises(LLMRateLimitError, match="Rate limit"):
             async for _ in fake.stream([Message(role="user", content="hi")]):
                 pass
 
+    @pytest.mark.asyncio
     async def test_complete_raises_configured_error(self) -> None:
         fake = FakeLLM(error_to_raise=LLMAuthError("Invalid API key"))
         with pytest.raises(LLMAuthError, match="Invalid API key"):
             await fake.complete([Message(role="user", content="hi")])
+
+    @pytest.mark.asyncio
+    async def test_complete_with_simulated_tool_call(self) -> None:
+        tc = ToolCall(
+            id="tc-1",
+            name="show_project_card",
+            arguments='{"project_id": "entropy-oj"}',
+        )
+        fake = FakeLLM(reply="Here is Entropy", tool_calls=[tc])
+
+        tools = [{"type": "function", "function": {"name": "show_project_card"}}]
+        result = await fake.complete(
+            [Message(role="user", content="Show entropy")], tools=tools
+        )
+
+        assert result.tool_calls == [tc]
+        assert fake.last_tools == tools
+
+    @pytest.mark.asyncio
+    async def test_stream_with_simulated_tool_call(self) -> None:
+        tc = ToolCall(
+            id="tc-1",
+            name="show_project_card",
+            arguments='{"project_id": "entropy-oj"}',
+        )
+        fake = FakeLLM(reply="Here is Entropy", tool_calls=[tc])
+
+        tools = [{"type": "function", "function": {"name": "show_project_card"}}]
+        items = [
+            item
+            async for item in fake.stream(
+                [Message(role="user", content="Show entropy")], tools=tools
+            )
+        ]
+
+        assert items == [tc]
+        assert fake.last_tools == tools
 
 
 # ── Error hierarchy tests ─────────────────────────────────────────────

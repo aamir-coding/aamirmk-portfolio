@@ -136,4 +136,57 @@ describe("<App />", () => {
       screen.queryByRole("button", { name: /Return to candidate dossier overview/i })
     ).not.toBeInTheDocument();
   });
+
+  it("renders summoned project card and opens architecture modal on click", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
+      opts.callbacks.onCard?.({
+        id: "entropy-oj",
+        title: "Entropy Online Judge",
+        subtitle: "Competitive Programming & DSA Platform",
+        summary: "Evaluates code in Linux sandbox.",
+        role: "Solo Author",
+        tech_stack: ["React 19", "Redis"],
+        highlights: ["BullMQ asynchronous judging"],
+        metrics: { Worker: "Dedicated VM" },
+        github_url: "https://github.com/aamir-coding/entropy-oj",
+        live_url: "https://entropy-oj.vercel.app",
+        source_sections: ["J1", "J2"],
+        architecture_details: "System uses Redis queue and Linux runner.",
+      });
+      opts.callbacks.onToken("Here is an overview of Entropy-OJ.");
+      opts.callbacks.onDone({ conversation_id: "conv-card-1" });
+    });
+
+    render(<App />);
+
+    const textarea = screen.getByPlaceholderText(/Ask about Aamir's experience/i);
+    fireEvent.change(textarea, { target: { value: "Tell me about Entropy-OJ" } });
+    const sendBtn = screen.getByRole("button", { name: /Send message/i });
+    fireEvent.click(sendBtn);
+
+    // Card appears in message
+    await waitFor(() => {
+      expect(screen.getByText("Entropy Online Judge")).toBeInTheDocument();
+      expect(screen.getByText("BullMQ asynchronous judging")).toBeInTheDocument();
+    });
+
+    // Click "Inspect Architecture →"
+    const inspectBtn = screen.getByRole("button", { name: /Inspect Architecture/i });
+    fireEvent.click(inspectBtn);
+
+    // Modal dialog appears
+    await waitFor(() => {
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+      expect(screen.getByText(/System uses Redis queue and Linux runner/i)).toBeInTheDocument();
+    });
+
+    // Close modal
+    const closeBtn = screen.getByRole("button", { name: /Close architecture modal/i });
+    fireEvent.click(closeBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).toBeNull();
+    });
+  });
 });

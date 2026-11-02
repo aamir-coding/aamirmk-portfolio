@@ -175,4 +175,59 @@ describe("streamChat", () => {
 
     expect(onError).not.toHaveBeenCalled();
   });
+
+  it("dispatches onSources and onCard callbacks when received in stream", async () => {
+    const ssePayload =
+      'event: sources\ndata: {"sources": [{"chunk_id": "c1", "title": "Entropy OJ", "type": "project", "source_section": "J1", "source_url": "https://entropy-oj.vercel.app"}]}\n\n' +
+      'event: card\ndata: {"card": {"id": "entropy-oj", "title": "Entropy Online Judge", "subtitle": "DSA Platform", "summary": "Platform", "role": "Author", "tech_stack": ["React"], "highlights": ["Async"], "metrics": {}, "source_sections": ["J1"], "architecture_details": "Arch"}}\n\n' +
+      'event: token\ndata: {"token": "Overview"}\n\n' +
+      'event: done\ndata: {"conversation_id": "conv-1"}\n\n';
+
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(ssePayload));
+        controller.close();
+      },
+    });
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      body: stream,
+    } as unknown as Response);
+
+    const onSources = vi.fn();
+    const onCard = vi.fn();
+    const onToken = vi.fn();
+    const onDone = vi.fn();
+
+    await streamChat({
+      message: "Entropy",
+      callbacks: {
+        onSources,
+        onCard,
+        onToken,
+        onDone,
+        onError: vi.fn(),
+      },
+    });
+
+    expect(onSources).toHaveBeenCalledWith([
+      {
+        chunk_id: "c1",
+        title: "Entropy OJ",
+        type: "project",
+        source_section: "J1",
+        source_url: "https://entropy-oj.vercel.app",
+      },
+    ]);
+    expect(onCard).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "entropy-oj",
+        title: "Entropy Online Judge",
+      })
+    );
+    expect(onToken).toHaveBeenCalledWith("Overview");
+    expect(onDone).toHaveBeenCalledWith({ conversation_id: "conv-1" });
+  });
 });
