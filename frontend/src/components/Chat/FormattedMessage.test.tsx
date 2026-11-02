@@ -160,4 +160,92 @@ Aamir Mohammed Khan's most notable production-grade projects are:
     const cursor = screen.getByTestId("streaming-cursor");
     expect(cursor).toBeInTheDocument();
   });
+
+  it("renders <br> and &lt;br&gt; tags as line breaks without leaking raw tags", () => {
+    const text = "First line<br>Second line<br />Third line&lt;br&gt;Fourth line";
+    render(<FormattedMessage content={text} />);
+
+    const brs = document.querySelectorAll("br.prose-br");
+    expect(brs.length).toBe(3);
+    expect(screen.queryByText("<br>")).not.toBeInTheDocument();
+    expect(screen.queryByText("<br />")).not.toBeInTheDocument();
+    expect(screen.queryByText("&lt;br&gt;")).not.toBeInTheDocument();
+  });
+
+  it("renders inline italics (*text* and _text_) and bold italics (***text***)", () => {
+    const text =
+      "This is *italic one*, _italic two_, and ***bold italic*** with ~~deleted~~ text.";
+    render(<FormattedMessage content={text} />);
+
+    const italic1 = screen.getByText("italic one");
+    expect(italic1.tagName).toBe("EM");
+
+    const italic2 = screen.getByText("italic two");
+    expect(italic2.tagName).toBe("EM");
+
+    const boldItalic = screen.getByText("bold italic");
+    expect(boldItalic.tagName).toBe("EM");
+    expect(boldItalic.parentElement?.tagName).toBe("STRONG");
+
+    const del = screen.getByText("deleted");
+    expect(del.tagName).toBe("DEL");
+  });
+
+  it("compacts the '#' index column and assigns col-compact class", () => {
+    const text = `
+| # | Skill | Projects |
+|---|---|---|
+| 1 | Full-Stack | Entropy-OJ |
+| 2 | Debugging | Redis investigation |
+`.trim();
+
+    render(<FormattedMessage content={text} />);
+
+    const table = screen.getByRole("table");
+    expect(table).toBeInTheDocument();
+
+    const compactTh = table.querySelector("th.col-compact");
+    expect(compactTh).toBeInTheDocument();
+    expect(compactTh).toHaveTextContent("#");
+
+    const compactTds = table.querySelectorAll("td.col-compact");
+    expect(compactTds).toHaveLength(2);
+    expect(compactTds[0]).toHaveTextContent("1");
+    expect(compactTds[1]).toHaveTextContent("2");
+  });
+
+  it("renders screenshot 2 top 5 skills table and footnote with proper italics and line breaks", () => {
+    const text = `
+Top 5 Skills - Aamir Mohammed Khan & Where He Applied Them
+
+| # | Skill (as highlighted in his résumé) | Projects/Contexts where the skill was used (see receipts below) |
+|---|---|---|
+| 1 | AI-Assisted Implementation & Rapid Learning | • Built Entropy-OJ using Claude Code<br>• Developed RAG-powered portfolio assistant |
+| 2 | Full-Stack System Integration | • Entropy-OJ: integrated React/TypeScript front-end<br>• Secure Auction System |
+
+*All entries are drawn directly from Aamir's verified résumé and skill inventory.*
+`.trim();
+
+    render(<FormattedMessage content={text} />);
+
+    // Table is present with compact col 0
+    const compactTh = document.querySelector("th.col-compact");
+    expect(compactTh).toBeInTheDocument();
+    expect(compactTh).toHaveTextContent("#");
+
+    // Line breaks parsed inside cells
+    const cellBrs = document.querySelectorAll("td .prose-br");
+    expect(cellBrs.length).toBe(2);
+
+    // Footnote rendered as italic (no raw asterisks leaking)
+    const footnote = screen.getByText(
+      /All entries are drawn directly from Aamir's verified résumé and skill inventory\./i
+    );
+    expect(footnote.tagName).toBe("EM");
+    expect(
+      screen.queryByText(
+        /\*All entries are drawn directly from Aamir's verified résumé and skill inventory\.\*/
+      )
+    ).not.toBeInTheDocument();
+  });
 });

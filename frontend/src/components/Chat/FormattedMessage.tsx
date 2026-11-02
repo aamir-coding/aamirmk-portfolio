@@ -5,24 +5,26 @@ export interface FormattedMessageProps {
   isStreaming?: boolean;
 }
 
+const INLINE_TOKEN_REGEX =
+  /(<br\s*\/?>|&lt;br\s*\/?&gt;|`[^`]+`|\*\*\*[^*]+\*\*\*|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_|~~[^~]+~~|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|<https?:\/\/[^\s>]+>|https?:\/\/[^\s<)"'`]+|<b>.*?<\/b>|<strong>.*?<\/strong>|<i>.*?<\/i>|<em>.*?<\/em>|<code>.*?<\/code>|<del>.*?<\/del>|<s>.*?<\/s>)/gi;
+
 /**
- * Parses inline formatting: **bold**, `code`, [label](url), <url>, and bare URLs
+ * Parses inline formatting:
+ * **bold**, *italic*, `code`, ~~strikethrough~~, [label](url), <url>, bare URLs,
+ * and safe HTML tags (<br>, <b>, <strong>, <i>, <em>, <code>).
  */
 function renderInline(text: string): React.ReactNode[] {
-  // Regex splitting on:
-  // 1) Code: `([^`]+)`
-  // 2) Bold: \*\*([^*]+)\*\*
-  // 3) Markdown Link: \[([^\]]+)\]\((https?:\/\/[^\s)]+)\)
-  // 4) Angle-bracket Link: <(https?:\/\/[^\s>]+)>
-  // 5) Bare URL: (https?:\/\/[^\s<)"'`]+)
-  const pattern =
-    /(`[^`]+`|\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^\s)]+\)|<https?:\/\/[^\s>]+>|https?:\/\/[^\s<)"'`]+)/g;
-  const parts = text.split(pattern);
+  const parts = text.split(INLINE_TOKEN_REGEX);
 
   return parts.map((part, index) => {
     if (!part) return null;
 
-    // Inline code
+    // 1. Line break tag: <br>, <br/>, <br />, &lt;br&gt;, &lt;br/&gt;
+    if (/^(&lt;br\s*\/?&gt;|<br\s*\/?>)$/i.test(part)) {
+      return <br key={index} className="prose-br" />;
+    }
+
+    // 2. Inline code: `code`
     if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
       return (
         <code key={index} className="prose-inline-code">
@@ -31,8 +33,29 @@ function renderInline(text: string): React.ReactNode[] {
       );
     }
 
-    // Bold
-    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+    // 3. HTML code: <code>...</code>
+    if (/^<code>(.*?)<\/code>$/i.test(part)) {
+      return (
+        <code key={index} className="prose-inline-code">
+          {part.replace(/^<code>|<\/code>$/gi, "")}
+        </code>
+      );
+    }
+
+    // 4. Bold + Italic: ***text***
+    if (part.startsWith("***") && part.endsWith("***") && part.length >= 6) {
+      return (
+        <strong key={index} className="prose-strong">
+          <em className="prose-em">{part.slice(3, -3)}</em>
+        </strong>
+      );
+    }
+
+    // 5. Bold: **text** or __text__
+    if (
+      (part.startsWith("**") && part.endsWith("**") && part.length >= 4) ||
+      (part.startsWith("__") && part.endsWith("__") && part.length >= 4)
+    ) {
       return (
         <strong key={index} className="prose-strong">
           {part.slice(2, -2)}
@@ -40,7 +63,34 @@ function renderInline(text: string): React.ReactNode[] {
       );
     }
 
-    // Markdown link: [label](url)
+    // 5. HTML bold: <b>...</b> or <strong>...</strong>
+    if (/^<(b|strong)>(.*?)<\/(b|strong)>$/i.test(part)) {
+      return (
+        <strong key={index} className="prose-strong">
+          {part.replace(/^<(b|strong)>|<\/(b|strong)>$/gi, "")}
+        </strong>
+      );
+    }
+
+    // 7. Strikethrough: ~~text~~
+    if (part.startsWith("~~") && part.endsWith("~~") && part.length >= 4) {
+      return (
+        <del key={index} className="prose-del">
+          {part.slice(2, -2)}
+        </del>
+      );
+    }
+
+    // 8. HTML strikethrough: <del>...</del> or <s>...</s>
+    if (/^<(del|s)>(.*?)<\/(del|s)>$/i.test(part)) {
+      return (
+        <del key={index} className="prose-del">
+          {part.replace(/^<(del|s)>|<\/(del|s)>$/gi, "")}
+        </del>
+      );
+    }
+
+    // 7. Markdown link: [label](url)
     const mdLinkMatch = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/);
     if (mdLinkMatch) {
       const [, label, href] = mdLinkMatch;
@@ -57,7 +107,7 @@ function renderInline(text: string): React.ReactNode[] {
       );
     }
 
-    // Angle-bracket link: <url>
+    // 8. Angle-bracket link: <url>
     const angleMatch = part.match(/^<(https?:\/\/[^\s>]+)>$/);
     if (angleMatch) {
       const [, href] = angleMatch;
@@ -74,7 +124,7 @@ function renderInline(text: string): React.ReactNode[] {
       );
     }
 
-    // Bare URL: https://...
+    // 9. Bare URL: https://...
     if (/^https?:\/\/[^\s<)"'`]+$/.test(part)) {
       return (
         <a
@@ -86,6 +136,27 @@ function renderInline(text: string): React.ReactNode[] {
         >
           {part}
         </a>
+      );
+    }
+
+    // 10. Italic: *text* or _text_ (evaluated after bold)
+    if (
+      (part.startsWith("*") && part.endsWith("*") && part.length >= 2) ||
+      (part.startsWith("_") && part.endsWith("_") && part.length >= 2)
+    ) {
+      return (
+        <em key={index} className="prose-em">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+
+    // 11. HTML italic: <i>...</i> or <em>...</em>
+    if (/^<(i|em)>(.*?)<\/(i|em)>$/i.test(part)) {
+      return (
+        <em key={index} className="prose-em">
+          {part.replace(/^<(i|em)>|<\/(i|em)>$/gi, "")}
+        </em>
       );
     }
 
@@ -120,6 +191,7 @@ interface TableBlock {
   headers: string[];
   alignments?: ("left" | "center" | "right")[];
   rows: string[][];
+  isCol0Compact?: boolean;
 }
 
 interface HeadingBlock {
@@ -230,11 +302,18 @@ function parseBlocks(markdown: string): Block[] {
         i++;
       }
 
+      // Check if column 0 is a compact index column (e.g. "#", "No.", "ID", "Rank", "Step", or all 1-4 chars)
+      const header0 = (headerRow[0] ?? "").trim().toLowerCase();
+      const isCol0Compact =
+        /^(#|no\.?|id|rank|step|num|idx)$/i.test(header0) ||
+        (rows.length > 0 && rows.every((r) => ((r[0] ?? "").trim().length <= 4)));
+
       blocks.push({
         type: "table",
         headers: headerRow,
         alignments,
         rows,
+        isCol0Compact,
       });
       continue;
     }
@@ -367,14 +446,22 @@ export const FormattedMessage = React.memo(function FormattedMessage({
               <table className="prose-table">
                 <thead>
                   <tr>
-                    {block.headers.map((header, hIdx) => (
-                      <th
-                        key={hIdx}
-                        style={{ textAlign: block.alignments?.[hIdx] ?? "left" }}
-                      >
-                        {renderInline(header)}
-                      </th>
-                    ))}
+                    {block.headers.map((header, hIdx) => {
+                      const isCompact = hIdx === 0 && block.isCol0Compact;
+                      return (
+                        <th
+                          key={hIdx}
+                          className={isCompact ? "col-compact" : undefined}
+                          style={{
+                            textAlign:
+                              block.alignments?.[hIdx] ??
+                              (isCompact ? "center" : "left"),
+                          }}
+                        >
+                          {renderInline(header)}
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
@@ -384,11 +471,15 @@ export const FormattedMessage = React.memo(function FormattedMessage({
                       <tr key={rIdx}>
                         {row.map((cell, cIdx) => {
                           const isLastCell = cIdx === row.length - 1;
+                          const isCompact = cIdx === 0 && block.isCol0Compact;
                           return (
                             <td
                               key={cIdx}
+                              className={isCompact ? "col-compact" : undefined}
                               style={{
-                                textAlign: block.alignments?.[cIdx] ?? "left",
+                                textAlign:
+                                  block.alignments?.[cIdx] ??
+                                  (isCompact ? "center" : "left"),
                               }}
                             >
                               {renderInline(cell)}

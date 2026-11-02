@@ -654,6 +654,22 @@ body {
   color: var(--text-primary);
 }
 
+.prose-em {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.prose-del {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.prose-br {
+  display: block;
+  content: "";
+  margin-top: var(--space-1);
+}
+
 .prose-inline-code {
   font-family: var(--font-mono);
   font-size: 0.85em;
@@ -752,15 +768,20 @@ body {
 
 .prose-table {
   width: 100%;
-  min-width: 720px;
   border-collapse: collapse;
   font-size: var(--text-xs);
   line-height: var(--leading-normal);
   text-align: left;
 }
 
+@media (max-width: 640px) {
+  .prose-table {
+    min-width: 500px;
+  }
+}
+
 .prose-table th {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-3);
   font-family: var(--font-mono);
   font-weight: var(--font-semibold);
   font-size: var(--text-xs);
@@ -768,27 +789,38 @@ body {
   background-color: var(--bg-subtle);
   border-bottom: 2px solid var(--border-strong);
   letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-.prose-table th:first-child,
-.prose-table td:first-child {
-  width: 20%;
-  min-width: 140px;
-  white-space: nowrap;
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
+  white-space: normal;
+  vertical-align: bottom;
 }
 
 .prose-table td {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-3);
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   vertical-align: top;
   line-height: var(--leading-relaxed);
-  min-width: 180px;
   word-break: normal;
   overflow-wrap: break-word;
+}
+
+/* Compact index column (#, ID, No., Rank, Step) */
+.prose-table th.col-compact,
+.prose-table td.col-compact {
+  width: 1%;
+  min-width: 36px;
+  max-width: 52px;
+  white-space: nowrap;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+  color: var(--text-muted);
+}
+
+/* First non-compact column (e.g. Project Name, Skill) has bold/semi-bold weight */
+.prose-table td:first-child:not(.col-compact) {
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
 }
 
 .prose-table td .prose-link {
