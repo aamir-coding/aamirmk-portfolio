@@ -98,6 +98,69 @@ A notorious iOS Safari quirk: if any text input or textarea has a `font-size` sm
   }
   ```
   Users with vestibular motion sensitivity experience zero jarring animations.
+
+---
+
+### 1.6 Three-State Theme Architecture & Pre-Hydration FOUC Elimination
+Supporting user-selected themes (Light, Dark, and Auto-System) in modern web applications presents a fundamental synchronization challenge: **The Flash of Unstyled Content (FOUC)**.
+
+#### The Problem: React Hydration Timing
+If a theme preference is read inside a React `useEffect` or standard component mount:
+1. The browser parses HTML and CSS.
+2. The browser renders the initial DOM using the default theme (e.g. Light mode).
+3. React downloads, boots, and hydrates (100–300ms later).
+4. `useEffect` runs, reads `localStorage.getItem("theme") === "dark"`, and sets a class or attribute.
+5. The page visibly flashes from white to dark, jarring the user.
+
+#### The Solution: Zero-Overhead Pre-Hydration Synchronous Script
+In `frontend/index.html`:
+```html
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("amk_portfolio_theme");
+      if (t === "dark" || t === "light") {
+        document.documentElement.setAttribute("data-theme", t);
+      }
+    } catch (e) {}
+  })();
+</script>
+```
+Because this script runs synchronously inside `<head>` before the browser executes the first layout/paint, the `data-theme` attribute is applied to `<html>` prior to the first frame. When CSS evaluates `:root[data-theme="dark"]`, the obsidian slate variables apply instantaneously with **zero visual flash**.
+
+#### CSS Cascade Priority
+```
+1. Base Variables (:root) ──> Default Light Dossier (Technical Paper)
+2. Media Query (@media (prefers-color-scheme: dark)) ──> Applied if no explicit [data-theme="light"]
+3. Explicit Selector (:root[data-theme="dark"]) ──> Obsidian Slate Parchment
+4. Explicit Selector (:root[data-theme="light"]) ──> Technical Paper Override
+```
+
+---
+
+### 1.7 Zero-Dependency Editorial Prose Formatter (AST Block Tokenizer)
+Modern LLMs output markdown syntax (fenced code blocks with language tags, bold spans, inline code backticks, bullet lists, numbered lists, blockquotes). 
+- Pulling in standard libraries like `react-markdown` or `marked` adds **35–60 KB** to initial JavaScript bundles and often introduces `dangerouslySetInnerHTML` vulnerabilities.
+- Our hand-crafted `FormattedMessage` component uses a two-phase AST parser:
+  1. **Block Parser (`parseBlocks`)**: Line-by-line state machine recognizing fenced blocks (` ``` `), bullet lists (`- ` or `* `), ordered lists (`\d+\. `), quotes (`> `), and paragraphs.
+  2. **Inline Tokenizer (`renderInline`)**: Regex splitter parsing `**bold**`, `` `inline_code` ``, and `[links](url)` into typed React nodes without innerHTML injection.
+  3. **Streaming Cursor Integration**: Automatically attaches the blinking cursor `▍` to the terminal text node during active generation.
+
+---
+
+### 1.8 Tactile Micro-Interactions & Clipboard Ergonomics
+Technical recruiters frequently copy candidate explanations or architectural snippets to paste into emails, ATS scorecards, or Slack channels.
+- `MessageItem` provides a native `Copy` action powered by `navigator.clipboard.writeText`.
+- Incorporates a self-cleaning `window.clearTimeout` timer to toggle between `"Copy"` and `"Copied ✓"` with a 2-second timeout.
+- All interactive dossier cards (`.dossier-card`), buttons, and links feature subtle `-1px` transform lifts and hairline border color transitions (`var(--transition-fast)`: 150ms bezier curves).
+
+---
+
+### 1.9 Mobile Bottom-Sheet Modal Drawers
+On desktop, `ProjectModal` centers itself as an architectural dossier window (`max-width: 720px`). On mobile viewports (`<= 640px`):
+- `.modal-portal` changes alignment to `align-items: flex-end`.
+- `.project-modal` morphs into a native-feeling bottom sheet drawer with top-only rounded corners, bounded to `max-height: 90dvh`.
+- Focus trapping and `Escape` key listeners remain active, delivering complete WCAG compliance across both form factors.
 - **Focus Rings**: `:focus-visible` ensures clear 2px cobalt focus outlines for keyboard navigators without showing unsightly outlines on mouse clicks.
 - **Semantic Structure**: Header `<header>`, main application `<main>`, articles `<article>` for messages, `<time>` for timestamps, and screen-reader accessible announcements (`aria-live="polite"`).
 
@@ -304,6 +367,22 @@ export const MessageItem = React.memo(function MessageItem({
 **Answer:**
 "On iOS Safari, if a form field (`<input>` or `<textarea>`) has an effective `font-size` less than `16px` (or `1rem` in default browser settings), the browser assumes the text is too small to read and automatically zooms the viewport when the field receives focus. This causes disorienting page displacement and horizontal scrolling.
 By setting `font-size: 16px` inside `@media (max-width: 640px)`, we prevent this automated zoom behavior entirely, preserving precise touch ergonomics."
+
+---
+
+### Q5: How do you eliminate Flash of Unstyled Content (FOUC) when supporting dark/light user theme preferences?
+**Answer:**
+"FOUC occurs when theme tokens are initialized after React mounts. Because React hydration takes 100–300ms, the browser paints default light CSS tokens before JavaScript reads `localStorage` and applies the dark class, causing an unpleasant visual flash.
+We solved this by injecting a tiny synchronous IIFE `<script>` into `index.html` inside `<head>` before the DOM renders. It reads `localStorage.getItem('amk_portfolio_theme')` and sets `document.documentElement.setAttribute('data-theme', theme)` synchronously before the first browser paint. When CSS executes, `:root[data-theme='dark']` styles are already active, completely eliminating FOUC with zero dependencies."
+
+---
+
+### Q6: Why did you build an in-house markdown tokenizer rather than importing `react-markdown`?
+**Answer:**
+"In performance-constrained AI web applications, initial bundle size is critical for recruiter engagement.
+- Standard libraries (`react-markdown`, `remark`, `rehype`) pull in AST parsers and syntax highlighting grammars that add 35–60 KB to the gzipped JS bundle.
+- Furthermore, many parsers rely on `dangerouslySetInnerHTML`, introducing XSS risks unless sanitized with additional heavy packages like DOMPurify.
+- Our in-house parser (`FormattedMessage.tsx`) uses a zero-dependency two-phase scanner: a line-based state machine for structural blocks (fenced code, lists, quotes, paragraphs) and regex splitting for inline formatting (`**bold**`, `` `code` ``, `[links](url)`). It maps directly to typed, safe React elements with zero DOM injection risk, keeps our entire initial JS bundle at **77.35 KB gzipped**, and natively attaches our blinking streaming cursor `▍` to the terminal text node."
 
 ---
 

@@ -3,6 +3,7 @@ import type { ChatMessage, ProjectCardData } from "../../lib/types";
 import { SourceChips } from "./SourceChips";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectModal } from "./ProjectModal";
+import { FormattedMessage } from "./FormattedMessage";
 
 export interface MessageItemProps {
   message: ChatMessage;
@@ -14,6 +15,34 @@ export const MessageItem = React.memo(function MessageItem({
   const isUser = message.role === "user";
   const [activeModalCard, setActiveModalCard] =
     useState<ProjectCardData | null>(null);
+  const [copied, setCopied] = useState(false);
+  const copyTimerRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleCopy = useCallback(async () => {
+    if (!message.content) return;
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(message.content);
+        setCopied(true);
+        if (copyTimerRef.current) {
+          window.clearTimeout(copyTimerRef.current);
+        }
+        copyTimerRef.current = window.setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      }
+    } catch {
+      // Graceful fallback if clipboard permission is restricted
+    }
+  }, [message.content]);
 
   const handleInspectArchitecture = useCallback((card: ProjectCardData) => {
     setActiveModalCard(card);
@@ -38,6 +67,17 @@ export const MessageItem = React.memo(function MessageItem({
           {isUser ? "Recruiter" : "Aamir.AI"}
         </span>
         <time className="chat-message-time">{message.timestamp}</time>
+        {!isUser && message.content && (
+          <button
+            type="button"
+            className={`btn-copy-message ${copied ? "copied" : ""}`.trim()}
+            onClick={handleCopy}
+            aria-label={copied ? "Copied to clipboard" : "Copy response text"}
+            title={copied ? "Copied to clipboard" : "Copy response"}
+          >
+            {copied ? "Copied ✓" : "Copy"}
+          </button>
+        )}
       </header>
       <div className="chat-message-body">
         {/* Render generative project cards summoned via tool calls */}
@@ -53,33 +93,23 @@ export const MessageItem = React.memo(function MessageItem({
           </div>
         )}
 
-        {message.content && (
-          <p className="chat-message-text">
-            {message.content}
-            {message.status === "streaming" && (
-              <span
-                className="streaming-cursor"
-                aria-hidden="true"
-                data-testid="streaming-cursor"
-              >
-                ▍
-              </span>
-            )}
-          </p>
-        )}
-        {message.status === "streaming" &&
-          !message.content &&
-          (!message.cards || message.cards.length === 0) && (
-            <p className="chat-message-text">
-              <span
-                className="streaming-cursor"
-                aria-hidden="true"
-                data-testid="streaming-cursor"
-              >
-                ▍
-              </span>
-            </p>
-          )}
+        {message.content ? (
+          <FormattedMessage
+            content={message.content}
+            isStreaming={message.status === "streaming"}
+          />
+        ) : message.status === "streaming" &&
+          (!message.cards || message.cards.length === 0) ? (
+          <div className="chat-message-text">
+            <span
+              className="streaming-cursor"
+              aria-hidden="true"
+              data-testid="streaming-cursor"
+            >
+              ▍
+            </span>
+          </div>
+        ) : null}
         {message.status === "error" && !message.content && (
           <p className="chat-message-error" role="alert">
             Generation interrupted or failed.
