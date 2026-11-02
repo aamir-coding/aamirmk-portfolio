@@ -112,3 +112,34 @@ def test_dense_semantic_retrieval_production(production_facts: list[FactChunk]):
         assert r.retrieval_method == "dense"
         assert -1.0 <= r.score <= 1.0
         assert r.rank >= 1
+
+
+def test_precomputed_embeddings_covers_all_production_facts(
+    production_facts: list[FactChunk],
+):
+    """Precomputed embeddings file exists and covers 100% of production fact chunks."""
+    from app.retrieval.dense import DEFAULT_EMBEDDINGS_PATH
+
+    assert DEFAULT_EMBEDDINGS_PATH.exists(), (
+        f"Precomputed embeddings file missing at {DEFAULT_EMBEDDINGS_PATH}"
+    )
+
+    data = np.load(DEFAULT_EMBEDDINGS_PATH)
+    saved_ids = {str(x) for x in data["ids"]}
+    fact_ids = {c.id for c in production_facts}
+
+    # Assert no production facts are missing from the precomputed embeddings matrix
+    missing_ids = fact_ids - saved_ids
+    assert not missing_ids, f"Precomputed index missing chunks: {missing_ids}"
+    assert data["matrix"].shape[1] == 384
+
+
+def test_dense_index_loads_precomputed_embeddings_fast(
+    production_facts: list[FactChunk],
+):
+    """DenseIndex loads precomputed matrix directly without re-embedding facts."""
+    index = DenseIndex(chunks=production_facts)
+    assert index._matrix is not None
+    assert index._matrix.shape == (len(production_facts), 384)
+    # _model should NOT be initialized during indexing if precomputed matrix is loaded
+    assert index._model is None

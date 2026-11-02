@@ -49,6 +49,9 @@ def retriever() -> HybridRetriever:
 @pytest.mark.asyncio
 async def test_retrieval_benchmark_aggregate(retriever: HybridRetriever) -> None:
     """Benchmark full retrieval suite asserting Hit Rate@5, MRR, and latency targets."""
+    # Warm up ONNX session so benchmark measures steady-state latency
+    await retriever.retrieve("warmup query", top_k=1)
+
     hits = 0
     reciprocal_ranks: list[float] = []
     latencies_ms: list[float] = []

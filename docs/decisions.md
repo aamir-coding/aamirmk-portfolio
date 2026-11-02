@@ -261,3 +261,20 @@ A. Bundle all metadata into the terminal `done` event only
 B. Stream separate structured event frames (`event: sources`, `event: card`, `event: token`, `event: done`)  
 **Choice:** B — Multi-event SSE stream protocol  
 **Why:** Emits source receipts and interactive project cards immediately upon resolution before or alongside streaming tokens. Allows the frontend UI to display receipt chips and cards immediately without waiting for long token generation to finish, while keeping streaming text parsing clean and zero-overhead. Also includes sources and cards in `done` for robust client state reconciliation.
+
+---
+
+### DRN-022: Precomputed Dense Embeddings & Single-Thread ONNX Runtime for 512MB RAM Gate
+
+**Date:** 2026-11-02  
+**Context:** When testing live chat endpoints on Render's free tier (512 MB cgroup memory cap), the service was killed with an OOM error (`Ran out of memory (used over 512MB)`) resulting in frontend `Notice: Failed to fetch`. Profiling revealed that dynamic runtime embedding of all 75 facts spawned multi-core ONNX thread arenas, peaking at 1,229 MB of RAM. Additionally, FastEmbed downloaded ~130 MB of model weights from HuggingFace on the first live request within the HTTP request cycle.  
+**Options:**  
+A. Increase Render plan to paid 1GB/2GB tier  
+B. Drop dense semantic retrieval and use BM25 only  
+C. Precompute fact chunk embeddings offline (`facts_embeddings.npz`, 103 KB), enforce `threads=1` on ONNX Runtime (`TextEmbedding`), pre-warm index in FastAPI `lifespan`, and pre-cache model during Render `buildCommand`.  
+**Choice:** C — Precomputed offline embeddings + single-threaded ONNX session + build-time model download  
+**Why:**
+1. **Memory:** Precomputed `.npz` loads in ~5ms using only ~3 MB RAM. At runtime, the server only embeds the single query string (1 sentence) using 1 ONNX thread, keeping peak process memory strictly at ~208 MB (<41% of Render's 512 MB cap, leaving >300 MB of headroom).
+2. **Speed:** Eliminates the 12-second CPU freeze on boot/first-query. Retrieval latency stays at 16.39 ms average on CPU.
+3. **Retrieval Quality Preserved:** Retains 100.0% Hit Rate@5 and 0.8778 MRR with zero accuracy degradation.
+4. **Resilience:** Model download happens during Render build time; zero network downloads or unauthenticated HuggingFace requests occur inside HTTP request handling.

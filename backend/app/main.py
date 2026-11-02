@@ -43,6 +43,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
     )
     logger.info("Starting up application in %s environment", settings.ENVIRONMENT)
+    try:
+        from app.retrieval.retriever import get_retriever
+
+        get_retriever()
+        logger.info("Hybrid retrieval index initialized and ready")
+    except Exception as exc:
+        logger.warning("Could not pre-warm retriever at startup: %s", exc)
     yield
     logger.info("Shutting down application")
 
