@@ -86,6 +86,8 @@ class LLMClient(Protocol):
         self,
         messages: list[Message],
         tools: list[dict[str, Any]] | None = None,
+        model: str | None = None,
+        response_format: dict[str, Any] | None = None,
     ) -> AssistantMessage: ...
 
     async def stream(
@@ -139,14 +141,19 @@ class GroqLLM:
         self,
         messages: list[Message],
         tools: list[dict[str, Any]] | None = None,
+        model: str | None = None,
+        response_format: dict[str, Any] | None = None,
     ) -> AssistantMessage:
         """Send messages to Groq and return the assistant reply."""
+        target_model = model or self._model
         kwargs: dict[str, Any] = {
-            "model": self._model,
+            "model": target_model,
             "messages": self._format_messages_for_groq(messages),
-            "temperature": 0.4,
+            "temperature": 0.2 if response_format else 0.4,
             "max_completion_tokens": 1024,
         }
+        if response_format:
+            kwargs["response_format"] = response_format
         if tools:
             kwargs["tools"] = tools
             kwargs["tool_choice"] = "auto"
@@ -273,22 +280,31 @@ class FakeLLM:
         stream_chunks: list[str] | None = None,
         tool_calls: list[ToolCall] | None = None,
         error_to_raise: Exception | None = None,
+        canned_replies: list[str] | None = None,
     ) -> None:
         self.reply = reply
         self.model = model
         self.stream_chunks = stream_chunks
         self.tool_calls = tool_calls or []
         self.error_to_raise = error_to_raise
+        self.canned_replies = list(canned_replies) if canned_replies else None
         self.last_messages: list[Message] = []
         self.last_tools: list[dict[str, Any]] | None = None
+        self.last_model: str | None = None
+        self.last_response_format: dict[str, Any] | None = None
+        self.call_count: int = 0
 
     async def complete(
         self,
         messages: list[Message],
         tools: list[dict[str, Any]] | None = None,
+        model: str | None = None,
+        response_format: dict[str, Any] | None = None,
     ) -> AssistantMessage:
         self.last_messages = list(messages)
         self.last_tools = tools
+        self.last_model = model
+        self.last_response_format = response_format
         if self.error_to_raise is not None:
             raise self.error_to_raise
 
@@ -303,13 +319,18 @@ class FakeLLM:
                 tool_calls=list(self.tool_calls),
             )
 
+        reply_content = self.reply
+        if self.canned_replies:
+            idx = min(self.call_count, len(self.canned_replies) - 1)
+            reply_content = self.canned_replies[idx]
+        self.call_count += 1
+
         return AssistantMessage(
-            content=self.reply,
-            model=self.model,
+            content=reply_content,
+            model=model or self.model,
             prompt_tokens=10,
             completion_tokens=5,
             total_tokens=15,
-            tool_calls=[],
         )
 
     async def stream(
