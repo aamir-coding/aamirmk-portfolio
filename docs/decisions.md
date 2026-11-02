@@ -237,3 +237,27 @@ C. In-process hybrid engine: custom Okapi BM25 ($k_1=1.5, b=0.75$) + FastEmbed O
 2. **Speed:** Average retrieval latency is 9.39 ms on CPU (p95 11.01 ms), well below the 25 ms ceiling.
 3. **Retrieval Quality:** Achieves 100.0% Hit Rate@5 (45/45 queries) and 0.8778 MRR on the labeled evaluation set.
 4. **Architectural Seam:** Clean dependency injection via `get_retriever()` enables `FakeRetriever` in unit tests (0.68s execution) and allows plugging in an external `QdrantRetriever` after Gate 2 without modifying a single line of endpoint code.
+
+---
+
+### DRN-020: Server-Supplied Generative UI via Function-Calling Seam
+
+**Date:** 2026-11-02  
+**Context:** Recruiters asking about projects should see structured, interactive technical cards with verified metrics, architecture flows, and repository links. If the LLM generates the JSON card directly in completion text, it could hallucinate metrics, fake repository URLs, or invent unsupported features.  
+**Options:**  
+A. Generative card schemas emitted directly by the LLM in markdown or JSON codeblocks  
+B. Server-supplied generative UI: model triggers an abstract function call (`show_project_card(project_id)`), and the server supplies immutable `ProjectCardData` loaded directly from verified facts on disk  
+**Choice:** B — Server-supplied generative UI via function-calling seam  
+**Why:** Strictly enforces Design Principle 2: "The model selects, your server supplies. Cards and facts come from your data files, never from generated text, so the UI cannot hallucinate a project." The model only decides *which* project to present, while the verified facts, benchmark metrics, live URLs, and architectural blueprints are 100% authoritative and tamper-proof.
+
+---
+
+### DRN-021: Dual-Event SSE Stream Protocol for Citations and Cards
+
+**Date:** 2026-11-02  
+**Context:** Need to stream structured citations and generative UI card schemas alongside token-by-token prose over Server-Sent Events (SSE) via POST (`/api/chat/stream`).  
+**Options:**  
+A. Bundle all metadata into the terminal `done` event only  
+B. Stream separate structured event frames (`event: sources`, `event: card`, `event: token`, `event: done`)  
+**Choice:** B — Multi-event SSE stream protocol  
+**Why:** Emits source receipts and interactive project cards immediately upon resolution before or alongside streaming tokens. Allows the frontend UI to display receipt chips and cards immediately without waiting for long token generation to finish, while keeping streaming text parsing clean and zero-overhead. Also includes sources and cards in `done` for robust client state reconciliation.

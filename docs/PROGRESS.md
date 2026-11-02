@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Band 2 / Phase 2: Hybrid RAG Complete** — 100% Hit Rate@5, 0.8778 MRR, 9.39ms latency, 227MB RAM. Next: User Approval & Phase 5 (Source Citations and Generative UI)
+**Band 2 / Phase 5: Source Citations & Generative UI Complete** — Server-supplied generative cards, dual-event SSE streaming, verified receipts, accessible blueprint modal, 75.50 KB gzipped JS (<200 KB budget), 188 backend/eval tests + 44 frontend tests passing (100% green). Next: Deliver Phase 5 Teach-Back, obtain user approval, tag `phase-5-done`.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -19,8 +19,8 @@
 | P7: Safety (first-share) | 🟢 Complete | `main` | `phase-7-done` | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
 | — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
 | P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
-| P5: Citations + gen UI | ⬜ Next Up (Band 2) | — | — | — |
-| P4: Design system (full) | ⬜ Not Started | — | — | — |
+| P5: Citations + gen UI | 🟢 Built & Verified | `phase-5-citations-gen-ui` | `phase-5-done` (pending approval) | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
+| P4: Design system (full) | ⬜ Next Up (Band 2) | — | — | — |
 | P6: Fit report | ⬜ Not Started | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
@@ -114,6 +114,17 @@
 - [x] Phase 2: Total test suite: 175 tests passed (127 backend + 48 evals, 100% green, 0 API cost)
 - [x] Phase 2: Architectural decisions DRN-018 and DRN-019 recorded in `docs/decisions.md`
 - [x] Phase 2: Comprehensive study guide written in `docs/study-guides/phase-02-hybrid-rag.md`
+- [x] Phase 5: Created `SourceCitation` and `ProjectCardData` Pydantic models with frozen immutability
+- [x] Phase 5: Built `ToolRegistry` protocol seam and authoritative catalog of 8 projects in `app/tools/`
+- [x] Phase 5: Extended `LLMClient` protocol with function-calling support in `GroqLLM` and `FakeLLM`
+- [x] Phase 5: Multi-event SSE streaming protocol (`event: sources`, `event: card`, `event: token`, `event: done`)
+- [x] Phase 5: Built accessible `SourceChips` with section badges (`[J1]`, `[X7]`) and external receipt anchors
+- [x] Phase 5: Built editorial `ProjectCard` and accessible architectural `ProjectModal` (focus trap, Esc listener, ARIA)
+- [x] Phase 5: Preserved bundle budget: JS is 75.50 KB gzipped (<200 KB budget), CSS is 4.28 KB gzipped
+- [x] Phase 5: Full test suite passing: 188 backend/eval tests (100% green) + 44 frontend Vitest tests (100% green)
+- [x] Phase 5: Verified real Groq tool dispatch against `openai/gpt-oss-120b` (0.96s non-streaming, 0.66s streaming)
+- [x] Phase 5: Architectural decisions DRN-020 and DRN-021 recorded in `docs/decisions.md`
+- [x] Phase 5: Comprehensive study guide written in `docs/study-guides/phase-05-citations-generative-ui.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -124,9 +135,9 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Deliver Phase 2 teach-back (3 questions).
-2. Obtain user approval to tag `phase-2-done` and merge to `main`.
-3. Present Phase 5 brief (Source Citations and Generative UI cards).
+1. Deliver Phase 5 interactive teach-back (3 questions).
+2. Obtain user approval to tag `phase-5-done`, merge to `main`, and push to remote.
+3. Present Phase 4 (Full Design System) or Phase 6 (JD Fit Report) brief.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
