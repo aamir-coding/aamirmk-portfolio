@@ -15,6 +15,34 @@ export const MessageItem = React.memo(function MessageItem({
   const isUser = message.role === "user";
   const [activeModalCard, setActiveModalCard] =
     useState<ProjectCardData | null>(null);
+  const [copied, setCopied] = useState(false);
+  const copyTimerRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        window.clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleCopy = useCallback(async () => {
+    if (!message.content) return;
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(message.content);
+        setCopied(true);
+        if (copyTimerRef.current) {
+          window.clearTimeout(copyTimerRef.current);
+        }
+        copyTimerRef.current = window.setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      }
+    } catch {
+      // Graceful fallback if clipboard permission is restricted
+    }
+  }, [message.content]);
 
   const handleInspectArchitecture = useCallback((card: ProjectCardData) => {
     setActiveModalCard(card);
@@ -39,6 +67,17 @@ export const MessageItem = React.memo(function MessageItem({
           {isUser ? "Recruiter" : "Aamir.AI"}
         </span>
         <time className="chat-message-time">{message.timestamp}</time>
+        {!isUser && message.content && (
+          <button
+            type="button"
+            className={`btn-copy-message ${copied ? "copied" : ""}`.trim()}
+            onClick={handleCopy}
+            aria-label={copied ? "Copied to clipboard" : "Copy response text"}
+            title={copied ? "Copied to clipboard" : "Copy response"}
+          >
+            {copied ? "Copied ✓" : "Copy"}
+          </button>
+        )}
       </header>
       <div className="chat-message-body">
         {/* Render generative project cards summoned via tool calls */}

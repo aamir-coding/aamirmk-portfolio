@@ -568,6 +568,33 @@ body {
   margin-left: auto;
 }
 
+.btn-copy-message {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-copy-message:hover {
+  background-color: var(--bg-subtle);
+  color: var(--accent-cobalt);
+  border-color: var(--accent-cobalt);
+}
+
+.btn-copy-message.copied {
+  background-color: var(--status-ready-bg);
+  color: var(--status-ready);
+  border-color: rgba(5, 150, 105, 0.3);
+}
+
 .chat-message-body {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
@@ -955,15 +982,17 @@ body {
 
 .dossier-card {
   background-color: var(--bg-surface);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: var(--space-4);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: border-color var(--transition-fast);
+  box-shadow: var(--shadow-subtle);
+  transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .dossier-card:hover {
-  border-color: var(--border-subtle);
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-dossier);
+  transform: translateY(-1px);
 }
 
 .dossier-card-header {
