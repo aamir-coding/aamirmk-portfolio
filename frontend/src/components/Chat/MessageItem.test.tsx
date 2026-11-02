@@ -14,6 +14,7 @@ describe("<MessageItem />", () => {
       role: "user",
       content: "What is Aamir's primary stack?",
       timestamp: "12:00 PM",
+      status: "done",
     };
 
     render(<MessageItem message={userMsg} />);
@@ -37,6 +38,7 @@ describe("<MessageItem />", () => {
       role: "assistant",
       content: "Aamir is specialized in FastAPI, Python, Groq, and React.",
       timestamp: "12:01 PM",
+      status: "done",
     };
 
     render(<MessageItem message={assistantMsg} />);

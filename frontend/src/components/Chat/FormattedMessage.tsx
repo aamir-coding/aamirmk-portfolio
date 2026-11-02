@@ -72,18 +72,28 @@ function parseBlocks(markdown: string): Block[] {
   let i = 0;
 
   while (i < lines.length) {
-    const line = lines[i];
+    const currentLine = lines[i];
+    if (currentLine === undefined) {
+      i++;
+      continue;
+    }
+
+    const trimmed = currentLine.trim();
 
     // 1. Fenced Code Block
-    if (line.trim().startsWith("```")) {
-      const lang = line.trim().slice(3).trim();
+    if (trimmed.startsWith("```")) {
+      const lang = trimmed.slice(3).trim();
       const codeLines: string[] = [];
       i++;
-      while (i < lines.length && !lines[i].trim().startsWith("```")) {
-        codeLines.push(lines[i]);
+      while (i < lines.length) {
+        const nextLine = lines[i];
+        if (nextLine === undefined || nextLine.trim().startsWith("```")) {
+          break;
+        }
+        codeLines.push(nextLine);
         i++;
       }
-      if (i < lines.length && lines[i].trim().startsWith("```")) {
+      if (i < lines.length && lines[i]?.trim().startsWith("```")) {
         i++; // skip closing ```
       }
       blocks.push({
@@ -95,16 +105,18 @@ function parseBlocks(markdown: string): Block[] {
     }
 
     // 2. Empty line -> skip
-    if (line.trim() === "") {
+    if (trimmed === "") {
       i++;
       continue;
     }
 
     // 3. Unordered list (- or *)
-    if (/^[-*]\s+/.test(line)) {
+    if (/^[-*]\s+/.test(trimmed)) {
       const items: string[] = [];
-      while (i < lines.length && /^[-*]\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^[-*]\s+/, ""));
+      while (i < lines.length) {
+        const l = lines[i];
+        if (!l || !/^[-*]\s+/.test(l.trim())) break;
+        items.push(l.trim().replace(/^[-*]\s+/, ""));
         i++;
       }
       blocks.push({
@@ -115,10 +127,12 @@ function parseBlocks(markdown: string): Block[] {
     }
 
     // 4. Ordered list (1., 2., etc)
-    if (/^\d+\.\s+/.test(line)) {
+    if (/^\d+\.\s+/.test(trimmed)) {
       const items: string[] = [];
-      while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
-        items.push(lines[i].replace(/^\d+\.\s+/, ""));
+      while (i < lines.length) {
+        const l = lines[i];
+        if (!l || !/^\d+\.\s+/.test(l.trim())) break;
+        items.push(l.trim().replace(/^\d+\.\s+/, ""));
         i++;
       }
       blocks.push({
@@ -129,10 +143,12 @@ function parseBlocks(markdown: string): Block[] {
     }
 
     // 5. Blockquote (> ...)
-    if (line.startsWith(">")) {
+    if (trimmed.startsWith(">")) {
       const quoteLines: string[] = [];
-      while (i < lines.length && lines[i].startsWith(">")) {
-        quoteLines.push(lines[i].replace(/^>\s?/, ""));
+      while (i < lines.length) {
+        const l = lines[i];
+        if (!l || !l.trim().startsWith(">")) break;
+        quoteLines.push(l.trim().replace(/^>\s?/, ""));
         i++;
       }
       blocks.push({
@@ -144,21 +160,28 @@ function parseBlocks(markdown: string): Block[] {
 
     // 6. Regular Paragraph
     const paraLines: string[] = [];
-    while (
-      i < lines.length &&
-      lines[i].trim() !== "" &&
-      !lines[i].trim().startsWith("```") &&
-      !/^[-*]\s+/.test(lines[i]) &&
-      !/^\d+\.\s+/.test(lines[i]) &&
-      !lines[i].startsWith(">")
-    ) {
-      paraLines.push(lines[i]);
+    while (i < lines.length) {
+      const l = lines[i];
+      if (!l) break;
+      const t = l.trim();
+      if (
+        t === "" ||
+        t.startsWith("```") ||
+        /^[-*]\s+/.test(t) ||
+        /^\d+\.\s+/.test(t) ||
+        t.startsWith(">")
+      ) {
+        break;
+      }
+      paraLines.push(t);
       i++;
     }
-    blocks.push({
-      type: "p",
-      content: paraLines.join(" "),
-    });
+    if (paraLines.length > 0) {
+      blocks.push({
+        type: "p",
+        content: paraLines.join(" "),
+      });
+    }
   }
 
   return blocks;
