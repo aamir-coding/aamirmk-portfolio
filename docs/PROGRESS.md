@@ -133,9 +133,11 @@
 - [x] Phase 4 (Full): Tactile micro-interactions (`-1px` lifts, hairline transitions) on cards, starter chips, and external links
 - [x] Phase 4 (Full): Mobile-first `100dvh` hardening with bottom-sheet modal drawer on screens <= 640px and safe-area inset protection
 - [x] Phase 4 (Full): Production bundle budget strictly maintained: JS is 77.35 KB gzipped (<200 KB budget), CSS is 5.04 KB gzipped
-- [x] Phase 4 (Full): 64 frontend Vitest tests and 190 backend Pytest tests 100% green
 - [x] Phase 4 (Full): Architectural decisions DRN-023 and DRN-024 recorded in `docs/decisions.md`
 - [x] Phase 4 (Full): Comprehensive study guide expanded in `docs/study-guides/phase-04-design-system.md`
+- [x] Phase 4 (Full): Hardened markdown table UX/UI with dynamic '#' compact column shrink-wrapping (40px), natural header text wrapping, and mobile horizontal scrolling
+- [x] Phase 4 (Full): Full inline tokenizer parsing for `<br>` line breaks in table cells, bold-italic, safe HTML tags (`<b>`, `<i>`, `<code>`, `<del>`), and footnote italics
+- [x] Phase 4 (Full): 72 frontend Vitest tests and 190 backend Pytest tests 100% green; bundle 78.42 KB gzipped JS (<200 KB budget)
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
@@ -146,9 +148,7 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Present Phase 4 teach-back to Aamir with 3 mental model verification questions.
-2. Obtain approval, merge `phase-4-editorial-dossier` to `main`, tag `phase-4-editorial-done`, and push to remote.
-3. Prepare brief for Band 3 / Phase 6 (JD Fit Report).
+1. Ready for Band 3 / Phase 6 (Job Description Fit Report). Start new chat session with Phase 6 kickoff prompt.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
