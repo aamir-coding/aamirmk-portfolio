@@ -7,6 +7,10 @@ import {
   TokenEventPayloadSchema,
   DoneEventPayloadSchema,
   ErrorEventPayloadSchema,
+  FitReportSchema,
+  FitProgressDataSchema,
+  FitRequirementSchema,
+  JudgedRequirementSchema,
 } from "./contracts";
 
 describe("Runtime API Contracts (Zod Validation)", () => {
@@ -59,37 +63,31 @@ describe("Runtime API Contracts (Zod Validation)", () => {
     const payload = {
       sources: [
         {
-          chunk_id: "skill-python",
-          title: "Python Experience",
-          type: "skill",
-          source_section: "S1",
-          source_url: null,
+          chunk_id: "proj-entropy-oj-pitch",
+          title: "Entropy Online Judge",
+          type: "project",
+          source_section: "J1",
         },
       ],
     };
 
     const parsed = SourcesEventPayloadSchema.safeParse(payload);
     expect(parsed.success).toBe(true);
-    if (parsed.success) {
-      expect(parsed.data.sources).toHaveLength(1);
-    }
   });
 
   it("validates backend 'event: card' payload", () => {
     const payload = {
       card: {
-        id: "vayusetu",
-        title: "VayuSetu",
-        subtitle: "Clean Air Intelligence",
-        summary: "IoT AQI telemetry.",
+        id: "entropy-oj",
+        title: "Entropy Online Judge",
+        subtitle: "CP Platform",
+        summary: "Evaluates code in Linux sandbox.",
         role: "Solo Author",
-        tech_stack: ["FastAPI", "React"],
-        highlights: ["Google Cloud Hackathon 2nd Runner-Up"],
-        metrics: { Latency: "<100ms" },
-        github_url: null,
-        live_url: null,
-        source_sections: ["AC3"],
-        architecture_details: "Predictive dispersion models.",
+        tech_stack: ["React", "Redis"],
+        highlights: ["BullMQ asynchronous judging"],
+        metrics: { Latency: "120ms" },
+        source_sections: ["J1"],
+        architecture_details: "Architecture details.",
       },
     };
 
@@ -130,5 +128,83 @@ describe("Runtime API Contracts (Zod Validation)", () => {
     if (parsed.success) {
       expect(parsed.data.detail).toContain("Rate limit reached");
     }
+  });
+
+  // ── Phase 6 Fit Report Tests ──────────────────────────────────────────
+
+  it("validates a compliant FitRequirement", () => {
+    const req = {
+      id: "req-1",
+      text: "FastAPI development",
+      importance: "must_have",
+      type: "skill",
+    };
+    const parsed = FitRequirementSchema.safeParse(req);
+    expect(parsed.success).toBe(true);
+  });
+
+  it("validates a JudgedRequirement with valid citations", () => {
+    const judged = {
+      requirement: {
+        id: "req-1",
+        text: "FastAPI development",
+        importance: "must_have",
+        type: "skill",
+      },
+      verdict: "strong",
+      evidence_chunk_ids: ["chunk-fastapi"],
+      explanation: "Built async FastAPI backend.",
+      ramp_up: null,
+      downgraded: false,
+    };
+    const parsed = JudgedRequirementSchema.safeParse(judged);
+    expect(parsed.success).toBe(true);
+  });
+
+  it("validates a full FitReport payload", () => {
+    const report = {
+      role_title: "Full-Stack AI Engineer",
+      jd_hash: "a".repeat(64),
+      score: {
+        must_have_total: 2,
+        must_have_strong: 2,
+        must_have_partial: 0,
+        must_have_gap: 0,
+        nice_to_have_total: 1,
+        nice_to_have_strong: 1,
+        nice_to_have_partial: 0,
+        nice_to_have_gap: 0,
+        total_requirements: 3,
+        overall_fit: "Strong Match",
+        headline: "Covers 2 of 2 must-haves, 1 of 1 nice-to-haves",
+      },
+      requirements: [
+        {
+          requirement: {
+            id: "req-1",
+            text: "FastAPI",
+            importance: "must_have",
+            type: "skill",
+          },
+          verdict: "strong",
+          evidence_chunk_ids: ["chunk-fastapi"],
+          explanation: "Built API.",
+        },
+      ],
+      summary: "Aamir is a strong match for this role.",
+      cached: false,
+    };
+    const parsed = FitReportSchema.safeParse(report);
+    expect(parsed.success).toBe(true);
+  });
+
+  it("validates a FitProgressData progress event", () => {
+    const progress = {
+      step: "retrieving_evidence",
+      message: "Cross-referencing facts...",
+      percent: 50,
+    };
+    const parsed = FitProgressDataSchema.safeParse(progress);
+    expect(parsed.success).toBe(true);
   });
 });

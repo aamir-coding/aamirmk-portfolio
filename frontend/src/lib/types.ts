@@ -1,5 +1,5 @@
 /**
- * Domain types for conversational messages, citations, and generative UI cards.
+ * Domain types for conversational messages, citations, generative UI cards, and JD Fit reports.
  */
 
 export interface SourceCitation {
@@ -38,4 +38,57 @@ export interface ChatMessage {
 export interface InstantAnswer {
   reply: string;
   sources?: SourceCitation[];
+}
+
+export interface FitRequirement {
+  id: string;
+  text: string;
+  importance: "must_have" | "nice_to_have";
+  type: "skill" | "experience" | "education" | "soft";
+}
+
+export interface JudgedRequirement {
+  requirement: FitRequirement;
+  verdict: "strong" | "partial" | "gap";
+  evidence_chunk_ids: string[];
+  explanation: string;
+  ramp_up?: string | null;
+  downgraded?: boolean;
+}
+
+export interface FitScoreSummary {
+  must_have_total: number;
+  must_have_strong: number;
+  must_have_partial: number;
+  must_have_gap: number;
+  nice_to_have_total: number;
+  nice_to_have_strong: number;
+  nice_to_have_partial: number;
+  nice_to_have_gap: number;
+  total_requirements: number;
+  overall_fit: "Strong Match" | "Partial Match" | "Low Match";
+  headline: string;
+}
+
+export interface FitReport {
+  role_title: string;
+  jd_hash: string;
+  score: FitScoreSummary;
+  requirements: JudgedRequirement[];
+  summary: string;
+  cached?: boolean;
+}
+
+export interface FitProgressData {
+  step: string;
+  message: string;
+  percent: number;
+}
+
+export interface SampleJobDescription {
+  id: string;
+  title: string;
+  company: string;
+  match_expectation: string;
+  text: string;
 }

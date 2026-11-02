@@ -1,11 +1,19 @@
 import { getApiBaseUrl } from "./api";
-import type { ProjectCardData, SourceCitation } from "./types";
+import type {
+  FitProgressData,
+  FitReport,
+  ProjectCardData,
+  SourceCitation,
+} from "./types";
 import {
   SourcesEventPayloadSchema,
   CardEventPayloadSchema,
   TokenEventPayloadSchema,
   DoneEventPayloadSchema,
   ErrorEventPayloadSchema,
+  FitProgressDataSchema,
+  FitReportSchema,
+  FitErrorPayloadSchema,
 } from "./contracts";
 
 export interface StreamChatCallbacks {
@@ -98,27 +106,21 @@ export async function streamChat({
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
       try {
-        const errorJson = (await response.json()) as {
-          error?: { message?: string };
-          detail?: string | unknown;
-        };
-        if (errorJson.error?.message) {
-          errorMessage = errorJson.error.message;
-        } else if (errorJson.detail) {
-          errorMessage =
-            typeof errorJson.detail === "string"
-              ? errorJson.detail
-              : JSON.stringify(errorJson.detail);
+        const errJson = await response.json();
+        if (errJson?.error?.message) {
+          errorMessage = errJson.error.message;
+        } else if (errJson?.detail) {
+          errorMessage = typeof errJson.detail === "string" ? errJson.detail : JSON.stringify(errJson.detail);
         }
       } catch {
-        // Fall back to HTTP status message if not JSON
+        // Fallback to generic status text
       }
       callbacks.onError(errorMessage);
       return;
     }
 
     if (!response.body) {
-      callbacks.onError("ReadableStream not supported by environment");
+      callbacks.onError("No response stream available");
       return;
     }
 
@@ -129,20 +131,20 @@ export async function streamChat({
     const dispatchEvent = (event: string, data: string) => {
       try {
         const parsed = JSON.parse(data);
-        if (event === "sources") {
-          const res = SourcesEventPayloadSchema.safeParse(parsed);
-          if (res.success) {
-            callbacks.onSources?.(res.data.sources);
-          }
-        } else if (event === "card") {
-          const res = CardEventPayloadSchema.safeParse(parsed);
-          if (res.success) {
-            callbacks.onCard?.(res.data.card);
-          }
-        } else if (event === "token") {
+        if (event === "token") {
           const res = TokenEventPayloadSchema.safeParse(parsed);
           if (res.success) {
             callbacks.onToken(res.data.token);
+          }
+        } else if (event === "sources") {
+          const res = SourcesEventPayloadSchema.safeParse(parsed);
+          if (res.success && callbacks.onSources) {
+            callbacks.onSources(res.data.sources);
+          }
+        } else if (event === "card") {
+          const res = CardEventPayloadSchema.safeParse(parsed);
+          if (res.success && callbacks.onCard) {
+            callbacks.onCard(res.data.card);
           }
         } else if (event === "done") {
           const res = DoneEventPayloadSchema.safeParse(parsed);
@@ -161,6 +163,130 @@ export async function streamChat({
         }
       } catch {
         // Ignore JSON parse errors for non-JSON comments or keep-alives
+      }
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const { events, remaining } = parseSSEBuffer(buffer);
+      buffer = remaining;
+
+      for (const { event, data } of events) {
+        dispatchEvent(event, data);
+      }
+    }
+
+    if (buffer.trim()) {
+      const { events } = parseSSEBuffer(buffer + "\n\n");
+      for (const { event, data } of events) {
+        dispatchEvent(event, data);
+      }
+    }
+  } catch (err: unknown) {
+    if (signal?.aborted) {
+      return;
+    }
+    const errMsg = err instanceof Error ? err.message : "Network error";
+    callbacks.onError(errMsg);
+  }
+}
+
+// ── Phase 6 Fit Report Streaming Client ─────────────────────────────────
+
+export interface StreamFitCallbacks {
+  onProgress: (progress: FitProgressData) => void;
+  onComplete: (report: FitReport) => void;
+  onError: (error: string) => void;
+}
+
+export interface StreamFitOptions {
+  jdText: string;
+  roleTitle?: string;
+  signal?: AbortSignal;
+  callbacks: StreamFitCallbacks;
+  baseUrl?: string;
+}
+
+/**
+ * Streams multi-step JD Fit Report evaluation over SSE from POST /api/fit.
+ */
+export async function streamFitReport({
+  jdText,
+  roleTitle,
+  signal,
+  callbacks,
+  baseUrl,
+}: StreamFitOptions): Promise<void> {
+  const base = baseUrl ?? getApiBaseUrl();
+  const url = `${base}/api/fit`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jd_text: jdText,
+        role_title: roleTitle || undefined,
+      }),
+      signal,
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errJson = await response.json();
+        if (errJson?.error?.message) {
+          errorMessage = errJson.error.message;
+        } else if (errJson?.detail) {
+          errorMessage =
+            typeof errJson.detail === "string"
+              ? errJson.detail
+              : JSON.stringify(errJson.detail);
+        }
+      } catch {
+        // Fallback
+      }
+      callbacks.onError(errorMessage);
+      return;
+    }
+
+    if (!response.body) {
+      callbacks.onError("No response stream available");
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    const dispatchEvent = (event: string, data: string) => {
+      try {
+        const parsed = JSON.parse(data);
+        if (event === "progress") {
+          const res = FitProgressDataSchema.safeParse(parsed);
+          if (res.success) {
+            callbacks.onProgress(res.data);
+          }
+        } else if (event === "complete") {
+          const res = FitReportSchema.safeParse(parsed);
+          if (res.success) {
+            callbacks.onComplete(res.data as FitReport);
+          } else {
+            callbacks.onError("Received invalid report schema from server");
+          }
+        } else if (event === "error") {
+          const res = FitErrorPayloadSchema.safeParse(parsed);
+          callbacks.onError(
+            res.success ? res.data.message : "Error analyzing job description"
+          );
+        }
+      } catch {
+        // Ignore non-JSON frames
       }
     };
 
