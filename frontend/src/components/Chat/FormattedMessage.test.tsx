@@ -26,6 +26,95 @@ describe("FormattedMessage", () => {
     expect(link).toHaveAttribute("href", "https://github.com/aamir");
   });
 
+  it("renders angle-bracket URLs and bare URLs as clickable links", () => {
+    const text =
+      "Live at <https://entropy-oj.vercel.app> or check https://aamirmk-portfolio.vercel.app for details.";
+    render(<FormattedMessage content={text} />);
+
+    const angleLink = screen.getByRole("link", {
+      name: "https://entropy-oj.vercel.app",
+    });
+    expect(angleLink).toHaveAttribute("href", "https://entropy-oj.vercel.app");
+
+    const bareLink = screen.getByRole("link", {
+      name: "https://aamirmk-portfolio.vercel.app",
+    });
+    expect(bareLink).toHaveAttribute(
+      "href",
+      "https://aamirmk-portfolio.vercel.app"
+    );
+  });
+
+  it("renders markdown tables with headers, cells, and inline links", () => {
+    const text = `
+| Project | Core purpose | Live Link |
+| :--- | :---: | ---: |
+| **Entropy-OJ** | Online Judge | <https://entropy-oj.vercel.app> |
+| **Portfolio** | AI Assistant | <https://aamirmk-portfolio.vercel.app> |
+`.trim();
+
+    render(<FormattedMessage content={text} />);
+
+    const table = screen.getByRole("table");
+    expect(table).toBeInTheDocument();
+
+    const columnHeaders = screen.getAllByRole("columnheader");
+    expect(columnHeaders).toHaveLength(3);
+    expect(columnHeaders[0]).toHaveTextContent("Project");
+    expect(columnHeaders[1]).toHaveTextContent("Core purpose");
+    expect(columnHeaders[2]).toHaveTextContent("Live Link");
+
+    const cells = screen.getAllByRole("cell");
+    expect(cells).toHaveLength(6);
+    expect(cells[0]).toHaveTextContent("Entropy-OJ");
+    expect(cells[2]?.querySelector("a")).toHaveAttribute(
+      "href",
+      "https://entropy-oj.vercel.app"
+    );
+  });
+
+  it("renders the user's project table and overall production impact smoothly", () => {
+    const text = `
+Aamir Mohammed Khan's most notable production-grade projects are:
+
+| Project | Core purpose | Architecture highlights (from his résumé) | Production impact |
+|---------|--------------|--------------------------------------------|-------------------|
+| **Entropy-OJ** | Competitive programming | React + TS; Node API; Docker | Live at <https://entropy-oj.vercel.app>. |
+| **AI Digital Assistant** | RAG assistant | FastEmbed ONNX + BM25 | Deployed at <https://aamirmk-portfolio.vercel.app>. |
+
+**Overall production impact** - All listed applications are publicly deployed.
+`.trim();
+
+    render(<FormattedMessage content={text} />);
+
+    expect(screen.getByRole("table")).toBeInTheDocument();
+    expect(
+      screen.getByText("Architecture highlights (from his résumé)")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "https://entropy-oj.vercel.app" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Overall production impact")
+    ).toBeInTheDocument();
+  });
+
+  it("renders headings and horizontal rules", () => {
+    const text = "# Heading 1\n## Heading 2\n---\n### Heading 3";
+    render(<FormattedMessage content={text} />);
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Heading 1"
+    );
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
+      "Heading 2"
+    );
+    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent(
+      "Heading 3"
+    );
+    expect(document.querySelector("hr")).toBeInTheDocument();
+  });
+
   it("renders bullet lists", () => {
     const text = "- Fast response time\n- Sub-second retrieval\n* High test coverage";
     render(<FormattedMessage content={text} />);
