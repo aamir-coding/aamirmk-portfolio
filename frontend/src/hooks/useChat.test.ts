@@ -1,20 +1,49 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useChat } from "./useChat";
+import { useChat, CHAT_SESSION_STORAGE_KEY } from "./useChat";
 import * as sseModule from "../lib/sse";
 
 describe("useChat hook", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    sessionStorage.clear();
   });
 
-  it("initializes with empty message list and idle state", () => {
+  it("initializes with empty message list and idle state when storage is empty", () => {
     const { result } = renderHook(() => useChat());
 
     expect(result.current.messages).toEqual([]);
     expect(result.current.isStreaming).toBe(false);
     expect(result.current.conversationId).toBeNull();
     expect(result.current.error).toBeNull();
+  });
+
+  it("hydrates previous conversation from sessionStorage on mount", () => {
+    const saved = {
+      messages: [
+        {
+          id: "u-1",
+          role: "user",
+          content: "Previous query",
+          status: "done",
+          timestamp: "12:00 PM",
+        },
+        {
+          id: "a-1",
+          role: "assistant",
+          content: "Previous answer",
+          status: "done",
+          timestamp: "12:00 PM",
+        },
+      ],
+      conversationId: "saved-conv-456",
+    };
+    sessionStorage.setItem(CHAT_SESSION_STORAGE_KEY, JSON.stringify(saved));
+
+    const { result } = renderHook(() => useChat());
+    expect(result.current.messages).toHaveLength(2);
+    expect(result.current.messages[0]?.content).toBe("Previous query");
+    expect(result.current.conversationId).toBe("saved-conv-456");
   });
 
   it("appends user and assistant messages and accumulates tokens", async () => {
@@ -41,6 +70,59 @@ describe("useChat hook", () => {
 
     expect(result.current.conversationId).toBe("conv-123");
     expect(result.current.isStreaming).toBe(false);
+
+    // Verify persisted to sessionStorage
+    const stored = JSON.parse(
+      sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY) || "{}"
+    );
+    expect(stored.messages).toHaveLength(2);
+    expect(stored.conversationId).toBe("conv-123");
+  });
+
+  it("supports sendInstantAnswer for 0ms cold-start offline responses", () => {
+    const { result } = renderHook(() => useChat());
+
+    act(() => {
+      result.current.sendInstantAnswer("What is Aamir's experience?", {
+        reply: "Instant offline dossier answer.",
+        sources: [
+          {
+            chunk_id: "test-chunk",
+            title: "Test Receipt",
+            type: "skill",
+            source_section: "S1",
+          },
+        ],
+      });
+    });
+
+    expect(result.current.messages).toHaveLength(2);
+    expect(result.current.messages[0]?.content).toBe("What is Aamir's experience?");
+    expect(result.current.messages[1]?.content).toBe("Instant offline dossier answer.");
+    expect(result.current.messages[1]?.sources).toHaveLength(1);
+    expect(result.current.isStreaming).toBe(false);
+
+    const stored = JSON.parse(
+      sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY) || "{}"
+    );
+    expect(stored.messages).toHaveLength(2);
+  });
+
+  it("clears messages and sessionStorage on resetChat", () => {
+    const { result } = renderHook(() => useChat());
+
+    act(() => {
+      result.current.sendInstantAnswer("Question", { reply: "Answer" });
+    });
+    expect(result.current.messages).toHaveLength(2);
+    expect(sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY)).not.toBeNull();
+
+    act(() => {
+      result.current.resetChat();
+    });
+
+    expect(result.current.messages).toHaveLength(0);
+    expect(sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY)).toBeNull();
   });
 
   it("handles streaming errors cleanly with inline error content", async () => {

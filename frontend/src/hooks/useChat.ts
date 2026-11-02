@@ -1,8 +1,15 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { streamChat } from "../lib/sse";
-import type { ChatMessage, ProjectCardData, SourceCitation } from "../lib/types";
+import type {
+  ChatMessage,
+  ProjectCardData,
+  SourceCitation,
+  InstantAnswer,
+} from "../lib/types";
 
 export type { ChatMessage };
+
+export const CHAT_SESSION_STORAGE_KEY = "amk_portfolio_chat_session";
 
 export interface UseChatReturn {
   messages: ChatMessage[];
@@ -10,15 +17,58 @@ export interface UseChatReturn {
   conversationId: string | null;
   error: string | null;
   sendMessage: (text: string) => Promise<void>;
+  sendInstantAnswer: (question: string, answer: InstantAnswer) => void;
   stopStreaming: () => void;
   clearError: () => void;
   resetChat: () => void;
 }
 
+function loadPersistedChat(): {
+  messages: ChatMessage[];
+  conversationId: string | null;
+} {
+  try {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      const raw = window.sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed?.messages)) {
+          return {
+            messages: parsed.messages,
+            conversationId: parsed.conversationId || null,
+          };
+        }
+      }
+    }
+  } catch {
+    // sessionStorage disabled or unavailable
+  }
+  return { messages: [], conversationId: null };
+}
+
+function savePersistedChat(
+  messages: ChatMessage[],
+  conversationId: string | null
+): void {
+  try {
+    if (typeof window !== "undefined" && window.sessionStorage) {
+      window.sessionStorage.setItem(
+        CHAT_SESSION_STORAGE_KEY,
+        JSON.stringify({ messages, conversationId })
+      );
+    }
+  } catch {
+    // sessionStorage quota exceeded or restricted
+  }
+}
+
 export function useChat(): UseChatReturn {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const initial = loadPersistedChat();
+  const [messages, setMessages] = useState<ChatMessage[]>(initial.messages);
   const [isStreaming, setIsStreaming] = useState(false);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(
+    initial.conversationId
+  );
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -44,6 +94,13 @@ export function useChat(): UseChatReturn {
     setIsStreaming(false);
     setConversationId(null);
     setError(null);
+    try {
+      if (typeof window !== "undefined" && window.sessionStorage) {
+        window.sessionStorage.removeItem(CHAT_SESSION_STORAGE_KEY);
+      }
+    } catch {
+      // storage unavailable
+    }
   }, []);
 
   const stopStreaming = useCallback(() => {
@@ -52,12 +109,51 @@ export function useChat(): UseChatReturn {
       abortControllerRef.current = null;
     }
     setIsStreaming(false);
-    setMessages((prev) =>
-      prev.map((msg) =>
-        msg.status === "streaming" ? { ...msg, status: "done" } : msg
-      )
-    );
-  }, []);
+    setMessages((prev) => {
+      const updated = prev.map((msg) =>
+        msg.status === "streaming" ? { ...msg, status: "done" as const } : msg
+      );
+      savePersistedChat(updated, conversationId);
+      return updated;
+    });
+  }, [conversationId]);
+
+  const sendInstantAnswer = useCallback(
+    (question: string, answer: InstantAnswer) => {
+      setError(null);
+      const userMessageId = `user-${Date.now()}`;
+      const assistantMessageId = `assistant-${Date.now() + 1}`;
+      const timestamp = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      const userMessage: ChatMessage = {
+        id: userMessageId,
+        role: "user",
+        content: question.trim(),
+        status: "done",
+        timestamp,
+      };
+
+      const assistantMessage: ChatMessage = {
+        id: assistantMessageId,
+        role: "assistant",
+        content: answer.reply,
+        status: "done",
+        timestamp,
+        sources: answer.sources || [],
+        cards: [],
+      };
+
+      setMessages((prev) => {
+        const next = [...prev, userMessage, assistantMessage];
+        savePersistedChat(next, conversationId);
+        return next;
+      });
+    },
+    [conversationId]
+  );
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -66,7 +162,7 @@ export function useChat(): UseChatReturn {
 
       setError(null);
       const userMessageId = `user-${Date.now()}`;
-      const assistantMessageId = `assistant-${Date.now()}`;
+      const assistantMessageId = `assistant-${Date.now() + 1}`;
       const timestamp = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
@@ -127,15 +223,17 @@ export function useChat(): UseChatReturn {
             );
           },
           onDone: (data) => {
+            let activeConvId = conversationId;
             if (data.conversation_id) {
               setConversationId(data.conversation_id);
+              activeConvId = data.conversation_id;
             }
-            setMessages((prev) =>
-              prev.map((msg) =>
+            setMessages((prev) => {
+              const updated = prev.map((msg) =>
                 msg.id === assistantMessageId
                   ? {
                       ...msg,
-                      status: "done",
+                      status: "done" as const,
                       sources:
                         msg.sources && msg.sources.length > 0
                           ? msg.sources
@@ -146,27 +244,31 @@ export function useChat(): UseChatReturn {
                           : data.cards || [],
                     }
                   : msg
-              )
-            );
+              );
+              savePersistedChat(updated, activeConvId);
+              return updated;
+            });
             setIsStreaming(false);
             abortControllerRef.current = null;
           },
           onError: (errMsg: string) => {
             setError(errMsg);
-            setMessages((prev) =>
-              prev.map((msg) =>
+            setMessages((prev) => {
+              const updated = prev.map((msg) =>
                 msg.id === assistantMessageId
                   ? {
                       ...msg,
-                      status: "error",
+                      status: "error" as const,
                       content:
                         msg.content ||
                         errMsg ||
                         "Generation failed. Please try again.",
                     }
                   : msg
-              )
-            );
+              );
+              savePersistedChat(updated, conversationId);
+              return updated;
+            });
             setIsStreaming(false);
             abortControllerRef.current = null;
           },
@@ -182,6 +284,7 @@ export function useChat(): UseChatReturn {
     conversationId,
     error,
     sendMessage,
+    sendInstantAnswer,
     stopStreaming,
     clearError,
     resetChat,

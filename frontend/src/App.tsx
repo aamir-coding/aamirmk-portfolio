@@ -9,7 +9,11 @@ import {
   StatusIndicator,
   type ServerState,
 } from "./components/StatusIndicator";
+import answersData from "./data/answers.json";
+import type { InstantAnswer } from "./lib/types";
 import "./styles/chat.css";
+
+const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
 
 export function App() {
   const [serverState, setServerState] = useState<ServerState>("checking");
@@ -21,6 +25,7 @@ export function App() {
     isStreaming,
     error,
     sendMessage,
+    sendInstantAnswer,
     stopStreaming,
     clearError,
     resetChat,
@@ -62,6 +67,11 @@ export function App() {
   }, []);
 
   const handleSelectPrompt = (prompt: string) => {
+    // If backend is asleep or still warming, answer instantly from bundled answers.json
+    if (serverState !== "ready" && BUNDLED_ANSWERS[prompt]) {
+      sendInstantAnswer(prompt, BUNDLED_ANSWERS[prompt]);
+      return;
+    }
     void sendMessage(prompt);
   };
 
@@ -102,6 +112,7 @@ export function App() {
           <span>
             <strong>Render free tier notice:</strong> Backend is cold starting
             from idle. This typically takes ~25s on the initial request.
+            Starter inquiries answer instantly while waking.
           </span>
         </div>
       )}

@@ -28,6 +28,22 @@ export function ChatInput({
     }
   }, [isStreaming, disabled]);
 
+  // Global Ctrl+K / Cmd+K shortcut to focus input
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        textareaRef.current?.focus();
+        textareaRef.current?.select();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, []);
+
   const handleSubmit = (e?: FormEvent) => {
     if (e) e.preventDefault();
     if (isStreaming) {
@@ -95,8 +111,15 @@ export function ChatInput({
         </div>
       </div>
       <div className="chat-input-helper">
-        <span>Enter to dispatch inquiry • Shift+Enter for newline</span>
-        {isStreaming && <span className="helper-active">Streaming active • Esc to stop</span>}
+        <span>
+          Enter to dispatch • Shift+Enter for newline •{" "}
+          <kbd className="kbd-shortcut" title="Focus composer (Ctrl+K or ⌘K)">
+            Ctrl+K
+          </kbd>
+        </span>
+        {isStreaming && (
+          <span className="helper-active">Streaming active • Esc to stop</span>
+        )}
       </div>
     </form>
   );

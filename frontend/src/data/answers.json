@@ -1,0 +1,106 @@
+{
+  "What is Aamir's experience with FastAPI and LLM systems?": {
+    "reply": "Aamir has practical experience designing and deploying high-performance asynchronous systems with **FastAPI** and modern LLM integrations:\n\n- **Production AI Digital Assistant**: Architected this portfolio assistant using FastAPI (Python 3.13), Uvicorn, and Starlette SSE streaming. Implemented hybrid retrieval (BM25 + FastEmbed ONNX with $k=60$ Reciprocal Rank Fusion) fitting under Render's 512 MB RAM ceiling, paired with a sliding-window rate limiter, daily token quota guard, and server-controlled tool calling.\n- **Entropy-OJ LLM Subsystems**: Integrated three distinct LLM workflows: a Socratic Debug Copilot with hint-level throttling, a Problem-Setting QA Auditor for automated edge-case synthesis, and an asynchronous solution complexity classifier with multi-provider failover across Groq, Gemini Flash, and OpenRouter.\n- **System Design Principles**: Emphasizes strict deterministic boundaries, XML delimiter isolation (`<user_inquiry>`) against prompt injections, off-thread CPU execution (`asyncio.to_thread`), and zero-hallucination server-supplied schemas.",
+    "sources": [
+      {
+        "chunk_id": "proj-ai-assistant-overview",
+        "title": "AI Digital Assistant Portfolio Overview",
+        "type": "project",
+        "source_section": "J15, V1",
+        "source_url": "https://github.com/aamir-coding/portfolio-assistant"
+      },
+      {
+        "chunk_id": "proj-entropy-oj-ai-features",
+        "title": "Entropy-OJ AI LLM Integration Workflows",
+        "type": "project",
+        "source_section": "J4",
+        "source_url": "https://github.com/aamir-coding/entropy-oj"
+      },
+      {
+        "chunk_id": "skill-ai-llm-engineering",
+        "title": "AI/LLM Engineering Skills & Practical Assessment",
+        "type": "skill",
+        "source_section": "A1, A2, A3",
+        "source_url": null
+      }
+    ]
+  },
+  "Tell me about his key projects and production impact.": {
+    "reply": "Aamir has authored several full-stack and systems projects with measured performance and reliability:\n\n- **Entropy-OJ (Flagship Online Judge)**: Microservices-based evaluation engine supporting C++, Java, and Python. Engineered a decoupled worker queue with Redis and BullMQ, an isolated Linux execution sandbox, and a React Monaco editor interface. Resolved a critical 2m12s idle TCP socket freeze by tuning TCP keep-alives and Redis heartbeat intervals.\n- **AI Digital Assistant Portfolio**: Real-time conversational portfolio delivering sub-second first-token SSE streaming over HTTP POST, in-process hybrid search, and deterministic generative UI cards summoned via tool dispatch without external vector database dependencies.\n- **VayuSetu (Clean Air Intelligence)**: 2nd Runner-Up in the Google Cloud Build with AI Hackathon. Integrated IoT AQI telemetry with predictive air dispersion modeling.\n- **Health Premium Predictor**: Full-cycle ML pipeline and FastAPI service predicting health insurance costs using ensemble gradient boosting, cross-validation, and Docker containerization.",
+    "sources": [
+      {
+        "chunk_id": "proj-entropy-oj-pitch",
+        "title": "Entropy-OJ Flagship Online Judge Overview",
+        "type": "project",
+        "source_section": "J1",
+        "source_url": "https://github.com/aamir-coding/entropy-oj"
+      },
+      {
+        "chunk_id": "exp-algouniversity-hardest-bug",
+        "title": "AlgoUniversity 2m12s Redis Socket Timeout Bug",
+        "type": "experience",
+        "source_section": "X8",
+        "source_url": null
+      },
+      {
+        "chunk_id": "achieve-google-cloud-hackathon",
+        "title": "Google Cloud Build with AI Hackathon 2nd Runner-Up",
+        "type": "achievement",
+        "source_section": "AC3, B8",
+        "source_url": null
+      }
+    ]
+  },
+  "What are Aamir's core technical strengths?": {
+    "reply": "Aamir's technical strengths center on pragmatic full-stack product engineering and robust backend systems:\n\n- **Backend & Systems**: Python (FastAPI, Django), Node.js, C++, RESTful APIs, Server-Sent Events (SSE), background task queues (BullMQ, Redis), and PostgreSQL.\n- **AI Engineering & Retrieval**: Grounded hybrid RAG (dense vector cosine similarity + Okapi BM25 with RRF), prompt injection defense, token quota budgeting, and tool-calling agent loops.\n- **Frontend Engineering**: React, TypeScript, Vite, accessible semantic HTML, CSS design tokens, and performant state orchestration with zero bundle bloat.\n- **Engineering Discipline**: Rigorous test-driven verification (Pytest, Vitest), strict typing at boundaries (Pydantic, TypeScript), memory profiling under resource constraints, and human-in-the-loop validation of AI-generated code.",
+    "sources": [
+      {
+        "chunk_id": "skill-strongest-summary",
+        "title": "Aamir's Strongest Technical Skills Summary",
+        "type": "skill",
+        "source_section": "S1",
+        "source_url": null
+      },
+      {
+        "chunk_id": "skill-programming-languages",
+        "title": "Programming Language Proficiencies",
+        "type": "skill",
+        "source_section": "S1",
+        "source_url": null
+      },
+      {
+        "chunk_id": "skill-ai-assisted-dev",
+        "title": "AI-Assisted Development Tools & Verification Policy",
+        "type": "skill",
+        "source_section": "S5, A4",
+        "source_url": null
+      }
+    ]
+  },
+  "What role is Aamir looking for?": {
+    "reply": "Aamir is seeking **AI Systems Engineer**, **Full-Stack Engineer**, or **Backend Software Engineer** roles:\n\n- **Availability**: Available immediately (from October 2026 onwards) for full-time internships or permanent engineering positions leading up to and beyond his June 2027 graduation. MSRUAS academic policies permit full-time industry employment.\n- **Location Preference**: First choice is onsite or hybrid in **Bengaluru, India**, or remote. Open to European relocation subject to work authorization.\n- **Work Focus**: Teams building production-grade software where engineering rigor, scalable backend services, and practical LLM integration intersect.",
+    "sources": [
+      {
+        "chunk_id": "profile-identity",
+        "title": "Identity & Professional Summary",
+        "type": "profile",
+        "source_section": "P1, P2",
+        "source_url": null
+      },
+      {
+        "chunk_id": "profile-location-relocation",
+        "title": "Location and Relocation Preferences",
+        "type": "profile",
+        "source_section": "P4, P5",
+        "source_url": null
+      },
+      {
+        "chunk_id": "profile-work-availability",
+        "title": "Work Availability and Academic Policies",
+        "type": "profile",
+        "source_section": "P3, P6",
+        "source_url": null
+      }
+    ]
+  }
+}

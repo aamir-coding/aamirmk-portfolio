@@ -34,3 +34,8 @@ export interface ChatMessage {
   sources?: SourceCitation[];
   cards?: ProjectCardData[];
 }
+
+export interface InstantAnswer {
+  reply: string;
+  sources?: SourceCitation[];
+}

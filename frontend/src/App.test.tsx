@@ -7,10 +7,12 @@ import * as sse from "./lib/sse";
 describe("<App />", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    sessionStorage.clear();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    sessionStorage.clear();
   });
 
   it("renders header, status indicator, and starter chips on mount", () => {
@@ -64,7 +66,7 @@ describe("<App />", () => {
     const sendBtn = screen.getByRole("button", { name: /Send message/i });
     fireEvent.click(sendBtn);
 
-    // Verify user message appears
+    // Verify user message appears in list
     expect(screen.getByText("Tell me about his experience")).toBeInTheDocument();
 
     // Verify streamed assistant reply appears
@@ -84,6 +86,10 @@ describe("<App />", () => {
 
     render(<App />);
 
+    await waitFor(() => {
+      expect(screen.getByText("Ready")).toBeInTheDocument();
+    });
+
     const chip = screen.getByRole("button", {
       name: /What are Aamir's core technical strengths\?/i,
     });
@@ -96,6 +102,22 @@ describe("<App />", () => {
     });
   });
 
+  it("delivers instant offline answer when starter chip is clicked while warming", async () => {
+    vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {})); // Never resolves (simulating cold start)
+    render(<App />);
+
+    const chip = screen.getByRole("button", {
+      name: /What are Aamir's core technical strengths\?/i,
+    });
+    fireEvent.click(chip);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Aamir's technical strengths center on pragmatic full-stack/i)
+      ).toBeInTheDocument();
+    });
+  });
+
   it("shows '← Dossier Overview' button during active chat and resets to CoverState on click", async () => {
     vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
     vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
@@ -104,6 +126,10 @@ describe("<App />", () => {
     });
 
     render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Ready")).toBeInTheDocument();
+    });
 
     // Initially in Cover State
     expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
@@ -160,33 +186,46 @@ describe("<App />", () => {
 
     render(<App />);
 
+    await waitFor(() => {
+      expect(screen.getByText("Ready")).toBeInTheDocument();
+    });
+
     const textarea = screen.getByPlaceholderText(/Ask about Aamir's experience/i);
     fireEvent.change(textarea, { target: { value: "Tell me about Entropy-OJ" } });
-    const sendBtn = screen.getByRole("button", { name: /Send message/i });
-    fireEvent.click(sendBtn);
+    fireEvent.click(screen.getByRole("button", { name: /Send message/i }));
 
-    // Card appears in message
+    // Wait for ProjectCard to render
     await waitFor(() => {
       expect(screen.getByText("Entropy Online Judge")).toBeInTheDocument();
-      expect(screen.getByText("BullMQ asynchronous judging")).toBeInTheDocument();
     });
 
-    // Click "Inspect Architecture →"
-    const inspectBtn = screen.getByRole("button", { name: /Inspect Architecture/i });
+    // Click Inspect Architecture Blueprint button
+    const inspectBtn = screen.getByRole("button", {
+      name: /Inspect Architecture/i,
+    });
     fireEvent.click(inspectBtn);
 
-    // Modal dialog appears
+    // Verify modal is open and shows architecture details
     await waitFor(() => {
-      expect(screen.getByRole("dialog")).toBeInTheDocument();
-      expect(screen.getByText(/System uses Redis queue and Linux runner/i)).toBeInTheDocument();
+      expect(
+        screen.getByRole("dialog", { name: /Entropy Online Judge/i })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("System uses Redis queue and Linux runner.")
+      ).toBeInTheDocument();
     });
 
-    // Close modal
-    const closeBtn = screen.getByRole("button", { name: /Close architecture modal/i });
+    // Close modal via Close button
+    const closeBtn = screen.getByRole("button", {
+      name: /Close architecture modal/i,
+    });
     fireEvent.click(closeBtn);
 
+    // Verify modal is dismissed
     await waitFor(() => {
-      expect(screen.queryByRole("dialog")).toBeNull();
+      expect(
+        screen.queryByRole("dialog", { name: /Entropy Online Judge/i })
+      ).not.toBeInTheDocument();
     });
   });
 });

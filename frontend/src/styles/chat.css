@@ -929,6 +929,20 @@ body {
   font-weight: var(--font-medium);
 }
 
+.kbd-shortcut {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  line-height: 1.2;
+  color: var(--text-secondary);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  vertical-align: baseline;
+}
+
 .chat-textarea {
   flex: 1;
   padding: var(--space-3) var(--space-3);
