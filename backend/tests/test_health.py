@@ -90,3 +90,13 @@ def test_404_returns_consistent_json_error(client: TestClient) -> None:
     assert data["error"]["message"] == "Not Found"
     assert data["error"]["request_id"] is not None
     assert response.headers.get("X-Request-ID") == data["error"]["request_id"]
+
+
+def test_response_security_headers(client: TestClient) -> None:
+    """Every response contains standard HTTP security hardening headers."""
+    response = client.get("/api/health")
+
+    assert response.status_code == 200
+    assert response.headers.get("X-Content-Type-Options") == "nosniff"
+    assert response.headers.get("X-Frame-Options") == "DENY"
+    assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"

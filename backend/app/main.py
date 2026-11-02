@@ -71,7 +71,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Pure ASGI path normalization middleware (runs before routing)
     app.add_middleware(NormalizePathMiddleware)
 
-    # Request ID and access logging middleware
+    # Request ID, security headers, and access logging middleware
     @app.middleware("http")
     async def request_id_and_logging_middleware(request: Request, call_next):
         request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex
@@ -82,6 +82,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
         duration_ms = (time.perf_counter() - start_time) * 1000.0
         response.headers["X-Request-ID"] = request_id
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
         client_ip = get_client_ip(request)
 

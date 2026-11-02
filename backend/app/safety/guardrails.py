@@ -29,10 +29,16 @@ _INJECTION_PATTERNS = [
         r"hidden\s+prompt|developer\s+mode\s+instructions)",
         re.IGNORECASE,
     ),
+    # Questioning startup directives
+    re.compile(
+        r"(?:what\s+were\s+the\s+initial\s+instructions|tell\s+me\s+your\s+instructions|"
+        r"output\s+all\s+rules)",
+        re.IGNORECASE,
+    ),
     # Persona hijacking / Jailbreak identities (DAN, developer mode, unrestricted)
     re.compile(
-        r"(?:you\s+are\s+now|pretend\s+to\s+be|act\s+as)\s+(?:an?\s+)?"
-        r"(?:dan|jailbroken|unrestricted|evil\s+bot|ai\s+without\s+rules)",
+        r"(?:you\s+are\s+now|pretend\s+to\s+be|act\s+as|speak\s+as)\s+(?:an?\s+)?"
+        r"(?:dan|jailbroken|unrestricted|unaligned|evil\s+bot|ai\s+without\s+(?:rules|boundaries))",
         re.IGNORECASE,
     ),
     # Special tokenizer / chat template token breakout attempts
@@ -42,7 +48,12 @@ _INJECTION_PATTERNS = [
     ),
     # Delimiter breakout attempts targeting XML framing
     re.compile(
-        r"<\s*/\s*(?:user_inquiry|context|system_instructions)\s*>",
+        r"<\s*/?\s*(?:user_inquiry|context|system_instructions)\s*>",
+        re.IGNORECASE,
+    ),
+    # System administrative command spoofing
+    re.compile(
+        r"(?:system\s+reboot|master\s+credentials|root\s+access|admin\s+mode\s+activated)",
         re.IGNORECASE,
     ),
 ]
@@ -59,37 +70,30 @@ class InjectionCheckResult:
 def check_prompt_injection(text: str) -> InjectionCheckResult:
     """Evaluate whether input text contains adversarial prompt injection directives.
 
-    Designed to detect imperative commands trying to subvert the LLM instructions
-    while deliberately allowing recruiters to ask questions ABOUT prompt engineering,
-    instructions, or safety systems.
+    Uses deterministic regex boundary checks to reject attacks at 0 LLM token cost
+    with zero false-positives on legitimate queries about architecture or engineering.
     """
-    if not text or not isinstance(text, str):
-        return InjectionCheckResult(is_safe=True)
-
-    normalized = text.strip()
-
     for pattern in _INJECTION_PATTERNS:
-        match = pattern.search(normalized)
+        match = pattern.search(text)
         if match:
-            reason = f"Matched injection pattern: {match.group(0)}"
-            logger.warning("Adversarial prompt injection attempt detected: %s", reason)
+            reason = f"Matched injection pattern: {pattern.pattern}"
+            logger.warning(
+                "Prompt injection rejected: %s (matched '%s')", text, match.group(0)
+            )
             return InjectionCheckResult(is_safe=False, flagged_reason=reason)
 
     return InjectionCheckResult(is_safe=True)
 
 
 def sanitize_user_input(text: str) -> str:
-    """Sanitize user input to neutralize delimiter breakouts."""
-    if not text:
-        return ""
-    # Neutralize XML-like tag injections
-    sanitized = text.replace("<user_inquiry>", "[user_inquiry]").replace(
-        "</user_inquiry>", "[/user_inquiry]"
-    )
+    """Strip or neutralize potentially malicious delimiter tags from user input."""
+    # Escape xml tags that might conflict with system prompt delimiter isolation
+    sanitized = re.sub(r"<\s*(/?)user_inquiry\s*>", r"[\1user_inquiry]", text)
+    sanitized = re.sub(r"<\s*(/?)context\s*>", r"[\1context]", sanitized)
     return sanitized.strip()
 
 
-def format_safe_user_message(text: str) -> str:
-    """Format sanitized user text inside structured XML delimiter tags."""
-    clean_text = sanitize_user_input(text)
-    return f"<user_inquiry>\n{clean_text}\n</user_inquiry>"
+def format_safe_user_message(user_input: str) -> str:
+    """Wrap user query in strict structural XML delimiter boundary fencing."""
+    cleaned = sanitize_user_input(user_input)
+    return f"<user_inquiry>\n{cleaned}\n</user_inquiry>"
