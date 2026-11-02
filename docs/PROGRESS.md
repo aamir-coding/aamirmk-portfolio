@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Band 2 / Phase 5: Source Citations & Generative UI Complete** — Server-supplied generative cards, dual-event SSE streaming, verified receipts, accessible blueprint modal, 75.50 KB gzipped JS (<200 KB budget), 188 backend/eval tests + 44 frontend tests passing (100% green). Next: Deliver Phase 5 Teach-Back, obtain user approval, tag `phase-5-done`.
+**Band 2 / Phase 4: Design System (Full) & Editorial Dossier Direction** — Phase 5 completed and tagged `phase-5-done`. Next: Complete full editorial dossier visual identity, typography system, responsive layout, dark/light themes, and polished card components.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -19,7 +19,7 @@
 | P7: Safety (first-share) | 🟢 Complete | `main` | `phase-7-done` | [`phase-07-safety-rate-limiting.md`](study-guides/phase-07-safety-rate-limiting.md) |
 | — Gate 1: Shareable link — | 🟢 Complete | `main` | `gate-1-done` | — |
 | P2: RAG | 🟢 Complete | `main` | `phase-2-done` | [`phase-02-hybrid-rag.md`](study-guides/phase-02-hybrid-rag.md) |
-| P5: Citations + gen UI | 🟢 Built & Verified | `phase-5-citations-gen-ui` | `phase-5-done` (pending approval) | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
+| P5: Citations + gen UI | 🟢 Complete | `main` | `phase-5-done` | [`phase-05-citations-generative-ui.md`](study-guides/phase-05-citations-generative-ui.md) |
 | P4: Design system (full) | ⬜ Next Up (Band 2) | — | — | — |
 | P6: Fit report | ⬜ Not Started | — | — | — |
 | P8: Evals | ⬜ Not Started | — | — | — |
@@ -135,9 +135,8 @@
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Deliver Phase 5 interactive teach-back (3 questions).
-2. Obtain user approval to tag `phase-5-done`, merge to `main`, and push to remote.
-3. Present Phase 4 (Full Design System) or Phase 6 (JD Fit Report) brief.
+1. Kick off Phase 4 (Full Design System & Editorial Dossier Direction) on branch `phase-4-editorial-dossier`.
+2. Present Phase 4 brief and obtain user approval before implementing.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
