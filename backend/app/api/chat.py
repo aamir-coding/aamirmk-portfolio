@@ -19,8 +19,9 @@ from app.llm import (
     Message,
     get_llm_client,
 )
-from app.models import ChatRequest, ChatResponse, TokenUsage
+from app.models import ChatRequest, ChatResponse, SourceCitation, TokenUsage
 from app.prompt_loader import build_system_prompt
+from app.retrieval.models import RetrievedChunk
 from app.retrieval.retriever import Retriever, get_retriever
 from app.safety.guardrails import (
     SAFE_REFUSAL_MESSAGE,
@@ -40,6 +41,27 @@ from app.safety.rate_limiter import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["chat"])
+
+
+def extract_citations(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
+    """Convert retrieved chunks into deduplicated SourceCitation receipts."""
+    seen_ids: set[str] = set()
+    citations: list[SourceCitation] = []
+    for rc in chunks:
+        chunk = rc.chunk
+        if chunk.id in seen_ids:
+            continue
+        seen_ids.add(chunk.id)
+        citations.append(
+            SourceCitation(
+                chunk_id=chunk.id,
+                title=chunk.title,
+                type=chunk.type,
+                source_section=chunk.source_section,
+                source_url=chunk.source_url,
+            )
+        )
+    return citations
 
 
 @router.post(
@@ -77,10 +99,12 @@ async def chat(
                 completion_tokens=0,
                 total_tokens=0,
             ),
+            sources=[],
         )
 
-    # 2. Retrieve relevant factual context chunks
+    # 2. Retrieve relevant factual context chunks & generate receipts
     retrieved_chunks = await retriever.retrieve(request.message, top_k=4)
+    citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(retrieved_chunks)
 
     # 3. Format user query with XML boundary fencing
@@ -130,6 +154,7 @@ async def chat(
             completion_tokens=completion.completion_tokens,
             total_tokens=completion.total_tokens,
         ),
+        sources=citations,
     )
 
 
@@ -165,7 +190,7 @@ async def chat_stream(
         async def refusal_generator() -> AsyncIterator[str]:
             payload = json.dumps({"token": SAFE_REFUSAL_MESSAGE})
             yield f"event: token\ndata: {payload}\n\n"
-            done_payload = json.dumps({"conversation_id": conv_id})
+            done_payload = json.dumps({"conversation_id": conv_id, "sources": []})
             yield f"event: done\ndata: {done_payload}\n\n"
 
         return StreamingResponse(
@@ -174,8 +199,9 @@ async def chat_stream(
             headers=headers,
         )
 
-    # 2. Retrieve relevant factual context chunks
+    # 2. Retrieve relevant factual context chunks & generate receipts
     retrieved_chunks = await retriever.retrieve(request.message, top_k=4)
+    citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(retrieved_chunks)
 
     # 3. Format user query with XML boundary fencing
@@ -189,12 +215,24 @@ async def chat_stream(
     async def event_generator() -> AsyncIterator[str]:
         tokens_emitted = 0
         try:
+            # Emit verified source receipts before token stream begins
+            if citations:
+                sources_payload = json.dumps(
+                    {"sources": [c.model_dump() for c in citations]}
+                )
+                yield f"event: sources\ndata: {sources_payload}\n\n"
+
             async for token in llm.stream(messages):
                 tokens_emitted += 1
                 payload = json.dumps({"token": token})
                 yield f"event: token\ndata: {payload}\n\n"
 
-            done_payload = json.dumps({"conversation_id": conv_id})
+            done_payload = json.dumps(
+                {
+                    "conversation_id": conv_id,
+                    "sources": [c.model_dump() for c in citations],
+                }
+            )
             yield f"event: done\ndata: {done_payload}\n\n"
 
             # 4. Track tokens (estimated prompt + generated tokens)

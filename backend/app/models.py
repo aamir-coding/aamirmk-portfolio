@@ -17,6 +17,26 @@ class TokenUsage(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class SourceCitation(BaseModel):
+    """Citation metadata connecting assistant statements to verified fact chunks."""
+
+    chunk_id: str = Field(description="Unique identifier of the fact chunk")
+    title: str = Field(description="Human-readable title of the chunk")
+    type: str = Field(
+        description="Category type: project, experience, skill, education, etc."
+    )
+    source_section: str = Field(
+        default="",
+        description="Questionnaire/resume receipt code, e.g. 'J1, J2'",
+    )
+    source_url: str | None = Field(
+        default=None,
+        description="Optional public receipt or repository URL",
+    )
+
+    model_config = ConfigDict(frozen=True)
+
+
 class ChatRequest(BaseModel):
     """Inbound chat payload from client."""
 
@@ -49,5 +69,9 @@ class ChatResponse(BaseModel):
     conversation_id: str = Field(..., description="Conversation identifier")
     model: str = Field(..., description="LLM model identifier used for response")
     usage: TokenUsage = Field(..., description="Token usage statistics")
+    sources: list[SourceCitation] = Field(
+        default_factory=list,
+        description="Verified source citations grounding the response",
+    )
 
     model_config = ConfigDict(frozen=True)
