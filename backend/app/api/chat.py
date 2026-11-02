@@ -17,6 +17,7 @@ from app.llm import (
     LLMRateLimitError,
     LLMUnavailableError,
     Message,
+    ToolCall,
     get_llm_client,
 )
 from app.models import ChatRequest, ChatResponse, SourceCitation, TokenUsage
@@ -37,6 +38,8 @@ from app.safety.rate_limiter import (
     RateLimitResult,
     check_rate_limit,
 )
+from app.tools.projects import ProjectCardData
+from app.tools.registry import ToolRegistry, get_tool_registry
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +78,7 @@ async def chat(
     response: Response,
     llm: LLMClient = Depends(get_llm_client),
     retriever: Retriever = Depends(get_retriever),
+    tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     _quota: None = Depends(check_daily_quota),
     quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
@@ -100,6 +104,7 @@ async def chat(
                 total_tokens=0,
             ),
             sources=[],
+            cards=[],
         )
 
     # 2. Retrieve relevant factual context chunks & generate receipts
@@ -115,8 +120,54 @@ async def chat(
         Message(role="user", content=safe_user_content),
     ]
 
+    tool_schemas = tool_registry.get_schemas()
+    summoned_cards: list[ProjectCardData] = []
+
     try:
-        completion = await llm.complete(messages)
+        completion = await llm.complete(messages, tools=tool_schemas)
+
+        # If LLM requested tool calls, execute them and run turn 2 for text reply
+        if completion.tool_calls:
+            messages.append(
+                Message(
+                    role="assistant",
+                    content="",
+                    tool_calls=completion.tool_calls,
+                )
+            )
+            for tc in completion.tool_calls:
+                card = tool_registry.execute(tc.name, tc.arguments)
+                if card:
+                    summoned_cards.append(card)
+                    tool_content = json.dumps(
+                        {"status": "card_displayed", "title": card.title}
+                    )
+                else:
+                    tool_content = json.dumps({"error": "Project not found"})
+
+                messages.append(
+                    Message(
+                        role="tool",
+                        content=tool_content,
+                        tool_call_id=tc.id,
+                        name=tc.name,
+                    )
+                )
+
+            # Turn 2: verbal explanation grounded in tool output
+            second_completion = await llm.complete(messages)
+            reply_text = second_completion.content
+            total_tokens = completion.total_tokens + second_completion.total_tokens
+            prompt_tokens = second_completion.prompt_tokens
+            completion_tokens = (
+                completion.completion_tokens + second_completion.completion_tokens
+            )
+        else:
+            reply_text = completion.content
+            total_tokens = completion.total_tokens
+            prompt_tokens = completion.prompt_tokens
+            completion_tokens = completion.completion_tokens
+
     except LLMRateLimitError as exc:
         logger.warning("[%s] Groq rate limit: %s", conv_id, exc)
         raise HTTPException(
@@ -143,18 +194,19 @@ async def chat(
         ) from exc
 
     # 4. Track actual consumed tokens against daily quota
-    await quota_guard.record_usage(tokens=completion.total_tokens)
+    await quota_guard.record_usage(tokens=total_tokens)
 
     return ChatResponse(
-        reply=completion.content,
+        reply=reply_text,
         conversation_id=conv_id,
         model=completion.model,
         usage=TokenUsage(
-            prompt_tokens=completion.prompt_tokens,
-            completion_tokens=completion.completion_tokens,
-            total_tokens=completion.total_tokens,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
         ),
         sources=citations,
+        cards=summoned_cards,
     )
 
 
@@ -167,6 +219,7 @@ async def chat_stream(
     request: ChatRequest,
     llm: LLMClient = Depends(get_llm_client),
     retriever: Retriever = Depends(get_retriever),
+    tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     _quota: None = Depends(check_daily_quota),
     quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
@@ -190,7 +243,9 @@ async def chat_stream(
         async def refusal_generator() -> AsyncIterator[str]:
             payload = json.dumps({"token": SAFE_REFUSAL_MESSAGE})
             yield f"event: token\ndata: {payload}\n\n"
-            done_payload = json.dumps({"conversation_id": conv_id, "sources": []})
+            done_payload = json.dumps(
+                {"conversation_id": conv_id, "sources": [], "cards": []}
+            )
             yield f"event: done\ndata: {done_payload}\n\n"
 
         return StreamingResponse(
@@ -212,25 +267,71 @@ async def chat_stream(
         Message(role="user", content=safe_user_content),
     ]
 
+    tool_schemas = tool_registry.get_schemas()
+
     async def event_generator() -> AsyncIterator[str]:
         tokens_emitted = 0
+        summoned_cards: list[ProjectCardData] = []
         try:
-            # Emit verified source receipts before token stream begins
+            # Emit verified source receipts before stream begins
             if citations:
                 sources_payload = json.dumps(
                     {"sources": [c.model_dump() for c in citations]}
                 )
                 yield f"event: sources\ndata: {sources_payload}\n\n"
 
-            async for token in llm.stream(messages):
-                tokens_emitted += 1
-                payload = json.dumps({"token": token})
-                yield f"event: token\ndata: {payload}\n\n"
+            # Stream Turn 1: checks for tool calls or direct text
+            detected_tool_calls: list[ToolCall] = []
+            async for item in llm.stream(messages, tools=tool_schemas):
+                if isinstance(item, ToolCall):
+                    detected_tool_calls.append(item)
+                else:
+                    tokens_emitted += 1
+                    payload = json.dumps({"token": item})
+                    yield f"event: token\ndata: {payload}\n\n"
+
+            # If tool calls were made, resolve them and stream Turn 2 explanation
+            if detected_tool_calls:
+                messages.append(
+                    Message(
+                        role="assistant",
+                        content="",
+                        tool_calls=detected_tool_calls,
+                    )
+                )
+                for tc in detected_tool_calls:
+                    card = tool_registry.execute(tc.name, tc.arguments)
+                    if card:
+                        summoned_cards.append(card)
+                        card_payload = json.dumps({"card": card.model_dump()})
+                        yield f"event: card\ndata: {card_payload}\n\n"
+                        tool_content = json.dumps(
+                            {"status": "card_displayed", "title": card.title}
+                        )
+                    else:
+                        tool_content = json.dumps({"error": "Project not found"})
+
+                    messages.append(
+                        Message(
+                            role="tool",
+                            content=tool_content,
+                            tool_call_id=tc.id,
+                            name=tc.name,
+                        )
+                    )
+
+                # Turn 2: stream verbal explanation
+                async for token in llm.stream(messages):
+                    if isinstance(token, str):
+                        tokens_emitted += 1
+                        payload = json.dumps({"token": token})
+                        yield f"event: token\ndata: {payload}\n\n"
 
             done_payload = json.dumps(
                 {
                     "conversation_id": conv_id,
                     "sources": [c.model_dump() for c in citations],
+                    "cards": [c.model_dump() for c in summoned_cards],
                 }
             )
             yield f"event: done\ndata: {done_payload}\n\n"

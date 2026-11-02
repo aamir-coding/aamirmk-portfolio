@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.tools.projects import ProjectCardData
+
 
 class TokenUsage(BaseModel):
     """Token consumption statistics for a chat completion."""
@@ -72,6 +74,10 @@ class ChatResponse(BaseModel):
     sources: list[SourceCitation] = Field(
         default_factory=list,
         description="Verified source citations grounding the response",
+    )
+    cards: list[ProjectCardData] = Field(
+        default_factory=list,
+        description="Authoritative generative UI cards summoned via tool calls",
     )
 
     model_config = ConfigDict(frozen=True)

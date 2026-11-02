@@ -1,7 +1,7 @@
 """Thin async LLM adapter — the seam between the app and Groq.
 
-Interface: `complete(messages) -> AssistantMessage`
-           and `stream(messages) -> AsyncIterator[str]`.
+Interface: `complete(messages, tools=None) -> AssistantMessage`
+           and `stream(messages, tools=None) -> AsyncIterator[str | ToolCall]`.
 Implementation details hidden behind the seam: API key, model selection,
 client lifecycle, timeouts, error mapping. Tests inject a FakeLLM that
 satisfies the same protocol — no real Groq calls in CI.
@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import logging
 from collections.abc import AsyncIterator
-from dataclasses import dataclass
-from typing import Protocol
+from dataclasses import dataclass, field
+from typing import Any, Protocol
 
 from fastapi import Depends
 from groq import AsyncGroq
@@ -26,11 +26,23 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
-class Message:
-    """A single chat message (role + content)."""
+class ToolCall:
+    """A tool call requested by the LLM."""
 
-    role: str  # "system" | "user" | "assistant"
+    id: str
+    name: str
+    arguments: str  # JSON-encoded arguments string
+
+
+@dataclass(frozen=True, slots=True)
+class Message:
+    """A single chat message (role + content + optional tool metadata)."""
+
+    role: str  # "system" | "user" | "assistant" | "tool"
     content: str
+    tool_call_id: str | None = None
+    name: str | None = None
+    tool_calls: list[ToolCall] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +54,7 @@ class AssistantMessage:
     prompt_tokens: int
     completion_tokens: int
     total_tokens: int
+    tool_calls: list[ToolCall] = field(default_factory=list)
 
 
 # ── LLM errors ─────────────────────────────────────────────────────────
@@ -69,9 +82,17 @@ class LLMUnavailableError(LLMError):
 class LLMClient(Protocol):
     """Protocol that both GroqLLM and FakeLLM satisfy."""
 
-    async def complete(self, messages: list[Message]) -> AssistantMessage: ...
+    async def complete(
+        self,
+        messages: list[Message],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AssistantMessage: ...
 
-    async def stream(self, messages: list[Message]) -> AsyncIterator[str]: ...
+    async def stream(
+        self,
+        messages: list[Message],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AsyncIterator[str | ToolCall]: ...
 
 
 # ── Real adapter ───────────────────────────────────────────────────────
@@ -87,20 +108,67 @@ class GroqLLM:
         self._model = settings.LLM_MODEL_MAIN
         self._client = AsyncGroq(api_key=settings.GROQ_API_KEY)
 
-    async def complete(self, messages: list[Message]) -> AssistantMessage:
+    def _format_messages_for_groq(
+        self, messages: list[Message]
+    ) -> list[dict[str, Any]]:
+        """Convert domain Message value objects to Groq API dicts."""
+        formatted: list[dict[str, Any]] = []
+        for m in messages:
+            entry: dict[str, Any] = {"role": m.role, "content": m.content}
+            if m.role == "assistant" and m.tool_calls:
+                entry["tool_calls"] = [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.name,
+                            "arguments": tc.arguments,
+                        },
+                    }
+                    for tc in m.tool_calls
+                ]
+            elif m.role == "tool":
+                if m.tool_call_id:
+                    entry["tool_call_id"] = m.tool_call_id
+                if m.name:
+                    entry["name"] = m.name
+            formatted.append(entry)
+        return formatted
+
+    async def complete(
+        self,
+        messages: list[Message],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AssistantMessage:
         """Send messages to Groq and return the assistant reply."""
+        kwargs: dict[str, Any] = {
+            "model": self._model,
+            "messages": self._format_messages_for_groq(messages),
+            "temperature": 0.4,
+            "max_completion_tokens": 1024,
+        }
+        if tools:
+            kwargs["tools"] = tools
+            kwargs["tool_choice"] = "auto"
+
         try:
-            response = await self._client.chat.completions.create(
-                model=self._model,
-                messages=[{"role": m.role, "content": m.content} for m in messages],
-                temperature=0.4,
-                max_completion_tokens=1024,
-            )
+            response = await self._client.chat.completions.create(**kwargs)
         except Exception as exc:
             self._map_error(exc)
 
         choice = response.choices[0]
         usage = response.usage
+
+        tool_calls: list[ToolCall] = []
+        if choice.message.tool_calls:
+            for tc in choice.message.tool_calls:
+                tool_calls.append(
+                    ToolCall(
+                        id=tc.id,
+                        name=tc.function.name,
+                        arguments=tc.function.arguments,
+                    )
+                )
 
         return AssistantMessage(
             content=choice.message.content or "",
@@ -108,25 +176,73 @@ class GroqLLM:
             prompt_tokens=usage.prompt_tokens if usage else 0,
             completion_tokens=usage.completion_tokens if usage else 0,
             total_tokens=usage.total_tokens if usage else 0,
+            tool_calls=tool_calls,
         )
 
-    async def stream(self, messages: list[Message]) -> AsyncIterator[str]:
-        """Stream assistant response token by token from Groq."""
+    async def stream(
+        self,
+        messages: list[Message],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AsyncIterator[str | ToolCall]:
+        """Stream assistant response tokens and tool calls from Groq."""
+        kwargs: dict[str, Any] = {
+            "model": self._model,
+            "messages": self._format_messages_for_groq(messages),
+            "temperature": 0.4,
+            "max_completion_tokens": 1024,
+            "stream": True,
+        }
+        if tools:
+            kwargs["tools"] = tools
+            kwargs["tool_choice"] = "auto"
+
         try:
-            response_stream = await self._client.chat.completions.create(
-                model=self._model,
-                messages=[{"role": m.role, "content": m.content} for m in messages],
-                temperature=0.4,
-                max_completion_tokens=1024,
-                stream=True,
-            )
+            response_stream = await self._client.chat.completions.create(**kwargs)
         except Exception as exc:
             self._map_error(exc)
 
+        tool_call_buffers: dict[int, dict[str, str]] = {}
+
         try:
             async for chunk in response_stream:
-                if chunk.choices and chunk.choices[0].delta.content:
-                    yield chunk.choices[0].delta.content
+                if not chunk.choices:
+                    continue
+                delta = chunk.choices[0].delta
+
+                if delta.content:
+                    yield delta.content
+
+                if delta.tool_calls:
+                    for tc_delta in delta.tool_calls:
+                        idx = tc_delta.index if tc_delta.index is not None else 0
+                        if idx not in tool_call_buffers:
+                            tool_call_buffers[idx] = {
+                                "id": tc_delta.id or "",
+                                "name": (
+                                    tc_delta.function.name
+                                    if tc_delta.function and tc_delta.function.name
+                                    else ""
+                                ),
+                                "arguments": "",
+                            }
+                        else:
+                            if tc_delta.id:
+                                tool_call_buffers[idx]["id"] = tc_delta.id
+                            if tc_delta.function and tc_delta.function.name:
+                                tool_call_buffers[idx]["name"] = tc_delta.function.name
+
+                        if tc_delta.function and tc_delta.function.arguments:
+                            tool_call_buffers[idx]["arguments"] += (
+                                tc_delta.function.arguments
+                            )
+
+            for tc_data in tool_call_buffers.values():
+                if tc_data["name"]:
+                    yield ToolCall(
+                        id=tc_data["id"] or "call_unknown",
+                        name=tc_data["name"],
+                        arguments=tc_data["arguments"],
+                    )
         except Exception as exc:
             self._map_error(exc)
 
@@ -155,30 +271,63 @@ class FakeLLM:
         reply: str = "Fake reply",
         model: str = "fake-model",
         stream_chunks: list[str] | None = None,
+        tool_calls: list[ToolCall] | None = None,
         error_to_raise: Exception | None = None,
     ) -> None:
         self.reply = reply
         self.model = model
         self.stream_chunks = stream_chunks
+        self.tool_calls = tool_calls or []
         self.error_to_raise = error_to_raise
         self.last_messages: list[Message] = []
+        self.last_tools: list[dict[str, Any]] | None = None
 
-    async def complete(self, messages: list[Message]) -> AssistantMessage:
+    async def complete(
+        self,
+        messages: list[Message],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AssistantMessage:
         self.last_messages = list(messages)
+        self.last_tools = tools
         if self.error_to_raise is not None:
             raise self.error_to_raise
+
+        # If tools provided and canned tool_calls configured, simulate tool call
+        if tools and self.tool_calls:
+            return AssistantMessage(
+                content="",
+                model=self.model,
+                prompt_tokens=15,
+                completion_tokens=10,
+                total_tokens=25,
+                tool_calls=list(self.tool_calls),
+            )
+
         return AssistantMessage(
             content=self.reply,
             model=self.model,
             prompt_tokens=10,
             completion_tokens=5,
             total_tokens=15,
+            tool_calls=[],
         )
 
-    async def stream(self, messages: list[Message]) -> AsyncIterator[str]:
+    async def stream(
+        self,
+        messages: list[Message],
+        tools: list[dict[str, Any]] | None = None,
+    ) -> AsyncIterator[str | ToolCall]:
         self.last_messages = list(messages)
+        self.last_tools = tools
         if self.error_to_raise is not None:
             raise self.error_to_raise
+
+        # If tools provided and canned tool_calls configured, yield tool call
+        if tools and self.tool_calls:
+            for tc in self.tool_calls:
+                yield tc
+            return
+
         if self.stream_chunks is not None:
             for chunk in self.stream_chunks:
                 yield chunk
