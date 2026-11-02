@@ -3,6 +3,7 @@ id: "proj-ai-assistant-overview"
 type: "project"
 title: "AI Digital Assistant Portfolio — Overview"
 source_section: "J1, J2 (Project D)"
+source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "portfolio", "rag", "chatbot", "recruiter", "fastapi", "react"]
 draft: true
 private: false
@@ -19,6 +20,7 @@ id: "proj-ai-assistant-architecture"
 type: "project"
 title: "AI Digital Assistant Portfolio — Architecture and Stack"
 source_section: "J4, J5 (Project D)"
+source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "fastapi", "react", "typescript", "rag", "sse", "hybrid-retrieval", "bm25", "embeddings"]
 draft: true
 private: false
@@ -40,6 +42,7 @@ id: "proj-ai-assistant-design"
 type: "project"
 title: "AI Digital Assistant Portfolio — Design Decisions"
 source_section: "J6 (Project D)"
+source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "design-decisions", "rag", "hybrid-retrieval", "citations", "ai-development"]
 draft: true
 private: false
@@ -60,6 +63,7 @@ id: "proj-ai-assistant-status"
 type: "project"
 title: "AI Digital Assistant Portfolio — Current Status"
 source_section: "J11, V2, V7 (Project D)"
+source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "status", "development", "knowledge-base"]
 draft: true
 private: false
@@ -76,6 +80,7 @@ id: "proj-ai-assistant-links"
 type: "project"
 title: "AI Digital Assistant Portfolio — Links"
 source_section: "J10, V1 (Project D)"
+source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "links", "repository", "live-app"]
 draft: true
 private: false

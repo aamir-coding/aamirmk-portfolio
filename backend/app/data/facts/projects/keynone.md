@@ -3,6 +3,7 @@ id: "proj-keynone-overview"
 type: "project"
 title: "Keynone — Local Voice Dictation for Windows"
 source_section: "X11, V6"
+source_url: "https://github.com/aamir-coding/keynone"
 tags: ["keynone", "voice-dictation", "speech-to-text", "windows", "local-processing", "open-source", "privacy"]
 draft: true
 private: false

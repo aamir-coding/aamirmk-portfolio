@@ -3,6 +3,7 @@ id: "proj-healthtracker-overview"
 type: "project"
 title: "HealthTracker — Overview"
 source_section: "J1, J2, J3 (Project B)"
+source_url: "https://github.com/aamir-coding/health-tracker"
 tags: ["healthtracker", "pwa", "health", "fullstack", "github-actions", "solo"]
 draft: true
 private: false
@@ -21,6 +22,7 @@ id: "proj-healthtracker-status"
 type: "project"
 title: "HealthTracker — Status and Known Issues"
 source_section: "J11, V2, V7 (Project B)"
+source_url: "https://github.com/aamir-coding/health-tracker"
 tags: ["healthtracker", "live-app", "render", "status"]
 draft: true
 private: false
@@ -35,6 +37,7 @@ id: "proj-healthtracker-links"
 type: "project"
 title: "HealthTracker — Links"
 source_section: "J10, V1 (Project B)"
+source_url: "https://github.com/aamir-coding/health-tracker"
 tags: ["healthtracker", "links", "repository"]
 draft: true
 private: false

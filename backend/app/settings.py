@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
+    ENABLE_DEBUG_RETRIEVAL: bool = False
 
     # CORS configuration - accepts comma-separated string or list of origins
     CORS_ORIGINS: str | list[str] = [

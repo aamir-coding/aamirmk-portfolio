@@ -3,6 +3,7 @@ id: "proj-entropy-oj-pitch"
 type: "project"
 title: "Entropy Online Judge — Pitch and Problem"
 source_section: "J1, J2 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "online-judge", "dsa", "competitive-programming", "ai-features"]
 draft: true
 private: false
@@ -19,6 +20,7 @@ id: "proj-entropy-oj-stack"
 type: "project"
 title: "Entropy Online Judge — Technologies, Stack and Architecture"
 source_section: "J4, J5 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "technologies", "tech-stack", "react", "typescript", "nodejs", "express", "mongodb", "redis", "bullmq", "azure", "architecture"]
 draft: true
 private: false
@@ -43,6 +45,7 @@ id: "proj-entropy-oj-design"
 type: "project"
 title: "Entropy Online Judge — Design Decisions"
 source_section: "J6 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "design-decisions", "async-queue", "sandboxing", "ai-fallback", "security"]
 draft: true
 private: false
@@ -63,6 +66,7 @@ id: "proj-entropy-oj-ai-features"
 type: "project"
 title: "Entropy Online Judge — Three AI Features"
 source_section: "J4, J5, J6, X5 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "ai", "socratic-debug", "qa-auditor", "complexity-classifier", "llm"]
 draft: true
 private: false
@@ -83,6 +87,7 @@ id: "proj-entropy-oj-security"
 type: "project"
 title: "Entropy Online Judge — Code Execution Security"
 source_section: "X3, J12 Q2 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "security", "sandboxing", "linux", "ulimit", "code-execution"]
 draft: true
 private: false
@@ -106,6 +111,7 @@ id: "proj-entropy-oj-debug-story"
 type: "project"
 title: "Entropy Online Judge — Redis ETIMEDOUT Debug Story"
 source_section: "J8, J12 Q3 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "debugging", "redis", "etimedout", "distributed-systems", "tcp-keepalive"]
 draft: true
 private: false
@@ -124,6 +130,7 @@ id: "proj-entropy-oj-interview-qa"
 type: "project"
 title: "Entropy Online Judge — Interview Q&A"
 source_section: "J12 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "interview", "questions", "queue", "security", "debugging"]
 draft: true
 private: false
@@ -143,6 +150,7 @@ id: "proj-entropy-oj-links"
 type: "project"
 title: "Entropy Online Judge — Links and Status"
 source_section: "J10, J11 (Project A)"
+source_url: "https://github.com/aamir-coding/entropy-oj"
 tags: ["entropy-oj", "links", "live-app", "demo"]
 draft: true
 private: false

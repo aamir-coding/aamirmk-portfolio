@@ -3,6 +3,7 @@ id: "proj-vayusetu-overview"
 type: "project"
 title: "VayuSetu — Google Cloud Hackathon Project"
 source_section: "X11, AC3"
+source_url: "https://hack2skill.com/event/codeforcommunities2"
 tags: ["vayusetu", "hackathon", "google-cloud", "hack2skill", "team-project", "achievement"]
 draft: true
 private: false

@@ -8,6 +8,7 @@ chunks:
     type: "profile"
     title: "Identity and Professional Summary"
     source_section: "P1, P2, P3, P11"
+    source_url: "https://github.com/aamir-coding"
     tags: ["identity", "introduction", "status"]
     draft: true
     private: false
@@ -46,6 +47,7 @@ chunks:
     type: "profile"
     title: "Contact Information"
     source_section: "P9, P12"
+    source_url: "https://www.linkedin.com/in/aamir-mk/"
     tags: ["contact", "email", "linkedin"]
     draft: true
     private: false

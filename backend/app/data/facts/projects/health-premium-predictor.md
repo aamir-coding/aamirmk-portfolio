@@ -3,6 +3,7 @@ id: "proj-health-premium-overview"
 type: "project"
 title: "Health Premium Predictor — Machine Learning (ML) Project Overview"
 source_section: "J1, J2, J3 (Project C)"
+source_url: "https://github.com/aamir-coding/health-prem-predict"
 tags: ["health-premium-predictor", "ml", "machine-learning", "xgboost", "streamlit", "regression", "solo", "ml-project"]
 draft: true
 private: false
@@ -19,6 +20,7 @@ id: "proj-health-premium-metrics"
 type: "project"
 title: "Health Premium Predictor — Reported Metrics"
 source_section: "J7, J14 (Project C)"
+source_url: "https://github.com/aamir-coding/health-prem-predict"
 tags: ["health-premium-predictor", "metrics", "r-squared", "evaluation", "xgboost"]
 draft: true
 private: false
@@ -41,6 +43,7 @@ id: "proj-health-premium-links"
 type: "project"
 title: "Health Premium Predictor — Links and Status"
 source_section: "J10, J11, V1, V2 (Project C)"
+source_url: "https://github.com/aamir-coding/health-prem-predict"
 tags: ["health-premium-predictor", "links", "streamlit", "live-app"]
 draft: true
 private: false

@@ -19,6 +19,7 @@ id: "achieve-google-cloud-hackathon"
 type: "achievement"
 title: "Google Cloud Build with AI Hackathon — 2nd Runner-Up (Track 2)"
 source_section: "AC3, E6, X11, B8"
+source_url: "https://hack2skill.com/event/codeforcommunities2"
 tags: ["achievement", "hackathon", "google", "google-cloud", "vayusetu", "runner-up", "clean-air"]
 draft: true
 private: false
