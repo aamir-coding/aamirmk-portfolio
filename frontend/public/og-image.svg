@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f0f12"/>
+      <stop offset="100%" stop-color="#18181b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="30" y="30" width="1140" height="570" fill="none" stroke="#27272a" stroke-width="2" rx="8"/>
+
+  <!-- Editorial Top Eyebrow -->
+  <g transform="translate(80, 100)">
+    <rect width="180" height="32" fill="#27272a" rx="4"/>
+    <text x="90" y="21" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600" fill="#a1a1aa" text-anchor="middle" letter-spacing="1">VERIFIED DOSSIER</text>
+    <text x="200" y="21" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500" fill="#71717a">REF: AMK-PORTFOLIO-2026</text>
+  </g>
+
+  <!-- Candidate Identity Headline -->
+  <text x="80" y="220" font-family="'Newsreader', 'Georgia', serif" font-size="64" font-weight="700" fill="#f4f4f5" letter-spacing="-0.5">Aamir Mohammed Khan</text>
+  <text x="80" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="28" font-weight="500" fill="#3b82f6">AI Systems &amp; Full-Stack Engineer</text>
+
+  <!-- Credentials Ribbon -->
+  <g transform="translate(80, 320)">
+    <text x="0" y="24" font-family="'JetBrains Mono', monospace" font-size="16" fill="#d4d4d8">AMU B.Tech (CGPA 9.77/10)  •  Bengaluru, India  •  Available for Hire</text>
+  </g>
+
+  <line x1="80" y1="380" x2="1120" y2="380" stroke="#27272a" stroke-width="1"/>
+
+  <!-- Core Competencies / Architecture Highlights -->
+  <g transform="translate(80, 430)">
+    <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="600" fill="#71717a" letter-spacing="1">SYSTEM ARCHITECTURES &amp; CORE STACK</text>
+    <text x="0" y="36" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="20" fill="#e4e4e7">FastAPI • Starlette SSE • Hybrid RAG (BM25 + ONNX) • Groq • React 19 • TypeScript • Redis</text>
+  </g>
+
+  <!-- Footer Trust Line -->
+  <g transform="translate(80, 540)">
+    <circle cx="6" cy="6" r="6" fill="#10b981"/>
+    <text x="24" y="11" font-family="'JetBrains Mono', monospace" font-size="14" fill="#a1a1aa">Interactive AI digital assistant grounded strictly in verified engineering receipts &amp; source citations</text>
+  </g>
+</svg>
