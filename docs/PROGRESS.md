@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Handoff Remediation Sprint** — implementation and local verification complete; architecture review passed. Interactive teach-back and completion tag are pending. Branch: `codex/handoff-remediation`. Phase 8 has not started.
+**Handoff Remediation Sprint** — implementation and local verification complete; architecture review passed. User authorized integration into `main` and remote push on 2026-11-03. Source branch: `codex/handoff-remediation`. Interactive teach-back and completion tag are pending. Phase 8 has not started.
 
 Approved scope: preset evidence/narratives, requirement-local citation validation, fail-closed extraction, colon-token preservation, EOF recovery, and JSON 422 responses. See [sprint study guide](study-guides/handoff-remediation.md) and [handoff retrospective](audits/2026-11-03-handoff-retrospective.md).
 
@@ -190,7 +190,7 @@ Next: finish remediation teach-back and review outstanding audit gates before a 
 
 ## Next Step
 1. Complete the remediation teach-back; then create the local `handoff-remediation-done` tag.
-2. Remote push/deployment requires separate authorization. `phase-6-done` already exists locally.
+2. User authorized this sprint's merge into `main` and remote push. Deployment status must be verified separately. `phase-6-done` already exists locally.
 3. Resolve or explicitly disposition the remaining audit items before approving Phase 8 implementation.
 
 ## Handoff Remediation — 2026-11-03
