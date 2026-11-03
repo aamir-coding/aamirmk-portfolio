@@ -245,7 +245,7 @@ function parseBlocks(markdown: string): Block[] {
     )
     // Repair protocol omission in domains: "https.linkedin.com" or "httpswww.linkedin.com" -> "https://www.linkedin.com"
     .replace(
-      /\bhttps?(?::\/\/|\.|\s*)(www\.[^\s<)"'`]+|[a-zA-Z0-9\-]+\.(?:com|org|io|dev|app|edu|in|net)(?:\/[^\s<)"'`]*)?)/gi,
+      /\bhttps?(?::\/\/|\.|\s*)(www\.[^\s<)"'`]+|[a-zA-Z0-9-]+\.(?:com|org|io|dev|app|edu|in|net)(?:\/[^\s<)"'`]*)?)/gi,
       "https://$1"
     );
 

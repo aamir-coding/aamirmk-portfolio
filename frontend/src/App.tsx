@@ -20,7 +20,6 @@ export function App() {
   const [serverState, setServerState] = useState<ServerState>("checking");
   const [healthError, setHealthError] = useState<string | null>(null);
   const [isFitModalOpen, setIsFitModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"cover" | "chat">("cover");
   const { theme, resolvedTheme, cycleTheme } = useTheme();
 
   const {
@@ -35,11 +34,9 @@ export function App() {
   } = useChat();
 
   // If restoring chat from sessionStorage on mount, automatically open in chat view
-  useEffect(() => {
-    if (messages.length > 0) {
-      setViewMode("chat");
-    }
-  }, []);
+  const [viewMode, setViewMode] = useState<"cover" | "chat">(() =>
+    messages.length > 0 ? "chat" : "cover"
+  );
 
   const isCoverState = viewMode === "cover" || messages.length === 0;
 

@@ -72,6 +72,8 @@ export function useChat(): UseChatReturn {
   const [error, setError] = useState<string | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   // Clean up any in-flight stream on unmount
   useEffect(() => {
@@ -190,7 +192,7 @@ export function useChat(): UseChatReturn {
       setIsStreaming(true);
 
       // Extract recent completed messages as conversational history for multi-turn context
-      const historyPayload = messages
+      const historyPayload = messagesRef.current
         .filter((m) => m.status === "done" && m.content.trim().length > 0)
         .slice(-6)
         .map((m) => ({ role: m.role, content: m.content }));
