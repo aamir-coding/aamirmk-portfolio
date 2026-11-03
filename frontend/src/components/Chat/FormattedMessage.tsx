@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
+import { formatSafeHref, sanitizeMarkdown } from "./formatHelpers";
 
 export interface FormattedMessageProps {
   content: string;
@@ -25,27 +26,6 @@ function processChildren(children: React.ReactNode): React.ReactNode {
     return React.Children.map(children, processChildren);
   }
   return renderWithBreaks(children);
-}
-
-function sanitizeMarkdown(text: string): string {
-  if (!text) return "";
-  return text
-    // 1. Normalize Unicode non-breaking and zero-width spaces
-    .replace(/\u202f/g, " ")
-    .replace(/\u00a0/g, " ")
-    .replace(/\u200b/g, "")
-    // 2. Separate glued list numerals (e.g., "are1. " -> "are\n\n1. ")
-    .replace(/([a-zA-Z,:]|[’']s)(\d+\.\s+)/g, "$1\n\n$2")
-    // 3. Repair unclosed bold contact headers ONLY when no closing ** exists on the line
-    .replace(
-      /^([-*]\s+\*\*(?:Email|LinkedIn|Phone(?:\s*\/\s*WhatsApp)?|WhatsApp|GitHub|Website|Contact|Location))\s*(?!.*\*\*):?\s*(.*)$/gim,
-      "$1:** $2"
-    )
-    // 4. Repair protocol omission in bare domain URLs (e.g. "https.linkedin.com" -> "https://linkedin.com")
-    .replace(
-      /\bhttps?(?::\/\/|\.|\s*)(www\.[^\s<)"'`]+|[a-zA-Z0-9-]+\.(?:com|org|io|dev|app|edu|in|net)(?:\/[^\s<)"'`]*)?)/gi,
-      "https://$1"
-    );
 }
 
 const markdownComponents: Components = {
@@ -80,16 +60,19 @@ const markdownComponents: Components = {
   ),
   em: ({ children }) => <em className="prose-em">{children}</em>,
   del: ({ children }) => <del className="prose-del">{children}</del>,
-  a: ({ href, children }) => (
-    <a
-      className="prose-link"
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {children}
-    </a>
-  ),
+  a: ({ href, children }) => {
+    const safeHref = formatSafeHref(href);
+    return (
+      <a
+        className="prose-link"
+        href={safeHref}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {children}
+      </a>
+    );
+  },
   table: ({ children }) => (
     <div className="prose-table-wrapper">
       <table className="prose-table">{children}</table>
