@@ -112,7 +112,7 @@ class FitPipeline:
                     "percent": 50,
                 },
             }
-            retrieved_by_req, all_valid_chunk_ids = await self._retrieve_evidence(
+            retrieved_by_req, valid_chunk_ids_by_req = await self._retrieve_evidence(
                 extraction.requirements
             )
 
@@ -134,7 +134,7 @@ class FitPipeline:
 
             # Step 5: Anti-overclaiming invariant & scoring (pure Python)
             sanitized_judged = validate_and_downgrade_verdicts(
-                raw_judged, all_valid_chunk_ids
+                raw_judged, valid_chunk_ids_by_req
             )
             score_summary = compute_fit_summary(sanitized_judged)
 
@@ -263,18 +263,17 @@ class FitPipeline:
 
     async def _retrieve_evidence(
         self, requirements: list[Requirement]
-    ) -> tuple[dict[str, list[RetrievedChunk]], set[str]]:
+    ) -> tuple[dict[str, list[RetrievedChunk]], dict[str, set[str]]]:
         """Retrieve candidate facts for each extracted requirement."""
         retrieved_by_req: dict[str, list[RetrievedChunk]] = {}
-        all_chunk_ids: set[str] = set()
+        chunk_ids_by_req: dict[str, set[str]] = {}
 
         for req in requirements:
             chunks = await self._retriever.retrieve(req.text, top_k=2)
             retrieved_by_req[req.id] = chunks
-            for rc in chunks:
-                all_chunk_ids.add(rc.chunk.id)
+            chunk_ids_by_req[req.id] = {rc.chunk.id for rc in chunks}
 
-        return retrieved_by_req, all_chunk_ids
+        return retrieved_by_req, chunk_ids_by_req
 
     async def _judge_requirements(
         self,

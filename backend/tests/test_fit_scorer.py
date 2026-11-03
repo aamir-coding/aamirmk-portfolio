@@ -62,6 +62,20 @@ class TestFitModels:
 class TestAntiOverclaimingEngine:
     """Verify the iron law: no verified evidence = automatic downgrade to gap."""
 
+    def test_citation_for_another_requirement_cannot_support_a_match(self) -> None:
+        req = Requirement(id="aws", text="AWS operations")
+        item = JudgedRequirement(
+            requirement=req,
+            verdict="strong",
+            evidence_chunk_ids=["python"],
+            explanation="Claims AWS experience using unrelated Python evidence.",
+        )
+        result = validate_and_downgrade_verdicts(
+            [item], {"aws": {"azure"}, "python": {"python"}}
+        )
+        assert result[0].verdict == "gap"
+        assert result[0].evidence_chunk_ids == []
+
     def test_strong_verdict_retained_when_evidence_valid(self) -> None:
         req = Requirement(
             id="req-1",
@@ -79,7 +93,7 @@ class TestAntiOverclaimingEngine:
             )
         ]
         valid_chunks = {"chunk-fastapi-1", "chunk-fastapi-2", "chunk-python"}
-        sanitized = validate_and_downgrade_verdicts(judged, valid_chunks)
+        sanitized = validate_and_downgrade_verdicts(judged, {req.id: valid_chunks})
 
         assert len(sanitized) == 1
         assert sanitized[0].verdict == "strong"
@@ -106,7 +120,7 @@ class TestAntiOverclaimingEngine:
             )
         ]
         sanitized = validate_and_downgrade_verdicts(
-            judged, valid_chunk_ids={"chunk-fastapi-1"}
+            judged, valid_chunk_ids={req.id: {"chunk-fastapi-1"}}
         )
 
         assert len(sanitized) == 1
@@ -132,7 +146,7 @@ class TestAntiOverclaimingEngine:
             )
         ]
         sanitized = validate_and_downgrade_verdicts(
-            judged, valid_chunk_ids={"chunk-fastapi-1", "chunk-python"}
+            judged, valid_chunk_ids={req.id: {"chunk-fastapi-1", "chunk-python"}}
         )
 
         assert len(sanitized) == 1
@@ -157,7 +171,7 @@ class TestAntiOverclaimingEngine:
             )
         ]
         sanitized = validate_and_downgrade_verdicts(
-            judged, valid_chunk_ids={"chunk-postgres-real"}
+            judged, valid_chunk_ids={req.id: {"chunk-postgres-real"}}
         )
 
         assert len(sanitized) == 1

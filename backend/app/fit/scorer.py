@@ -10,7 +10,7 @@ Enforces server-side truthfulness invariants:
 from __future__ import annotations
 
 import logging
-from collections.abc import Collection
+from collections.abc import Collection, Mapping
 
 from app.fit.models import FitScoreSummary, JudgedRequirement
 
@@ -24,17 +24,17 @@ DEFAULT_GAP_RAMP_UP = (
 
 def validate_and_downgrade_verdicts(
     judged_requirements: list[JudgedRequirement],
-    valid_chunk_ids: Collection[str],
+    valid_chunk_ids: Mapping[str, Collection[str]],
 ) -> list[JudgedRequirement]:
     """Enforce the anti-overclaiming invariant on LLM-judged requirements.
 
     Any 'strong' or 'partial' verdict that lacks valid evidence chunk IDs
     (or cites unknown/invented chunk IDs) is downgraded to 'gap'.
     """
-    valid_id_set = set(valid_chunk_ids)
     sanitized: list[JudgedRequirement] = []
 
     for item in judged_requirements:
+        valid_id_set = set(valid_chunk_ids.get(item.requirement.id, ()))
         # Filter citations to only those that actually exist in the retrieved corpus
         verified_chunk_ids = [
             cid for cid in item.evidence_chunk_ids if cid in valid_id_set
