@@ -26,6 +26,7 @@ Next: Band 3 / Phase 8 (Evals).
 | **Bands 1 & 2 Parity Backfill** | 🟢 Complete | `main` | `backfill-parity-done` | [`phase-parity-backfill.md`](study-guides/phase-parity-backfill.md) |
 | **P6: Fit report** | 🟢 Complete | `main` | `phase-6-done` | [`phase-06-jd-fit-report.md`](study-guides/phase-06-jd-fit-report.md) |
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
+| **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | ⬜ Next Up (Band 3) | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
