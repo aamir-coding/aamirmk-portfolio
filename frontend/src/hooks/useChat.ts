@@ -9,7 +9,7 @@ import type {
 
 export type { ChatMessage };
 
-export const CHAT_SESSION_STORAGE_KEY = "amk_portfolio_chat_session";
+export const CHAT_SESSION_STORAGE_KEY = "amk_portfolio_chat_session_v2";
 
 export interface UseChatReturn {
   messages: ChatMessage[];
@@ -29,6 +29,7 @@ function loadPersistedChat(): {
 } {
   try {
     if (typeof window !== "undefined" && window.sessionStorage) {
+      window.sessionStorage.removeItem("amk_portfolio_chat_session"); // purge stale v1 transcript
       const raw = window.sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
