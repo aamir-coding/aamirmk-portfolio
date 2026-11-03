@@ -78,6 +78,35 @@ export function parseSSEBuffer(buffer: string): {
   return { events, remaining };
 }
 
+async function readEventStream(
+  body: ReadableStream<Uint8Array>,
+  dispatch: (event: string, data: string) => boolean,
+  signal?: AbortSignal,
+): Promise<void> {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  try {
+    while (!signal?.aborted) {
+      const { done, value } = await reader.read();
+      if (signal?.aborted) return;
+      if (done) {
+        throw new Error("Stream ended before completion. Please retry.");
+      }
+      buffer += decoder.decode(value, { stream: true });
+      const { events, remaining } = parseSSEBuffer(buffer);
+      buffer = remaining;
+      for (const { event, data } of events) {
+        if (signal?.aborted) return;
+        if (dispatch(event, data)) return;
+      }
+    }
+  } finally {
+    await reader.cancel().catch(() => undefined);
+    reader.releaseLock();
+  }
+}
+
 /**
  * Streams conversation completion from FastAPI backend using Server-Sent Events (SSE) over POST.
  * Zero external client dependencies (pure fetch + ReadableStream).
@@ -128,11 +157,7 @@ export async function streamChat({
       return;
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    const dispatchEvent = (event: string, data: string) => {
+    const dispatchEvent = (event: string, data: string): boolean => {
       try {
         const parsed = JSON.parse(data);
         if (event === "token") {
@@ -158,37 +183,24 @@ export async function streamChat({
               sources: res.data.sources,
               cards: res.data.cards,
             });
+            return true;
           }
         } else if (event === "error") {
           const res = ErrorEventPayloadSchema.safeParse(parsed);
           callbacks.onError(
             res.success ? res.data.detail : "An error occurred during streaming"
           );
+          return true;
         }
       } catch {
-        // Ignore JSON parse errors for non-JSON comments or keep-alives
+        if (event === "done" || event === "error") {
+          throw new Error("Received invalid terminal event from server");
+        }
       }
+      return false;
     };
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const { events, remaining } = parseSSEBuffer(buffer);
-      buffer = remaining;
-
-      for (const { event, data } of events) {
-        dispatchEvent(event, data);
-      }
-    }
-
-    if (buffer.trim()) {
-      const { events } = parseSSEBuffer(buffer + "\n\n");
-      for (const { event, data } of events) {
-        dispatchEvent(event, data);
-      }
-    }
+    await readEventStream(response.body, dispatchEvent, signal);
   } catch (err: unknown) {
     if (signal?.aborted) {
       return;
@@ -264,11 +276,7 @@ export async function streamFitReport({
       return;
     }
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    const dispatchEvent = (event: string, data: string) => {
+    const dispatchEvent = (event: string, data: string): boolean => {
       try {
         const parsed = JSON.parse(data);
         if (event === "progress") {
@@ -280,39 +288,27 @@ export async function streamFitReport({
           const res = FitReportSchema.safeParse(parsed);
           if (res.success) {
             callbacks.onComplete(res.data as FitReport);
+            return true;
           } else {
             callbacks.onError("Received invalid report schema from server");
+            return true;
           }
         } else if (event === "error") {
           const res = FitErrorPayloadSchema.safeParse(parsed);
           callbacks.onError(
             res.success ? res.data.message : "Error analyzing job description"
           );
+          return true;
         }
       } catch {
-        // Ignore non-JSON frames
+        if (event === "complete" || event === "error") {
+          throw new Error("Received invalid terminal event from server");
+        }
       }
+      return false;
     };
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const { events, remaining } = parseSSEBuffer(buffer);
-      buffer = remaining;
-
-      for (const { event, data } of events) {
-        dispatchEvent(event, data);
-      }
-    }
-
-    if (buffer.trim()) {
-      const { events } = parseSSEBuffer(buffer + "\n\n");
-      for (const { event, data } of events) {
-        dispatchEvent(event, data);
-      }
-    }
+    await readEventStream(response.body, dispatchEvent, signal);
   } catch (err: unknown) {
     if (signal?.aborted) {
       return;

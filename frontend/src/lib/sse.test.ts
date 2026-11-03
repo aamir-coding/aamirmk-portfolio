@@ -1,5 +1,41 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { parseSSEBuffer, streamChat } from "./sse";
+import { parseSSEBuffer, streamChat, streamFitReport } from "./sse";
+
+describe("stream terminal lifecycle", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it.each(["chat", "fit"])("reports premature EOF for %s", async (kind) => {
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) { controller.close(); },
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, body }));
+    const onError = vi.fn();
+    if (kind === "chat") {
+      await streamChat({ message: "test", callbacks: { onToken: vi.fn(), onDone: vi.fn(), onError } });
+    } else {
+      await streamFitReport({ jdText: "test", callbacks: { onProgress: vi.fn(), onComplete: vi.fn(), onError } });
+    }
+    expect(onError).toHaveBeenCalledExactlyOnceWith(expect.stringMatching(/ended.*complet/i));
+    expect(body.locked).toBe(false);
+  });
+
+  it.each([
+    ["done", "not JSON"], ["done", "{}"],
+    ["error", '{"detail":"upstream failed"}'],
+  ])("reports one error for terminal %s: %s", async (event, data) => {
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode(`event: ${event}\ndata: ${data}\n\n`));
+        controller.close();
+      },
+    });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, body }));
+    const onError = vi.fn();
+    await streamChat({ message: "test", callbacks: { onToken: vi.fn(), onDone: vi.fn(), onError } });
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(body.locked).toBe(false);
+  });
+});
 
 describe("parseSSEBuffer", () => {
   it("parses single complete SSE event", () => {
