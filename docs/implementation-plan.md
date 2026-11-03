@@ -341,6 +341,8 @@ The outcome is the two features that make the site distinctive: every answer car
 
 ## Phase 6: JD fit report
 
+**Handoff remediation (2026-11-03):** Requirement-local evidence membership and unique IDs now replace global-ID checks. Extraction retries once and fails closed; curated samples are manually maintained assessments with computed scores, not calibrated eval ground truth. Membership alone does not prove semantic support. See DRN-035 and the outstanding audit gates in PROGRESS.md before opening Phase 8.
+
 The outcome is the feature no other portfolio has: a recruiter pastes a job description and gets an honest requirement-by-requirement match, with gaps flagged and a ramp-up plan. Effort: 3 to 4 days.
 
 **Inputs:** your 8 to 10 sample JDs, `skills.yaml` with honest levels and evidence, your `learning_in_progress` list, and short ramp-up notes for common gaps (for example Kubernetes or a cloud provider you have not used).

@@ -1,9 +1,13 @@
 # Progress Tracker
 
 ## Current Phase
+**Handoff Remediation Sprint** — implementation and local verification complete; architecture review passed. Interactive teach-back and completion tag are pending. Branch: `codex/handoff-remediation`. Phase 8 has not started.
+
+Approved scope: preset evidence/narratives, requirement-local citation validation, fail-closed extraction, colon-token preservation, EOF recovery, and JSON 422 responses. See [sprint study guide](study-guides/handoff-remediation.md) and [handoff retrospective](audits/2026-11-03-handoff-retrospective.md).
+
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Band 3 / Phase 8 (Evals).
+Next: finish remediation teach-back and review outstanding audit gates before a Phase 8 brief.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -185,9 +189,32 @@ Next: Band 3 / Phase 8 (Evals).
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Deliver Phase 6 interactive teach-back with 3 questions to verify user's mental model per protocol.
-2. Tag `phase-6-done` and push branch `phase-6-jd-fit-report` to remote.
-3. Stop and await user's explicit "approved" before moving to Band 3 / Phase 8.
+1. Complete the remediation teach-back; then create the local `handoff-remediation-done` tag.
+2. Remote push/deployment requires separate authorization. `phase-6-done` already exists locally.
+3. Resolve or explicitly disposition the remaining audit items before approving Phase 8 implementation.
+
+## Handoff Remediation — 2026-11-03
+- Preset assessments use real current fact IDs and conservative narratives. Scores/headlines are computed from verdicts. All first three samples now rate Partial Match; embedded firmware remains Low Match. Facts were not silently promoted from draft.
+- Per-requirement evidence maps replace the global citation union. Duplicate extracted IDs and blank requirement text are rejected. Citation membership is not semantic entailment.
+- Invalid extraction gets one retry, then an `extraction_error` SSE event; no synthetic job requirement, report, or cache entry. JSON-mode responses bypass prose normalization.
+- Typed heartbeat markers preserve colon-prefixed model tokens. Both chat and fit serialize markers as SSE comments. Slow-fit regression added after architecture review caught the shared-caller regression.
+- Shared frontend reader requires a terminal event, reports premature EOF, cancels/releases the reader, and permits retry. Hooks tested through the actual transport. Explicit abort remains non-error behavior.
+- Custom validation exception context is omitted from JSON error details, preserving HTTP 422 and request IDs.
+- Final backend/eval run: **253 passed, 1 warning in 16.62s**. Frontend: **132 passed across 18 files in 17.48s**. Ruff/ESLint/TypeScript/build evidence recorded in the sprint guide. Zero live Groq calls.
+- Final build: **162.99 kB gzipped JS** (explicit Node/zlib gate: **162,988 bytes < 200,000**); CSS 7.57 kB gzip. Vite build 5.53s. Ruff: all checks passed, 60 files formatted; ESLint/typecheck passed. Existing build warnings remain non-failing.
+- Read-only architecture review: both findings fixed and rechecked; no remaining blocker within sprint scope. Browser QA not run: agent-browser is unavailable locally. No skills or dependencies installed.
+
+## Remaining Handoff Audit Work
+- [ ] Resolve approval/provenance for all 76 draft public fact chunks; reconcile stale fact descriptions with verified implementation.
+- [ ] Per-provider-call quota admission/accounting, concurrent reservations, deadlines and client lifecycle.
+- [ ] Semantic evidence support and known-negative constraints; generated summaries/ramp-up can still overclaim.
+- [ ] Embedding content/model fingerprint, bounded initialization/inference, BM25 degradation, truthful readiness and Linux 512 MB cgroup testing.
+- [ ] Verify production trusted-proxy chain and canonical IP identity.
+- [ ] Cache identity/versioning/bounds, accurate cached flags, and an actual bypass for “Re-Run Live.”
+- [ ] Remaining Markdown/code/URL repairs, session-history validation and message-length limits.
+- [ ] CRLF SSE conformance, complete cancellation/idle-timeout policy, preprocessing heartbeats and upstream close ownership.
+- [ ] Cross-language event fixtures, root evals and gzip-budget gates in CI; fit-dialog focus behavior and browser/device QA.
+- [ ] Apply remaining governing-document corrections and clarify Phase 10's dependencies on deferred Phase 9 work.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
@@ -211,4 +238,4 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-None.
+Phase 8 acceptance remains gated by the outstanding handoff audit work above. The approved six-defect remediation scope is locally verified.

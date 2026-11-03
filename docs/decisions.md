@@ -3,6 +3,14 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-035: Requirement-local evidence and explicit failure/stream completion
+
+**Date:** 2026-11-03
+**Context:** Handoff review found cross-requirement citation acceptance, invented fallback requirements, unsupported preset narratives, colon/heartbeat conflation, silent premature EOF and nonserializable validator context.
+**Choice:** Keep the fixed pipeline and existing stack. Validate evidence against a requirement-ID-to-retrieved-IDs map, with unique extracted IDs. Retain one extraction retry and then emit `extraction_error` without a report/cache entry. Preserve raw JSON-mode responses before parsing. Curated snapshots cite actual facts, use conservative narratives, compute scores through the scorer, and disclose manual provenance in the UI. Heartbeats use a distinct marker internally and SSE comments at both chat/fit transports. The shared frontend reader treats EOF before a valid terminal event as failure and owns reader cancellation/release. Validation responses omit exception context while retaining the 422 envelope/request ID.
+**Alternatives:** Continue global citation checks and generic fallback requirements; recognize heartbeat strings by their prefix; silently accept EOF. Rejected because they produce misleading matches, lose valid text, or leave UI loading indefinitely.
+**Limits:** Requirement-local membership establishes lineage, not semantic support. The snapshots are not independently calibrated evaluation ground truth. Draft approval, semantic judges, quota accounting, cache bypass/versioning and resource bounds remain tracked in PROGRESS.md. This record qualifies DRN-028's anti-overclaiming and authoritative-benchmark claims and DRN-026's stream lifecycle claims.
+
 ---
 
 ### DRN-001: Assistant Voice
