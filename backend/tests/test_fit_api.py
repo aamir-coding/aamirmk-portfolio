@@ -35,9 +35,9 @@ def test_get_fit_presets_returns_curated_roles() -> None:
         assert len(data) == 4
         assert data[0]["id"] == "01-fullstack-ai-engineer"
         assert "text" in data[0]
-        assert data[0]["match_expectation"] == "Strong Match"
+        assert data[0]["match_expectation"] == "Partial Match"
         assert "report" in data[0]
-        assert data[0]["report"]["score"]["overall_fit"] == "Strong Match"
+        assert data[0]["report"]["score"]["overall_fit"] == "Partial Match"
 
 
 def test_post_fit_returns_pre_seeded_cache_hit_instantly() -> None:

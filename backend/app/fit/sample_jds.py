@@ -62,8 +62,12 @@ def load_sample_jds() -> list[SampleJobDescription]:
 
         title = role_match.group(1).strip() if role_match else stem
         company = company_match.group(1).strip() if company_match else "Tech Co"
-        expectation = expectations.get(stem, "Partial Match")
         report = GOLDEN_BENCHMARK_REPORTS.get(stem)
+        expectation = (
+            report.score.overall_fit
+            if report is not None
+            else expectations.get(stem, "Partial Match")
+        )
 
         jds.append(
             SampleJobDescription(
