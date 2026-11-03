@@ -177,7 +177,10 @@ class FitPipeline:
                 "event": "error",
                 "data": {
                     "code": "extraction_error",
-                    "message": "Could not extract valid job requirements. Please retry or clarify the job description.",
+                    ("message"): (
+                        "Could not extract valid job requirements. Please retry or "
+                        "clarify the job description."
+                    ),
                 },
             }
         except LLMError as err:

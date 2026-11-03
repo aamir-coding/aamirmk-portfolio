@@ -92,6 +92,31 @@ def chat_client(
 # ── Non-streaming /chat tests ─────────────────────────────────────────
 
 
+@pytest.mark.parametrize("tool_turn", [False, True])
+def test_colon_tokens_are_preserved(chat_client, tool_turn: bool) -> None:
+    client, fake, _ = chat_client
+
+    async def stream(messages, tools=None):
+        if tool_turn and tools:
+            yield ToolCall(
+                id="call-1",
+                name="show_project_card",
+                arguments='{"project_id":"entropy-oj"}',
+            )
+        else:
+            for token in ("Email", ":", ": contact", " complete"):
+                yield token
+
+    fake.stream = stream
+    response = client.post("/api/chat/stream", json={"message": "Contact details"})
+    tokens = [
+        data["token"]
+        for event, data in parse_sse_events(response.text)
+        if event == "token"
+    ]
+    assert tokens == ["Email", ":", ": contact", " complete"]
+
+
 def test_chat_success(
     chat_client: tuple[TestClient, FakeLLM, FakeRetriever],
 ) -> None:
@@ -586,7 +611,7 @@ async def test_stream_with_heartbeat_emits_comment_when_delayed():
     """Verify that slow upstreams trigger periodic comment keep-alives."""
     import asyncio
 
-    from app.api.chat import stream_with_heartbeat
+    from app.api.chat import StreamHeartbeat, stream_with_heartbeat
 
     async def slow_generator():
         await asyncio.sleep(0.08)
@@ -598,8 +623,8 @@ async def test_stream_with_heartbeat_emits_comment_when_delayed():
     async for item in stream_with_heartbeat(slow_generator(), heartbeat_interval=0.03):
         items.append(item)
 
-    heartbeats = [it for it in items if it == ": heartbeat\n\n"]
-    tokens = [it for it in items if it != ": heartbeat\n\n"]
+    heartbeats = [it for it in items if it is StreamHeartbeat.PING]
+    tokens = [it for it in items if it is not StreamHeartbeat.PING]
     assert len(heartbeats) >= 2
     assert tokens == ["token_1", "token_2"]
 

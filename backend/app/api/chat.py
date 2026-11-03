@@ -7,6 +7,8 @@ import json
 import logging
 import uuid
 from collections.abc import AsyncIterator
+from contextlib import suppress
+from enum import Enum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -49,6 +51,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["chat"])
 
 
+class StreamHeartbeat(Enum):
+    PING = "heartbeat"
+
+
 async def stream_with_heartbeat(
     stream: AsyncIterator[Any],
     heartbeat_interval: float = 15.0,
@@ -72,10 +78,12 @@ async def stream_with_heartbeat(
                 except StopAsyncIteration:
                     break
             else:
-                yield ": heartbeat\n\n"
+                yield StreamHeartbeat.PING
     finally:
         if anext_task is not None and not anext_task.done():
             anext_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await anext_task
 
 
 def extract_citations(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
@@ -353,8 +361,8 @@ async def chat_stream(
             async for item in stream_with_heartbeat(
                 llm.stream(messages, tools=tool_schemas)
             ):
-                if isinstance(item, str) and item.startswith(":"):
-                    yield item
+                if item is StreamHeartbeat.PING:
+                    yield ": heartbeat\n\n"
                     continue
                 if isinstance(item, ToolCall):
                     detected_tool_calls.append(item)
@@ -395,8 +403,8 @@ async def chat_stream(
 
                 # Turn 2: stream verbal explanation
                 async for token in stream_with_heartbeat(llm.stream(messages)):
-                    if isinstance(token, str) and token.startswith(":"):
-                        yield token
+                    if token is StreamHeartbeat.PING:
+                        yield ": heartbeat\n\n"
                         continue
                     if isinstance(token, str):
                         tokens_emitted += 1
