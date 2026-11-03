@@ -208,3 +208,92 @@ async def rewrite_follow_up_query(
 - [Pydantic v2 String Constraints & Field Validation](https://docs.pydantic.dev/latest/concepts/fields/)
 - [Unicode Character U+202F (Narrow No-Break Space)](https://www.unicode.org/charts/PDF/U2000.pdf)
 - [Query Rewriting for Retrieval-Augmented Generation (Lewis et al.)](https://arxiv.org/abs/2005.11401)
+
+
+---
+
+## 3. Advanced Failure Modes & Production Defenses (DRN-034 Deep-Dive)
+
+### D. The Relative Link Ambiguity (`httpsamirmk...` $\to$ Double Origin Resolution)
+In HTML specifications, the `href` attribute on an `<a>` tag behaves according to URI RFC 3986:
+- If `href` begins with a scheme (`https://`, `http://`, `mailto:`, `tel:`), the browser treats it as an **absolute URI**.
+- If `href` does **not** begin with a scheme, the browser treats it as a **relative URI reference** resolved against the document's base URL.
+
+When an LLM emits an angle-bracketed link with an omitted or malformed protocol (such as `<httpsamirmk-portfolio.vercel.app>`), standard CommonMark parsers create:
+```html
+<a href="httpsamirmk-portfolio.vercel.app">httpsamirmk-portfolio.vercel.app</a>
+```
+Because `httpsamirmk-portfolio.vercel.app` has no `://`, the browser resolves it relative to the current site origin (`https://aamirmk-portfolio.vercel.app`):
+$$\text{Base Origin: } \texttt{https://aamirmk-portfolio.vercel.app/} + \text{Relative Path: } \texttt{httpsamirmk-portfolio.vercel.app}$$
+$$\implies \texttt{https://aamirmk-portfolio.vercel.app/httpsamirmk-portfolio.vercel.app}$$
+
+**Production Solution (`formatSafeHref`):**
+In custom React markdown components, never pass `href` directly to the DOM without absolute scheme validation:
+```typescript
+export function formatSafeHref(rawHref?: string): string | undefined {
+  if (!rawHref) return undefined;
+  const trimmed = rawHref.trim();
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) return trimmed;
+  if (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(trimmed)) {
+    return `mailto:${trimmed}`;
+  }
+  let cleaned = trimmed.replace(/^https?\./i, "");
+  if (/^https[a-zA-Z0-9-]+\.[a-zA-Z]/i.test(cleaned)) {
+    cleaned = cleaned.replace(/^https/i, "");
+  }
+  return `https://${cleaned}`;
+}
+```
+
+### E. Multi-Segment Subdomain Truncation in Regex Pre-processors
+When engineers attempt to "fix" raw markdown with ad-hoc regex string replacements prior to AST parsing, they frequently introduce severe regression bugs:
+```typescript
+// ❌ Flawed regex assuming single-label domains and hardcoded TLDs:
+.replace(/\bhttps?(?::\/\/|\.|\s*)(www\.[^\s<)"'`]+|[a-zA-Z0-9-]+\.(?:com|org|io|dev|app|edu|in|net)(?:\/[^\s<)"'`]*)?)/gi, "https://$1")
+```
+- A domain like `entropy-oj.vercel.app` contains **two dots**.
+- The regex character class `[a-zA-Z0-9-]+` stops at the first dot (`.vercel`).
+- Because `vercel` is not in the hardcoded TLD list, the regex skips `entropy-oj` and captures only the trailing piece, truncating `https://entropy-oj.vercel.app` into `<https-oj.vercel.app>`.
+
+**Production Rule:** Never run regex string mutations on URLs or domain names before feeding markdown to an AST parser. Let standard CommonMark/GFM autolinkers parse URLs naturally.
+
+### F. Negative Prompt Constraints & The "Pink Elephant" Attention Bias
+When prompting open-weight LLMs, developers often write negative constraints:
+- ❌ *"Never omit the `https://` prefix or produce malformed links like `https.domain`."*
+- ❌ *"Never write `**Labelvalue` without a closing asterisk."*
+- ❌ *"Never attach list numerals to sentences (e.g. `are1.`)."*
+
+In transformer attention heads, negative framing increases the token probability of the very tokens mentioned. The model attends strongly to `https.domain` and `are1.` because those token representations are activated in the prompt embeddings.
+
+**Production Rule:** Always write positive, prescriptive formatting instructions with canonical examples:
+- ✅ *"Format external web links as standard markdown: `[Project Name](https://domain)` or absolute URLs starting with `https://`. Always write the full `https://` protocol scheme and full domain name."*
+- ✅ *"When listing contact channels, write each entry on its own line using closed bold labels followed by a colon and space: `- **Email:** aamirmkh25@gmail.com`."*
+
+### G. In-Context Conversation History Poisoning
+In multi-turn chat applications, the client transmits recent messages (`history`) to maintain conversational context.
+If a bug in Turn 1 produces corrupted assistant text (e.g., dropped colons, mutilated links), that corrupted text is persisted in `sessionStorage` and sent as few-shot exemplars in Turn 2, 3, and 4.
+LLMs possess strong in-context few-shot learning capability; seeing corrupted assistant turns in the prompt, the model rapidly learns to replicate the flawed syntax.
+
+**Production Defense:**
+1. Cleanse and validate assistant turns prior to including them in the rolling `historyPayload`.
+2. When deploying critical formatting fixes, increment the client storage key (e.g., `amk_portfolio_chat_session_v2`) to purge corrupted legacy transcripts from users' browser tabs automatically.
+
+---
+
+## 4. Technical Placement Q&A (Updated)
+
+### Q5: Why did a link without a protocol result in `https://site.vercel.app/httpssite.vercel.app` in the browser?
+> **Answer:**  
+> "According to the W3C and RFC 3986 URI specifications, any URL in an `<a href="...">` attribute that lacks an explicit scheme (`https://`, `http://`, `mailto:`) is evaluated by the browser as a relative path resolved against the current origin. 
+> 
+> If an LLM emits an autolink where the protocol prefix is missing or malformed (e.g., `<httpsamirmk-portfolio.vercel.app>`), the browser treats `httpsamirmk-portfolio.vercel.app` as a relative path inside the current domain, resulting in `https://aamirmk-portfolio.vercel.app/httpsamirmk-portfolio.vercel.app`.
+> 
+> In our architecture, we defend against this in the custom React markdown anchor component (`markdownComponents.a`) via `formatSafeHref()`, which inspects the `href` attribute, prepends `https://` if a scheme is missing, and prevents relative resolution on external links."
+
+### Q6: Why are negative constraints ('Never do X') dangerous in LLM system prompts, and how do you replace them?
+> **Answer:**  
+> "Transformers operate on token attention weights. When a system prompt includes negative examples—such as 'Never emit malformed links like https.domain'—the attention mechanism attends to the tokens 'https', '.', and 'domain'. This raises their generation logits rather than suppressing them (the classic 'Pink Elephant' problem in prompt engineering).
+> 
+> The robust engineering solution is to replace negative prohibitions with positive, canonical syntax contracts. Instead of telling the model what not to write, we supply explicit few-shot canonical formatting exemplars:
+> `Format external web links as standard markdown: [Label](https://domain). Always write the full https:// scheme.`
+> This directs the model's attention toward valid token sequences without ever exposing it to malformed patterns."

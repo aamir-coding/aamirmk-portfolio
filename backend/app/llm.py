@@ -86,7 +86,12 @@ def normalize_llm_text(text: str) -> str:
         return text
     # Replace narrow no-break space (\u202f), non-breaking space (\u00a0),
     # and zero-width space (\u200b) with standard ASCII space.
-    cleaned = text.replace("\u202f", " ").replace("\u00a0", " ").replace("\u200b", "")
+    cleaned = (
+        text.replace("\u202f", " ")
+        .replace("\u00a0", " ")
+        .replace("\u200b", "")
+        .replace("\u2011", "-")
+    )
     # Normalize glued list numerals (e.g. "are1. " -> "are\n\n1. ")
     return re.sub(r"([a-zA-Z,:]|[\u2019\']s)(\d+\.\s+)", r"\1\n\n\2", cleaned)
 

@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { FormattedMessage } from "./FormattedMessage";
+import { formatSafeHref } from "./formatHelpers";
 
 describe("FormattedMessage", () => {
   it("renders plain text paragraphs", () => {
@@ -340,5 +341,75 @@ Top 5 Skills - Aamir Mohammed Khan & Where He Applied Them
     expect(listItems.length).toBe(2);
     expect(listItems[0]).toHaveTextContent(/AI-Assisted Implementation/);
     expect(listItems[1]).toHaveTextContent(/Full-Stack System Integration/);
+  });
+  it("renders multi-segment domains without truncation or mangling", () => {
+    const text =
+      "Entropy-OJ is live at <https://entropy-oj.vercel.app> and Health Predictor at <https://health-prem-prediction.streamlit.app> with repo at https://github.com/aamir-coding/health-prem-predict.";
+    render(<FormattedMessage content={text} />);
+
+    const entropyLink = screen.getByRole("link", {
+      name: "https://entropy-oj.vercel.app",
+    });
+    expect(entropyLink).toHaveAttribute("href", "https://entropy-oj.vercel.app");
+
+    const streamlitLink = screen.getByRole("link", {
+      name: "https://health-prem-prediction.streamlit.app",
+    });
+    expect(streamlitLink).toHaveAttribute(
+      "href",
+      "https://health-prem-prediction.streamlit.app"
+    );
+
+    const githubLink = screen.getByRole("link", {
+      name: "https://github.com/aamir-coding/health-prem-predict",
+    });
+    expect(githubLink).toHaveAttribute(
+      "href",
+      "https://github.com/aamir-coding/health-prem-predict"
+    );
+  });
+
+  it("renders unbulleted contact channels with bold labels and valid links", () => {
+    const text =
+      "Aamir's contact channels are:\n\n**Email:** aamirmkh25@gmail.com\n**LinkedIn:** https://www.linkedin.com/in/aamir-mk/\n**Phone / WhatsApp:** +91 8904816279";
+    render(<FormattedMessage content={text} />);
+
+    expect(screen.getByText("Email:")).toBeInTheDocument();
+    expect(screen.getByText("Email:").tagName).toBe("STRONG");
+    expect(screen.getByText("LinkedIn:")).toBeInTheDocument();
+    expect(screen.getByText("LinkedIn:").tagName).toBe("STRONG");
+    expect(screen.getByText("Phone / WhatsApp:")).toBeInTheDocument();
+    expect(screen.getByText("Phone / WhatsApp:").tagName).toBe("STRONG");
+
+    const emailLink = screen.getByRole("link", {
+      name: "aamirmkh25@gmail.com",
+    });
+    expect(emailLink).toHaveAttribute("href", "mailto:aamirmkh25@gmail.com");
+
+    const linkedInLink = screen.getByRole("link", {
+      name: "https://www.linkedin.com/in/aamir-mk/",
+    });
+    expect(linkedInLink).toHaveAttribute(
+      "href",
+      "https://www.linkedin.com/in/aamir-mk/"
+    );
+  });
+
+  it("normalizes formatSafeHref to prevent relative browser resolution", () => {
+    expect(formatSafeHref("https://entropy-oj.vercel.app")).toBe(
+      "https://entropy-oj.vercel.app"
+    );
+    expect(formatSafeHref("aamirmkh25@gmail.com")).toBe(
+      "mailto:aamirmkh25@gmail.com"
+    );
+    expect(formatSafeHref("https.linkedin.com/in/aamir-mk/")).toBe(
+      "https://linkedin.com/in/aamir-mk/"
+    );
+    expect(formatSafeHref("httpsamirmk-portfolio.vercel.app")).toBe(
+      "https://amirmk-portfolio.vercel.app"
+    );
+    expect(formatSafeHref("entropy-oj.vercel.app")).toBe(
+      "https://entropy-oj.vercel.app"
+    );
   });
 });

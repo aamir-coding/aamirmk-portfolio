@@ -466,3 +466,33 @@ B. Adopt the battle-tested `react-markdown` + `remark-gfm` ecosystem with custom
 2. **Safe Loose Lists & Start Numbering:** Ordered lists with blank lines remain a single unified `<ol>`, and starting offsets (`<ol start={N}>`) are respected automatically.
 3. **Bundle Budget Compliant:** Initial JS bundle increased from 112.92 KB to 162.88 KB gzipped, safely below the 200 KB gzipped ceiling (leaving 37.12 KB of headroom). Avoided heavy HTML parsers like `rehype-raw`/`parse5` by handling line breaks (`<br>`) via lightweight child processing.
 4. **Backend Invariant Reinforcement:** Reinforced LLM output formatting in `system.txt` (requiring lists to start on newlines with preceding blank lines) and added regex normalization for glued numerals (`are1. ` -> `are\n\n1. `) in `normalize_llm_text`.
+
+
+---
+
+### DRN-034: Protocol Safe Normalization, Non-Destructive Formatting, and Session Storage Purge
+
+**Date:** 2026-11-03  
+**Context:** Following the adoption of `react-markdown` in DRN-033, user testing revealed edge-case formatting defects:
+1. **Multi-segment domain truncation:** A legacy regex in `sanitizeMarkdown()` attempting to normalize bare domains only matched single-label domains followed by a hardcoded list of TLDs (`[a-zA-Z0-9-]+\.(?:com|org|io|dev|app|edu|in|net)`). On two-dot domains (`entropy-oj.vercel.app`, `health-prem-prediction.streamlit.app`), the regex failed to match across the first dot, truncating domain prefixes and generating corrupted URLs like `<https-oj.vercel.app>`.
+2. **Double URL / relative link resolution:** When the model emitted `<httpsamirmk-portfolio.vercel.app>` without `://`, `ReactMarkdown` generated an `<a href="httpsamirmk-portfolio.vercel.app">`. Because the browser treats any URL lacking an absolute protocol scheme (`http://`, `https://`, `mailto:`) as a relative path to the current origin, clicking the link navigated to `https://aamirmk-portfolio.vercel.app/httpsamirmk-portfolio.vercel.app`.
+3. **Session history poisoning:** When corrupted assistant outputs were emitted during earlier testing, `sessionStorage` stored them under `amk_portfolio_chat_session`. In subsequent turns, `useChat.ts` sent the last 6 messages in the `history` payload. In-context learning caused Groq (`openai/gpt-oss-120b`) to mirror the malformed syntax (omitted colons, missing bullets) in new answers.
+4. **Negative prompt constraint activation:** The system prompt explicitly instructed the model: *"Never produce malformed links like `https.domain`"*. Mentioning negative token patterns activated attention weights on those exact sequences (the "pink elephant" effect), occasionally triggering the model to emit the pattern.
+
+**Choice:**
+1. **Extract `formatHelpers.ts` with Non-Destructive Sanitization:**
+   - Completely removed destructive URL rewriting regexes from text pre-processing.
+   - Limited `sanitizeMarkdown()` to safe Unicode normalization (`\u202f`, `\u00a0`, `\u200b` $\to$ space, `\u2011` $\to$ hyphen), glued numeral separation, and harmless closing of unclosed bold contact headers if missing closing `**`.
+2. **Enforce Absolute URLs in `formatSafeHref()`:**
+   - In `markdownComponents.a`, inspect every `href`. If a link lacks a protocol, normalize typos (e.g. `https.domain` or `httpsaamirmk...`) and prepend `https://` (or `mailto:` if an email). External links are guaranteed never to resolve relative to the portfolio root.
+3. **Purge Poisoned Transcripts via Session Storage v2:**
+   - Bumped `CHAT_SESSION_STORAGE_KEY` to `amk_portfolio_chat_session_v2` and explicitly purged legacy v1 transcripts on startup.
+4. **Prescriptive Positive Invariants in `system.txt`:**
+   - Replaced negative constraint warnings with positive, canonical markdown examples.
+5. **Backend Normalization:**
+   - Added non-breaking hyphen `\u2011` $\to$ `-` normalization in `backend/app/llm.py` `normalize_llm_text()`.
+
+**Consequences:**
+- Zero domain truncation or relative path resolution regressions.
+- Bundle size remains 162.94 kB gzipped (<200 kB budget).
+- All 125 frontend Vitest tests and 239 backend Pytest tests pass cleanly.
