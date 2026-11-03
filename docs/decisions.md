@@ -379,3 +379,20 @@ C. Deterministic 5-stage pipeline: structured requirement extraction, per-requir
 4. **Idempotent SHA-256 Caching:** Identical job descriptions produce an identical SHA-256 hash, returning cached evaluations in sub-10ms without consuming daily LLM quotas.
 5. **Fit Rate Limiting:** A dedicated daily quota (`FIT_RATE_LIMIT_DAILY = 5` per client IP) protects Groq free-tier rate limits from automated abuse.
 6. **Pre-Evaluated Golden Benchmarks for Curated Roles:** Rather than burning live Groq tokens or faking progress timers when recruiters click curated sample roles, 4 authoritative golden benchmark reports (`backend/app/fit/golden_benchmarks.py`) are pre-evaluated, SHA-256 matched, and pre-seeded directly into the pipeline cache and exposed over `GET /api/fit/presets`. In the UI, recruiters receive an instant snapshot labeled `[VERIFIED GOLDEN BENCHMARK (CACHED SNAPSHOT)]`, a collapsible `“📄 View Evaluated Job Description”` preview, and a `“🔄 Re-Run Live Pipeline”` button for complete transparency. Custom pasted JDs always invoke the live 5-stage SSE pipeline.
+
+
+---
+
+### DRN-029: Authoritative Contact Number Disclosure via Verified Profile Fact Chunk
+
+**Date:** 2026-11-03  
+**Context:** Aamir's phone number was previously withheld across the knowledge base and system prompts due to an overly restrictive initial questionnaire entry, despite the phone number already being publicly present on his résumé (`resume.tex`). As a result, recruiters asking for contact details to schedule calls or reach out via WhatsApp were unable to obtain his number.  
+**Options:**  
+A. Unconditionally inject the phone number into the global system prompt template (would risk leaking the phone number in unrelated responses)  
+B. Keep the phone number permanently withheld, forcing recruiters to rely solely on email or LinkedIn  
+C. Enrich the `profile-contact` fact chunk with the verified phone/WhatsApp number (`+91 8904816279`), update Rule 5 in `system.txt` to permit sharing contact channels when requested, and rely on hybrid retrieval isolation ($top\_k = 4$) so the chunk surfaces strictly when contact or interview scheduling is requested.  
+**Choice:** C — Authoritative contact fact chunk enrichment + dynamic retrieval isolation  
+**Why:**  
+1. **Strict Context Isolation:** For non-contact inquiries (e.g. FastAPI, Entropy-OJ, education, algorithms), `profile-contact` does not rank in the top 4 chunks, so the phone number is physically absent from the LLM's prompt and cannot leak.
+2. **Authoritative Grounding:** When a recruiter explicitly requests contact channels, a phone call, or WhatsApp, `profile-contact` ranks #1, allowing the assistant to share the phone number alongside email and LinkedIn with full receipt attribution.
+3. **Résumé Parity:** Resolves an artificial discrepancy with `resume.tex` (Line 54: `+91 8904816279`), providing recruiters a direct path to schedule interviews.

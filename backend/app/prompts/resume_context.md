@@ -2,6 +2,7 @@
 
 Email: aamirmkh25@gmail.com
 LinkedIn: https://www.linkedin.com/in/aamir-mk/
+Phone / WhatsApp: +91 8904816279
 GitHub: https://github.com/aamir-coding
 Location: Bengaluru, Karnataka, India
 

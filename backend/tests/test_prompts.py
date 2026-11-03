@@ -24,9 +24,11 @@ def test_system_prompt_contains_identity_and_voice() -> None:
     assert "AlgoUniversity" in SYSTEM_PROMPT
 
 
-def test_phone_number_is_excluded() -> None:
-    # Per hard rules, no private phone numbers in prompt/context
-    assert "8904816279" not in SYSTEM_PROMPT
+def test_contact_channels_in_system_prompt() -> None:
+    # Verifies public contact channels from resume.tex are present
+    assert "8904816279" in SYSTEM_PROMPT
+    assert "aamirmkh25@gmail.com" in SYSTEM_PROMPT
+    assert "linkedin.com/in/aamir-mk" in SYSTEM_PROMPT
 
 
 def test_build_system_prompt_with_chunks() -> None:

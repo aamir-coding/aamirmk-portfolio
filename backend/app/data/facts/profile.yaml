@@ -48,18 +48,19 @@ chunks:
     title: "Contact Information"
     source_section: "P9, P12"
     source_url: "https://www.linkedin.com/in/aamir-mk/"
-    tags: ["contact", "email", "linkedin"]
+    tags: ["contact", "email", "linkedin", "phone", "whatsapp", "call"]
     draft: true
     private: false
     content: |
-      Preferred public contact channels: email, LinkedIn, or WhatsApp.
+      Preferred public contact channels: email, LinkedIn, phone call, or WhatsApp.
 
       Email: aamirmkh25@gmail.com
       LinkedIn: https://www.linkedin.com/in/aamir-mk/
+      Phone / WhatsApp: +91 8904816279
 
-      Aamir aims to respond to genuine professional enquiries within one business day. To schedule a meeting, contact him through email, LinkedIn, or WhatsApp.
+      Aamir is available for genuine professional inquiries, recruiter phone calls, WhatsApp messages, and interview scheduling. He aims to respond within one business day.
 
-      Note: Aamir's phone number is available through the assistant's contact-sharing policy at runtime only and is not indexed here.
+      Note: Home address and private personal credentials are not shared.
 
   - id: "profile-links"
     type: "profile"

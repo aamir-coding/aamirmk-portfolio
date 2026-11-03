@@ -413,8 +413,8 @@ questions:
     intent_tag: "factual"
     expected_chunk_ids: ["profile-contact"]
     required_facts:
-      - "Assistant may share phone number when explicitly requested by a recruiter for professional call/WhatsApp"
-      - "Also offer email and LinkedIn"
+      - "+91 8904816279 (Phone / WhatsApp)"
+      - "Offer email (aamirmkh25@gmail.com) and LinkedIn"
       - "Never share home address"
     source_section: "B1, P9"
     abstention_expected: false
