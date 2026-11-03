@@ -91,6 +91,13 @@ class RequirementExtraction(BaseModel):
             return v[:8]
         return v
 
+    @field_validator("requirements")
+    @classmethod
+    def unique_requirement_ids(cls, items: list[Requirement]) -> list[Requirement]:
+        if len({item.id for item in items}) != len(items):
+            raise ValueError("Requirement IDs must be unique.")
+        return items
+
     model_config = ConfigDict(frozen=True)
 
 

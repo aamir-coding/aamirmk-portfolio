@@ -198,7 +198,11 @@ class GroqLLM:
                 )
 
         return AssistantMessage(
-            content=normalize_llm_text(choice.message.content or ""),
+            content=(
+                choice.message.content or ""
+                if response_format
+                else normalize_llm_text(choice.message.content or "")
+            ),
             model=response.model,
             prompt_tokens=usage.prompt_tokens if usage else 0,
             completion_tokens=usage.completion_tokens if usage else 0,

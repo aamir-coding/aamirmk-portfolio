@@ -1,10 +1,14 @@
 """Tests for app.llm — verifies the LLM adapter seam using FakeLLM."""
 
+from types import SimpleNamespace
+from unittest.mock import AsyncMock
+
 import pytest
 
 from app.llm import (
     AssistantMessage,
     FakeLLM,
+    GroqLLM,
     LLMAuthError,
     LLMError,
     LLMRateLimitError,
@@ -13,6 +17,28 @@ from app.llm import (
     ToolCall,
     normalize_llm_text,
 )
+
+
+@pytest.mark.asyncio
+async def test_json_mode_preserves_raw_structured_response() -> None:
+    payload = '{"text": "Python3. Strong API skills"}'
+    create = AsyncMock(
+        return_value=SimpleNamespace(
+            choices=[
+                SimpleNamespace(message=SimpleNamespace(content=payload, tool_calls=[]))
+            ],
+            usage=None,
+            model="fake",
+        )
+    )
+    llm = GroqLLM.__new__(GroqLLM)
+    llm._model = "fake"
+    llm._client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+    )
+    reply = await llm.complete([], response_format={"type": "json_object"})
+    assert reply.content == payload
+
 
 # ── Value object tests ────────────────────────────────────────────────
 

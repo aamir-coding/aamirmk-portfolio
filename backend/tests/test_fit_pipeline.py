@@ -11,6 +11,30 @@ from app.retrieval.models import FactChunk
 from app.retrieval.retriever import FakeRetriever
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "payload",
+    [
+        "not JSON",
+        '{"requirements": []}',
+        '{"requirements": [{"id": "same", "text": "Python"},'
+        ' {"id": "same", "text": "Docker"}]}',
+        '{"requirements": [{"id": "empty", "text": "   "}]}',
+    ],
+)
+async def test_invalid_extraction_stops_without_report_or_cache(payload: str) -> None:
+    llm = FakeLLM(canned_replies=[payload, payload])
+    retriever = FakeRetriever(canned_chunks=[])
+    cache = {}
+    pipeline = FitPipeline(llm, retriever, cache=cache)
+    events = [event async for event in pipeline.run(FitRequest(jd_text="A" * 60))]
+    assert events[-1]["event"] == "error"
+    assert events[-1]["data"]["code"] == "extraction_error"
+    assert not any(event["event"] == "complete" for event in events)
+    assert retriever.recorded_queries == []
+    assert cache == {}
+
+
 @pytest.fixture
 def fake_retriever() -> FakeRetriever:
     """Fixture providing a deterministic FakeRetriever with verified chunks."""

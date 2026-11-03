@@ -33,6 +33,10 @@ from app.settings import Settings, get_settings
 logger = logging.getLogger(__name__)
 
 
+class RequirementExtractionError(ValueError):
+    """No trustworthy requirement set could be extracted after the bounded retry."""
+
+
 class FitPipeline:
     """Fixed-stage deep module for generating grounded JD fit reports."""
 
@@ -168,6 +172,14 @@ class FitPipeline:
                 "data": report.model_dump(),
             }
 
+        except RequirementExtractionError:
+            yield {
+                "event": "error",
+                "data": {
+                    "code": "extraction_error",
+                    "message": "Could not extract valid job requirements. Please retry or clarify the job description.",
+                },
+            }
         except LLMError as err:
             logger.error("LLM failure during fit report generation: %s", err)
             yield {
@@ -209,7 +221,9 @@ class FitPipeline:
                 reqs: list[Requirement] = []
                 for idx, r in enumerate(raw_reqs[:8], start=1):
                     req_id = r.get("id") or f"req-{idx}"
-                    text = r.get("text", "").strip() or f"Requirement {idx}"
+                    text = r.get("text", "").strip()
+                    if not text:
+                        raise ValueError("Requirement text must not be empty.")
                     imp_val = r.get("importance")
                     importance = (
                         imp_val
@@ -247,19 +261,7 @@ class FitPipeline:
                         )
                     )
 
-        # Fallback if both attempts fail
-        fallback_role = request.role_title or "Target Role"
-        fallback_reqs = [
-            Requirement(
-                id="req-1",
-                text="Core software development and application engineering",
-                importance="must_have",
-                type="skill",
-            )
-        ]
-        return RequirementExtraction(
-            role_title=fallback_role, requirements=fallback_reqs
-        )
+        raise RequirementExtractionError("Requirement extraction failed twice.")
 
     async def _retrieve_evidence(
         self, requirements: list[Requirement]
