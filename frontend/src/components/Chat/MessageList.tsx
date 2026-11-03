@@ -6,6 +6,7 @@ import { CoverState } from "../Cover/CoverState";
 export interface MessageListProps {
   messages: ChatMessage[];
   isStreaming: boolean;
+  isCoverState?: boolean;
   onSelectPrompt: (prompt: string) => void;
   onOpenFitModal?: () => void;
 }
@@ -13,6 +14,7 @@ export interface MessageListProps {
 export function MessageList({
   messages,
   isStreaming,
+  isCoverState = false,
   onSelectPrompt,
   onOpenFitModal,
 }: MessageListProps) {
@@ -22,7 +24,7 @@ export function MessageList({
     bottomRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [messages]);
 
-  if (messages.length === 0) {
+  if (isCoverState || messages.length === 0) {
     return (
       <div className="chat-empty-state" aria-label="Welcome and suggestions">
         <CoverState

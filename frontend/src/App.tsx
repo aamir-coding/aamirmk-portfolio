@@ -20,6 +20,7 @@ export function App() {
   const [serverState, setServerState] = useState<ServerState>("checking");
   const [healthError, setHealthError] = useState<string | null>(null);
   const [isFitModalOpen, setIsFitModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"cover" | "chat">("cover");
   const { theme, resolvedTheme, cycleTheme } = useTheme();
 
   const {
@@ -33,7 +34,14 @@ export function App() {
     resetChat,
   } = useChat();
 
-  const isCoverState = messages.length === 0;
+  // If restoring chat from sessionStorage on mount, automatically open in chat view
+  useEffect(() => {
+    if (messages.length > 0) {
+      setViewMode("chat");
+    }
+  }, []);
+
+  const isCoverState = viewMode === "cover" || messages.length === 0;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -69,6 +77,7 @@ export function App() {
   }, []);
 
   const handleSelectPrompt = (prompt: string) => {
+    setViewMode("chat");
     // If backend is asleep or still warming, answer instantly from bundled answers.json
     if (serverState !== "ready" && BUNDLED_ANSWERS[prompt]) {
       sendInstantAnswer(prompt, BUNDLED_ANSWERS[prompt]);
@@ -83,7 +92,13 @@ export function App() {
 
   const handleAskGap = (gapText: string) => {
     setIsFitModalOpen(false);
+    setViewMode("chat");
     void sendMessage(`How does Aamir plan to ramp up on: ${gapText}?`);
+  };
+
+  const handleResetChat = () => {
+    resetChat();
+    setViewMode("cover");
   };
 
   return (
@@ -102,16 +117,37 @@ export function App() {
           >
             ⚡ Role Fit
           </button>
-          {!isCoverState && (
+          {isCoverState && messages.length > 0 && (
             <button
               type="button"
-              className="btn-header-reset"
-              onClick={resetChat}
-              disabled={isStreaming}
-              aria-label="Return to candidate dossier overview"
+              className="btn-header-resume"
+              onClick={() => setViewMode("chat")}
+              aria-label="Resume active chat conversation"
             >
-              ← Dossier Overview
+              Resume Chat ({messages.length}) →
             </button>
+          )}
+          {!isCoverState && (
+            <>
+              <button
+                type="button"
+                className="btn-header-dossier"
+                onClick={() => setViewMode("cover")}
+                aria-label="Return to candidate dossier overview"
+              >
+                ← Dossier Overview
+              </button>
+              <button
+                type="button"
+                className="btn-header-reset"
+                onClick={handleResetChat}
+                disabled={isStreaming}
+                aria-label="Clear active conversation and reset"
+                title="Clear conversation"
+              >
+                Clear Chat
+              </button>
+            </>
           )}
           <ThemeToggle
             theme={theme}
@@ -169,6 +205,7 @@ export function App() {
           <MessageList
             messages={messages}
             isStreaming={isStreaming}
+            isCoverState={isCoverState}
             onSelectPrompt={handleSelectPrompt}
             onOpenFitModal={handleOpenFitModal}
           />
@@ -176,7 +213,10 @@ export function App() {
 
         <div className="chat-input-container">
           <ChatInput
-            onSend={(text) => void sendMessage(text)}
+            onSend={(text) => {
+              setViewMode("chat");
+              void sendMessage(text);
+            }}
             onStop={stopStreaming}
             isStreaming={isStreaming}
           />

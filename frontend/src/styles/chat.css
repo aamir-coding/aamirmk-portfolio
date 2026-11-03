@@ -125,7 +125,9 @@ body {
   letter-spacing: 0.02em;
 }
 
-.btn-header-reset {
+.btn-header-dossier,
+.btn-header-reset,
+.btn-header-resume {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
@@ -141,12 +143,26 @@ body {
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
+.btn-header-dossier:hover:not(:disabled),
 .btn-header-reset:hover:not(:disabled) {
   background-color: var(--accent-cobalt-subtle);
   color: var(--accent-cobalt);
   border-color: var(--accent-cobalt);
 }
 
+.btn-header-resume {
+  background-color: var(--accent-cobalt-subtle);
+  color: var(--accent-cobalt);
+  border-color: var(--accent-cobalt);
+  font-weight: var(--font-semibold);
+}
+
+.btn-header-resume:hover {
+  background-color: var(--accent-cobalt);
+  color: #ffffff;
+}
+
+.btn-header-dossier:disabled,
 .btn-header-reset:disabled {
   opacity: 0.5;
   cursor: not-allowed;

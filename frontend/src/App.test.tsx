@@ -151,16 +151,36 @@ describe("<App />", () => {
       ).toBeInTheDocument();
     });
 
-    // Click the reset button
-    const resetBtn = screen.getByRole("button", {
+    // Click the dossier overview navigation button
+    const dossierBtn = screen.getByRole("button", {
       name: /Return to candidate dossier overview/i,
     });
-    fireEvent.click(resetBtn);
+    fireEvent.click(dossierBtn);
 
-    // Should return to Cover State
+    // Should return to Cover State non-destructively
+    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+
+    // Resume Chat button is now available to jump back
+    const resumeBtn = screen.getByRole("button", {
+      name: /Resume active chat conversation/i,
+    });
+    expect(resumeBtn).toBeInTheDocument();
+
+    // Click Resume Chat -> returns back to active transcript with messages preserved
+    fireEvent.click(resumeBtn);
+    expect(
+      screen.getByText("Aamir is specialized in distributed LLM architectures.")
+    ).toBeInTheDocument();
+
+    // Now click Clear Chat -> completely wipes session
+    const clearBtn = screen.getByRole("button", {
+      name: /Clear active conversation and reset/i,
+    });
+    fireEvent.click(clearBtn);
+
     expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /Return to candidate dossier overview/i })
+      screen.queryByRole("button", { name: /Resume active chat conversation/i })
     ).not.toBeInTheDocument();
   });
 
