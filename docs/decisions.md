@@ -396,3 +396,50 @@ C. Enrich the `profile-contact` fact chunk with the verified phone/WhatsApp numb
 1. **Strict Context Isolation:** For non-contact inquiries (e.g. FastAPI, Entropy-OJ, education, algorithms), `profile-contact` does not rank in the top 4 chunks, so the phone number is physically absent from the LLM's prompt and cannot leak.
 2. **Authoritative Grounding:** When a recruiter explicitly requests contact channels, a phone call, or WhatsApp, `profile-contact` ranks #1, allowing the assistant to share the phone number alongside email and LinkedIn with full receipt attribution.
 3. **Résumé Parity:** Resolves an artificial discrepancy with `resume.tex` (Line 54: `+91 8904816279`), providing recruiters a direct path to schedule interviews.
+
+---
+
+### DRN-030: Multi-Turn Coreference Query Rewriting & Stateless History Passing
+
+**Date:** 2026-11-03  
+**Context:** The chat endpoints (`POST /api/chat` and `/api/chat/stream`) previously accepted only a single user message string without conversation history. Follow-up queries containing pronouns or elliptical phrasing (e.g., "what about entropy in one line", followed by "tell me more") broke down because: (1) BM25 and dense embedding search on "tell me more" retrieved irrelevant overview chunks, and (2) the LLM was given zero conversational history, leading it to ask for clarification as if starting a fresh conversation.  
+**Options:**  
+A. Server-side session store (Redis or database) tracking message history by `conversation_id`  
+B. Client-side state passing full history without query rewriting (passing history directly to LLM without search rewriting)  
+C. Stateless client-side rolling history passing + heuristic follow-up detection with fast utility model query rewriting  
+**Choice:** C — Client-side rolling history passing + heuristic follow-up query rewriting  
+**Why:**  
+1. **Zero Database Dependencies:** Adheres to Phase 1 architecture principle "keep the server stateless". The client passes up to 10 recent turns (`history` field on `ChatRequest`). The server trims this to a rolling 4–6 turn window, keeping token usage strictly bounded.
+2. **Retrieval Semantic Alignment:** Hybrid search algorithms (BM25 + vector dot products) fail on short follow-ups like "tell me more" or "what was its stack?". The rewriter uses a fast regex heuristic (`is_likely_follow_up`) to avoid unnecessary LLM calls on self-contained queries, only invoking the utility model (`openai/gpt-oss-20b`) when coreference resolution is genuinely needed.
+3. **Graceful Degraded Execution:** If the query rewriter times out or fails, the pipeline immediately falls back to the raw query without throwing 500 errors to the recruiter.
+
+---
+
+### DRN-031: Tokenizer Normalization & Markdown Formatting Invariants for Open-Weight Models
+
+**Date:** 2026-11-03  
+**Context:** When asked for contact details, `openai/gpt-oss-120b` occasionally emitted Unicode `\u202f` (Narrow No-Break Space) instead of colons and spaces, left bold tags unclosed (e.g., `- **Email aamirmkh25...`), or stripped protocol prefixes from URLs (e.g., `https.linkedin...`). Hand-crafted frontend markdown parsers (`FormattedMessage.tsx`) expecting standard markdown delimiters rendered these as raw unformatted strings.  
+**Options:**  
+A. Rely exclusively on system prompt instructions to fix model behavior  
+B. Pull in a heavyweight third-party markdown library (e.g., `marked` or `react-markdown` with plugins)  
+C. Defense-in-depth: explicit system prompt Rule 9 formatting invariants + backend token normalizer + frontend regex repair layer for non-standard whitespace, unclosed bold list tags, and URL protocol restoration.  
+**Choice:** C — Multi-layer defense-in-depth formatting hardening  
+**Why:**  
+1. **Open-Weight Tokenizer Resilience:** Models trained on multilingual corpora frequently emit narrow non-breaking spaces before punctuation or numbers. Normalizing `\u202f`, `\u00a0`, and `\u200b` at the LLM adapter boundary (`normalize_llm_text` in `app.llm`) eliminates invisible whitespace corruptions across both streaming and complete calls.
+2. **Resilient Parsing:** The frontend markdown tokenizer repairs unclosed bold tags on standard contact bullets and restores missing `https://` protocol prefixes, ensuring links remain clickable even if the upstream LLM drops punctuation.
+3. **Zero Bundle Budget Impact:** Adding regex repairs in `FormattedMessage.tsx` adds 0 external dependencies, preserving the 112.90 KB gzipped bundle budget.
+
+---
+
+### DRN-032: Dossier View State Decoupling from Transcript Lifecycle
+
+**Date:** 2026-11-03  
+**Context:** In Phase 4, the Editorial Dossier UI used a shortcut where the landing hero view was defined as `isCoverState = messages.length === 0`. Navigating back to the dossier overview via `← Dossier Overview` called `resetChat()`, erasing the user's entire conversation transcript and clearing `sessionStorage`. Recruiters navigating back to check credentials lost their active multi-turn session.  
+**Options:**  
+A. Keep `resetChat()` as the return mechanism (forces recruiters to start over)  
+B. Separate view routing (`viewMode: "cover" | "chat"`) from transcript data, adding a non-destructive navigation button and a "Resume Chat (N) →" entry point.  
+**Choice:** B — View state decoupling with non-destructive navigation and resume entry points  
+**Why:**  
+1. **Preserved Recruiter Context:** Recruiters can freely navigate between reading the candidate dossier and conducting exploratory chat without losing their transcript.
+2. **Clear User Intent:** Decouples navigation (`← Dossier Overview` sets `viewMode = "cover"`) from destructive action (`Clear Chat` explicitly wipes state and resets `sessionStorage`).
+3. **Session Continuity:** If a recruiter returns to the Dossier Overview while a conversation exists, a prominent `Resume Chat (N) →` pill appears in the header, making context switching effortless.

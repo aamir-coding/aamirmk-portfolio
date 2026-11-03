@@ -25,6 +25,7 @@ Next: Band 3 / Phase 8 (Evals).
 | P4: Design system (full) | 🟢 Complete | `main` | `phase-4-editorial-done` | [`phase-04-design-system.md`](study-guides/phase-04-design-system.md) |
 | **Bands 1 & 2 Parity Backfill** | 🟢 Complete | `main` | `backfill-parity-done` | [`phase-parity-backfill.md`](study-guides/phase-parity-backfill.md) |
 | **P6: Fit report** | 🟢 Complete | `main` | `phase-6-done` | [`phase-06-jd-fit-report.md`](study-guides/phase-06-jd-fit-report.md) |
+| **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | ⬜ Next Up (Band 3) | — | — | — |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
@@ -163,6 +164,15 @@ Next: Band 3 / Phase 8 (Evals).
 - [x] **Phase 6**: Added pre-evaluated golden benchmarks (`backend/app/fit/golden_benchmarks.py`) pre-seeding pipeline cache and `GET /api/fit/presets` with instant preview, match expectation badges, collapsible JD preview, and live re-run capability
 - [x] **Phase 6**: Architectural decision DRN-028 recorded in `docs/decisions.md`
 - [x] **Phase 6**: Comprehensive study guide written in `docs/study-guides/phase-06-jd-fit-report.md`
+- [x] **Quality & Multi-Turn Hardening**: Extended `ChatRequest` schema with rolling `history` (`ChatHistoryMessage`)
+- [x] **Quality & Multi-Turn Hardening**: Follow-up query rewriter (`backend/app/retrieval/rewriter.py`) resolving coreferences before hybrid retrieval
+- [x] **Quality & Multi-Turn Hardening**: Rolling conversation context passed to Groq completion and streaming endpoints
+- [x] **Quality & Multi-Turn Hardening**: Enforced Rule 9 in `system.txt` for strict URL, bold, and list formatting
+- [x] **Quality & Multi-Turn Hardening**: Added `normalize_llm_text` in `backend/app/llm.py` and frontend regex repairs in `FormattedMessage.tsx` handling `\u202f`, unclosed bold tags, and URL protocol restoration
+- [x] **Quality & Multi-Turn Hardening**: Decoupled Dossier Overview navigation (`viewMode: "cover" | "chat"`) from transcript reset; added `Resume Chat (N) →` entry point and explicit `Clear Chat` action
+- [x] **Quality & Multi-Turn Hardening**: Full test suite passing: 237 backend tests (189 unit + 48 evals, 100% green, 0 API cost) + 119 frontend Vitest tests (100% green, 112.90 KB gzipped JS)
+- [x] **Quality & Multi-Turn Hardening**: Architectural decisions DRN-030, DRN-031, and DRN-032 recorded in `docs/decisions.md`
+- [x] **Quality & Multi-Turn Hardening**: Comprehensive study guide written in `docs/study-guides/quality-and-multi-turn-hardening.md`
 
 ## Measured Cold-Start Benchmarks (Render Free Tier)
 - **Idle Timeout**: 15 minutes
