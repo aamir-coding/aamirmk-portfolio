@@ -443,3 +443,26 @@ B. Separate view routing (`viewMode: "cover" | "chat"`) from transcript data, ad
 1. **Preserved Recruiter Context:** Recruiters can freely navigate between reading the candidate dossier and conducting exploratory chat without losing their transcript.
 2. **Clear User Intent:** Decouples navigation (`← Dossier Overview` sets `viewMode = "cover"`) from destructive action (`Clear Chat` explicitly wipes state and resets `sessionStorage`).
 3. **Session Continuity:** If a recruiter returns to the Dossier Overview while a conversation exists, a prominent `Resume Chat (N) →` pill appears in the header, making context switching effortless.
+
+---
+
+### DRN-033: React Markdown AST Migration for Robustness & Anti-Regression
+
+**Date:** 2026-11-03  
+**Context:** In DRN-024, an in-house zero-dependency regex tokenizer (`FormattedMessage.tsx`) was chosen to parse markdown. However, Markdown is not a regular language. Over time, attempts to patch tokenizer edge cases (e.g. unclosed bullet bolding, loose lists with double newlines, nested asterisks, table line breaks) caused brittle regex interactions:
+1. Regex replacements matching words inside bullet items inadvertently matched legitimate terms like `- **Availability**:` and `- **Work Focus**:`, mutating them into `Availabilit: y**` and `Work: Focus**`.
+2. A single orphaned asterisk on `- **Location Preference**:` paired with subsequent bold text on the same line, corrupting `**Bengaluru, India**`.
+3. Block list parsing broke on empty lines between items in loose lists, creating separate `<ol>` blocks that each restarted numbering at `1.`.
+4. Glued numerals emitted by LLMs (`...are1. **AI-Assisted...`) were parsed as raw paragraph text rather than list items.
+Meanwhile, copying response text succeeded because the raw LLM markdown was valid, proving the issue was strictly frontend parser brittleness.
+
+**Options:**  
+A. Continue patching the 630-line hand-rolled regex tokenizer  
+B. Adopt the battle-tested `react-markdown` + `remark-gfm` ecosystem with custom component overrides matching existing design tokens  
+
+**Choice:** B — Adopt `react-markdown` + `remark-gfm`  
+**Why:**  
+1. **Zero Regex Fragility:** Replaced 727 lines of fragile ad-hoc regexes with a declarative ~140-line component. Tables, loose lists, nested emphasis, code blocks, blockquotes, and link autolinking are handled by standard CommonMark/GFM AST parsers.
+2. **Safe Loose Lists & Start Numbering:** Ordered lists with blank lines remain a single unified `<ol>`, and starting offsets (`<ol start={N}>`) are respected automatically.
+3. **Bundle Budget Compliant:** Initial JS bundle increased from 112.92 KB to 162.88 KB gzipped, safely below the 200 KB gzipped ceiling (leaving 37.12 KB of headroom). Avoided heavy HTML parsers like `rehype-raw`/`parse5` by handling line breaks (`<br>`) via lightweight child processing.
+4. **Backend Invariant Reinforcement:** Reinforced LLM output formatting in `system.txt` (requiring lists to start on newlines with preceding blank lines) and added regex normalization for glued numerals (`are1. ` -> `are\n\n1. `) in `normalize_llm_text`.

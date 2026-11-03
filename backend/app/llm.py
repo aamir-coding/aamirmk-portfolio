@@ -10,6 +10,7 @@ satisfies the same protocol — no real Groq calls in CI.
 from __future__ import annotations
 
 import logging
+import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
@@ -85,7 +86,9 @@ def normalize_llm_text(text: str) -> str:
         return text
     # Replace narrow no-break space (\u202f), non-breaking space (\u00a0),
     # and zero-width space (\u200b) with standard ASCII space.
-    return text.replace("\u202f", " ").replace("\u00a0", " ").replace("\u200b", "")
+    cleaned = text.replace("\u202f", " ").replace("\u00a0", " ").replace("\u200b", "")
+    # Normalize glued list numerals (e.g. "are1. " -> "are\n\n1. ")
+    return re.sub(r"([a-zA-Z,:]|[\u2019\']s)(\d+\.\s+)", r"\1\n\n\2", cleaned)
 
 
 # ── Protocol (the seam) ───────────────────────────────────────────────

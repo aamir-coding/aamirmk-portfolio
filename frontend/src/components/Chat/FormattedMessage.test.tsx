@@ -184,8 +184,8 @@ Aamir Mohammed Khan's most notable production-grade projects are:
     expect(italic2.tagName).toBe("EM");
 
     const boldItalic = screen.getByText("bold italic");
-    expect(boldItalic.tagName).toBe("EM");
-    expect(boldItalic.parentElement?.tagName).toBe("STRONG");
+    expect(boldItalic.closest("em")).toBeInTheDocument();
+    expect(boldItalic.closest("strong")).toBeInTheDocument();
 
     const del = screen.getByText("deleted");
     expect(del.tagName).toBe("DEL");
@@ -287,5 +287,58 @@ Top 5 Skills - Aamir Mohammed Khan & Where He Applied Them
       "https://www.linkedin.com/in/aamir-mk/"
     );
     expect(link.closest("strong")).toBeInTheDocument();
+  });
+
+  it("renders complex bullet headers (Availability, Work Focus, Location Preference) without mangling", () => {
+    const text = `
+- **Availability**: Available immediately (from October 2026 onwards)
+- **Location Preference**: First choice is onsite or hybrid in **Bengaluru, India**, or remote.
+- **Work Focus**: Teams building production-grade software
+`.trim();
+
+    render(<FormattedMessage content={text} />);
+
+    expect(screen.getByText("Availability")).toBeInTheDocument();
+    expect(screen.getByText("Location Preference")).toBeInTheDocument();
+    expect(screen.getByText("Bengaluru, India")).toBeInTheDocument();
+    expect(screen.getByText("Work Focus")).toBeInTheDocument();
+
+    // Verify no broken escaped asterisks or misplaced colons leak into text
+    expect(screen.queryByText(/Availabilit: y/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Work: Focus/)).not.toBeInTheDocument();
+  });
+
+  it("renders loose ordered lists with blank lines as a single continuous sequential list", () => {
+    const text = `
+1. **AI-Assisted Implementation** – Proficient with Claude Code.
+
+2. **Full-Stack System Integration** – Demonstrated by building Entropy-OJ.
+
+3. **Evidence-Based Debugging** – Uses logs and timestamps.
+`.trim();
+
+    render(<FormattedMessage content={text} />);
+
+    const olElements = document.querySelectorAll("ol.prose-ol");
+    expect(olElements.length).toBe(1);
+
+    const listItems = screen.getAllByRole("listitem");
+    expect(listItems.length).toBe(3);
+    expect(listItems[0]).toHaveTextContent(/AI-Assisted Implementation/);
+    expect(listItems[1]).toHaveTextContent(/Full-Stack System Integration/);
+    expect(listItems[2]).toHaveTextContent(/Evidence-Based Debugging/);
+  });
+
+  it("separates glued list numbers into distinct ordered list items", () => {
+    const text =
+      "Aamir's top three strengths, as highlighted in his résumé, are1. **AI-Assisted Implementation**\n\n2. **Full-Stack System Integration**";
+
+    render(<FormattedMessage content={text} />);
+
+    expect(screen.getByText(/Aamir's top three strengths/)).toBeInTheDocument();
+    const listItems = screen.getAllByRole("listitem");
+    expect(listItems.length).toBe(2);
+    expect(listItems[0]).toHaveTextContent(/AI-Assisted Implementation/);
+    expect(listItems[1]).toHaveTextContent(/Full-Stack System Integration/);
   });
 });
