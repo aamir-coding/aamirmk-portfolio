@@ -202,3 +202,7 @@ class TestNormalizeLLMText:
             normalize_llm_text(raw)
             == "His strengths are\n\n1. AI-Assisted Implementation"
         )
+
+    def test_replaces_non_breaking_hyphen(self) -> None:
+        raw = "Entropy\u2011OJ"
+        assert normalize_llm_text(raw) == "Entropy-OJ"
