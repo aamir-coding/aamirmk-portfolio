@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Generator
+from collections.abc import AsyncIterator, Generator
 
 import pytest
 from fastapi import FastAPI
@@ -14,6 +14,7 @@ from app.llm import (
     LLMAuthError,
     LLMRateLimitError,
     LLMUnavailableError,
+    Message,
     ToolCall,
     get_llm_client,
 )
@@ -93,10 +94,14 @@ def chat_client(
 
 
 @pytest.mark.parametrize("tool_turn", [False, True])
-def test_colon_tokens_are_preserved(chat_client, tool_turn: bool) -> None:
+def test_colon_tokens_are_preserved(
+    chat_client: tuple[TestClient, FakeLLM, FakeRetriever], tool_turn: bool
+) -> None:
     client, fake, _ = chat_client
 
-    async def stream(messages, tools=None):
+    async def stream(
+        messages: list[Message], tools: list[dict[str, object]] | None = None
+    ) -> AsyncIterator[str | ToolCall]:
         if tool_turn and tools:
             yield ToolCall(
                 id="call-1",

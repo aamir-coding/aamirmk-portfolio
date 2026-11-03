@@ -10,7 +10,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import StreamingResponse
 
-from app.api.chat import stream_with_heartbeat
+from app.api.chat import StreamHeartbeat, stream_with_heartbeat
 from app.fit.models import FitRequest
 from app.fit.pipeline import FitPipeline
 from app.fit.sample_jds import load_sample_jds
@@ -92,11 +92,12 @@ async def generate_fit_report(
             event_data = json.dumps(frame["data"])
             yield f"event: {event_name}\ndata: {event_data}\n\n"
 
-    # Wrap with 15s heartbeats to keep idle cloud proxies alive
-    stream = stream_with_heartbeat(sse_event_generator())
+    async def transport_stream() -> AsyncIterator[str]:
+        async for item in stream_with_heartbeat(sse_event_generator()):
+            yield ": heartbeat\n\n" if item is StreamHeartbeat.PING else item
 
     return StreamingResponse(
-        stream,
+        transport_stream(),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache, no-transform",

@@ -120,9 +120,9 @@ export function FitReportCard({
           <div className="fit-benchmark-meta">
             <span className="fit-benchmark-icon" aria-hidden="true">⚡</span>
             <div className="fit-benchmark-details">
-              <strong>VERIFIED GOLDEN BENCHMARK (CACHED SNAPSHOT)</strong>
+              <strong>CURATED SAMPLE ASSESSMENT (CACHED SNAPSHOT)</strong>
               <span>
-                Pre-evaluated against Aamir's verified dossier to preserve free-tier compute.
+                Manually reviewed against current curated facts; this sample is not a live evaluation.
               </span>
             </div>
           </div>

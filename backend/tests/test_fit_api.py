@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
+from collections.abc import AsyncIterator
+from functools import partial
+from typing import Any
+
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api.fit import set_fit_pipeline
-from app.fit.models import FitReport, FitScoreSummary
+from app.fit.models import FitReport, FitRequest, FitScoreSummary
 from app.fit.pipeline import FitPipeline
 from app.fit.sample_jds import load_sample_jds
 from app.llm import FakeLLM
@@ -16,14 +21,41 @@ from app.retrieval.retriever import FakeRetriever, set_retriever
 from app.safety.rate_limiter import SlidingWindowRateLimiter, get_fit_rate_limiter
 
 
+def test_slow_fit_stage_emits_heartbeat_and_finishes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import app.api.fit as fit_api
+
+    report = load_sample_jds()[0].report
+    assert report is not None
+
+    class SlowPipeline(FitPipeline):
+        async def run(self, request: FitRequest) -> AsyncIterator[dict[str, Any]]:
+            await asyncio.sleep(0.03)
+            yield {"event": "complete", "data": report.model_dump()}
+
+    monkeypatch.setattr(
+        fit_api,
+        "stream_with_heartbeat",
+        partial(fit_api.stream_with_heartbeat, heartbeat_interval=0.005),
+    )
+    set_fit_pipeline(SlowPipeline(FakeLLM(), FakeRetriever()))
+    with TestClient(app) as client:
+        response = client.post("/api/fit", json={"jd_text": "A" * 60})
+    assert ": heartbeat\n\n" in response.text
+    assert "event: complete" in response.text
+
+
 @pytest.fixture(autouse=True)
 def setup_test_pipeline() -> None:
     """Ensure a clean, lightweight fake retriever for test isolation."""
     fake_ret = FakeRetriever(canned_chunks=[])
+    get_fit_rate_limiter().reset()
     set_retriever(fake_ret)
     yield
     set_fit_pipeline(None)
     app.dependency_overrides.clear()
+    get_fit_rate_limiter().reset()
 
 
 def test_get_fit_presets_returns_curated_roles() -> None:

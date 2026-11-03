@@ -119,7 +119,8 @@ describe("<FitReportCard />", () => {
       />
     );
 
-    expect(screen.getByText(/VERIFIED GOLDEN BENCHMARK \(CACHED SNAPSHOT\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/CURATED SAMPLE ASSESSMENT \(CACHED SNAPSHOT\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Manually reviewed against current curated facts/i)).toBeInTheDocument();
     expect(screen.getByText(/View Evaluated Job Description/i)).toBeInTheDocument();
 
     const rerunBtn = screen.getByRole("button", { name: /Re-Run Live Pipeline/i });

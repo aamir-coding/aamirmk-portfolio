@@ -35,6 +35,23 @@ async def test_invalid_extraction_stops_without_report_or_cache(payload: str) ->
     assert cache == {}
 
 
+@pytest.mark.asyncio
+async def test_extraction_can_recover_on_its_single_retry() -> None:
+    payload = json.dumps({"requirements": [{"id": "python", "text": "Python APIs"}]})
+    llm = FakeLLM(
+        canned_replies=[
+            "invalid",
+            payload,
+            '{"judged": []}',
+            "A bounded summary for this test.",
+        ]
+    )
+    pipeline = FitPipeline(llm, FakeRetriever(canned_chunks=[]), cache={})
+    events = [event async for event in pipeline.run(FitRequest(jd_text="A" * 60))]
+    assert events[-1]["event"] == "complete"
+    assert events[-1]["data"]["requirements"][0]["requirement"]["text"] == "Python APIs"
+
+
 @pytest.fixture
 def fake_retriever() -> FakeRetriever:
     """Fixture providing a deterministic FakeRetriever with verified chunks."""
