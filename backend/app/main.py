@@ -140,7 +140,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 "error": {
                     "code": 422,
                     "message": "Validation error in request payload",
-                    "details": exc.errors(),
+                    "details": [
+                        {key: value for key, value in error.items() if key != "ctx"}
+                        for error in exc.errors()
+                    ],
                     "request_id": request_id,
                 }
             },

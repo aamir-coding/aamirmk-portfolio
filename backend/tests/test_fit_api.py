@@ -64,8 +64,20 @@ def test_post_fit_rejects_payload_too_short() -> None:
             json={"jd_text": "Too short JD"},
         )
         assert response.status_code == 422
+
         data = response.json()
         assert data["error"]["code"] == 422
+
+
+def test_post_fit_whitespace_validation_returns_serializable_422() -> None:
+    with TestClient(app, raise_server_exceptions=False) as client:
+        response = client.post("/api/fit", json={"jd_text": " " * 50})
+    assert response.status_code == 422
+    error = response.json()["error"]
+    assert error["code"] == 422
+    assert error["request_id"] == response.headers["X-Request-ID"]
+    assert error["details"][0]["loc"] == ["body", "jd_text"]
+    assert "ctx" not in error["details"][0]
 
 
 def test_post_fit_rejects_payload_too_long() -> None:
