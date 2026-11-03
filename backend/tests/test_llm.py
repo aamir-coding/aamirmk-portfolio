@@ -195,3 +195,10 @@ class TestNormalizeLLMText:
     def test_handles_empty_or_normal_string(self) -> None:
         assert normalize_llm_text("") == ""
         assert normalize_llm_text("Clean text") == "Clean text"
+
+    def test_separates_glued_numbered_list_items(self) -> None:
+        raw = "His strengths are1. AI-Assisted Implementation"
+        assert (
+            normalize_llm_text(raw)
+            == "His strengths are\n\n1. AI-Assisted Implementation"
+        )
