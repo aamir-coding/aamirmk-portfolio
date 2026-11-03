@@ -11,6 +11,8 @@ import {
   FitProgressDataSchema,
   FitRequirementSchema,
   JudgedRequirementSchema,
+  ChatRequestSchema,
+  ChatHistoryMessageSchema,
 } from "./contracts";
 
 describe("Runtime API Contracts (Zod Validation)", () => {
@@ -206,5 +208,30 @@ describe("Runtime API Contracts (Zod Validation)", () => {
     };
     const parsed = FitProgressDataSchema.safeParse(progress);
     expect(parsed.success).toBe(true);
+  });
+
+  it("validates a ChatRequest with multi-turn history", () => {
+    const validChat = {
+      message: "tell me more",
+      conversation_id: "conv-123",
+      history: [
+        { role: "user", content: "What is Entropy-OJ?" },
+        { role: "assistant", content: "An online judge platform." },
+      ],
+    };
+    const parsed = ChatRequestSchema.safeParse(validChat);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.history).toHaveLength(2);
+    }
+  });
+
+  it("rejects invalid role in ChatHistoryMessage", () => {
+    const invalidHistory = {
+      role: "admin",
+      content: "Hello",
+    };
+    const parsed = ChatHistoryMessageSchema.safeParse(invalidHistory);
+    expect(parsed.success).toBe(false);
   });
 });

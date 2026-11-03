@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.tools.projects import ProjectCardData
@@ -39,6 +41,19 @@ class SourceCitation(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
+class ChatHistoryMessage(BaseModel):
+    """Prior conversation turn passed from client."""
+
+    role: Literal["user", "assistant"] = Field(
+        ..., description="Message role (user or assistant)"
+    )
+    content: str = Field(
+        ..., min_length=1, max_length=4000, description="Message content text"
+    )
+
+    model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
+
+
 class ChatRequest(BaseModel):
     """Inbound chat payload from client."""
 
@@ -51,6 +66,11 @@ class ChatRequest(BaseModel):
     conversation_id: str | None = Field(
         default=None,
         description="Optional tracking ID for the conversation session",
+    )
+    history: list[ChatHistoryMessage] = Field(
+        default_factory=list,
+        max_length=10,
+        description="Recent conversation turns for multi-turn context",
     )
 
     model_config = ConfigDict(str_strip_whitespace=True)

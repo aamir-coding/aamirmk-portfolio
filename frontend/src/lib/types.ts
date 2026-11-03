@@ -41,6 +41,11 @@ export interface ChatMessage {
   cards?: ProjectCardData[];
 }
 
+export interface ChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 // ── Phase 6 Fit Report Types ────────────────────────────────────────────
 
 export interface FitRequirement {

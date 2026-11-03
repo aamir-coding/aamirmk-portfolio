@@ -42,6 +42,17 @@ export const TokenEventPayloadSchema = z.object({
   token: z.string(),
 });
 
+export const ChatHistoryMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().min(1),
+});
+
+export const ChatRequestSchema = z.object({
+  message: z.string().min(1),
+  conversation_id: z.string().optional(),
+  history: z.array(ChatHistoryMessageSchema).optional(),
+});
+
 export const DoneEventPayloadSchema = z.object({
   conversation_id: z.string().min(1),
   sources: z.array(SourceCitationSchema).optional(),

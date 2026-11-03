@@ -1,5 +1,6 @@
 import { getApiBaseUrl } from "./api";
 import type {
+  ChatHistoryMessage,
   FitProgressData,
   FitReport,
   ProjectCardData,
@@ -31,6 +32,7 @@ export interface StreamChatCallbacks {
 export interface StreamChatOptions {
   message: string;
   conversationId?: string;
+  history?: ChatHistoryMessage[];
   signal?: AbortSignal;
   callbacks: StreamChatCallbacks;
   baseUrl?: string;
@@ -83,6 +85,7 @@ export function parseSSEBuffer(buffer: string): {
 export async function streamChat({
   message,
   conversationId,
+  history,
   signal,
   callbacks,
   baseUrl,
@@ -99,6 +102,7 @@ export async function streamChat({
       body: JSON.stringify({
         message,
         conversation_id: conversationId,
+        history: history && history.length > 0 ? history : undefined,
       }),
       signal,
     });

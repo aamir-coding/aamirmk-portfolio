@@ -26,6 +26,7 @@ from app.models import ChatRequest, ChatResponse, SourceCitation, TokenUsage
 from app.prompt_loader import build_system_prompt
 from app.retrieval.models import RetrievedChunk
 from app.retrieval.retriever import Retriever, get_retriever
+from app.retrieval.rewriter import rewrite_follow_up_query
 from app.safety.guardrails import (
     SAFE_REFUSAL_MESSAGE,
     check_prompt_injection,
@@ -138,16 +139,34 @@ async def chat(
             cards=[],
         )
 
-    # 2. Retrieve relevant factual context chunks & generate receipts
-    retrieved_chunks = await retriever.retrieve(request.message, top_k=4)
+    # 2. Rewrite follow-up query if conversation history is present
+    search_query = await rewrite_follow_up_query(
+        request.message,
+        request.history,
+        llm=llm,
+    )
+
+    # 3. Retrieve relevant factual context chunks & generate receipts
+    retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(retrieved_chunks)
 
-    # 3. Format user query with XML boundary fencing
+    # 4. Format user query with XML boundary fencing and assemble conversation messages
     safe_user_content = format_safe_user_message(request.message)
+
+    history_messages: list[Message] = []
+    if request.history:
+        for h in request.history[-6:]:
+            if h.role == "user":
+                history_messages.append(
+                    Message(role="user", content=format_safe_user_message(h.content))
+                )
+            elif h.role == "assistant":
+                history_messages.append(Message(role="assistant", content=h.content))
 
     messages = [
         Message(role="system", content=system_prompt),
+        *history_messages,
         Message(role="user", content=safe_user_content),
     ]
 
@@ -285,16 +304,34 @@ async def chat_stream(
             headers=headers,
         )
 
-    # 2. Retrieve relevant factual context chunks & generate receipts
-    retrieved_chunks = await retriever.retrieve(request.message, top_k=4)
+    # 2. Rewrite follow-up query if conversation history is present
+    search_query = await rewrite_follow_up_query(
+        request.message,
+        request.history,
+        llm=llm,
+    )
+
+    # 3. Retrieve relevant factual context chunks & generate receipts
+    retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(retrieved_chunks)
 
-    # 3. Format user query with XML boundary fencing
+    # 4. Format user query with XML boundary fencing and assemble conversation messages
     safe_user_content = format_safe_user_message(request.message)
+
+    history_messages: list[Message] = []
+    if request.history:
+        for h in request.history[-6:]:
+            if h.role == "user":
+                history_messages.append(
+                    Message(role="user", content=format_safe_user_message(h.content))
+                )
+            elif h.role == "assistant":
+                history_messages.append(Message(role="assistant", content=h.content))
 
     messages = [
         Message(role="system", content=system_prompt),
+        *history_messages,
         Message(role="user", content=safe_user_content),
     ]
 

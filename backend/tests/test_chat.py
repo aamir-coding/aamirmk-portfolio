@@ -602,3 +602,51 @@ async def test_stream_with_heartbeat_emits_comment_when_delayed():
     tokens = [it for it in items if it != ": heartbeat\n\n"]
     assert len(heartbeats) >= 2
     assert tokens == ["token_1", "token_2"]
+
+
+def test_chat_multi_turn_with_history(
+    chat_client: tuple[TestClient, FakeLLM, FakeRetriever],
+) -> None:
+    """Verify that multi-turn history is accepted and included in generation context."""
+    client, fake_llm, _ = chat_client
+
+    payload = {
+        "message": "tell me more",
+        "conversation_id": "test-conv-123",
+        "history": [
+            {"role": "user", "content": "What is Entropy-OJ?"},
+            {
+                "role": "assistant",
+                "content": "Entropy-OJ is a full-stack online judge.",
+            },
+        ],
+    }
+
+    res = client.post("/api/chat", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["conversation_id"] == "test-conv-123"
+    assert data["reply"] == "Aamir has built full-stack and LLM applications."
+
+
+def test_chat_stream_multi_turn_with_history(
+    chat_client: tuple[TestClient, FakeLLM, FakeRetriever],
+) -> None:
+    """Verify that streaming chat accepts history and streams response successfully."""
+    client, fake_llm, _ = chat_client
+
+    payload = {
+        "message": "expand on his backend skills",
+        "history": [
+            {"role": "user", "content": "Tell me about Aamir."},
+            {"role": "assistant", "content": "Aamir is a full-stack AI engineer."},
+        ],
+    }
+
+    res = client.post("/api/chat/stream", json=payload)
+    assert res.status_code == 200
+    events = parse_sse_events(res.text)
+    token_events = [p for ev, p in events if ev == "token"]
+    assert len(token_events) > 0
+    done_events = [p for ev, p in events if ev == "done"]
+    assert len(done_events) == 1

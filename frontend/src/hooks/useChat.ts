@@ -189,12 +189,19 @@ export function useChat(): UseChatReturn {
       setMessages((prev) => [...prev, userMessage, assistantMessage]);
       setIsStreaming(true);
 
+      // Extract recent completed messages as conversational history for multi-turn context
+      const historyPayload = messages
+        .filter((m) => m.status === "done" && m.content.trim().length > 0)
+        .slice(-6)
+        .map((m) => ({ role: m.role, content: m.content }));
+
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
       await streamChat({
         message: trimmed,
         conversationId: conversationId ?? undefined,
+        history: historyPayload,
         signal: controller.signal,
         callbacks: {
           onSources: (sources: SourceCitation[]) => {
