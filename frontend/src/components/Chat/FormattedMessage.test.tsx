@@ -248,4 +248,44 @@ Top 5 Skills - Aamir Mohammed Khan & Where He Applied Them
       )
     ).not.toBeInTheDocument();
   });
+
+  it("normalizes unicode whitespace artifacts and repairs unclosed bold contact lists", () => {
+    // String matching the exact problematic pattern with \u202f and unclosed bold tags
+    const mangled =
+      "Aamir's contact details:\n- **Email\u202faamirmkh25@gmail.com\n- **LinkedIn\u202fhttps.linkedin.com/in/aamir-mk/\n- **Phone / WhatsApp\u202f+91 8904816279";
+
+    render(<FormattedMessage content={mangled} />);
+
+    // Bold tags are repaired
+    expect(screen.getByText("Email:")).toBeInTheDocument();
+    expect(screen.getByText("Email:").tagName).toBe("STRONG");
+    expect(screen.getByText("LinkedIn:")).toBeInTheDocument();
+    expect(screen.getByText("LinkedIn:").tagName).toBe("STRONG");
+    expect(screen.getByText("Phone / WhatsApp:")).toBeInTheDocument();
+    expect(screen.getByText("Phone / WhatsApp:").tagName).toBe("STRONG");
+
+    // Mangled https.linkedin is repaired to clickable link
+    const link = screen.getByRole("link", {
+      name: "https://linkedin.com/in/aamir-mk/",
+    });
+    expect(link).toHaveAttribute(
+      "href",
+      "https://linkedin.com/in/aamir-mk/"
+    );
+  });
+
+  it("renders URLs wrapped in bold markdown as clickable strong links", () => {
+    const text =
+      "Profile: **https://www.linkedin.com/in/aamir-mk/**";
+    render(<FormattedMessage content={text} />);
+
+    const link = screen.getByRole("link", {
+      name: "https://www.linkedin.com/in/aamir-mk/",
+    });
+    expect(link).toHaveAttribute(
+      "href",
+      "https://www.linkedin.com/in/aamir-mk/"
+    );
+    expect(link.closest("strong")).toBeInTheDocument();
+  });
 });

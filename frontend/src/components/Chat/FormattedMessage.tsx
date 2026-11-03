@@ -56,9 +56,24 @@ function renderInline(text: string): React.ReactNode[] {
       (part.startsWith("**") && part.endsWith("**") && part.length >= 4) ||
       (part.startsWith("__") && part.endsWith("__") && part.length >= 4)
     ) {
+      const inner = part.slice(2, -2);
+      if (/^https?:\/\/[^\s<)"'`]+$/.test(inner)) {
+        return (
+          <strong key={index} className="prose-strong">
+            <a
+              href={inner}
+              className="prose-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {inner}
+            </a>
+          </strong>
+        );
+      }
       return (
         <strong key={index} className="prose-strong">
-          {part.slice(2, -2)}
+          {inner}
         </strong>
       );
     }
@@ -218,8 +233,24 @@ type Block =
  * code blocks, tables, headings, lists, quotes, hr, and paragraphs.
  */
 function parseBlocks(markdown: string): Block[] {
+  // Pre-normalize Unicode whitespace artifacts and repair common LLM unclosed bold list tags
+  const sanitized = markdown
+    .replace(/\u202f/g, " ")
+    .replace(/\u00a0/g, " ")
+    .replace(/\u200b/g, "")
+    // Repair unclosed bold in bullet points: "- **Email aamir..." -> "- **Email:** aamir..."
+    .replace(
+      /([-*]\s+\*\*(?:Email|LinkedIn|Phone(?:\s*\/\s*WhatsApp)?|WhatsApp|GitHub|Website|Contact|Location|[A-Za-z]+))\s*(?!\*\*):?\s*/gi,
+      "$1:** "
+    )
+    // Repair protocol omission in domains: "https.linkedin.com" or "httpswww.linkedin.com" -> "https://www.linkedin.com"
+    .replace(
+      /\bhttps?(?::\/\/|\.|\s*)(www\.[^\s<)"'`]+|[a-zA-Z0-9\-]+\.(?:com|org|io|dev|app|edu|in|net)(?:\/[^\s<)"'`]*)?)/gi,
+      "https://$1"
+    );
+
   const blocks: Block[] = [];
-  const lines = markdown.split(/\r?\n/);
+  const lines = sanitized.split(/\r?\n/);
   let i = 0;
 
   while (i < lines.length) {

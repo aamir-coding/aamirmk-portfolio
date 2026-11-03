@@ -76,6 +76,18 @@ class LLMUnavailableError(LLMError):
     """Upstream service unavailable (503/500/connection)."""
 
 
+# ── Domain functions ───────────────────────────────────────────────────
+
+
+def normalize_llm_text(text: str) -> str:
+    """Normalize non-standard Unicode whitespace and tokenizer artifacts."""
+    if not text:
+        return text
+    # Replace narrow no-break space (\u202f), non-breaking space (\u00a0),
+    # and zero-width space (\u200b) with standard ASCII space.
+    return text.replace("\u202f", " ").replace("\u00a0", " ").replace("\u200b", "")
+
+
 # ── Protocol (the seam) ───────────────────────────────────────────────
 
 
@@ -178,7 +190,7 @@ class GroqLLM:
                 )
 
         return AssistantMessage(
-            content=choice.message.content or "",
+            content=normalize_llm_text(choice.message.content or ""),
             model=response.model,
             prompt_tokens=usage.prompt_tokens if usage else 0,
             completion_tokens=usage.completion_tokens if usage else 0,
@@ -217,7 +229,7 @@ class GroqLLM:
                 delta = chunk.choices[0].delta
 
                 if delta.content:
-                    yield delta.content
+                    yield normalize_llm_text(delta.content)
 
                 if delta.tool_calls:
                     for tc_delta in delta.tool_calls:

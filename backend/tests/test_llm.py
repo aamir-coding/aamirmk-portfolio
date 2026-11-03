@@ -11,6 +11,7 @@ from app.llm import (
     LLMUnavailableError,
     Message,
     ToolCall,
+    normalize_llm_text,
 )
 
 # ── Value object tests ────────────────────────────────────────────────
@@ -180,3 +181,17 @@ class TestErrorHierarchy:
 
     def test_unavailable_is_llm_error(self) -> None:
         assert issubclass(LLMUnavailableError, LLMError)
+
+
+# ── Text normalization tests ──────────────────────────────────────────
+
+
+class TestNormalizeLLMText:
+    def test_replaces_narrow_and_non_breaking_spaces(self) -> None:
+        raw = "Aamir\u202fs\u00a0contact:\u200bdetails"
+        normalized = normalize_llm_text(raw)
+        assert normalized == "Aamir s contact:details"
+
+    def test_handles_empty_or_normal_string(self) -> None:
+        assert normalize_llm_text("") == ""
+        assert normalize_llm_text("Clean text") == "Clean text"
