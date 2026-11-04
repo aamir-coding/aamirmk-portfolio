@@ -1,6 +1,6 @@
 # Phase 8 — Evaluation inputs and reproducible evidence
 
-Incremental study guide. Increments 1 and 2 are covered here; replay, calibration,
+Incremental study guide. Increments 1–3 are covered here; calibration,
 telemetry and result-backed publication will be added as implemented. Aamir waived
 waiting for teach-back answers on 4 November 2026 once the material was verified.
 This does not waive the separate human calibration grading required at Increment 4.
@@ -172,6 +172,130 @@ labels. It says nothing about semantic answer correctness or unseen questions.
 shared CI machine is temporarily slow. The runner still measures warmed latency,
 and an explicit benchmark can enforce a chosen machine-specific ceiling.
 
+## Increment 3 — what recorded replay actually measures
+
+Recorded replay holds the output fixed and changes or reruns the checker. It can
+show that saved output satisfies current deterministic checks. Fresh evaluation
+holds inputs/configuration fixed and asks a model to produce output again. A
+passing replay after a prompt edit says nothing about the new prompt's generation
+quality. Our report therefore always says `generation_accuracy_available: false`.
+
+There are two independent provenance axes. **Origin** describes who produced the
+answer: injected fake, manually curated, or an authorized live model. **Delivery**
+describes how it reached the caller: fresh, cached or preset. A fake answer on its
+first request is fresh delivery without being live generation. A second request
+can return that same fake answer from an isolated cache with zero new model calls.
+Neither path creates a calibrated answer label.
+
+Trace the implemented module interfaces in this order (line anchors refer to the
+Increment 3 implementation; symbol names remain the stable navigation points):
+
+1. `evals/checks.py:20`, `ReplayModel`, forbids extra fields/nonfinite numbers and
+   freezes assignments. `RecordedUsage.honest_usage` requires both counts when
+   usage is reported and rejects invented counts under `unavailable`. This is
+   structural honesty, not proof that an external provider measurement is genuine.
+2. `Recording.coherent_origin` separates transport, origin and delivery. Live
+   records would need model/authorization metadata; the offline `CaptureBundle`
+   rejects them entirely. Fake/curated records cannot claim provider token usage.
+   Fake endpoint captures must bind to a versioned development case.
+3. `evals/capture.py:70`, `TraceFakeLLM`, implements the existing adapter interface
+   and counts synthetic attempts/reported fake usage. `CaptureRetriever` returns
+   actual public chunk objects selected by scripted queries; its evidence map
+   records which IDs each requirement query received. It is not real retrieval
+   quality measurement; Increment 2 handles that separately.
+4. `_capture_app` injects settings with an empty API key, fake adapters, request
+   guards, a fresh tool registry/quota object and optional isolated fit pipeline.
+   `capture_contracts` uses the actual routes/tool loop/fit pipeline, including
+   history rewriting, extraction failure and a second cached request. TestClient
+   is explicitly closed without entering lifespan. This deliberately tests request
+   contracts, not production model initialization or rate/quota enforcement.
+5. `evals/checks.py:208`, `decode_recording`, converts raw SSE frames into a typed
+   `Transcript`, validating event-specific Pydantic payloads and exact terminal
+   behavior. Chat terminal sources/cards must match earlier metadata. Colon text
+   inside a JSON token is data; an SSE line beginning with a colon is a comment.
+   Byte boundaries need not align with Unicode characters or events, which is why
+   the frontend tests replay the UTF-8 bytes in one-byte and seven-byte pieces.
+6. `ReplayProtocolError.prefix` retains events validated before an error. A stream
+   that says a forbidden claim and then truncates must still fail the prohibition,
+   even if EOF was expected. Positive completion requirements become unavailable,
+   because absence in an incomplete answer is not an ordinary content failure.
+7. `check_recording` binds case ID/version/hash, split, immutable refusal/error
+   expectations and target transport before checking output. It then applies
+   normalized literal fragments, length and narrow refusal detection, public
+   citation identity, retrieved membership and requirement-local evidence maps.
+   `compute_fit_summary` checks score arithmetic against production behavior.
+   Summary, explanations and ramp-up text are all subject to literal prohibitions.
+8. A positive fit verdict needs citations. A configured known-negative rule rejects
+   a positive row supported only by the named negative chunks. These intrinsic
+   checks still apply to curated reports. Missing curated retrieval traces make
+   local membership unavailable, not a reason to skip every evidence check.
+9. `evals/replay.py:73`, `load_recordings`, verifies the frozen dataset/corpus.
+   `replay_report` records current checker/recording hashes and original capture
+   provenance, discloses changed prompts and lists development cases without
+   recordings. `main` saves atomically, returns 1 for failed limited checks and 2
+   for unavailable inputs, and preserves old output on input failure.
+10. `backend/tests/test_recorded_events.py` regenerates bodies through real routes,
+    compares them to the committed file and captures twice to detect cache leakage.
+    It also fails if capture constructs real Groq/embedding adapters.
+    `frontend/src/lib/backendEventFixtures.test.ts` loads that exact JSON, uses
+    production Zod schemas and the real streaming clients under mocked fetch,
+    and checks truncated/corrupt terminals plus reader release. Fixture data is
+    test-only and never imported into the shipped application bundle.
+
+## Why the evidence checks are intentionally limited
+
+Consider an AWS requirement. A citation to the real chunk saying Aamir lacks
+hands-on AWS experience is a valid ID and may have been retrieved for that exact
+requirement. Those two checks cannot justify a positive verdict. A configured
+negative-only rule catches this particular mistake, while a semantic judge must
+also assess the meaning of mixed, unrelated or misleading evidence and the
+summary's broader claims. Literal fragment bans miss paraphrases; they can also
+reject a legitimate denial when designed carelessly. They are regression checks,
+not a universal entailment engine. Human-calibrated judging remains Increment 4.
+
+Eight captures presently cover four unique development cases: seven are fake and
+one is curated. The report lists 36 development cases without recordings. An 8/8
+limited-check result therefore neither covers the entire suite nor measures model
+accuracy. The existing cached flag defect is visible as a warning, and curated
+local evidence is unavailable. No comparable authorized live stuffed/RAG answer
+and token-usage pair exists; the comparison remains unavailable. Fake counts
+cannot establish live token savings. All 76 public chunks stay draft, and no
+held-out outcome is executed or used for tuning.
+
+## Increment 3 placement questions
+
+**Why use real routes with fake adapters?** They exercise serialization, tool
+events, failures and cache behavior through the production interface while
+keeping execution deterministic and avoiding provider costs. They do not measure
+model reasoning, real retrieval rankings, quota correctness or production startup.
+
+**Why keep a validated prefix after an error?** Otherwise an expected EOF/error
+could erase a forbidden claim or invalid source already sent to the user. Checks
+must distinguish obligations about emitted content from obligations requiring a
+complete answer.
+
+**Why bind the transport as well as the case hash?** An unchanged fit-case hash
+does not prevent someone from attaching a chat recording to it. Enforcing both
+prevents an easy chat response or early error from bypassing fit-specific checks.
+
+**Why can a result pass with unavailable checks?** Passing means only that the
+applicable deterministic obligations passed. Unavailable checks, missing cases
+and semantic review remain separate fields. Publication must inspect those fields;
+the engineering result cannot be relabeled as supported model accuracy.
+
+## Optional Increment 3 practice — responses waived
+
+1. A valid stream prefix contains an unknown citation, then ends before `done`.
+   EOF is expected. Which checks must still fail, and which become unavailable?
+2. A curated fit row cites only an AWS-negative chunk and claims `strong`.
+   Its original retrieval map is absent. Which guarantees can still be checked?
+3. All eight fake/curated captures pass after changing the generator prompt.
+   What does that establish, and what remains required for an accuracy badge?
+
+These questions support retrieval practice; no answers have been assessed and
+none are required to continue under Aamir's waiver. Ask follow-up questions on
+any step. Human calibration grading remains a separate required input.
+
 ## Optional retrieval practice — responses waived
 
 1. A chunk keeps its ID but changes from “no hands-on AWS” to a positive claim.
@@ -192,3 +316,6 @@ and an explicit benchmark can enforce a chosen machine-specific ceiling.
 - [FastEmbed official implementation](https://github.com/qdrant/fastembed/blob/main/fastembed/text/onnx_embedding.py): cached model loading and local-only configuration, checked alongside installed 0.9.1 source.
 - [NIST trec_eval recall implementation](https://github.com/usnistgov/trec_eval/blob/main/m_recall.c): relevant retrieved divided by relevant at a cutoff.
 - [NIST trec_eval reciprocal rank](https://github.com/usnistgov/trec_eval/blob/main/m_recip_rank.c): rank of the first relevant result; this project's explicitly named @5 variant truncates at five.
+- [Zod schema parsing](https://zod.dev/basics): `parse` and `safeParse` validate actual backend payloads at the frontend contract.
+- [SSE parsing standard](https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream): UTF-8 event framing and comment lines. The POST/fetch client and explicit terminal events are this application's additional contract; broad production CRLF/cancellation policy remains deferred.
+- [Starlette TestClient](https://www.starlette.io/testclient/): lifespan runs when entering its context manager; the capture intentionally injects dependencies and skips that startup path. Checked alongside installed TestClient source.

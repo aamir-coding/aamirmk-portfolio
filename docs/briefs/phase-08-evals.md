@@ -4,6 +4,8 @@ Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later th
 
 **Later instruction, 2026-11-04:** Aamir waived waiting for teach-back answers once the study guide is verified complete/correct for implemented work, and authorized Increment 2. The remediation guide was verified and its local completion tag created at `88fae8c`; no answers were assessed or tag pushed. Phase 8 study material continues incrementally; human calibration at Increment 4 and live-budget approval remain separate gates.
 
+**Implementation status, 2026-11-04:** Aamir subsequently authorized Increment 3. Increments 1–3 are locally implemented, reviewed and verified; see `docs/PROGRESS.md` for fresh evidence. The guide covers those increments. Increment 4 calibration grading, live-budget approval and Phase 8 completion remain pending.
+
 ## Remaining audit disposition
 
 ### 1. Offline implementation

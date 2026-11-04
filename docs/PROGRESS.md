@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — brief approved on 2026-11-04, on `phase-8-evals`. Increments 1 and 2 are implemented, reviewed and locally verified. The user waived waiting for teach-back answers once complete study material is verified; the guide is updated for implemented increments. Human calibration grading remains a separate required user input at Increment 4. No live Groq run or budget is authorized.
+**Phase 8: Evals, under-the-hood panel and eval badge** — brief approved on 2026-11-04, on `phase-8-evals`. Increments 1–3 are implemented, reviewed and locally verified. The user waived waiting for teach-back answers once complete study material is verified; the guide covers implemented increments. Human calibration grading remains a separate required user input at Increment 4. No live Groq run or budget is authorized.
 
 **Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
@@ -9,7 +9,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Increment 3 recorded-answer replay under the [approved Phase 8 brief](briefs/phase-08-evals.md). No teach-back answer wait is required.
+Next: Increment 4 human judging and gated live-runner infrastructure under the [approved Phase 8 brief](briefs/phase-08-evals.md). Human calibration data remains pending; implementation/tests must remain offline. No teach-back answer wait is required.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +34,7 @@ Next: Increment 3 recorded-answer replay under the [approved Phase 8 brief](brie
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 In Progress — Increment 2 | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟡 In Progress — Increment 3 verified | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -191,7 +191,7 @@ Next: Increment 3 recorded-answer replay under the [approved Phase 8 brief](brie
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Increments 1 and 2 are implemented, reviewed and locally verified; Increment 3 adds recorded-answer replay. Phase 8 is approved for offline work only.
+1. Increments 1–3 are implemented, reviewed and locally verified. Increment 4 is next, with human calibration still pending. Phase 8 is approved for offline work only.
 2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
 3. Human calibration grading is a later user input at Increment 4. Fact approval/provenance and a concrete live budget require separate review; no blanket approval of draft facts or live model calls is implied.
 
@@ -221,7 +221,7 @@ Next: Increment 3 recorded-answer replay under the [approved Phase 8 brief](brie
 - [ ] Cache identity/versioning/bounds, accurate cached flags, and an actual bypass for “Re-Run Live.”
 - [ ] Remaining Markdown/code/URL repairs, session-history validation and message-length limits.
 - [ ] CRLF SSE conformance, complete cancellation/idle-timeout policy, preprocessing heartbeats and upstream close ownership.
-- [ ] Cross-language event fixtures, root evals and gzip-budget gates in CI; fit-dialog focus behavior and browser/device QA.
+- [ ] Cross-language event fixtures are implemented in Increment 3; root evals and gzip-budget gates in CI remain Increment 5 work. Fit-dialog focus behavior and browser/device QA remain deferred.
 - [ ] Apply remaining governing-document corrections and clarify Phase 10's dependencies on deferred Phase 9 work.
 
 ## Phase 8 Increment 1 — 2026-11-04
@@ -245,6 +245,17 @@ Next: Increment 3 recorded-answer replay under the [approved Phase 8 brief](brie
 - Fresh test-first evidence: missing-module collection failures followed by **27 fake-retriever/clock tests passed in 1.05s**, including cutoff arithmetic, macro denominators, misses, exclusions, strict legacy gate, errors, output round-trip and separate latency gating. Final full offline command `.venv/Scripts/python.exe -m pytest backend/tests evals -q` with the existing cache → **327 passed, 1 warning in 13.65s**, outside the already diagnosed sandbox asyncio deadlock.
 - Fresh Ruff lint across backend/evals/builder → **All checks passed**; formatter → **74 files already formatted**. `git diff --check` and development-only `python -m evals.validate` passed: 40 selected/10 reserved, 76 public/76 draft. No frontend source changed; frontend tests/lint/build/gzip checks were not rerun for this increment. Their previous evidence remains historical.
 - Scoped read-only architecture review found no blocker. Its independent test attempt stalled at async setup and was stopped; it is not counted as a completed suite. Root's completed runs above supply test evidence. See DRN-037 and the updated study guide/README. No package installation, model download, live Groq evaluation, public accuracy badge, remote push or deployment occurred.
+
+## Phase 8 Increment 3 — 2026-11-04
+- User authorized Increment 3. Added pure `evals/checks.py` and `python -m evals.replay`, plus explicit fake-only `python -m evals.capture` regeneration/checking. Actual chat/fit/preset endpoint bodies are committed in `evals/recordings/endpoints-v1.json`; real frontend Zod schemas and streaming clients consume those same bodies under mocked fetch. No frontend runtime code or dependency changed.
+- Eight recordings: seven fake and one curated, delivered six fresh/one cached/one preset. They cover four unique development cases; 36 cases explicitly have no recording. Chat covers tool cards, colon/Unicode tokens, follow-up rewriting, guard refusal and model error. Fit covers fresh/cached reports, a real curated preset and fail-closed extraction. Fresh app dependencies, tool registries and fit caches prevent cross-run/seed leakage. TestClient intentionally skips production lifespan; this is endpoint contract evidence, not startup, resource or quota acceptance.
+- Replay checks literal required/forbidden text, length, narrow refusal behavior, citation identity/retrieval membership, requirement-local evidence, configured negative-only evidence rules, summary/ramp-up prohibitions, unique requirements and production score arithmetic. Case ID/version/hash/split/transport binding and frozen expectations cannot be bypassed by expected-error handling. Valid emitted prefixes retain prohibitions/size/citation checks on EOF or application errors; completion-dependent checks are unavailable. Mutated bad fixtures demonstrate rejection. Semantic review remains pending for every result; membership does not prove support.
+- Standalone replay: **8/8 recordings pass applicable limited checks**, `generation_accuracy_available: false`, zero Groq calls and no held-out execution. Exposes `server_cached_flag_unreliable` for the existing cached report flag defect; does not silently fix it. Curated requirement-local evidence is unavailable because no original retrieval map exists. All 76 public fact chunks remain draft. No comparable authorized live stuffed/RAG answer/token records exist; comparison and live token savings remain unavailable. Fake attempt/token counts are explicitly synthetic.
+- Implementation commit `b63529c` is the clean source for the refreshed capture (UTC timestamp, `dirty: false`, case/corpus/dataset/prompt/source hashes). Only capture provenance changed on regeneration; endpoint bodies stayed identical. Replay separately fingerprints its checker/recording/current source and discloses prompt compatibility, unavailable checks and missing cases. Local diagnostic: `build/phase8-replay-increment3.json` (ignored). Complete combined result provenance/CI gates remain Increment 5.
+- Test-first/review evidence: **28 replay regressions passed in 4.59s**. Architecture review found three false-pass classes (discarded error prefixes, mismatched case transport, skipped intrinsic curated evidence checks); six new failing regressions reproduced them, fixes passed, and independent read-only recheck reported **6 passed, 22 deselected in 1.78s**, no remaining blocker in that scope.
+- Fresh complete offline verification: `.venv/Scripts/python.exe -m pytest backend/tests evals -q` with existing local embedding cache → **358 passed, 1 warning in 38.27s**, outside the diagnosed Windows sandbox asyncio deadlock. `npm test -- --run` → **150 passed across 19 files in 35.15s**, including 18 cross-language contract/stream tests. After the provenance-only fixture refresh, `python -m evals.capture` passed and endpoint tests passed again: **3 passed, 1 warning in 6.01s**. No live Groq calls or model downloads.
+- Fresh Ruff lint → **All checks passed**; formatter → **79 files already formatted**. ESLint and TypeScript/build passed; Vite build **8.28s**, JS **162,988 gzip bytes < 200,000**, CSS **7.57 kB gzip**. Existing non-failing dependency annotation/chunk-size warnings remain. `evals.validate` reports 40 development selected/10 reserved, 76 public/76 draft. Browser QA was not run; no visible UI changed.
+- DRN-038, eval README and study guide updated through Increment 3, with three optional practice questions. Answers were waived, not assessed. Human calibration grading remains required at Increment 4; a separate numeric budget/authorization remains required for all live Groq runs. No public badge, remote push, deployment or Phase 8 completion tag.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅

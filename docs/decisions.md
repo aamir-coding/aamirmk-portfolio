@@ -3,6 +3,16 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-038: Recorded contract replay with explicit evidence limits
+
+**Date:** 2026-11-04
+**Context:** Increment 3 needs reproducible answer checks and backend-to-frontend event contracts without authorized live answers or human-calibrated labels. Existing fit cache flags and curated reports cannot establish fresh generation or semantic correctness.
+**Choice:** Capture actual chat/fit/preset endpoints through fresh application instances with injected fake model/retrieval adapters and request guards, fresh tool registries and isolated fit caches. Skip production lifespan deliberately; contract capture is not startup QA. Commit raw endpoint bodies with case ID/version/hash, corpus/dataset/prompt/source fingerprints, capture timestamp and commit/dirty provenance. Track origin (`fake`, `curated`, future `live`) independently of delivery (`fresh`, `cached`, `preset`); record fake adapter attempts and synthetic usage as fake, never provider measurements. Offline bundles reject live records. Use production Pydantic models and scorer to inspect saved bodies; consume the same bodies through real frontend Zod schemas and streaming clients under mocked fetch.
+**Failure behavior:** Validate case/split/transport binding and immutable expectations before interpreting expected errors. Preserve the validated stream prefix on malformed/truncated output: forbidden text, size limits and citation identity still apply; incomplete required-answer/refusal obligations are explicitly unavailable. Check requirement-local citation membership separately from intrinsic positive-evidence and configured negative-only rules. Curated reports without retrieval traces cannot claim local membership, but still face intrinsic citation/score checks. Never turn an unavailable check into an accuracy pass. Stale corpus/dataset recordings fail closed; prompt changes are disclosed without pretending old outputs were regenerated. Replay failures retain categories; provenance/execution errors leave previous output untouched.
+**Limits:** Eight captures cover four unique development cases; 36 have no recording. Seven are fake, one is curated. Lexical constraints and narrow known-negative rules cannot establish semantic entailment. All 76 fact chunks remain draft, judging remains pending, and no held-out case is executed. The existing cached report flag remains unreliable and is exposed as a warning, not repaired by fixture metadata. Curated local evidence and comparable authorized live stuffed/RAG answers/usage remain unavailable. Combined result provenance/CI gates are Increment 5 work; request telemetry is Increment 6. No dependency, live runner, provider budget, public badge or production safety claim is added.
+
+---
+
 ### DRN-037: Retrieval metrics with honest denominators and portable gates
 
 **Date:** 2026-11-04

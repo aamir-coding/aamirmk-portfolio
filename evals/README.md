@@ -1,7 +1,8 @@
-# Offline evaluation dataset — Phase 8, Increment 1
+# Offline evaluations — Phase 8, Increments 1–3
 
-This increment supplies inputs and integrity checks. It does not generate answers,
-run a judge, report model accuracy, or certify the current facts.
+These increments supply frozen inputs, retrieval diagnostics and recorded-output
+checks. They do not generate live answers, run a semantic judge, report model
+accuracy, or certify the current facts.
 
 ## Dataset and approval status
 
@@ -101,11 +102,11 @@ version-specific `model._model_dir` access and fails explicitly if unavailable.
 
 ## Remaining phase work
 
-Increment 2 adds metric computation/runner behavior, described below. Replay checks and event
-fixtures arrive in Increment 3; human grading and the separately budgeted live
-runner arrive in Increment 4. Final result provenance/CI gates, telemetry and the
-panel/badge follow. No score, baseline, live workflow, schedule or badge is created
-by Increment 1. Production quota/resource/lifecycle work remains tracked separately.
+Increments 2 and 3 add retrieval diagnostics and recorded-output checks, described
+below. Human grading and the separately budgeted live runner remain Increment 4.
+Combined result provenance/CI gates, telemetry and the panel/badge follow. No model
+accuracy, live baseline, live workflow, schedule or badge is created by these
+increments. Production quota/resource/lifecycle work remains tracked separately.
 
 ## Increment 2 — retrieval diagnostics
 
@@ -156,3 +157,73 @@ project; its installed version is now explicitly pinned as a direct dependency.
 - [NumPy load, including non-pickle loading and archive ownership](https://numpy.org/doc/stable/reference/generated/numpy.load.html)
 - [NumPy compressed archives](https://numpy.org/doc/stable/reference/generated/numpy.savez_compressed.html)
 - [FastEmbed official model implementation](https://github.com/qdrant/fastembed/blob/main/fastembed/text/onnx_embedding.py)
+
+## Increment 3 — recorded-answer and contract replay
+
+```powershell
+.\.venv\Scripts\python.exe -m evals.replay --output build/replay.json
+.\.venv\Scripts\python.exe -m evals.capture
+.\.venv\Scripts\python.exe -m pytest -c backend/pyproject.toml evals/test_replay.py -q
+.\.venv\Scripts\python.exe -m pytest backend/tests/test_recorded_events.py -q
+# From frontend/:
+npm test -- --run src/lib/backendEventFixtures.test.ts
+```
+
+`replay` parses committed bodies only: no application startup, model loading or
+provider calls. `capture` exercises actual backend endpoints with isolated fake
+dependencies and compares their bodies to `recordings/endpoints-v1.json`.
+`capture --write` explicitly regenerates that file after review. It has no live
+mode. TestClient intentionally skips production lifespan, since every request
+dependency is injected; this does not verify deployment startup. On this Windows
+host, async/TestClient checks require execution outside the previously diagnosed
+sandbox socketpair deadlock. This is unrelated to network access or live models.
+
+The eight captures contain seven fake answers/outcomes and one actual curated
+preset response: chat project/card/colon/Unicode, rewritten follow-up, guard
+refusal, model error, fresh and cached fit reports, curated preset, and failed
+extraction. They bind to only **four unique development cases**; **36 development
+cases have no recording**, listed in the diagnostic. Capture coverage is not
+answer accuracy. Mutated test bodies additionally cover malformed JSON,
+premature EOF, invalid citations, cross-requirement evidence, negative-only
+positive judgments and summary/ramp-up overclaims. No held-out case is scored.
+
+`checks.py` validates required/forbidden normalized substrings, character limits,
+a deliberately narrow assistant-refusal pattern, citation identity/retrieval
+membership, unique requirement IDs, production score arithmetic, local evidence
+membership and explicitly configured negative-only evidence rules. Frozen case
+expectations cannot be weakened by a recording's refusal/error overrides. A case
+must bind to its version/hash, development split and matching transport.
+Expected protocol/application errors still check the valid output prefix for
+forbidden text, size and invalid citations; completion-dependent checks are
+unavailable. Every result retains `semantic_review: pending` and
+`generation_accuracy_available: false`. Neither valid membership nor passing
+literal constraints proves semantic support.
+
+Origin and delivery are independent. A fresh fake report is still fake; cached
+delivery is identified from the real cache-hit progress event. The existing
+`report.cached == false` defect is preserved and disclosed as
+`server_cached_flag_unreliable`, rather than concealed by editing the capture.
+The curated preset lacks its original requirement-local retrieval map, so that
+check is unavailable; intrinsic citations, positive evidence, configured negative
+rules and score arithmetic still apply. Curated content is not calibrated truth.
+Fake token counts/adapter attempts are labeled synthetic; unknown/provider usage
+is never inferred from character counts or failed calls.
+
+The capture includes commit/dirty state, timestamp, corpus/dataset/prompt/source
+hashes and case references. Replay adds its own commit/time, checker and recording
+hashes, current-prompt compatibility, missing cases, origins/delivery counts,
+failures/warnings/unavailable checks. A changed corpus or dataset is rejected;
+changed prompts are disclosed, because replay still tests saved output. Complete
+combined-run/runtime/model/rubric provenance remains Increment 5 work. The
+stuffed-versus-RAG comparison is **unavailable**: no comparable authorized live
+answer/usage recordings exist. No quality or token-savings number is invented.
+
+Replay exits 0 when all applicable limited checks pass, 1 for completed check
+failures, and 2 for unavailable/invalid inputs. An input error writes no result
+and preserves any earlier file. Inspect timestamps and missing/unavailable
+checks before using an artifact. These commands do not update a public result
+or badge, and do not authorize Groq evaluation.
+
+- [Zod schema parsing](https://zod.dev/basics)
+- [SSE framing and UTF-8](https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream)
+- [Starlette TestClient lifecycle](https://www.starlette.io/testclient/)
