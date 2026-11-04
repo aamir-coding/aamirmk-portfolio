@@ -1,15 +1,15 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — brief approved on 2026-11-04. User explicitly authorized starting Increment 1 on `phase-8-evals`, offline, while remediation close-out remains pending. Increment 1 is implemented and locally verified: versioned cases, a reserved split and corpus/index provenance. Human calibration grading will be provided at Increment 4. No live Groq run or budget is authorized.
+**Phase 8: Evals, under-the-hood panel and eval badge** — brief approved on 2026-11-04, on `phase-8-evals`. Increments 1 and 2 are implemented, reviewed and locally verified. The user waived waiting for teach-back answers once complete study material is verified; the guide is updated for implemented increments. Human calibration grading remains a separate required user input at Increment 4. No live Groq run or budget is authorized.
 
-**Handoff Remediation Sprint** — implementation and historical local verification complete; architecture review passed. User authorized integration into `main` and remote push on 2026-11-03. Source branch: `codex/handoff-remediation`. Interactive teach-back and completion tag remain pending; Phase 8 authorization does not mark them complete.
+**Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
 Approved scope: preset evidence/narratives, requirement-local citation validation, fail-closed extraction, colon-token preservation, EOF recovery, and JSON 422 responses. See [sprint study guide](study-guides/handoff-remediation.md) and [handoff retrospective](audits/2026-11-03-handoff-retrospective.md).
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Increment 2, retrieval metrics under the [approved Phase 8 brief](briefs/phase-08-evals.md). Remediation teach-back and completion tag remain pending.
+Next: Increment 3 recorded-answer replay under the [approved Phase 8 brief](briefs/phase-08-evals.md). No teach-back answer wait is required.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +34,7 @@ Next: Increment 2, retrieval metrics under the [approved Phase 8 brief](briefs/p
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 In Progress — Increment 1 | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟡 In Progress — Increment 2 | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -191,8 +191,8 @@ Next: Increment 2, retrieval metrics under the [approved Phase 8 brief](briefs/p
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Increment 1 is implemented, reviewed and locally verified; Increment 2 adds retrieval metric computation. Phase 8 is approved for offline work only.
-2. Remediation teach-back and local `handoff-remediation-done` tag remain pending. Its authorized integration is recorded at `88fae8c`; user-reported live acceptance is below. Phase 8 start was explicitly authorized despite that pending close-out.
+1. Increments 1 and 2 are implemented, reviewed and locally verified; Increment 3 adds recorded-answer replay. Phase 8 is approved for offline work only.
+2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
 3. Human calibration grading is a later user input at Increment 4. Fact approval/provenance and a concrete live budget require separate review; no blanket approval of draft facts or live model calls is implied.
 
 ## User-Reported Live Acceptance — 2026-11-04
@@ -236,6 +236,16 @@ Next: Increment 2, retrieval metrics under the [approved Phase 8 brief](briefs/p
 - Fresh Ruff checks on backend/new eval modules/builder → **All checks passed**; formatter check → **68 files already formatted**. `git diff --check` passed. `python -m evals.validate` reports 40 development selected, 10 reserved, 76 public/76 draft; explicit structural validation covers all 50.
 - See DRN-036, [eval dataset README](../evals/README.md) and [incremental study guide](study-guides/phase-08-evals.md). Phase 8 review/teach-back/tagging are incomplete. No live evaluation, model accuracy result, badge, push or deployment was performed.
 
+## Phase 8 Increment 2 — 2026-11-04
+- User authorized Increment 2 and waived waiting for teach-back answers once study material is verified complete/correct. Checked the remediation and Increment 1 guide against implementation, extended the Phase 8 guide through Increment 2, and retained optional practice without claiming assessed answers. Local annotated `handoff-remediation-done` targets `88fae8c`; it has not been pushed. Full Phase 8 implementation/guide are still incremental, not complete.
+- Added `evals/metrics.py` and `python -m evals.run`: Hit@3/@5, truncated MRR@5 and macro Recall@3/@5 with explicit numerators/denominators. Alternative-source cases do not contribute to recall; no eligible cases produce null. Per-category results retain exclusions. Histories requiring recorded rewriting, JDs requiring extraction, protocol cases and no-source cases are excluded from this raw-query diagnostic, never silently counted as passes.
+- Preserved all 45 legacy per-query top-five regressions and centralized the aggregate arithmetic. Portable gates: Hit@3 >=0.90, MRR@5 >=0.80, plus every legacy Hit@5. Machine-specific warmed mean/p50/p95/p99 latency is reported separately; the old default <25 ms assertion becomes the explicit `--max-mean-ms` benchmark option, independently recorded in JSON.
+- Standalone cached local retrieval measurement: legacy development **Hit@3 41/45 (91.11%), Hit@5 45/45, MRR@5 0.888889**; versioned development **34 evaluated/40 total**, six explicitly excluded, **Hit@3 31/34 (91.18%), Hit@5 34/34, MRR@5 0.889706**. Recall@3/@5 is **1.0 over only two provisional all-relevant cases**; legacy recall is unavailable (zero eligible labels). The overlapping sets remain separate, with no combined score. All quality gates passed without changing facts, labels, splits or retrieval settings.
+- Initial standalone warm mean latency: legacy 17.15 ms (p95 22.01 ms), versioned 17.27 ms (p95 26.25 ms). These are machine-dependent observations, not cold-start, production SLA or semantic-accuracy evidence. Saved diagnostic: `build/phase8-retrieval-increment2.json` (ignored local output), explicitly provisional/offline, no held-out execution, zero Groq calls. Its timestamp/source provenance identifies each execution; runtime versions/configuration and source/data/index hashes are recorded. Combined result/publication/CI contracts remain Increment 5 work.
+- Fresh test-first evidence: missing-module collection failures followed by **27 fake-retriever/clock tests passed in 1.05s**, including cutoff arithmetic, macro denominators, misses, exclusions, strict legacy gate, errors, output round-trip and separate latency gating. Final full offline command `.venv/Scripts/python.exe -m pytest backend/tests evals -q` with the existing cache → **327 passed, 1 warning in 13.65s**, outside the already diagnosed sandbox asyncio deadlock.
+- Fresh Ruff lint across backend/evals/builder → **All checks passed**; formatter → **74 files already formatted**. `git diff --check` and development-only `python -m evals.validate` passed: 40 selected/10 reserved, 76 public/76 draft. No frontend source changed; frontend tests/lint/build/gzip checks were not rerun for this increment. Their previous evidence remains historical.
+- Scoped read-only architecture review found no blocker. Its independent test attempt stalled at async setup and was stopped; it is not counted as a completed suite. Root's completed runs above supply test evidence. See DRN-037 and the updated study guide/README. No package installation, model download, live Groq evaluation, public accuracy badge, remote push or deployment occurred.
+
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
 - [x] Groq limits confirmed (see below) ✅
@@ -258,4 +268,4 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-Offline Phase 8 is authorized under the approved brief's scoped audit disposition. No live Groq generation/judging is authorized; a separate numeric budget is required. Human calibration grading is pending for Increment 4. Public factual accuracy remains gated by fact approval/provenance, human-calibrated labels/judging and genuine compatible results. Remediation teach-back/tagging remain pending but do not override the user's explicit authorization to begin Phase 8.
+Offline Phase 8 is authorized under the approved brief's scoped audit disposition. No live Groq generation/judging is authorized; a separate numeric budget is required. Human calibration grading is pending for Increment 4 and was not waived by the teach-back instruction. Public factual accuracy remains gated by fact approval/provenance, human-calibrated labels/judging and genuine compatible results. Complete study material is required; waiting for teach-back answers is waived. Remediation is locally tagged; Phase 8 completion/tagging remain future work.

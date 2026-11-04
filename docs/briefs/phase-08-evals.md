@@ -2,6 +2,8 @@
 
 Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later that day. He explicitly authorized starting Increment 1 on `phase-8-evals`, offline, and will provide human calibration grading at Increment 4. This approval narrows the remaining handoff audit gates; it does not accept every retrospective recommendation or promote facts. Remediation teach-back and `handoff-remediation-done` remain pending. Their recommended pre-phase close-out was superseded by the explicit authorization to begin, not declared complete.
 
+**Later instruction, 2026-11-04:** Aamir waived waiting for teach-back answers once the study guide is verified complete/correct for implemented work, and authorized Increment 2. The remediation guide was verified and its local completion tag created at `88fae8c`; no answers were assessed or tag pushed. Phase 8 study material continues incrementally; human calibration at Increment 4 and live-budget approval remain separate gates.
+
 ## Remaining audit disposition
 
 ### 1. Offline implementation
@@ -43,7 +45,7 @@ Preserve the fixed FastAPI/Groq GPT-OSS pair/hand-built retrieval/React-Vite sta
 
 ## Decisions and risks
 
-Approved scope: the seven increments, narrow audit disposition, proposed quality/CI thresholds, and an offline-first milestone whose accuracy badge can remain unavailable pending evidence. The user explicitly authorized Phase 8 start while remediation teach-back/tagging remain pending.
+Approved scope: the seven increments, narrow audit disposition, proposed quality/CI thresholds, and an offline-first milestone whose accuracy badge can remain unavailable pending evidence. The user explicitly authorized Phase 8 start before remediation close-out, then waived teach-back responses and authorized Increment 2. Remediation is now locally tagged; Phase 8 is ongoing.
 
 Aamir's later inputs: factual approval/provenance (without blanket flag changes), human labels/calibration review, and separate live-run authorization after reviewing a numeric budget. No live budget is approved by accepting this brief. No push/deployment is authorized here.
 

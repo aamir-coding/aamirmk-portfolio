@@ -57,10 +57,10 @@ The `finally` block cancels the reader and releases its lock on success, failure
 
 Baseline: 239 backend/eval and 125 frontend tests. Sprint final backend run: `python -m pytest backend/tests evals -q` → **253 passed, 1 warning in 16.62s**. Frontend final run: `npm test` → **132 passed, 18 files, 17.48s**. Ruff lint passed; Ruff reports 60 files already formatted. ESLint and TypeScript passed. Final Vite build: 5.53s, **162.99 kB gzip JS**, CSS 7.57 kB gzip. Explicit Node/zlib assertion: **162,988 JS bytes < 200,000**. The existing AnyIO deprecation and Vite chunk/annotation warnings remain non-failing. No live Groq calls, production deployment checks or browser QA were performed. agent-browser is unavailable locally.
 
-## Teach-back — answer before looking back
+## Optional retrieval practice
 
 1. A requirement cites a real chunk retrieved for a different requirement. What happens now, and what additional question must we still ask about a surviving local citation?
 2. A response streams several tokens and the connection closes without `done`. Why is that an error, and how does deliberate Stop differ?
 3. Both extraction attempts fail. Which pipeline stages must not run, and why would a generic fallback requirement violate the product promise?
 
-Teach-back completion is pending the user's answers. Ask follow-up questions about any concept that remains unclear.
+On 4 November 2026, Aamir waived waiting for teach-back answers once the study guide was verified complete and correct. The guide was checked against the implemented remediation; the response requirement is closed by user waiver, not by assessing answers. Local completion tag `handoff-remediation-done` targets integration commit `88fae8c`. The questions remain optional study material. No new push or deployment is implied.

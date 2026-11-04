@@ -3,6 +3,16 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-037: Retrieval metrics with honest denominators and portable gates
+
+**Date:** 2026-11-04
+**Context:** The legacy benchmark used alternative source IDs for Hit@5 and a machine-dependent latency assertion. Phase 8 needs distinct top-three/top-five metrics, without converting alternative sources into exhaustive relevance labels or scoring skipped behaviors as successes.
+**Choice:** Use shared pure ranking metrics for the CLI and legacy aggregate regression. Report Hit@3/@5, explicitly truncated MRR@5, and macro Recall@3/@5 only over `all_relevant` labels. Alternative-source cases do not contribute to recall; no-source cases have no score. Exclude protocol, requirement-extraction JDs and histories requiring recorded rewriting from the raw-query retrieval diagnostic. Retain excluded counts/reasons and all legacy individual top-five regressions. Portable gates are Hit@3 >=0.90 and MRR@5 >=0.80, plus every legacy Hit@5. Report warmed latency and nearest-rank percentiles separately; the previous default mean <25 ms assertion becomes an opt-in, separately recorded `--max-mean-ms` benchmark gate.
+**Provenance and failure:** Validate frozen evidence before loading cached ONNX assets. Report the two overlapping development sets separately, with per-category denominators and measured/skipped cases. Record source commit/dirty state, retrieval-code hash, frozen dataset/corpus/index identities, runtime/library versions and RRF configuration. Abort on retrieval/provenance failure without overwriting a previous complete artifact; completed gate failures remain valid diagnostics with nonzero exit status. Test through the real retriever interface using injected fakes and clocks. No new dependencies, Groq path, held-out execution or badge publication is added.
+**Limits:** Source membership and retrieval quality do not prove semantic answer support. Recall presently has only two eligible provisional development cases; do not present its perfect score as broad evidence. Reserved cases remain author-visible and unexecuted. Full combined result/CI/publication contracts remain Increment 5. The user's waiver of teach-back answers does not waive human calibration or live-run budget approval.
+
+---
+
 ### DRN-036: Frozen evaluation inputs and fail-closed embedding provenance
 
 **Date:** 2026-11-04
