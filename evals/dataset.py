@@ -24,7 +24,7 @@ def _text_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_text(encoding="utf-8").encode("utf-8")).hexdigest()
 
 
-def _case_sha256(case: EvalCase) -> str:
+def case_fingerprint(case: EvalCase) -> str:
     return hashlib.sha256(
         json.dumps(
             case.model_dump(mode="json"),
@@ -148,7 +148,7 @@ def load_cases(
                 version=c.version,
                 group_id=c.group_id,
                 split=c.split,
-                sha256=_case_sha256(c),
+                sha256=case_fingerprint(c),
             )
             for c in suite.cases
         ]
@@ -231,7 +231,7 @@ def freeze_dataset(root: Path = DEFAULT_ROOT) -> None:
                 version=c.version,
                 group_id=c.group_id,
                 split=c.split,
-                sha256=_case_sha256(c),
+                sha256=case_fingerprint(c),
             )
             for c in suite.cases
         ],
