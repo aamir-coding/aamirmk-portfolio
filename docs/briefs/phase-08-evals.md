@@ -6,6 +6,8 @@ Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later th
 
 **Implementation status, 2026-11-04:** Aamir subsequently authorized Increment 3. Increments 1–3 are locally implemented, reviewed and verified; see `docs/PROGRESS.md` for fresh evidence. The guide covers those increments. Increment 4 calibration grading, live-budget approval and Phase 8 completion remain pending.
 
+**Increment 4, 2026-11-04:** Aamir authorized beginning Increment 4 and chose to fill a copied annotation JSON. Offline grading/runner infrastructure is implemented and verified; the packet contains 20 authored calibration and eight separate development validation answers. Human grades, real judge outputs/agreement and live-budget authorization remain pending. The guide covers this implemented infrastructure. Increment 4 is not declared calibrated or fully complete.
+
 ## Remaining audit disposition
 
 ### 1. Offline implementation

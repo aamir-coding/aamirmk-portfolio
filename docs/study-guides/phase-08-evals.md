@@ -1,7 +1,8 @@
 # Phase 8 — Evaluation inputs and reproducible evidence
 
-Incremental study guide. Increments 1–3 are covered here; calibration,
-telemetry and result-backed publication will be added as implemented. Aamir waived
+Incremental study guide. Increments 1–3 and Increment 4's offline calibration/runner
+infrastructure are covered here. Human grading and genuine judge calibration are
+pending; telemetry and result-backed publication follow later. Aamir waived
 waiting for teach-back answers on 4 November 2026 once the material was verified.
 This does not waive the separate human calibration grading required at Increment 4.
 
@@ -308,6 +309,177 @@ any step. Human calibration grading remains a separate required input.
 4. A query finds one of four relevant chunks at rank two. Compare Hit@3, Recall@3
    and reciprocal rank. How would an `any_of` label change what can be reported?
 
+## Increment 4 — judge agreement requires a human reference
+
+An LLM judge is a fallible measurement instrument. A second model may share the
+generator's assumptions and blind spots, particularly within the fixed GPT-OSS
+family. We use 120b for generation and 20b for evaluation judging, but that does
+not make a judge score true. Human grading defines the independent reference for
+these authored examples. The fit pipeline's own 120b alignment step is distinct
+from this external evaluation judge.
+
+The packet has twenty authored calibration answers and eight separate development
+validation answers. It includes deliberate counterexamples, false premises,
+refusals and negative fit evidence. Both slices were grouped and frozen before
+human grading. They are author-visible development material, not the separate ten
+reserved held-out cases or live generated answers. Keep the full original evidence
+available; all 76 chunks remain draft. Grading relative support does not approve
+their truth. Obvious synthetic mistakes can make agreement look better than it
+will be on subtle real answers.
+
+Read `evals/rubrics/support-v1.md` and `evals/annotations/README.md` before filling
+the copied `build/human-v1.json`. Grade support, completeness, behavior and tone
+independently, each `pass`, `fail` or `uncertain`, with a rationale citing the
+relevant claim/evidence. A compelling tone can coexist with unsupported content.
+Do not force a binary judgment when the evidence is insufficient. Reviewer and
+independent-grading attestation are required; the agent supplies no human labels.
+
+The validation agreement for axis a is:
+
+`matching binary human/judge labels / binary human validation labels`.
+
+Human uncertainty is excluded and reported. Judge uncertainty is a disagreement
+when the human is binary. Missing judge labels stay missing, never disappearing
+from the denominator. The frozen policy needs at least twenty human calibration
+answers and twenty calibration judge outputs first, then eight binary validation
+grades and both human pass/fail classes on every axis. Each axis must meet 80%.
+This avoids an always-pass judge looking calibrated on an all-pass set. The
+threshold is a project gate, not a statistical confidence guarantee. Small samples
+remain weak evidence. Failed/insufficient validation requires reviewed new
+material after further calibration; do not tune to these validation outcomes.
+
+```mermaid
+flowchart LR
+  P[Frozen authored packet and rubric] --> H[Human grades: pending]
+  P --> J[20b judge: separate live approval required]
+  H --> C[Calibration slice: at least 20]
+  J --> C
+  C --> V[Separate validation agreement]
+  V --> R[Per-axis counts, confusion, human overrides]
+  F[Fake judge tests] --> D[Diagnostic only]
+```
+
+Trace the code in `evals/calibration.py`:
+
+1. `load_packet` verifies the lock, current frozen public corpus, static prompt and
+   rubric, case/version/hash bindings, grouped slices and exact evidence snapshots.
+   `prepare_grading.build_packet` constructs authored inputs, while `--freeze`
+   refuses to overwrite them. It never fills a human grade.
+2. `Review` requires a rationale for completed labels. `AnnotationSet` requires a
+   reviewer and attestation. `validate_reviews` rejects unknown/duplicate items,
+   stale hashes and changed static/effective judge instructions.
+3. `judge_system_prompt` compacts only judge instructions: defining axis sentences
+   plus explicit safety/support rules. Human workflow procedures are omitted.
+   Answers and complete evidence remain identical. Its actual rendered text is
+   hashed by `effective_judge_prompt_sha256`; a hash of `judge-v1.txt` alone would
+   miss changes in the compaction recipe.
+4. `agreement_report` counts both human and judge coverage before computing any
+   validation score. It retains per-axis numerator/denominator, confusion,
+   abstentions and missing coverage. Disagreements carry the human's authoritative
+   label/rationale in `human_overrides`. It never edits annotations to agree.
+5. A fake `JudgeSet` can report diagnostic agreement but cannot set
+   `live_judge_calibrated`. Every report keeps generator accuracy unavailable.
+   With no human labels or judge outputs, the actual current status is pending.
+
+## Increment 4 — budgeting each provider attempt
+
+An endpoint request may contain several provider calls. Chat can rewrite a
+follow-up, request a card, then explain it in another turn. Fit can retry malformed
+extraction, judge batches and synthesize a summary. An endpoint-level counter
+cannot bound those attempts. The standalone runner places its accounting seam
+below the production logic so all completion calls cross the same ledger.
+
+Read `evals/budget.py:163`, `MeteredLLM`, alongside `evals/live.py`:
+
+1. `Budget` requires approved per-model attempt/input/output ceilings and per-call
+   reservations, shared rate/day limits, declared prior consumption, positive
+   visitor headroom, pacing and request/run deadlines. Limits are account-specific
+   and can change; the old screenshot or an SDK default is not a fresh approval.
+2. `request_payload` includes message history, tool schemas/results and structured
+   output settings. `input_reservation_bound` uses UTF-8 bytes plus overhead. This
+   is conservative policy, not measured tokenizer usage or an enforced upstream
+   input cap. Full input/output caps are reserved before an attempt. Reservations
+   are not refunded after success, so the run can stop before using its apparent
+   actual-token remainder. Safety takes precedence over spending every token.
+3. `MeteredLLM.complete` serializes admission, checks model/run ceilings, waits for
+   shared minute capacity and spacing, then records a reservation before calling
+   the provider. Minute reservations are retained conservatively from completion.
+   Fake clocks make this testable without real waits. Each application retry must
+   be admitted again; SDK retries are disabled to avoid invisible attempts.
+4. Reported input/output/total usage must reconcile and remain within reservation.
+   Missing usage is unknown, not zero. Errors/timeouts/cancellation retain unknown
+   reservations and stop further calls. Reported model mismatch or output ending
+   because of length also stops. Already consumed excess cannot be undone; that
+   is why the later operator must explicitly review the reservation policy.
+5. `live.generate_case` invokes actual chat or a fresh `FitPipeline(cache={})`.
+   Local fake tests verify rewrite/tool/extraction/alignment/summary accounting,
+   including exceptions swallowed by production fallback logic. A stopped ledger
+   blocks later calls and prevents a fallback report from passing as a valid run.
+   Guardrail responses have their own origin and no claimed model generation.
+6. `live.judge_messages` excludes human labels and other judge outputs. `run_jobs`
+   snapshots the effective instructions and records their hash. This keeps the
+   validation judge from seeing the answers it is being compared against.
+7. `preflight` binds source commit/dirty/code/prompt/data/runtime versions and input
+   hashes. Judge proposals require human calibration coverage; validation requires
+   compatible completed live calibration outputs. It checks whole-slice numeric
+   capacity and every judge prompt's byte-policy feasibility before writing a
+   proposal. A passing preflight spends zero quota and grants no authorization.
+8. `authorize` requires a matching plan hash, explicit reviewer/reference,
+   fresh verified account limits, short valid time window and visitor/draft/input
+   policy acknowledgments. `execute` rechecks compatibility before certification.
+   The run deadline ends at the earliest of its own ceiling, authorization expiry
+   and UTC midnight. The API key is read only from process environment afterward.
+9. `live_provider` owns the SDK client, pins Groq's host and disables hidden
+   retries. Nonstreaming calls retain actual usage; streaming evaluation is
+   deliberately disabled. `GroqProvider` preserves raw structured JSON, maps tool
+   calls and returns provider usage without inventing missing values.
+10. `execute` creates an exclusive workspace lock and a unique receipt before
+    creating a client. A run ID cannot reset its allowance by being rerun. Save
+    known ledgers before awaiting client shutdown, including close cancellation.
+    Results are replaced atomically. A 60-second cross-run cooldown preserves
+    minute accounting; receipts overlapping UTC days count on both. Unreconciled
+    runs charge full approved ceilings. Stale locks/unknown consumption need
+    inspection, with no automatic resume or uncertainty reset.
+
+These controls govern one local evaluation runner, not all production users or
+other workspaces. They cannot observe concurrent visitors; fresh remaining account
+capacity and real headroom still require operator review. Native ONNX work running
+in a thread is not forcibly stopped by asyncio cancellation, although a provider
+call cannot be admitted after deadline. Production quota/resource/lifecycle fixes
+remain tracked separately. Do not delete receipts or invent an approval file.
+
+## Increment 4 interview questions and optional practice
+
+**Why can perfect fake agreement never calibrate the live judge?** It exercises
+the arithmetic and gates using predetermined labels. It contains no observation
+of the real judge's decisions. Even genuine agreement on this small authored
+sample would not establish live generator accuracy or factual approval.
+
+**Why fingerprint rendered instructions?** The static prompt file can stay
+unchanged while code changes how rubric text is extracted or appended. Binding
+the effective system text prevents reusing calibration for a different judge.
+
+**Why keep reservations after reported usage arrives?** It bounds future attempts
+under a conservative approved ceiling and avoids optimistic reuse during pacing.
+The cost is unused quota, which is preferable to hidden retry/usage overspend.
+
+**Why save before client closure?** Shutdown is an await point that can fail or
+be cancelled. A result computed in memory can otherwise disappear, leaving only
+an uncertain receipt. Persisting first preserves known consumption for inspection.
+
+Optional practice; responses are waived, not assessed:
+
+1. A judge labels eight validation examples perfectly but provides no calibration
+   outputs. Why must the calibration report remain pending?
+2. A fit extraction request times out and production code attempts its fallback
+   retry. Which reservation remains, and what prevents another provider request?
+3. A local run crosses UTC midnight, then another starts immediately. Which daily
+   charges and minute cooldown must the standalone runner preserve?
+
+The guide is complete for implemented Increment 4 infrastructure. Human grading,
+genuine judge agreement and live-budget authorization remain incomplete. Ask for
+clarification on any step; the teach-back waiver does not waive those inputs.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.
@@ -319,3 +491,6 @@ any step. Human calibration grading remains a separate required input.
 - [Zod schema parsing](https://zod.dev/basics): `parse` and `safeParse` validate actual backend payloads at the frontend contract.
 - [SSE parsing standard](https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream): UTF-8 event framing and comment lines. The POST/fetch client and explicit terminal events are this application's additional contract; broad production CRLF/cancellation policy remains deferred.
 - [Starlette TestClient](https://www.starlette.io/testclient/): lifespan runs when entering its context manager; the capture intentionally injects dependencies and skips that startup path. Checked alongside installed TestClient source.
+- [Groq Python SDK retries/timeouts](https://github.com/groq/groq-python#retries): checked with installed Groq 1.7.0; standalone evaluation explicitly sets `max_retries=0` and per-request timeouts.
+- [Groq completion API](https://console.groq.com/docs/api-reference#chat-create): output caps and provider usage. The runner refuses missing or inconsistent reported usage.
+- [Groq organization rate limits](https://console.groq.com/docs/rate-limits): exact account limits and remaining capacity must be freshly reviewed before a live budget.

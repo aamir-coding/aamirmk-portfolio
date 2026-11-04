@@ -1,8 +1,8 @@
-# Offline evaluations — Phase 8, Increments 1–3
+# Offline evaluations — Phase 8, Increments 1–4 infrastructure
 
-These increments supply frozen inputs, retrieval diagnostics and recorded-output
-checks. They do not generate live answers, run a semantic judge, report model
-accuracy, or certify the current facts.
+These increments supply frozen inputs, retrieval diagnostics, recorded-output
+checks and calibration/budget infrastructure. Human grading and live model runs
+remain pending. No model accuracy is reported and no draft fact is certified.
 
 ## Dataset and approval status
 
@@ -103,7 +103,8 @@ version-specific `model._model_dir` access and fails explicitly if unavailable.
 ## Remaining phase work
 
 Increments 2 and 3 add retrieval diagnostics and recorded-output checks, described
-below. Human grading and the separately budgeted live runner remain Increment 4.
+below. Increment 4 infrastructure is implemented; human grading, genuine judge
+agreement and separately approved live runs remain pending.
 Combined result provenance/CI gates, telemetry and the panel/badge follow. No model
 accuracy, live baseline, live workflow, schedule or badge is created by these
 increments. Production quota/resource/lifecycle work remains tracked separately.
@@ -227,3 +228,119 @@ or badge, and do not authorize Groq evaluation.
 - [Zod schema parsing](https://zod.dev/basics)
 - [SSE framing and UTF-8](https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream)
 - [Starlette TestClient lifecycle](https://www.starlette.io/testclient/)
+
+## Increment 4 — human calibration and a gated runner
+
+Start with [human grading instructions](annotations/README.md), the frozen
+20-answer calibration/eight-answer validation packet, and its blank annotation
+template. These examples are **authored development inputs**, with intentional
+errors and no agent-supplied human labels. They do not replace or execute the ten
+reserved held-out cases. The group split is frozen before grading. The rubric
+defines support, completeness, behavior and tone; human labels are authoritative.
+
+```powershell
+.\.venv\Scripts\python.exe -m evals.prepare_grading
+.\.venv\Scripts\python.exe -m evals.calibration --annotations build/human-v1.json
+.\.venv\Scripts\python.exe -m evals.live
+```
+
+The first command validates existing grading material; `--freeze` is write-once
+initial creation and refuses overwrites. The second reports pending until genuine
+grades/judge outputs exist. `--judge <judge.json>` compares saved judge output
+offline; it never generates labels. The third prints offline-only/zero Groq calls.
+None grants authorization. Current grading/calibration status is pending.
+
+Agreement uses validation only, after twenty human calibration answers and twenty
+judge calibration answers exist. It requires at least 80% agreement on every axis,
+eight binary human validation labels per axis and both pass/fail classes. It shows
+numerators/denominators, confusion counts, abstentions, missing labels and human
+overrides. Human uncertainty is excluded; judge uncertainty is a disagreement on a
+binary human label. Fake judges can only produce diagnostics. Same-family bias,
+the small authored sample and draft evidence limit generalization even if the
+eventual gate passes. Calibration does not establish generator accuracy.
+
+The future runner has three explicit stages: `generation`, `judge_calibration`,
+and `judge_validation`. Generation selects named development answer cases only;
+protocol and reserved cases are rejected. It invokes the actual nonstreaming chat
+route/tool/rewrite logic or a fresh fit pipeline/cache, using real cached local
+retrieval in live mode. Streaming is deliberately disabled for live evaluation
+because complete usage is required. Guardrail answers retain a distinct origin.
+All automated tests inject fake providers/retrievers or SDK MockTransport.
+
+The fit pipeline's extraction, alignment and summary calls pass through one
+`MeteredLLM`, as do chat rewrite/tool turns. The current production chat rewrite
+defaults to the main model; the ledger records that actual choice rather than
+assuming a cheaper utility call. Evaluation judging uses 20b. Judge prompts
+contain the answer, entire supplied evidence/local maps and compact rubric
+definitions; they contain no human labels or other judge outputs. Exact rendered
+system instructions have a separate fingerprint. Changing their construction
+invalidates prior calibration even if `judge-v1.txt` itself is unchanged.
+
+To prepare a **future unapproved** numeric proposal, provide a reviewed JSON
+`Budget` (see `evals/budget.py`), then use:
+
+```powershell
+.\.venv\Scripts\python.exe -m evals.live --draft-plan build/proposed-run.json --run-id <unique-id> --budget <budget-file> --stage generation --cases <development-case-ids>
+.\.venv\Scripts\python.exe -m evals.live --plan build/proposed-run.json
+```
+
+Judge proposals require `--stage judge_calibration --annotations <human-file>`.
+Validation additionally requires `--prior-judge <completed-calibration-judge.json>`
+and eight human validation grades. Prior output must be live, contain exactly the
+twenty calibration items, and match packet/rubric/static/effective prompt hashes.
+Full requested judge-slice reservations and prompt byte-policy feasibility are
+checked before any proposal is written. No numeric budget or approval is supplied
+by default. Test feasibility arithmetic is not an authorization or recommendation
+for visitor headroom/output length.
+
+A budget specifies, for each approved fixed model, attempt/input/output ceilings
+and per-call input/output reservations; shared RPM/TPM/RPD/TPD, already consumed
+daily requests/tokens, positive visitor reserves, pacing, request timeout and total
+deadline. Both models share one conservative minute pool in this runner. Whole
+per-call ceilings are reserved before every provider attempt and never refunded.
+Reported usage is recorded separately. Prompt admission uses UTF-8 serialized
+payload bytes plus a conservative overhead allowance; this is **not a tokenizer
+measurement or a provider-enforced input cap**. Over-cap prompts are rejected,
+and reported usage above a reservation stops the run. This limitation must be
+explicitly acknowledged in any later budget approval. Output is capped through
+`max_completion_tokens`; truncated output stops rather than becoming a score.
+
+Execution additionally requires `--execute --approval <approval-file>` matching
+the exact plan hash, explicit reviewer/reference, a current one-day authorization
+window, fresh exact-account-limit evidence and acknowledgments for visitor
+allowance, draft corpus and input reservation policy. It rejects dirty/changed
+source, data, runtime or grading inputs. It reads the API key only from the process
+environment after these gates; no key is accepted/stored in plans. The owned SDK
+client pins Groq's host and disables SDK retries. This session has **no such
+authorization**, and no execution command was run.
+
+Each provider error, timeout, cancellation, missing/inconsistent usage, model
+mismatch, truncation or exhausted cap stops further attempts; production fallback
+handlers cannot reset the ledger. Known usage stays known; uncertain usage stays
+unknown. The overall deadline also ends at authorization expiry or UTC midnight.
+Client cleanup is owned, and a known ledger is saved before awaiting closure so a
+close failure/cancellation cannot erase it. Safe reason codes replace raw provider
+exception text.
+
+Receipts/results live only in ignored `build/eval-live`. A shared exclusive lock
+prevents concurrent runner instances in this workspace. Unique run directories
+are created before clients, so reusing a run ID cannot reset a budget. A conservative
+60-second cooldown after prior completion preserves minute limits across runs;
+unreconciled runs use their worst-case deadline. Current-day prior usage must
+include known local reservations; interrupted runs charge full approved ceilings.
+Runs intersecting UTC days count conservatively on both. A stale active lock or
+uncertain receipt requires inspection; there is no automatic resume, lock clearing
+or uncertainty reset. Do not delete/relocate receipts to reuse authorization.
+
+This is a **standalone runner guard**, not the missing production-wide ledger.
+It cannot measure concurrent visitor/other-workspace consumption; the later
+operator must verify remaining account capacity, preserve real visitor headroom
+and choose an appropriate run window. Native ONNX work in a thread is not forcibly
+terminated by an asyncio deadline; no provider call is admitted after expiration.
+Durable multi-host quota accounting, full publication provenance and result/CI
+contracts remain separate tracked work. No live calibration, generator accuracy,
+held-out outcome, public badge, schedule, push or deployment is implied here.
+
+- [Groq SDK retry/timeout controls](https://github.com/groq/groq-python#retries)
+- [Groq completion caps and usage](https://console.groq.com/docs/api-reference#chat-create)
+- [Organization/account-specific rate limits](https://console.groq.com/docs/rate-limits)
