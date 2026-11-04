@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "text_hash_format": "utf8-universal-newlines-v1",
+  "suite_version": "phase8-v1",
+  "frozen_at": "2026-11-04T08:49:05.358428Z",
+  "case_files": {
+    "development.yaml": "0c4045e4f4ab5c21d62191c0c964551dc98069fa1c51aabcda37b223252bacb8",
+    "held_out.yaml": "e67c293029e39f17da0f25575bc76ac0af2983748402a38da6d4a7511ed86490"
+  },
+  "cases": [
+    {
+      "id": "eval-01-degree-grad",
+      "version": 1,
+      "group_id": "degree",
+      "split": "development",
+      "sha256": "b7cad341da23eb270cec88b8e0ffdedf05f97a9f52ac90c4789ae9299c43b52c"
+    },
+    {
+      "id": "eval-02-cgpa",
+      "version": 1,
+      "group_id": "academic-grade",
+      "split": "development",
+      "sha256": "8f97780018415b7e33c5dc62114ce97751eb77cc8477602eb2883427a2a1e4e6"
+    },
+    {
+      "id": "eval-03-location",
+      "version": 1,
+      "group_id": "location",
+      "split": "development",
+      "sha256": "a15c7c947c5648bf6631574360fd393851e356f4faafb0bd57a2dde8460d4618"
+    },
+    {
+      "id": "eval-05-reputation",
+      "version": 1,
+      "group_id": "professional-identity",
+      "split": "development",
+      "sha256": "0ec6a260a00c088db69d7a97f8851153fc9ad3ab8298bbe67d3a72f39a3a833e"
+    },
+    {
+      "id": "eval-06-algouniversity-role",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "afab4c1977300de5b10c7275a43a7ad7b71d235b65d7c009b0ae132464cfba12"
+    },
+    {
+      "id": "eval-07-entropy-oj-pitch",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "49de0cf2b8c0ff073360b38362007021f3b8a477bf68f27cee0e98913f254d7d"
+    },
+    {
+      "id": "eval-08-entropy-oj-tech",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "722492a129cb69609a97afc4066dd141eb92c08e44d31f6ae5c2015533819f67"
+    },
+    {
+      "id": "eval-09-entropy-oj-execution",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "76dfe966836fb59565832abef97b014527be1f93a84e01a0f8a6044e5f17bd05"
+    },
+    {
+      "id": "eval-10-entropy-oj-ai-features",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "1b96229f3bb96a05e14bfdef83e7d72b27b77abc5ea913b01dd27d9b6dbbe2a7"
+    },
+    {
+      "id": "eval-11-socratic-copilot-leakage",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "0f74d972510e285280aae02eb395ca4c57537b04e7fb8d92d93bbdbd968cd166"
+    },
+    {
+      "id": "eval-12-hardest-bug",
+      "version": 1,
+      "group_id": "redis-debug",
+      "split": "development",
+      "sha256": "49dbdcc14c95457731cd8692940c79f8add1ec08a894fda92b91ed7f4d5a54c5"
+    },
+    {
+      "id": "eval-13-adversarial-latency-metric",
+      "version": 1,
+      "group_id": "redis-debug",
+      "split": "development",
+      "sha256": "4ec9ba8d40c3e5ca31439613a9301d3abf341019abbe6d90030246414c779234"
+    },
+    {
+      "id": "eval-14-concurrency-limits",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "fccd29255bd0ab75636099e17c549e9b4ba1141e68d4040ae24e696ae577ab20"
+    },
+    {
+      "id": "eval-15-test-suite-status",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "91416413d4f91c8ad634ebc403a323c8a6901263ec0c4223f73f2d723bef033e"
+    },
+    {
+      "id": "eval-16-why-redis-bullmq",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "b6e4354928a8a6d2d2ede46376d4287852249482c0282ebcf360a4bdec3702b3"
+    },
+    {
+      "id": "eval-17-healthtracker-demo",
+      "version": 1,
+      "group_id": "healthtracker",
+      "split": "development",
+      "sha256": "bc63003579941f9b6e232e711f50206e49107aa6b33f2d5a15e089b0b751f608"
+    },
+    {
+      "id": "eval-18-healthtracker-offline",
+      "version": 1,
+      "group_id": "healthtracker",
+      "split": "development",
+      "sha256": "580af1344a1f15c4f1a6f976a35a37586f37babb7aadc61221f021bd372bfbf1"
+    },
+    {
+      "id": "eval-19-health-premium-predictor",
+      "version": 1,
+      "group_id": "premium",
+      "split": "development",
+      "sha256": "633fbf18254bfa9280910ae50c68c727ab5e6e0d74408fa8657c9297265314d1"
+    },
+    {
+      "id": "eval-20-r2-score-meaning",
+      "version": 1,
+      "group_id": "premium",
+      "split": "development",
+      "sha256": "f49b83efc00635626055d7e1f54dc6743dc139a8bd5ebd0488d548c091ac1806"
+    },
+    {
+      "id": "eval-21-adversarial-accuracy",
+      "version": 1,
+      "group_id": "premium",
+      "split": "development",
+      "sha256": "6be2963f0727f8c7ff83b7fa1b7b78be98ae517a62c0e6d9119c069211ddd77e"
+    },
+    {
+      "id": "eval-22-portfolio-assistant-purpose",
+      "version": 1,
+      "group_id": "assistant-design",
+      "split": "development",
+      "sha256": "5c5242b8da7febffb4091705bb049a414293d2a1075d5c851b39837adecfa85c"
+    },
+    {
+      "id": "eval-23-why-rag",
+      "version": 1,
+      "group_id": "rag",
+      "split": "development",
+      "sha256": "c26c01ce331d7797fbd304f3de75635c0697d4944a78edd3781f86d6b4c0efb4"
+    },
+    {
+      "id": "eval-24-retrieval-method",
+      "version": 1,
+      "group_id": "rag",
+      "split": "development",
+      "sha256": "5fa0edf5ae9064907eeedbef8c64bf827d917692b796679905aa5c21e30f75e5"
+    },
+    {
+      "id": "eval-25-coding-tools",
+      "version": 1,
+      "group_id": "coding-tools",
+      "split": "development",
+      "sha256": "f66c8b1eb8e390dd765083dbf976158877c84f350e28d975b5c27aefd8587ec7"
+    },
+    {
+      "id": "eval-26-ibm-cert-status",
+      "version": 1,
+      "group_id": "certification",
+      "split": "development",
+      "sha256": "58ff1b9a0f7b869c3f6315960e01218a1d969d87401abc9f0f3f5177253b67d6"
+    },
+    {
+      "id": "eval-27-career-direction",
+      "version": 1,
+      "group_id": "professional-identity",
+      "split": "development",
+      "sha256": "a266cb21a9849754efd70362211c6fb63afa2efc3939abe29c023f410f8b6e4f"
+    },
+    {
+      "id": "eval-28-ml-project",
+      "version": 1,
+      "group_id": "premium",
+      "split": "development",
+      "sha256": "f4b220ee0cec8d04d0e0eb5ce7929db46a074cf38ff230498afe181fd647447e"
+    },
+    {
+      "id": "eval-29-hackathon-result",
+      "version": 1,
+      "group_id": "hackathon",
+      "split": "development",
+      "sha256": "3f05bb0599c17035058a2c9fe9c55d96e864703ea4d9c50bf3abbbaf65917dbf"
+    },
+    {
+      "id": "eval-30-contest-result",
+      "version": 1,
+      "group_id": "graph-contest",
+      "split": "development",
+      "sha256": "0678b48c107b084ad1429bf0a3aba733c7002a19cac986b10aaa9c98145379cf"
+    },
+    {
+      "id": "eval-31-why-fullstack-ai",
+      "version": 1,
+      "group_id": "career-motivation",
+      "split": "development",
+      "sha256": "6aba61b53082d2e0663eefd6a61f3df65c7dfbbeea48a4e1a2e4b211f415b2dc"
+    },
+    {
+      "id": "eval-32-top-strengths",
+      "version": 1,
+      "group_id": "strengths",
+      "split": "development",
+      "sha256": "f77edda778b20523c5811316a0d7c5e8c70c3b466859b923efb102d4139b1b5e"
+    },
+    {
+      "id": "eval-33-weakness",
+      "version": 1,
+      "group_id": "weakness",
+      "split": "development",
+      "sha256": "7c85251174531a3149b96a7702427d89aa321e613a4681668b081a6a7cb15cff"
+    },
+    {
+      "id": "scope-cooking",
+      "version": 1,
+      "group_id": "scope-cooking",
+      "split": "development",
+      "sha256": "be1ec28c6281715fbfe5886a3e31a0275805ae81d7da91d14934105276364ecc"
+    },
+    {
+      "id": "persona-override",
+      "version": 1,
+      "group_id": "persona-override",
+      "split": "development",
+      "sha256": "933178f40b16f0b1fd6211df2e52eba4b98010810c77bcf105dda52d660d7ccc"
+    },
+    {
+      "id": "salary-demand",
+      "version": 1,
+      "group_id": "salary-demand",
+      "split": "development",
+      "sha256": "ec7ea31e6f8f38add8b05fe52f2bc3f768050b9c62862887877c894ccf0d36bd"
+    },
+    {
+      "id": "false-google-employer",
+      "version": 1,
+      "group_id": "google-employer",
+      "split": "development",
+      "sha256": "8075ac71fd5b0a9860a839c8df62615cd6d7971bd07676875be6f0f36ca5931e"
+    },
+    {
+      "id": "followup-entropy-stack",
+      "version": 1,
+      "group_id": "entropy",
+      "split": "development",
+      "sha256": "19cf6aaf67d71dd0b5bb4a660b390e6c117b20799d842700858964ab0d3b8b3e"
+    },
+    {
+      "id": "fit-cloud-negative",
+      "version": 1,
+      "group_id": "fit-cloud-negative",
+      "split": "development",
+      "sha256": "5b987d02da473e69bbb1da396ae893fbf40d85928c6e010b86ead6559a3df410"
+    },
+    {
+      "id": "fit-firmware-negative",
+      "version": 1,
+      "group_id": "fit-firmware-negative",
+      "split": "development",
+      "sha256": "96b994d175d8dc804ea9e855bf9c419fd4c9882bbcf011a07b7a44814efd255e"
+    },
+    {
+      "id": "protocol-premature-eof",
+      "version": 1,
+      "group_id": "protocol-eof",
+      "split": "development",
+      "sha256": "66dbb53a73756f02a4c4b34da3e4b1883b0d2c8b4dbd67f433d615e081a6f350"
+    },
+    {
+      "id": "reserved-01",
+      "version": 1,
+      "group_id": "reserved-dictation",
+      "split": "held_out",
+      "sha256": "04647720ed66a7261ebb930d74237fc8fec9909d1859d31a58086bd91f269b66"
+    },
+    {
+      "id": "reserved-02",
+      "version": 1,
+      "group_id": "reserved-dictation",
+      "split": "held_out",
+      "sha256": "d550007ac987c5daa574b616aa9e3e0a95601d80b239705dbcd36932f72d78bb"
+    },
+    {
+      "id": "reserved-03",
+      "version": 1,
+      "group_id": "reserved-school-background",
+      "split": "held_out",
+      "sha256": "e85a18ebba7c4c8692074058973d4e21ce86b93e323cdf462d1788d7d74a05c8"
+    },
+    {
+      "id": "reserved-04",
+      "version": 1,
+      "group_id": "reserved-school-background",
+      "split": "held_out",
+      "sha256": "3c5fc9137a8d3bff476287486b7549a0367094844425b50a44dc835179c91245"
+    },
+    {
+      "id": "reserved-05",
+      "version": 1,
+      "group_id": "reserved-communication",
+      "split": "held_out",
+      "sha256": "7dd78b093aff66141b283da1479f6c06165cb645ed2925acf92b4f7e81de8569"
+    },
+    {
+      "id": "reserved-06",
+      "version": 1,
+      "group_id": "reserved-communication",
+      "split": "held_out",
+      "sha256": "84540f8af502b8266551448f964b07e770f1b23e43630625d9658420ab0c21cb"
+    },
+    {
+      "id": "reserved-07",
+      "version": 1,
+      "group_id": "reserved-pressure",
+      "split": "held_out",
+      "sha256": "95b6b88b50d1255a3fcb8392249dc989aae4ae5f4dde183f594028b157415334"
+    },
+    {
+      "id": "reserved-08",
+      "version": 1,
+      "group_id": "reserved-pressure",
+      "split": "held_out",
+      "sha256": "1b58be1db7bc42d6a95a60f782634b74b50f88533f3bb0fca7203f41018aac20"
+    },
+    {
+      "id": "reserved-09",
+      "version": 1,
+      "group_id": "reserved-team-values",
+      "split": "held_out",
+      "sha256": "845f2ad04aa4977ee51c730757793ce148a0fcbd5214b5cd57c637cd0eabe504"
+    },
+    {
+      "id": "reserved-10",
+      "version": 1,
+      "group_id": "reserved-team-values",
+      "split": "held_out",
+      "sha256": "8629c88089038b22b0705f1547dbac59de533ad9bbcec223a3b046986977e53b"
+    }
+  ],
+  "legacy_seed_sha256": "137efb8c4cdb9e157b521ba377ca38ebf54168e1c52804bd8b980e2e74e3c636",
+  "corpus_snapshot_sha256": "41af5875e80b21e108d1199841564817334672e77a8f7cd9e9e9552186608725",
+  "index_snapshot_sha256": "72de0c82f6a5f1494667fc7070f39e658665566efa7688d1bc41ca55daaac882"
+}

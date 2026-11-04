@@ -3,6 +3,16 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-036: Frozen evaluation inputs and fail-closed embedding provenance
+
+**Date:** 2026-11-04
+**Context:** Phase 8's offline brief was approved. The legacy 45-question retrieval set is known development material, every public fact is still draft, and the existing embedding archive bound IDs to vectors without validating same-ID content changes.
+**Choice:** Create 40 development cases and 10 newly authored held-out cases, grouped before tuning. Preserve provisional labels and draft facts. Freeze case/group/split hashes plus corpus/index snapshots; reject duplicate IDs, group/conversation overlap, copied legacy inquiries and unknown/nonpublic source labels. Default loading excludes held-out content; explicit reserved validation checks structure/provenance only. Separate all-relevant source sets from acceptable alternatives and semantic expectations from literal substring checks. Text fingerprints normalize Git CRLF/LF differences; the NPZ uses exact byte and matrix hashes.
+**Index implementation:** Share artifact validation and embedding-input construction between builder/runtime. Rebuild vectors from cached local model assets, embedding corpus/input/model-asset/matrix fingerprints, FastEmbed version, UTC build time and source commit/dirty state in the archive. Production runtime rejects legacy/stale/corrupt artifacts instead of re-embedding the corpus, and uses local-only query model loading with asset fingerprint verification. Keep fake model injection. Isolate FastEmbed 0.9.1's private resolved-directory accessor in one helper. Move CI's previously implicit model-asset acquisition to an explicit setup step; no live Groq workflow is added. Pin the already-used PyYAML dependency.
+**Trade-offs and limits:** A reserved set visible to its author is not an independently blind benchmark; paraphrase grouping still needs manual review. Hashes establish identity, not fact approval, semantic entailment or authenticity. Initial index provenance records `88fae8c` plus a dirty working tree, not a clean-commit accuracy run. Production concurrency/readiness/resource bounds and quota accounting remain separate work. No judge calibration, live result, public accuracy badge, new framework or database is introduced. Approval to start Phase 8 does not complete the pending remediation teach-back/tag.
+
+---
+
 ### DRN-035: Requirement-local evidence and explicit failure/stream completion
 
 **Date:** 2026-11-03

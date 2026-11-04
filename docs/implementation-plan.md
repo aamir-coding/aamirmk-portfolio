@@ -431,6 +431,8 @@ The outcome is a site that cannot exhaust your free quota or be made to misrepre
 
 ## Phase 8: Evals, under-the-hood panel and eval badge
 
+**Current authorization (2026-11-04):** The [scoped Phase 8 brief](briefs/phase-08-evals.md) is approved for offline implementation on `phase-8-evals`, beginning with Increment 1. Human calibration is pending user input at Increment 4. All live Groq evaluation runs require a separate concrete budget approval. Draft facts and curated fit samples are not approved ground truth; offline/replay results must not be presented as fresh model accuracy.
+
 The outcome is proof that the assistant is accurate, plus a panel that lets technical interviewers see how it works. Evals are the habit that most separates AI engineers from people who only call an API. Effort: 3 to 4 days.
 
 **Inputs:** your 40 or more questions, the attack set from Phase 7, the golden fit reports from Phase 6, and the real questions you collect once logging is live.

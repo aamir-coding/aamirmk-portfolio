@@ -1,0 +1,312 @@
+{
+  "schema_version": 1,
+  "scope": "public_indexed_including_drafts",
+  "approval_status": "not_factually_approved",
+  "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+  "chunks": [
+    {
+      "id": "achieve-academic-excellence",
+      "draft": true
+    },
+    {
+      "id": "achieve-google-cloud-hackathon",
+      "draft": true
+    },
+    {
+      "id": "achieve-graph-contest",
+      "draft": true
+    },
+    {
+      "id": "education-certifications",
+      "draft": true
+    },
+    {
+      "id": "education-clubs",
+      "draft": true
+    },
+    {
+      "id": "education-coursework",
+      "draft": true
+    },
+    {
+      "id": "education-degree",
+      "draft": true
+    },
+    {
+      "id": "education-no-backlogs",
+      "draft": true
+    },
+    {
+      "id": "education-school-background",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-built",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-cloud-arch",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-concurrency",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-hardest-bug",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-improvements",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-mentor-feedback",
+      "draft": true
+    },
+    {
+      "id": "exp-algouniversity-role",
+      "draft": true
+    },
+    {
+      "id": "hr-career-goals-and-preferences",
+      "draft": true
+    },
+    {
+      "id": "hr-handling-pressure-and-deadlines",
+      "draft": true
+    },
+    {
+      "id": "hr-outside-coding-and-curiosity",
+      "draft": true
+    },
+    {
+      "id": "hr-tell-me-about-yourself",
+      "draft": true
+    },
+    {
+      "id": "hr-weakness-and-mitigation",
+      "draft": true
+    },
+    {
+      "id": "hr-why-cs-and-ai-engineering",
+      "draft": true
+    },
+    {
+      "id": "hr-why-hire-and-strengths",
+      "draft": true
+    },
+    {
+      "id": "opinion-ai-engineering-misconception",
+      "draft": true
+    },
+    {
+      "id": "opinion-ai-generated-code",
+      "draft": true
+    },
+    {
+      "id": "opinion-fastapi-react-db",
+      "draft": true
+    },
+    {
+      "id": "opinion-production-debugging",
+      "draft": true
+    },
+    {
+      "id": "opinion-rag-vs-finetuning",
+      "draft": true
+    },
+    {
+      "id": "opinion-system-design",
+      "draft": true
+    },
+    {
+      "id": "opinion-testing-philosophy",
+      "draft": true
+    },
+    {
+      "id": "opinion-what-makes-code-good",
+      "draft": true
+    },
+    {
+      "id": "personal-background",
+      "draft": true
+    },
+    {
+      "id": "personal-hobbies-and-curiosity",
+      "draft": true
+    },
+    {
+      "id": "personal-values-and-teamwork",
+      "draft": true
+    },
+    {
+      "id": "profile-communication",
+      "draft": true
+    },
+    {
+      "id": "profile-contact",
+      "draft": true
+    },
+    {
+      "id": "profile-identity",
+      "draft": true
+    },
+    {
+      "id": "profile-links",
+      "draft": true
+    },
+    {
+      "id": "profile-location-relocation",
+      "draft": true
+    },
+    {
+      "id": "profile-work-availability",
+      "draft": true
+    },
+    {
+      "id": "proj-ai-assistant-architecture",
+      "draft": true
+    },
+    {
+      "id": "proj-ai-assistant-design",
+      "draft": true
+    },
+    {
+      "id": "proj-ai-assistant-links",
+      "draft": true
+    },
+    {
+      "id": "proj-ai-assistant-overview",
+      "draft": true
+    },
+    {
+      "id": "proj-ai-assistant-status",
+      "draft": true
+    },
+    {
+      "id": "proj-browser-games-overview",
+      "draft": true
+    },
+    {
+      "id": "proj-browser-games-status",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-ai-features",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-debug-story",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-design",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-interview-qa",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-links",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-pitch",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-security",
+      "draft": true
+    },
+    {
+      "id": "proj-entropy-oj-stack",
+      "draft": true
+    },
+    {
+      "id": "proj-health-premium-links",
+      "draft": true
+    },
+    {
+      "id": "proj-health-premium-metrics",
+      "draft": true
+    },
+    {
+      "id": "proj-health-premium-overview",
+      "draft": true
+    },
+    {
+      "id": "proj-healthtracker-links",
+      "draft": true
+    },
+    {
+      "id": "proj-healthtracker-overview",
+      "draft": true
+    },
+    {
+      "id": "proj-healthtracker-status",
+      "draft": true
+    },
+    {
+      "id": "proj-keynone-overview",
+      "draft": true
+    },
+    {
+      "id": "proj-secure-auction-overview",
+      "draft": true
+    },
+    {
+      "id": "proj-secure-auction-status",
+      "draft": true
+    },
+    {
+      "id": "proj-vayusetu-overview",
+      "draft": true
+    },
+    {
+      "id": "skill-ai-assisted-dev",
+      "draft": true
+    },
+    {
+      "id": "skill-ai-llm-engineering",
+      "draft": true
+    },
+    {
+      "id": "skill-cloud-devops-tools",
+      "draft": true
+    },
+    {
+      "id": "skill-core-cs",
+      "draft": true
+    },
+    {
+      "id": "skill-currently-learning",
+      "draft": true
+    },
+    {
+      "id": "skill-databases",
+      "draft": true
+    },
+    {
+      "id": "skill-frameworks-libraries",
+      "draft": true
+    },
+    {
+      "id": "skill-not-claimed",
+      "draft": true
+    },
+    {
+      "id": "skill-programming-languages",
+      "draft": true
+    },
+    {
+      "id": "skill-ramp-up-narratives",
+      "draft": true
+    },
+    {
+      "id": "skill-strongest-summary",
+      "draft": true
+    }
+  ]
+}

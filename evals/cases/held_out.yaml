@@ -1,0 +1,206 @@
+version: phase8-v1
+cases:
+- id: reserved-01
+  version: 1
+  group_id: reserved-dictation
+  split: held_out
+  category: technical
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: Does Keynone send audio to a cloud service, and what runs the transcription?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - proj-keynone-overview
+    support_expectations:
+    - Local CPU processing with open models; audio/text stays on the user's computer.
+- id: reserved-02
+  version: 1
+  group_id: reserved-dictation
+  split: held_out
+  category: factual
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: How does Keynone place cleaned dictation into another application?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - proj-keynone-overview
+    support_expectations:
+    - It cleans filler/repetitions, applies self-corrections and punctuation, and types where the cursor
+      is.
+- id: reserved-03
+  version: 1
+  group_id: reserved-school-background
+  split: held_out
+  category: factual
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: Which school did Aamir attend in Muscat, and when did he complete Class 10?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - personal-background
+    support_expectations:
+    - Indian School Al Wadi Al Kabir, Muscat; Class 10 in 2021. Draft corpus expectation only.
+- id: reserved-04
+  version: 1
+  group_id: reserved-school-background
+  split: held_out
+  category: factual
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: Where did Aamir finish Class 12, and in what year?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - personal-background
+    support_expectations:
+    - Sindhi High School in Hebbal, Bengaluru; 2023. Draft corpus expectation only.
+- id: reserved-05
+  version: 1
+  group_id: reserved-communication
+  split: held_out
+  category: factual
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: What time zone should an interviewer use to schedule a call with Aamir?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - profile-communication
+    support_expectations:
+    - India Standard Time, UTC+05:30.
+- id: reserved-06
+  version: 1
+  group_id: reserved-communication
+  split: held_out
+  category: factual
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: What communication languages are documented, and which does this assistant use by default?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - profile-communication
+    support_expectations:
+    - Fluent professional English, conversational Hindi; assistant defaults to English. Do not invent
+      other fluencies.
+- id: reserved-07
+  version: 1
+  group_id: reserved-pressure
+  split: held_out
+  category: hr
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: How does Aamir prioritize work when the deadline is tight?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - hr-handling-pressure-and-deadlines
+    support_expectations:
+    - Identify outcomes/dependencies/risks, break into verifiable milestones, prioritize the primary user
+      journey and integration testing.
+- id: reserved-08
+  version: 1
+  group_id: reserved-pressure
+  split: held_out
+  category: hr
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: What teamwork response is documented when a hackathon teammate dropped out?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - hr-handling-pressure-and-deadlines
+    support_expectations:
+    - Rebalance tasks among remaining teammates and submit a functioning prototype; do not invent a new
+      team anecdote.
+- id: reserved-09
+  version: 1
+  group_id: reserved-team-values
+  split: held_out
+  category: hr
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: What kind of code-review culture does Aamir prefer?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - personal-values-and-teamwork
+    support_expectations:
+    - Timely constructive review, clear ownership, open communication and empirical verification.
+- id: reserved-10
+  version: 1
+  group_id: reserved-team-values
+  split: held_out
+  category: hr
+  target: chat
+  origin:
+    kind: authored
+    reference: Existing public draft corpus; provisional case authoring, 2026-11-04
+  label_status: provisional
+  conversation:
+  - role: user
+    content: How does Aamir describe responding to direct feedback from teammates?
+  checks:
+    sources:
+      mode: all_relevant
+      ids:
+      - personal-values-and-teamwork
+    support_expectations:
+    - Treat feedback as an opportunity to improve work; separate ego from implementation.

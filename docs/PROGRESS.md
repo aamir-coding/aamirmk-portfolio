@@ -1,13 +1,15 @@
 # Progress Tracker
 
 ## Current Phase
-**Handoff Remediation Sprint** — implementation and local verification complete; architecture review passed. User authorized integration into `main` and remote push on 2026-11-03. Source branch: `codex/handoff-remediation`. Interactive teach-back and completion tag are pending. Phase 8 has not started.
+**Phase 8: Evals, under-the-hood panel and eval badge** — brief approved on 2026-11-04. User explicitly authorized starting Increment 1 on `phase-8-evals`, offline, while remediation close-out remains pending. Increment 1 is implemented and locally verified: versioned cases, a reserved split and corpus/index provenance. Human calibration grading will be provided at Increment 4. No live Groq run or budget is authorized.
+
+**Handoff Remediation Sprint** — implementation and historical local verification complete; architecture review passed. User authorized integration into `main` and remote push on 2026-11-03. Source branch: `codex/handoff-remediation`. Interactive teach-back and completion tag remain pending; Phase 8 authorization does not mark them complete.
 
 Approved scope: preset evidence/narratives, requirement-local citation validation, fail-closed extraction, colon-token preservation, EOF recovery, and JSON 422 responses. See [sprint study guide](study-guides/handoff-remediation.md) and [handoff retrospective](audits/2026-11-03-handoff-retrospective.md).
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: finish remediation teach-back and review outstanding audit gates before a Phase 8 brief.
+Next: Increment 2, retrieval metrics under the [approved Phase 8 brief](briefs/phase-08-evals.md). Remediation teach-back and completion tag remain pending.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -32,7 +34,7 @@ Next: finish remediation teach-back and review outstanding audit gates before a 
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | ⬜ Next Up (Band 3) | — | — | — |
+| P8: Evals | 🟡 In Progress — Increment 1 | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -189,9 +191,15 @@ Next: finish remediation teach-back and review outstanding audit gates before a 
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Complete the remediation teach-back; then create the local `handoff-remediation-done` tag.
-2. User authorized this sprint's merge into `main` and remote push. Deployment status must be verified separately. `phase-6-done` already exists locally.
-3. Resolve or explicitly disposition the remaining audit items before approving Phase 8 implementation.
+1. Increment 1 is implemented, reviewed and locally verified; Increment 2 adds retrieval metric computation. Phase 8 is approved for offline work only.
+2. Remediation teach-back and local `handoff-remediation-done` tag remain pending. Its authorized integration is recorded at `88fae8c`; user-reported live acceptance is below. Phase 8 start was explicitly authorized despite that pending close-out.
+3. Human calibration grading is a later user input at Increment 4. Fact approval/provenance and a concrete live budget require separate review; no blanket approval of draft facts or live model calls is implied.
+
+## User-Reported Live Acceptance — 2026-11-04
+- Aamir reports personally verifying that the live website works, including formatting, raw Markdown handling, continued chat context, links, and contact details.
+- Evidence type: user-reported acceptance, provided in this chat on 4 November 2026. This is not agent-run browser QA, a semantic accuracy evaluation, factual approval of the 76 draft chunks, or independent verification of the deployed commit.
+- The previous 253 backend/eval tests, 132 frontend tests, lint/typecheck/build results and 162.99 kB gzip measurement remain historical sprint evidence; they were not rerun during Phase 8 preparation.
+- Preparation checks: clean `main` at `88fae8c` before documentation edits; local read-only loading confirmed 76 public indexed chunks, all 76 draft, 45 existing retrieval cases, and an embedding archive containing only `ids` and `matrix`. No tests or live Groq calls were run during preparation.
 
 ## Handoff Remediation — 2026-11-03
 - Preset assessments use real current fact IDs and conservative narratives. Scores/headlines are computed from verdicts. All first three samples now rate Partial Match; embedded firmware remains Low Match. Facts were not silently promoted from draft.
@@ -208,13 +216,25 @@ Next: finish remediation teach-back and review outstanding audit gates before a 
 - [ ] Resolve approval/provenance for all 76 draft public fact chunks; reconcile stale fact descriptions with verified implementation.
 - [ ] Per-provider-call quota admission/accounting, concurrent reservations, deadlines and client lifecycle.
 - [ ] Semantic evidence support and known-negative constraints; generated summaries/ramp-up can still overclaim.
-- [ ] Embedding content/model fingerprint, bounded initialization/inference, BM25 degradation, truthful readiness and Linux 512 MB cgroup testing.
+- [ ] Embedding content/model fingerprint and rebuild validation are implemented in Phase 8 Increment 1; bounded initialization/inference, BM25 degradation, truthful readiness and Linux 512 MB cgroup testing remain deferred.
 - [ ] Verify production trusted-proxy chain and canonical IP identity.
 - [ ] Cache identity/versioning/bounds, accurate cached flags, and an actual bypass for “Re-Run Live.”
 - [ ] Remaining Markdown/code/URL repairs, session-history validation and message-length limits.
 - [ ] CRLF SSE conformance, complete cancellation/idle-timeout policy, preprocessing heartbeats and upstream close ownership.
 - [ ] Cross-language event fixtures, root evals and gzip-budget gates in CI; fit-dialog focus behavior and browser/device QA.
 - [ ] Apply remaining governing-document corrections and clarify Phase 10's dependencies on deferred Phase 9 work.
+
+## Phase 8 Increment 1 — 2026-11-04
+- Created `phase-8-evals`; only local work/commits are authorized. The approved brief, scoped audit disposition and authorization to start despite pending remediation close-out are recorded.
+- Added 50 versioned cases: 40 development (32 legacy plus eight authored) and 10 new held-out cases in five separate groups. All labels are provisional; all 76 public chunks retain draft flags. No curated fit report was promoted to calibrated ground truth. The held-out set is author-visible and reserved from tuning, not independently blind.
+- Added strict case/source validation, explicit all-relevant versus alternative source semantics, overlap checks against all 45 legacy inquiries, write-once split manifests and corpus/index snapshots. Default loading selects development only. Reserved validation checks structure/hashes/IDs, not answers. Text hashes survive Git CRLF/LF conversion; binary artifact hashes remain exact.
+- Shared builder/runtime index validation now rejects same-ID content edits, model/library/asset changes, missing/legacy/corrupt/truncated artifacts and invalid matrices. Rebuilt the actual `(76, 384)` vectors from cached local ONNX assets; no model download or Groq call. Runtime never re-embeds the corpus or downloads query assets. General resource/readiness guarantees remain deferred.
+- Explicit CI embedding-asset setup replaces implicit test-time model downloads. Root eval/gzip gates remain Increment 5 work. Pinned the already-used `PyYAML==6.0.3`; no package installation or new dependency was required.
+- Test-first evidence: initial missing-module collection failures; three architecture findings reproduced as failing regressions, fixed and independently rechecked; Git newline-conversion regression reproduced then fixed without changing case content/splits/freeze time. Read-only review has no remaining blocker within Increment 1 scope.
+- Fresh final verification: `.venv/Scripts/python.exe -m pytest backend/tests evals -q` with `FASTEMBED_CACHE_PATH` pointing at the existing local cache → **300 passed, 1 warning in 13.57s**. This includes the new 47 regressions. The sandbox run stalled and was interrupted; a 10-second minimal asyncio probe located the known Windows `_fallback_socketpair -> accept` deadlock. Only the completed outside-sandbox run is counted.
+- Fresh frontend regression run: `npm test` → **132 passed, 18 files, 32.97s**. No frontend source changed. Frontend lint/typecheck/build/gzip checks were not rerun for this increment; previous build metrics remain historical.
+- Fresh Ruff checks on backend/new eval modules/builder → **All checks passed**; formatter check → **68 files already formatted**. `git diff --check` passed. `python -m evals.validate` reports 40 development selected, 10 reserved, 76 public/76 draft; explicit structural validation covers all 50.
+- See DRN-036, [eval dataset README](../evals/README.md) and [incremental study guide](study-guides/phase-08-evals.md). Phase 8 review/teach-back/tagging are incomplete. No live evaluation, model accuracy result, badge, push or deployment was performed.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
@@ -238,4 +258,4 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-Phase 8 acceptance remains gated by the outstanding handoff audit work above. The approved six-defect remediation scope is locally verified.
+Offline Phase 8 is authorized under the approved brief's scoped audit disposition. No live Groq generation/judging is authorized; a separate numeric budget is required. Human calibration grading is pending for Increment 4. Public factual accuracy remains gated by fact approval/provenance, human-calibrated labels/judging and genuine compatible results. Remediation teach-back/tagging remain pending but do not override the user's explicit authorization to begin Phase 8.
