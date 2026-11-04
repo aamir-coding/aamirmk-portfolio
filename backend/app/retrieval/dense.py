@@ -7,6 +7,13 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from app.retrieval.artifacts import (
+    EmbeddingManifest,
+    IndexArtifactError,
+    embedding_text,
+    load_embedding_artifact,
+    model_assets_sha256,
+)
 from app.retrieval.models import FactChunk, RetrievedChunk
 
 if TYPE_CHECKING:
@@ -43,6 +50,9 @@ class DenseIndex:
         self.cache_dir = cache_dir
         self.embeddings_path = Path(embeddings_path) if embeddings_path else None
         self._model = embedding_model
+        self._injected_model = embedding_model is not None
+        self._manifest: EmbeddingManifest | None = None
+        self._model_assets_sha256: str | None = None
         self.chunks: list[FactChunk] = []
         self._matrix: np.ndarray | None = None
 
@@ -54,11 +64,27 @@ class DenseIndex:
         if self._model is None:
             from fastembed import TextEmbedding
 
-            # Single thread prevents multi-core arena memory explosion (>512MB)
-            self._model = TextEmbedding(
-                model_name=self.model_name,
-                cache_dir=self.cache_dir,
-                threads=1,
+            try:
+                model = TextEmbedding(
+                    model_name=self.model_name,
+                    cache_dir=self.cache_dir,
+                    threads=1,
+                    local_files_only=True,
+                )
+                fingerprint = model_assets_sha256(model)
+            except Exception as exc:
+                raise IndexArtifactError(
+                    "Cannot load cached local embedding model assets; "
+                    "provision them at build time."
+                ) from exc
+            self._model = model
+            self._model_assets_sha256 = fingerprint
+        if not self._injected_model and (
+            self._manifest is None
+            or self._model_assets_sha256 != self._manifest.model_assets_sha256
+        ):
+            raise IndexArtifactError(
+                "Cached model assets differ from the embedding index build."
             )
         return self._model
 
@@ -78,38 +104,28 @@ class DenseIndex:
 
     def index(self, chunks: list[FactChunk]) -> None:
         """Build or load normalized dense embedding matrix over fact chunks."""
-        self.chunks = list(chunks)
-        if not self.chunks:
+        if not chunks:
+            self.chunks = []
             self._matrix = None
+            self._manifest = None
             return
 
-        # Fast path: load precomputed embeddings if available and matching
-        if (
-            self.embeddings_path
-            and self.embeddings_path.exists()
-            and self._model is None
-        ):
-            try:
-                data = np.load(self.embeddings_path)
-                saved_ids = [str(x) for x in data["ids"]]
-                saved_matrix = data["matrix"]
-                id_to_row = {cid: saved_matrix[i] for i, cid in enumerate(saved_ids)}
-
-                if all(c.id in id_to_row for c in self.chunks):
-                    self._matrix = np.array(
-                        [id_to_row[c.id] for c in self.chunks], dtype=np.float32
-                    )
-                    return
-            except Exception:
-                # If precomputed load fails or is incompatible, fallback to computing
-                pass
-
-        texts: list[str] = []
-        for chunk in self.chunks:
-            tag_str = " ".join(chunk.tags)
-            texts.append(f"{chunk.title} {tag_str} {chunk.content}")
-
-        self._matrix = self._embed_texts(texts)
+        if self._injected_model:
+            matrix = self._embed_texts([embedding_text(chunk) for chunk in chunks])
+            manifest = None
+        else:
+            if self.embeddings_path is None:
+                raise IndexArtifactError(
+                    "A precomputed embedding artifact is required."
+                )
+            matrix, manifest = load_embedding_artifact(
+                self.embeddings_path,
+                chunks,
+                model_name=self.model_name,
+            )
+        self.chunks = list(chunks)
+        self._matrix = matrix
+        self._manifest = manifest
 
     def search(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
         """Search chunks by cosine similarity to the query embedding."""

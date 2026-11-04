@@ -36,6 +36,11 @@ jobs:
       - name: Run Ruff formatter check
         run: ruff format --check backend
 
+      - name: Provision embedding assets before offline runtime tests
+        run: >-
+          python -c "from fastembed import TextEmbedding;
+          TextEmbedding(model_name='BAAI/bge-small-en-v1.5', threads=1)"
+
       - name: Run pytest test suite
         run: |
           cd backend
