@@ -1,14 +1,12 @@
 """Retrieval evaluation suite and latency benchmarks.
 
-Evaluates the in-process hybrid retriever against the 45 labeled test queries
-in evals/seed_questions.yaml, asserting Hit Rate@5 >= 90%, MRR >= 0.80, and
-average CPU latency < 25ms.
+Evaluates the hybrid retriever against all 45 legacy development queries.
+Portable quality gates are separate from machine-dependent latency reports.
 """
 
 from __future__ import annotations
 
 import sys
-import time
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +21,7 @@ if str(_BACKEND_DIR) not in sys.path:
 
 from app.retrieval.hybrid import HybridRetriever  # noqa: E402
 from app.retrieval.loader import FactLoader  # noqa: E402
+from evals.run import evaluate_suite, load_legacy_cases  # noqa: E402
 
 
 def _load_seed_questions() -> list[dict[str, Any]]:
@@ -48,91 +47,21 @@ def retriever() -> HybridRetriever:
 
 @pytest.mark.asyncio
 async def test_retrieval_benchmark_aggregate(retriever: HybridRetriever) -> None:
-    """Benchmark full retrieval suite asserting Hit Rate@5, MRR, and latency targets."""
-    # Warm up ONNX session so benchmark measures steady-state latency
-    await retriever.retrieve("warmup query", top_k=1)
-
-    hits = 0
-    reciprocal_ranks: list[float] = []
-    latencies_ms: list[float] = []
-    category_stats: dict[str, dict[str, Any]] = {}
-    failures: list[dict[str, Any]] = []
-
-    for item in _QUESTIONS:
-        q_id = item["id"]
-        query = item["question"]
-        expected = item.get("expected_chunk_ids", [])
-        intent = item.get("intent_tag", "other")
-
-        t_start = time.perf_counter()
-        results = await retriever.retrieve(query, top_k=5)
-        elapsed_ms = (time.perf_counter() - t_start) * 1000
-        latencies_ms.append(elapsed_ms)
-
-        retrieved_ids = [r.chunk.id for r in results]
-
-        first_rank: int | None = None
-        for rank, r_id in enumerate(retrieved_ids, start=1):
-            if r_id in expected:
-                first_rank = rank
-                break
-
-        if first_rank is not None:
-            hits += 1
-            rr = 1.0 / first_rank
-        else:
-            rr = 0.0
-            failures.append(
-                {
-                    "id": q_id,
-                    "query": query,
-                    "expected": expected,
-                    "retrieved": retrieved_ids,
-                }
-            )
-
-        reciprocal_ranks.append(rr)
-
-        if intent not in category_stats:
-            category_stats[intent] = {"total": 0, "hits": 0, "rr_sum": 0.0}
-        category_stats[intent]["total"] += 1
-        if first_rank is not None:
-            category_stats[intent]["hits"] += 1
-        category_stats[intent]["rr_sum"] += rr
-
-    total = len(_QUESTIONS)
-    hit_rate = hits / total
-    mrr = sum(reciprocal_ranks) / total
-    latencies_ms.sort()
-    avg_latency = sum(latencies_ms) / total
-    p50 = latencies_ms[int(total * 0.50)]
-    p95 = latencies_ms[int(total * 0.95)]
-    p99 = latencies_ms[int(total * 0.99)]
-
-    print(f"\n{'=' * 68}")
-    print(f"RETRIEVAL BENCHMARK REPORT ({total} Queries)")
-    print(f"{'=' * 68}")
-    print(f"Hit Rate@5:  {hits}/{total} = {hit_rate:.2%}  (Target: >= 90.0%)")
-    print(f"MRR:         {mrr:.4f}           (Target: >= 0.8000)")
+    """Keep every legacy top-five hit and add the approved top-three quality gate."""
+    report = await evaluate_suite(load_legacy_cases(), retriever, require_all_hit5=True)
+    print("Legacy development retrieval metrics:", report.metrics.model_dump())
     print(
-        f"Latency:     avg={avg_latency:.2f}ms, p50={p50:.2f}ms, p95={p95:.2f}ms, p99={p99:.2f}ms (Target: < 25.0ms)"
+        "Per-category metrics:",
+        {name: item.model_dump() for name, item in report.by_category.items()},
     )
-    print(f"{'-' * 68}")
-    print("Breakdown by Intent:")
-    for intent, stats in sorted(category_stats.items()):
-        cat_rate = stats["hits"] / stats["total"]
-        cat_mrr = stats["rr_sum"] / stats["total"]
-        print(
-            f"  {intent:15s}: {stats['hits']:2d}/{stats['total']:2d} ({cat_rate:6.1%})  MRR={cat_mrr:.3f}"
-        )
-    print(f"{'=' * 68}")
-
-    assert hit_rate >= 0.90, f"Hit Rate@5 ({hit_rate:.1%}) below 90% target"
-    assert mrr >= 0.80, f"MRR ({mrr:.4f}) below 0.80 target"
-    assert avg_latency < 25.0, (
-        f"Average latency ({avg_latency:.2f}ms) exceeded 25ms limit"
+    print("Warm retrieval latency (informational):", report.latency.model_dump())
+    assert report.evaluated_cases == len(_QUESTIONS) == 45
+    assert report.metrics.recall_at_3.value is None, (
+        "Legacy alternative IDs are not exhaustive relevance labels"
     )
-    assert len(failures) == 0, f"Failed queries: {failures}"
+    assert report.quality_passed, (
+        f"Failed quality gates: {report.failed_quality_checks}"
+    )
 
 
 @pytest.mark.asyncio
@@ -140,7 +69,7 @@ async def test_retrieval_benchmark_aggregate(retriever: HybridRetriever) -> None
 async def test_retrieval_query_hit(
     retriever: HybridRetriever, item: dict[str, Any]
 ) -> None:
-    """Verify each individual evaluation query retrieves at least one expected chunk in top 5."""
+    """Preserve the individual top-five hit regression for every legacy query."""
     query = item["question"]
     expected = item.get("expected_chunk_ids", [])
     results = await retriever.retrieve(query, top_k=5)

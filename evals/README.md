@@ -101,11 +101,52 @@ version-specific `model._model_dir` access and fails explicitly if unavailable.
 
 ## Remaining phase work
 
-Increment 2 adds metric computation/runner behavior. Replay checks and event
+Increment 2 adds metric computation/runner behavior, described below. Replay checks and event
 fixtures arrive in Increment 3; human grading and the separately budgeted live
 runner arrive in Increment 4. Final result provenance/CI gates, telemetry and the
 panel/badge follow. No score, baseline, live workflow, schedule or badge is created
 by Increment 1. Production quota/resource/lifecycle work remains tracked separately.
+
+## Increment 2 — retrieval diagnostics
+
+```powershell
+$env:FASTEMBED_CACHE_PATH = '<existing-cache>'
+.\.venv\Scripts\python.exe -m evals.run --output build/retrieval.json
+.\.venv\Scripts\python.exe -m evals.run --suite legacy --max-mean-ms 25
+```
+
+The runner validates frozen inputs and uses cached local ONNX assets; it has no
+live Groq mode or held-out execution flag. `--suite` selects `all` (default),
+`legacy`, or `development`. Both development sets overlap and remain separate in
+the report. It does not save or update a public `results.json` or badge. Optional
+`--output` saves complete per-case diagnostics; stdout contains the summary.
+
+Metrics are Hit@3/@5, MRR@5 and macro Recall@3/@5. Every score includes its numerator
+and eligible-case denominator. Recall excludes alternative-source labels; empty
+denominators produce null, not a perfect score. No-source cases, protocol cases,
+fit JDs needing extraction and conversations needing recorded rewriting are
+explicitly excluded from this raw-query measurement. No fake rewriting/extraction
+is substituted into real results. This does not measure application guardrails,
+semantic support, fit verdicts or generated answers.
+
+Portable quality gates are Hit@3 >=0.90 and MRR@5 >=0.80. The legacy suite also keeps
+its existing requirement that all 45 questions hit a listed source in the top five;
+the individual regression tests remain. Warmed mean/p50/p95/p99 latency is reported
+separately. The old default mean <25 ms assertion is replaced by the explicit
+`--max-mean-ms` benchmark option, whose outcome is separately recorded in JSON.
+
+The diagnostic includes commit/dirty status, retrieval-code hash, frozen dataset,
+corpus/index identities, embedding model, runtime/library versions and fixed RRF
+settings. Its type is `offline_retrieval_diagnostic`; label status remains
+provisional, held-out execution is false and Groq calls are zero. This is an input
+and retrieval measurement, not independently verified model accuracy. Complete
+combined-run provenance and CI/publication gates remain Increment 5 work.
+
+Exit status: 0 for passing requested gates; 1 for a completed measurement that
+fails a quality or explicitly requested latency gate; 2 for an execution/provenance
+error. Gate failures are still valid measurements and can be saved. An execution
+error writes no new report and leaves an existing report unchanged; do not mistake
+that earlier timestamp for a fresh successful run.
 
 Implementation references checked against installed versions: Pydantic 2.10.6,
 NumPy 2.5.4, FastEmbed 0.9.1 and PyYAML 6.0.3. PyYAML was already used by the

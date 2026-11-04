@@ -117,7 +117,7 @@ class DatasetManifest(CaseModel):
         return self
 
 
-def _read_manifest(root: Path) -> DatasetManifest:
+def load_manifest(root: Path = DEFAULT_ROOT) -> DatasetManifest:
     return DatasetManifest.model_validate_json(
         (root / "manifests" / "dataset-v1.json").read_text(encoding="utf-8")
     )
@@ -126,7 +126,7 @@ def _read_manifest(root: Path) -> DatasetManifest:
 def load_cases(
     root: Path = DEFAULT_ROOT, *, include_held_out: bool = False
 ) -> list[EvalCase]:
-    manifest = _read_manifest(root)
+    manifest = load_manifest(root)
     selected = (
         CASE_FILES if include_held_out else {"development": CASE_FILES["development"]}
     )
@@ -245,7 +245,7 @@ def freeze_dataset(root: Path = DEFAULT_ROOT) -> None:
 def verify_dataset(
     root: Path = DEFAULT_ROOT, *, include_held_out: bool = False
 ) -> dict[str, int]:
-    manifest = _read_manifest(root)
+    manifest = load_manifest(root)
     cases = load_cases(root, include_held_out=include_held_out)
     for filename, expected in (
         ("corpus-v1.json", manifest.corpus_snapshot_sha256),
