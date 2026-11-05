@@ -499,3 +499,23 @@ nonterminal or malformed unknowns and lifecycle failures. Prior charge becomes
 18,439 known + 7,512 unknown-reserved = 25,951; new local daily ceiling is 185,951.
 Original records remain unchanged. No new attempt refunds, retry or validation
 permission is added. Fresh hard deadline: **14:36:03 IST on 5 November**.
+
+
+### Strict schema and explicitly authorized recovery
+
+V4/JSON-object stopped on attempt five with HTTP 400 `json_validate_failed`:
+four grades, 3,857 known tokens, unknown call retaining 8,000. Exact records:
+`annotations/runs/calibration-2026-11-05-v4/`. Strict output now derives from typed
+JudgePayload/Labels. Effective recipe hashes instructions plus actual schema;
+runner snapshots, sends and hashes the same pair. Used v4/human inputs are intact.
+
+Aamir explicitly directed continuing through failures until twenty answers. New
+plans can opt into up to four recoveries and conservative request-bound input
+reservations, without refunds or quota/deadline reset. Defaults stay full-cap/no
+recovery. Retry JSON/contract/429/5xx/network failures; auth, missing usage and
+budget overruns remain hard stops. A 24-attempt ceiling reserves 135,424 input +
+24,576 output = 160,000; prior 37,808 includes both unknown calls in full, giving
+197,808 daily maximum, zero visitors. Full strict input bound 6,953 <= 6,976.
+Preflight covers base input 91,243 + four worst-case extras 27,904 = 119,147.
+`--judge-recovery-attempts 4` is recorded in the plan; input policy is in the budget.
+No validation/held-out calls or human/fact approvals are implied.
