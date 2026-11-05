@@ -1,0 +1,14 @@
+{
+  "purpose": "fully_reported_incomplete_output",
+  "run_id": "calibration-2026-11-05-a",
+  "receipt_sha256": "bb8891fdb9d195555a8a533307c488be3f165eaacbcfb88bb6355579d0a35286",
+  "result_sha256": "af6878934dacfe3c097abd3499d3accb0db1347c8b155208fdd309c2f9741cf0",
+  "ledger_sha256": "b7a486200710a610a71c23d291fc707ba01ab32eede19e244b4ecfaecc0178cf",
+  "actor": "Codex at Aamir's explicit direction",
+  "reference": "User requested immediate recovery after the hold was explained and reaffirmed listed account capacity. Original process exit was verified; every provider attempt has reconciled usage.",
+  "created_at": "2026-11-05T06:34:54.416787Z",
+  "process_exit_verified": true,
+  "charged_requests": 3,
+  "charged_reserved_tokens": 22536,
+  "reported_tokens": 3342
+}

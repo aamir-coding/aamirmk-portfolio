@@ -460,6 +460,200 @@ def test_prior_run_crossing_utc_midnight_counts_on_both_days(tmp_path: Path) -> 
         check_local_prior_usage(plan(), tmp_path, now)
 
 
+def stopped_run(directory: Path) -> Path:
+    from evals.budget import Attempt
+
+    old = directory / "test-run"
+    old.mkdir()
+    proposal = plan()
+    now = datetime.now(UTC)
+    receipt = {
+        "plan": proposal.model_dump(mode="json"),
+        "started_at": (now - timedelta(minutes=10)).isoformat(),
+        "approval": approval(proposal)
+        .model_copy(update={"approved_at": now - timedelta(minutes=11)})
+        .model_dump(mode="json"),
+    }
+    rows = [
+        Attempt(
+            number=1,
+            task_id="case",
+            model="openai/gpt-oss-120b",
+            start_seconds=0,
+            reserved_input=6000,
+            reserved_output=100,
+            request_sha256="0" * 64,
+            status="reported",
+            usage=Usage(prompt_tokens=20, completion_tokens=5, total_tokens=25),
+            reported_model="openai/gpt-oss-120b",
+            finished_seconds=1,
+        ).model_dump(mode="json")
+    ]
+    result = {
+        "kind": "live_eval_attempts",
+        "plan_sha256": canonical_sha256(receipt["plan"]),
+        "status": "stopped",
+        "stop_reason": "incomplete_provider_output",
+        "finished_at": (now - timedelta(minutes=5)).isoformat(),
+        "attempts": rows,
+        "ledger_sha256": canonical_sha256(rows),
+    }
+    (old / "receipt.json").write_text(json.dumps(receipt), encoding="utf-8")
+    (old / "result.json").write_text(json.dumps(result), encoding="utf-8")
+    return old
+
+
+def test_explicit_known_stop_reconciliation_keeps_attempt_reservations(
+    tmp_path: Path,
+) -> None:
+    from evals.live import build_known_stop_reconciliation, check_local_prior_usage
+
+    old = stopped_run(tmp_path)
+    original = [(old / name).read_bytes() for name in ("receipt.json", "result.json")]
+    proposal = plan().model_copy(
+        update={"budget": budget(prior_requests_today=1, prior_tokens_today=6100)}
+    )
+    with pytest.raises(ValueError, match="prior usage"):
+        check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+    record = build_known_stop_reconciliation(
+        old,
+        actor="TEST ONLY",
+        reference="TEST ONLY explicit reconciliation",
+        process_exit_verified=True,
+    )
+    assert record.charged_reserved_tokens == 6100
+    assert record.reported_tokens == 25
+    (old / "reconciliation.json").write_text(record.model_dump_json(), encoding="utf-8")
+    check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+    assert original == [
+        (old / name).read_bytes() for name in ("receipt.json", "result.json")
+    ]
+
+
+@pytest.mark.parametrize(
+    "fault",
+    [
+        "unknown",
+        "missing_usage",
+        "usage_total",
+        "wrong_reason",
+        "no_attempts",
+        "over_reservation",
+        "duplicate_number",
+        "plan_binding",
+        "approval_binding",
+        "reversed_wall",
+        "negative_start",
+        "reversed_attempt",
+        "overlap",
+    ],
+)
+def test_uncertain_stopped_runs_cannot_be_reconciled(
+    tmp_path: Path, fault: str
+) -> None:
+    from evals.live import build_known_stop_reconciliation
+
+    old = stopped_run(tmp_path)
+    result = json.loads((old / "result.json").read_text())
+    if fault == "unknown":
+        result["attempts"][0]["status"] = "unknown"
+    if fault == "missing_usage":
+        result["attempts"][0]["usage"] = None
+    if fault == "usage_total":
+        result["attempts"][0]["usage"]["total_tokens"] = 99
+    if fault == "wrong_reason":
+        result["stop_reason"] = "client_lifecycle_or_consumption_unknown"
+    if fault == "no_attempts":
+        result["attempts"] = []
+    if fault == "over_reservation":
+        result["attempts"][0]["usage"] = {
+            "prompt_tokens": 7000,
+            "completion_tokens": 5,
+            "total_tokens": 7005,
+        }
+    if fault == "duplicate_number":
+        result["attempts"].append(result["attempts"][0])
+    if fault == "plan_binding":
+        result["plan_sha256"] = "0" * 64
+    if fault == "approval_binding":
+        receipt = json.loads((old / "receipt.json").read_text())
+        receipt["approval"]["plan_sha256"] = "0" * 64
+        (old / "receipt.json").write_text(json.dumps(receipt))
+    if fault == "reversed_wall":
+        result["finished_at"] = "2000-01-01T00:00:00+00:00"
+    if fault == "negative_start":
+        result["attempts"][0]["start_seconds"] = -1
+    if fault == "reversed_attempt":
+        result["attempts"][0]["start_seconds"] = 2
+    if fault == "overlap":
+        overlap = dict(
+            result["attempts"][0], number=2, start_seconds=0.5, finished_seconds=1.5
+        )
+        result["attempts"].append(overlap)
+    result["ledger_sha256"] = canonical_sha256(result["attempts"])
+    (old / "result.json").write_text(json.dumps(result), encoding="utf-8")
+    with pytest.raises(ValueError):
+        build_known_stop_reconciliation(
+            old, actor="TEST ONLY", reference="TEST ONLY", process_exit_verified=True
+        )
+
+
+def test_stale_reconciliation_and_cooldown_fail_closed(tmp_path: Path) -> None:
+    from evals.live import build_known_stop_reconciliation, check_local_prior_usage
+
+    old = stopped_run(tmp_path)
+    record = build_known_stop_reconciliation(
+        old, actor="TEST ONLY", reference="TEST ONLY", process_exit_verified=True
+    )
+    (old / "reconciliation.json").write_text(record.model_dump_json(), encoding="utf-8")
+    result = json.loads((old / "result.json").read_text())
+    result["finished_at"] = datetime.now(UTC).isoformat()
+    (old / "result.json").write_text(json.dumps(result), encoding="utf-8")
+    proposal = plan().model_copy(
+        update={"budget": budget(prior_requests_today=1, prior_tokens_today=6100)}
+    )
+    with pytest.raises(ValueError):
+        check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+    record = build_known_stop_reconciliation(
+        old, actor="TEST ONLY", reference="TEST ONLY", process_exit_verified=True
+    )
+    (old / "reconciliation.json").write_text(record.model_dump_json(), encoding="utf-8")
+    with pytest.raises(ValueError, match="cooldown"):
+        check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+
+
+@pytest.mark.parametrize(
+    "fault", ["active", "unverified_exit", "forged_charge", "ledger_hash"]
+)
+def test_reconciliation_requires_explicit_proof(tmp_path: Path, fault: str) -> None:
+    from evals.live import build_known_stop_reconciliation, check_local_prior_usage
+
+    old = stopped_run(tmp_path)
+    if fault == "active":
+        (tmp_path / "active.lock").write_text("runner still active")
+    if fault == "ledger_hash":
+        result = json.loads((old / "result.json").read_text())
+        result["ledger_sha256"] = "0" * 64
+        (old / "result.json").write_text(json.dumps(result))
+    if fault != "forged_charge":
+        with pytest.raises(ValueError):
+            build_known_stop_reconciliation(
+                old,
+                actor="TEST ONLY",
+                reference="TEST ONLY",
+                process_exit_verified=fault != "unverified_exit",
+            )
+        return
+    record = build_known_stop_reconciliation(
+        old, actor="TEST ONLY", reference="TEST ONLY", process_exit_verified=True
+    )
+    data = record.model_dump(mode="json")
+    data["charged_reserved_tokens"] = 25
+    (old / "reconciliation.json").write_text(json.dumps(data))
+    with pytest.raises(ValueError, match="reservations"):
+        check_local_prior_usage(plan(), tmp_path, datetime.now(UTC))
+
+
 class ScriptProvider(Provider):
     def __init__(
         self, replies: list[str], *, tool_turn: int | None = None, failure: str = ""
@@ -529,10 +723,10 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
     provider = ScriptProvider([reply] * 20)
     limits = {
         "max_attempts": 20,
-        "input_tokens": 140000,
-        "output_tokens": 10240,
-        "per_call_input": 7000,
-        "per_call_output": 512,
+        "input_tokens": 129760,
+        "output_tokens": 20480,
+        "per_call_input": 6488,
+        "per_call_output": 1024,
     }
     proposal = LivePlan(
         run_id="test-judge",
@@ -545,14 +739,14 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
         ),
         source={"dirty": False},
         inputs_sha256="test-only",
-        judge_configuration=JudgeConfiguration(max_completion_tokens=512),
+        judge_configuration=JudgeConfiguration(max_completion_tokens=1024),
     )
     report = await live.run_jobs(proposal, provider)
     assert report["status"] == "complete"
     assert len(report["reviews"]) == provider.calls == 20
     assert report["judge_configuration"]["reasoning_effort"] == "low"
     assert all(
-        r.reasoning_effort == "low" and r.max_completion_tokens == 512
+        r.reasoning_effort == "low" and r.max_completion_tokens == 1024
         for r in provider.requests
     )
     assert all(a["finish_reason"] == "stop" for a in report["attempts"])

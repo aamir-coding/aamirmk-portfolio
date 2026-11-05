@@ -534,6 +534,39 @@ cannot establish that a future real response fits in 512 tokens. Optional practi
 explain why known usage, HTTP success, complete output and calibrated judging are
 four separate observations.
 
+## Reallocating the same budget for 1,024 output tokens
+
+Aamir subsequently approved a 1,024-token output cap with low reasoning effort.
+Adding that to the old 7,000 input reservation and 400 visitor reserve would need
+8,424 TPM, above the 8,000 limit. Approval to increase output does not permit
+pretending that the full prompt fits a smaller input cap, reducing visitor
+headroom, or bypassing the previous run's hold.
+
+The solution is a concise runtime prefix in `evals/rubrics/judge-v2.txt`. It
+retains evidence-only grounding, resistance to embedded instructions, semantic
+and requirement-local support, negatives, plans versus experience, independent
+labels and evidence-linked rationales. `judge_system_prompt` still appends the
+same four defining rubric sentences verbatim. Repeated JSON examples and
+procedural wording are omitted; the question/answer/evidence JSON remains
+complete and unchanged. The frozen v1 authoring template, rubric and human grading
+packet are not refrozen. The current effective runtime hash is additionally
+bound into `inputs_state`, invalidating an old plan or prior judge result when
+runtime instructions change.
+
+Measured maximum full prompt reservation: 6,369. Keep a 6,488 input ceiling,
+then reserve 1,024 output: **7,512 per call**, the same previous combined ceiling.
+Twenty calls remain **150,240** total, now split into 129,760 input and 20,480
+output. Add 400 visitor TPM to obtain 7,912, within 8,000. The estimator/margins
+are unchanged; this is input compaction, not quota-accounting relaxation. Fake
+tests verify full evidence preservation and construct all twenty 1,024-token
+requests; they do not prove that the real model will finish within that cap.
+
+The previous daily hold still applies until the next local UTC budget day,
+05:30 IST on 6 November. A numerical budget that fits is distinct from a valid
+execution window. The user's start-time choice is pending; no scheduling or new
+provider call has occurred. Human grading remains valid and unchanged, and the
+eight validation calls still require their own compatible budget.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

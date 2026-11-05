@@ -229,10 +229,11 @@ def test_compact_judge_prompt_keeps_all_evidence_and_fits_recorded_limit_policy(
                 request_payload(messages, response_format={"type": "json_object"})
             )
         )
-    assert max(bounds) <= 7000
+    assert max(bounds) <= 6488
     # Feasibility arithmetic, not a proposed or authorized run budget.
-    assert 7000 + 512 + 400 <= 8000
-    assert 20 * (7000 + 512) + 20000 <= 200000
+    assert 6488 + 1024 + 400 <= 8000
+    assert 20 * (6488 + 1024) == 150240
+    assert 20 * (6488 + 1024) + 20000 <= 200000
 
 
 def test_changed_effective_prompt_invalidates_prior(
@@ -245,5 +246,20 @@ def test_changed_effective_prompt_invalidates_prior(
     monkeypatch.setattr(
         calibration, "judge_system_prompt", lambda: original + "changed recipe"
     )
+    with pytest.raises(ValueError, match="Judge prompt changed"):
+        validate_reviews(packet, judged)
+
+
+def test_runtime_prefix_change_invalidates_judge(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    import evals.calibration as calibration
+
+    packet, judged = load_packet(), reviews(judge=True)
+    changed = tmp_path / "runtime-prefix.txt"
+    changed.write_text("Different runtime instructions.", encoding="utf-8")
+    monkeypatch.setattr(calibration, "JUDGE_RUNTIME_PROMPT", changed)
+    assert load_packet() == packet
     with pytest.raises(ValueError, match="Judge prompt changed"):
         validate_reviews(packet, judged)

@@ -33,6 +33,7 @@ AXES = ("support", "completeness", "behavior", "tone")
 DEFAULT_PACKET = DEFAULT_ROOT / "annotations/packet-v1.json"
 RUBRIC = DEFAULT_ROOT / "rubrics/support-v1.md"
 JUDGE_PROMPT = DEFAULT_ROOT / "rubrics/judge-v1.txt"
+JUDGE_RUNTIME_PROMPT = DEFAULT_ROOT / "rubrics/judge-v2.txt"
 
 
 def text_sha(path: Path) -> str:
@@ -46,7 +47,10 @@ def judge_system_prompt() -> str:
         paragraph = rubric.split(f"- **{axis}**:", 1)[1].split("\n- **", 1)[0]
         sentence = " ".join(paragraph.split()).split(". ", 1)[0]
         definitions.append(f"{axis}: {sentence}.")
-    return JUDGE_PROMPT.read_text(encoding="utf-8") + "\n\n" + "\n".join(definitions)
+    # Keep the frozen authoring template intact. This independently versioned
+    # runtime prefix retains its constraints without repeated JSON examples.
+    prefix = " ".join(JUDGE_RUNTIME_PROMPT.read_text(encoding="utf-8").split())
+    return prefix + "\n\n" + "\n".join(definitions)
 
 
 def effective_judge_prompt_sha256() -> str:

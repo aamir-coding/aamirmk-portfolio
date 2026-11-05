@@ -3,6 +3,25 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-042: Explicit reconciliation of a fully reported stopped evaluation
+
+**Date:** 2026-11-05
+**Context:** After learning that the old local hold blocked same-day recovery, Aamir explicitly requested immediate execution and reaffirmed capacity. The stopped run's three attempts all had reconciled reported usage; no unknown provider consumption or live process remained. Holding twenty potential attempts as if they had all occurred obscured the distinction between authorization ceiling and spent reservations.
+**Choice:** Add an opt-in, separately recorded operator reconciliation only for fully reported incomplete-output stops. Preserve and hash the original receipt/result/ledger; bind them to the original approval's exact plan, validate chronology and sequential finite attempt times, approved model/caps, per-model aggregate ceilings, and process exit. Retain every attempted input/output reservation in full. The old run therefore remains charged three requests/22,536 reserved tokens, rather than only 3,342 actual tokens. Release only unattempted potential reservations, with explicit actor/reference and immutable proof. Missing/uncertain/stale/forged/lifecycle records keep the full hold or fail closed.
+**Limits:** No receipt deletion, per-attempt refund, generic retry, approval reuse, cooldown bypass or production-wide quota fix. The fresh account-capacity statement and original visitor reserves remain necessary; other provider traffic is not independently observed. Reconciliation plus a distinct approved plan permits the requested immediate recovery without inventing a new quota day. The quiet-window expiry is anchored to the user's confirmation, not extended by preparation. Original partial grades remain diagnostic and are not mixed with the new configuration.
+
+---
+
+### DRN-041: Fit the approved 1,024-token output cap without weakening input guards
+
+**Date:** 2026-11-05
+**Context:** Aamir approved the low-effort recovery and requested `max_completion_tokens`/`per_call_output` of 1,024. The previous 7,000 input reservation plus 1,024 output plus 400 visitor TPM exceeded the confirmed 8,000 TPM limit. The previous stopped run's same-day hold also remains active; the current date is still 5 November UTC.
+**Choice:** Keep all answers, evidence, human labels, case/split files, frozen authoring template and rubric unchanged. Add a separately versioned concise runtime prefix (`judge-v2.txt`), retaining evidence-only grounding, injection resistance, semantic/requirement-local citation support, known negatives, plans versus experience and independent labels. Append the same four rubric defining sentences verbatim. Remove repeated JSON schema examples/workflow wording; retain the existing JSON payload with complete evidence. Bind the effective runtime prompt into planning inputs as well as judge artifacts.
+**Budget:** The largest full prompt reservation becomes 6,369 under the unchanged byte-plus-overhead policy. Reserve 6,488 input + 1,024 output = 7,512 per call; twenty calls still reserve exactly 150,240 tokens (129,760 input + 20,480 output). Add the existing 400 visitor TPM to get 7,912 < 8,000. Daily visitor reserve stays 20,000, so the previously confirmed 170,240 daily capacity requirement is unchanged. No tokenizer estimate, visitor reserve, quota limit or old receipt is weakened to admit the larger output cap.
+**Timing/limits:** This is offline preparation for the user's amendment, not another live attempt. The old hold remains until the next local UTC budget day, 05:30 IST on 6 November, and a start-window preference is pending. Do not silently reinterpret current capacity/quiet-window confirmation as an arbitrary later execution time. No new provider calls, scheduling action, validation execution or accuracy claim is made by this change. The larger cap reduces one constraint but cannot guarantee complete output.
+
+---
+
 ### DRN-040: Explicit judge settings after a bounded incomplete calibration run
 
 **Date:** 2026-11-05

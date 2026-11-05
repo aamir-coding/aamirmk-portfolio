@@ -375,4 +375,30 @@ ledger conservatively holds the entire stopped run's approved ceiling for that
 UTC budget day; this is **not** actual provider consumption. Do not delete its
 build receipt, reset the hold, or reinterpret the unused allowance as permission
 for retries. A new plan needs fresh approval and account capacity, normally in a
-later UTC budget day. No follow-up live call has been authorized or made.
+later UTC budget day. Aamir subsequently approved the amendment below; it has not
+been executed.
+
+### Approved 1,024-output amendment
+
+The user approved low effort with `max_completion_tokens` and `per_call_output`
+of 1,024. Keeping the old 7,000 input reservation would exceed 8,000 TPM once
+output and visitor reserves are included. A concise, independently versioned
+runtime prefix (`rubrics/judge-v2.txt`) preserves the grounding/safety constraints
+and the same four rubric defining sentences. The complete JSON question, answer,
+citations, evidence and local maps are unchanged; no evidence is truncated or
+summarized. The frozen v1 authoring template and grading packet remain intact.
+The effective current runtime instructions are bound into plan inputs and judge
+compatibility checks, so old outputs cannot be silently reused.
+
+The largest full prompt is now 6,369 under the unchanged reservation policy.
+Reserve **6,488 input + 1,024 output = 7,512 per call**, with twenty calls totaling
+**150,240** (129,760 input + 20,480 output). Visitor headroom stays 400 TPM and
+20,000 TPD: minute usage reserved is 7,912 and the daily capacity requirement
+remains 170,240. No quota guard, input-estimation margin or receipt hold was relaxed.
+The larger cap still cannot guarantee complete output.
+
+The prior same-day hold remains active on 5 November UTC and clears with the next
+local UTC budget day, 05:30 IST on 6 November. A start-window preference was asked
+asynchronously; no answer or scheduling action has yet occurred. Budget approval
+is recorded, but no new live approval window/provider attempt is created while
+timing remains unresolved. This amendment does not authorize validation calls.

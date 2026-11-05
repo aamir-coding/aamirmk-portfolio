@@ -16,6 +16,11 @@ binds explicit low reasoning effort/output settings and records finish reasons;
 it does not retroactively fill missing settings/reasons in the old run. Your
 human labels remain unchanged and need no re-grading for this follow-up.
 
+**Approved amendment:** Aamir requested 1,024 output tokens with low effort.
+Concise runtime instructions retain the full evidence and rubric criteria and
+keep the same total reservation. Execution awaits a start window after the
+prior daily hold clears at 05:30 IST on 6 November; no new calls have run.
+
 The committed template contains **no human grades**. Aamir chose to fill a copied
 JSON file on 4 November 2026. `build/human-v1.json` is an ignored working copy;
 it is never overwritten by the tooling. Other filenames are accepted explicitly.

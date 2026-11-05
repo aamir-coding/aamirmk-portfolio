@@ -21,13 +21,18 @@ if backend_dir not in sys.path:
 from pydantic import AwareDatetime, Field, model_validator  # noqa: E402
 
 from app.llm import Message, ToolCall  # noqa: E402
-from app.retrieval.artifacts import canonical_sha256, corpus_sha256  # noqa: E402
+from app.retrieval.artifacts import (  # noqa: E402
+    Sha256,
+    canonical_sha256,
+    corpus_sha256,
+)
 from app.retrieval.loader import FactLoader  # noqa: E402
 from app.retrieval.models import RetrievedChunk  # noqa: E402
 from app.retrieval.retriever import Retriever  # noqa: E402
 from evals.budget import (  # noqa: E402
     MAIN,
     UTILITY,
+    Attempt,
     Budget,
     CompletionProvider,
     MeteredLLM,
@@ -44,6 +49,7 @@ from evals.calibration import (  # noqa: E402
     JudgeSet,
     Labels,
     Review,
+    effective_judge_prompt_sha256,
     judge_system_prompt,
     load_packet,
     packet_fingerprint,
@@ -175,6 +181,7 @@ def inputs_state(
         raise ValueError("Calibration cannot import validation judge results")
     return {
         "packet_sha256": packet_fingerprint(packet),
+        "effective_prompt_sha256": effective_judge_prompt_sha256(),
         "human_sha256": canonical_sha256(human.model_dump(mode="json")),
         "prior_judge_sha256": canonical_sha256(prior.model_dump(mode="json"))
         if prior
@@ -515,6 +522,112 @@ async def run_jobs(
     }
 
 
+class KnownStopReconciliation(ReplayModel):
+    purpose: Literal["fully_reported_incomplete_output"] = (
+        "fully_reported_incomplete_output"
+    )
+    run_id: Identifier
+    receipt_sha256: Sha256
+    result_sha256: Sha256
+    ledger_sha256: Sha256
+    actor: Text
+    reference: Text
+    created_at: AwareDatetime
+    process_exit_verified: Literal[True]
+    charged_requests: int = Field(gt=0, strict=True)
+    charged_reserved_tokens: int = Field(gt=0, strict=True)
+    reported_tokens: int = Field(ge=0, strict=True)
+
+
+def _known_stop_charge(
+    receipt: dict[str, Any], result: dict[str, Any], run_id: str
+) -> tuple[int, int, int]:
+    plan_hash = canonical_sha256(receipt["plan"])
+    approved = LiveApproval.model_validate(receipt.get("approval", {}))
+    if result.get("plan_sha256") != plan_hash or approved.plan_sha256 != plan_hash:
+        raise ValueError("Stopped usage must bind to its original approved plan")
+    if (
+        receipt["plan"]["run_id"] != run_id
+        or result.get("kind") != "live_eval_attempts"
+        or result.get("status") != "stopped"
+        or result.get("stop_reason") != "incomplete_provider_output"
+    ):
+        raise ValueError("Only a fully reported incomplete-output stop is reconcilable")
+    rows = result.get("attempts", [])
+    finished = datetime.fromisoformat(result.get("finished_at", ""))
+    started = datetime.fromisoformat(receipt.get("started_at", ""))
+    if (
+        started.utcoffset() is None
+        or finished.utcoffset() is None
+        or not approved.approved_at <= started <= finished <= approved.expires_at
+        or finished > datetime.now(UTC)
+    ):
+        raise ValueError("A known stop needs a valid completed timestamp")
+    if not rows or result.get("ledger_sha256") != canonical_sha256(rows):
+        raise ValueError("Missing or inconsistent stopped-run ledger")
+    attempts = [Attempt.model_validate(row) for row in rows]
+    if [a.number for a in attempts] != list(range(1, len(attempts) + 1)):
+        raise ValueError("Stopped-run attempt sequence is not complete")
+    budget = Budget.model_validate(receipt["plan"]["budget"])
+    counts: dict[str, int] = {}
+    previous_finish = 0.0
+    for a in attempts:
+        cap = budget.models.get(a.model)
+        counts[a.model] = counts.get(a.model, 0) + 1
+        if (
+            cap is None
+            or counts[a.model] > cap.max_attempts
+            or a.status != "reported"
+            or a.usage is None
+            or a.finished_seconds is None
+            or not previous_finish <= a.start_seconds <= a.finished_seconds
+            or a.reported_model != a.model
+            or a.reserved_input != cap.per_call_input
+            or a.reserved_output != cap.per_call_output
+            or a.usage.prompt_tokens > a.reserved_input
+            or a.usage.completion_tokens > a.reserved_output
+        ):
+            raise ValueError("Unknown or inconsistent usage cannot release a hold")
+        previous_finish = a.finished_seconds
+    for model, cap in budget.models.items():
+        selected = [a for a in attempts if a.model == model]
+        if (
+            sum(a.reserved_input for a in selected) > cap.input_tokens
+            or sum(a.reserved_output for a in selected) > cap.output_tokens
+        ):
+            raise ValueError(
+                "Stopped-run reservations exceed the approved model budget"
+            )
+    return (
+        len(attempts),
+        sum(a.reserved_input + a.reserved_output for a in attempts),
+        sum(a.usage.total_tokens for a in attempts if a.usage is not None),
+    )
+
+
+def build_known_stop_reconciliation(
+    run_dir: Path, *, actor: str, reference: str, process_exit_verified: bool
+) -> KnownStopReconciliation:
+    if (run_dir.parent / "active.lock").exists():
+        raise ValueError("Cannot reconcile while a runner is active")
+    receipt = json.loads((run_dir / "receipt.json").read_text(encoding="utf-8"))
+    result = json.loads((run_dir / "result.json").read_text(encoding="utf-8"))
+    requests, reserved, reported = _known_stop_charge(receipt, result, run_dir.name)
+    return KnownStopReconciliation(
+        run_id=run_dir.name,
+        receipt_sha256=canonical_sha256(receipt),
+        result_sha256=canonical_sha256(result),
+        ledger_sha256=result["ledger_sha256"],
+        actor=actor,
+        reference=reference,
+        created_at=datetime.now(UTC),
+        process_exit_verified=process_exit_verified,
+        charged_requests=requests,
+        charged_reserved_tokens=reserved,
+        reported_tokens=reported,
+    )
+
+
 def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> None:
     known_requests = known_tokens = 0
     for receipt_path in directory.glob("*/receipt.json"):
@@ -528,6 +641,9 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
             x.input_tokens + x.output_tokens for x in old_budget.models.values()
         )
         result_path = receipt_path.parent / "result.json"
+        reconciliation_path = receipt_path.parent / "reconciliation.json"
+        if reconciliation_path.exists() and not result_path.exists():
+            raise ValueError("A reconciliation cannot replace a missing result")
         if result_path.exists():
             result = json.loads(result_path.read_text(encoding="utf-8"))
             if result.get("finished_at"):
@@ -544,6 +660,30 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                     )
                     for a in result["attempts"]
                 )
+            if reconciliation_path.exists():
+                record = KnownStopReconciliation.model_validate_json(
+                    reconciliation_path.read_text(encoding="utf-8")
+                )
+                if (
+                    record.run_id != receipt_path.parent.name
+                    or record.receipt_sha256 != canonical_sha256(receipt)
+                    or record.result_sha256 != canonical_sha256(result)
+                    or record.ledger_sha256 != result.get("ledger_sha256")
+                    or not finished <= record.created_at <= now
+                ):
+                    raise ValueError("Stopped-run reconciliation is stale or invalid")
+                requests, reserved, reported = _known_stop_charge(
+                    receipt, result, record.run_id
+                )
+                if (
+                    record.charged_requests,
+                    record.charged_reserved_tokens,
+                    record.reported_tokens,
+                ) != (requests, reserved, reported):
+                    raise ValueError(
+                        "Reconciliation cannot reduce attempted-call reservations"
+                    )
+                request_charge, token_charge = requests, reserved
         if now < finished + timedelta(seconds=60):
             raise ValueError(
                 "Local run cooldown has not elapsed; do not reset minute usage"
