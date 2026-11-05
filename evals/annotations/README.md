@@ -1,4 +1,13 @@
-# Human calibration — twenty answers judged; validation pending
+# Human calibration — validation complete; gate failed
+
+**Current validation result:** All 8 items completed in 8 calls with the exact
+calibrated recipe, no failures/retries. Support 8/8(100%), Completeness 6/8(75%),
+Behavior 7/8(87.5%), Tone 6/8(75%). Completeness/Tone fail the 80% floor. One valid
+Completeness `uncertain` counts as disagreement, not a retryable error. No human
+grade changed or new prompt/run selected to obtain a pass. See
+`runs/validation-2026-11-05-axis-independent/` for complete provenance, formal
+report and all five disagreements. No calibrated/generator-accuracy claim.
+The earlier calibration summaries below are historical.
 
 **Latest measured result:** Axis-independent calibration completed 20/20 in 20
 attempts, no retries, 19,018 known tokens and no new unknown consumption. Agreement:

@@ -1,5 +1,9 @@
 # Judge calibration — axis-independent rerun completed
 
+**Subsequent outcome:** Independent validation completed and failed Completeness/Tone.
+See [validation results](2026-11-05-judge-validation.md). This report retains the
+preceding calibration checkpoint and its historical metrics.
+
 All **20 calibration answers completed in 20 attempts**, with no failures or
 recoveries, at **17:38:26 IST on 5 November 2026**. The clarified prompt explicitly
 forbids failing Behavior for factual falsity/unsupportedness; Behavior covers only

@@ -775,6 +775,31 @@ prior-result validation checks all 20 IDs and the actual current fingerprint. Th
 [latest result](../audits/2026-11-05-judge-calibration.md) records metrics/provenance/
 budget. All76facts remain draft; no badge, phase tag or publication follows.
 
+## Independent validation can fail after calibration passes
+
+The authorized validation used the exact recipe/schema/settings and all twenty
+prior calibration judgments unchanged. Eight calls completed without failure or
+retry; 19,018 earlier calibration tokens are separate from 8,382 new validation
+tokens. The official `agreement_report()` yields Support 8/8, Completeness 6/8,
+Behavior 7/8, Tone 6/8: **gate failed**, `live_judge_calibrated:false`.
+
+With eight binary human labels, at least 7/8 (87.5%) is needed to meet an 80% floor;
+6/8 is 75%. Each axis has balanced 4 pass/4 fail human labels, no abstentions or missing
+model outputs. A model Completeness `uncertain` is legal and counts as a mismatch
+against binary human fail. The result has sufficient coverage; this is a quality
+failure, not a test/execution failure. Repeating valid judgments until the score
+passes would select outcomes and compromise independent validation.
+
+Disagreements concentrate on validation 06 (Completeness/Tone) and 08
+(Completeness/Behavior/Tone). In 08, the model acknowledges an insulting phrase
+yet calls the answer courteous. Typed JSON/citation identity do not prove semantic
+judging quality. Keep original human labels, rationales and the failed report.
+Under the frozen policy, further calibration requires a reviewed new validation
+version with independent human grading, not tuning and rerunning this exposed set.
+The [validation result](../audits/2026-11-05-judge-validation.md) records full
+provenance, confusion counts, usage and limitations. All76facts remain draft;
+this result cannot generate an accuracy badge or complete Phase 8.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

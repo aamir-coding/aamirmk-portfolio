@@ -1,0 +1,115 @@
+{
+  "kind": "judge_human_agreement",
+  "status": "failed",
+  "packet_sha256": "f1fad4a25c601f23b37893cb61efcb0767af922e8ca0403f0b44ce995cecfc90",
+  "human_sha256": "833f71ab520b9d0c5a9ba21d29f7af71cb8eece220a2f79586179f63dd9d5d67",
+  "judge_sha256": "8038a742c46b9ccb30151f0635a49851b11933ead268144088e6667c625c727a",
+  "calibration_graded": 20,
+  "validation_graded": 8,
+  "calibration_judged": 20,
+  "validation_judged": 8,
+  "agreement_floor": 0.8,
+  "agreement_floor_met": false,
+  "live_judge_calibrated": false,
+  "generation_accuracy_available": false,
+  "per_label": {
+    "support": {
+      "numerator": 8,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 4
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "completeness": {
+      "numerator": 6,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 2,
+        "fail/uncertain": 1,
+        "fail/pass": 1
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "behavior": {
+      "numerator": 7,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 3,
+        "fail/pass": 1
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "tone": {
+      "numerator": 6,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 2,
+        "fail/pass": 2
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    }
+  },
+  "human_overrides": [
+    {
+      "item_id": "validation-06",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "uncertain",
+      "rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "pass",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "pass",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    },
+    {
+      "item_id": "validation-06",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    }
+  ],
+  "limitation": "Authored development examples; not live generator accuracy. Same-family judge bias remains."
+}

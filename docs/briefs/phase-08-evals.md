@@ -1,5 +1,14 @@
 # Phase 8 brief — approved for offline implementation
 
+**Current validation outcome, 5 November:** All 8 independently graded validation
+answers completed in 8 calls, no failures/retries, with the exact accepted calibration
+recipe. Agreement: Support 8/8(100%), Completeness 6/8(75%), Behavior 7/8(87.5%),
+Tone 6/8(75%). The formal gate failed Completeness/Tone; no calibrated/badge claim.
+All human labels and draft facts unchanged. Preserve this failed validation;
+further calibration needs a reviewed fresh validation version rather than retuning
+or resampling these exposed outcomes. See `docs/audits/2026-11-05-judge-validation.md`.
+Earlier calibration/status updates are historical. Increment 5 has not started.
+
 **Latest result, 5 November:** Authorized axis-independence rerun completed all
 20 answers in 20 attempts, no failures/recoveries. Updated agreement: Support
 18/20 (90%); Completeness, Behavior and Tone each 17/20 (85%). Every axis exceeds
@@ -15,7 +24,7 @@ Aamir's explicit continuation instruction. Agreement19/20 support,18/20 complete
 15/20 behavior,17/20 tone. Behavior remains below 80%; independent 8-answer validation
 is unexecuted, so the quality gate is not passed. All human grades and76 draft
 facts remain unchanged. Full provenance/disagreements: `docs/audits/2026-11-05-judge-calibration.md`.
-Historical status updates below retain their original scope; Increment5 has not started.
+Historical status updates below retain their original scope; Increment 5 has not started.
 
 Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later that day. He explicitly authorized starting Increment 1 on `phase-8-evals`, offline, and will provide human calibration grading at Increment 4. This approval narrows the remaining handoff audit gates; it does not accept every retrospective recommendation or promote facts. Remediation teach-back and `handoff-remediation-done` remain pending. Their recommended pre-phase close-out was superseded by the explicit authorization to begin, not declared complete.
 

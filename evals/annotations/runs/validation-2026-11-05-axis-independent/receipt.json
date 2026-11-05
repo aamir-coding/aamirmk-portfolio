@@ -1,0 +1,74 @@
+{
+  "plan": {
+    "version": 2,
+    "run_id": "validation-2026-11-05-axis-independent",
+    "stage": "judge_validation",
+    "case_ids": [],
+    "budget": {
+      "input_reservation": "request_bound",
+      "models": {
+        "openai/gpt-oss-20b": {
+          "max_attempts": 12,
+          "input_tokens": 83712,
+          "output_tokens": 12288,
+          "per_call_input": 6976,
+          "per_call_output": 1024
+        }
+      },
+      "shared_rpm": 30,
+      "shared_tpm": 8000,
+      "shared_rpd": 1000,
+      "shared_tpd": 200000,
+      "prior_requests_today": 71,
+      "prior_tokens_today": 90256,
+      "visitor_rpm": 0,
+      "visitor_tpm": 0,
+      "visitor_rpd": 0,
+      "visitor_tpd": 0,
+      "min_interval_seconds": 3.0,
+      "deadline_seconds": 2700.0,
+      "request_timeout_seconds": 60.0
+    },
+    "source": {
+      "commit": "4d8032073536aba1bce0177a06a2a0f843fc181d",
+      "dirty": false,
+      "code_sha256": "4d50f5ce609db7a9743d85393ec2cc744b2db2632b056173f93b9a91f35eb0fe",
+      "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+      "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "versions": {
+        "groq": "1.7.0",
+        "pydantic": "2.10.6",
+        "httpx": "0.28.1",
+        "fastapi": "0.115.11",
+        "fastembed": "0.9.1",
+        "numpy": "2.5.4"
+      },
+      "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+    },
+    "inputs_sha256": "fcc437a9cae4fd283b18af93b8f2843a99b4237179cc30f52742e27873423bfa",
+    "judge_configuration": {
+      "model": "openai/gpt-oss-20b",
+      "temperature": 0.2,
+      "reasoning_effort": "low",
+      "response_format": "json_schema",
+      "max_completion_tokens": 1024
+    },
+    "judge_recovery_attempts": 4
+  },
+  "approval": {
+    "purpose": "live_groq_authorization",
+    "approved_by": "Aamir Mohammed Khan",
+    "reference": "Aamir explicitly authorizes validation01through08 using exact calibrated judge-v4-strict20b/low/1024, resolve recoverable errors, ample>150000accountcapacity, standing actual-use reconciliation and zero visitors. Bounded12attempts96000tokens within200000daily.",
+    "plan_sha256": "66af1537d61003f2372629ad62af64cefa42ed3587f141919f5fe450fecefe25",
+    "approved_at": "2026-11-05T12:19:35Z",
+    "expires_at": "2026-11-05T13:04:35Z",
+    "limits_verified_at": "2026-11-05T12:19:35Z",
+    "limits_reference": "User confirms>150000remaining and actual-use/zero visitors; standing30RPM/1000RPD/8000TPM/200000TPD; conservative local ledger includes all unknowns, same frozen configuration.",
+    "visitor_allowance_acknowledged": true,
+    "draft_corpus_acknowledged": true,
+    "input_reservation_policy_acknowledged": true
+  },
+  "state": "started_consumption_unknown_until_result",
+  "started_at": "2026-11-05T12:22:29.350118+00:00"
+}

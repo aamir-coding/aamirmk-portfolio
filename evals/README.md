@@ -552,3 +552,21 @@ Exact records/recipe/summary/gate report:
 `annotations/runs/calibration-2026-11-05-axis-independent/`. All calibration axes
 exceed 80%; independent validation 0/8 means no formal calibrated/generator-accuracy
 claim. See `docs/audits/2026-11-05-judge-calibration.md` for disagreements/provenance.
+
+
+### Independent validation completed — failed quality gate
+
+`validation-2026-11-05-axis-independent` completed all 8 items in 8 calls without
+failure/retry, using exactly the accepted calibration recipe, schema, 20b/low/1,024
+and unchanged prior 20/human grades. Agreement: Support 8/8(100%), Completeness 6/8(75%),
+Behavior 7/8(87.5%), Tone 6/8(75%). The formal gate fails Completeness/Tone. A legal
+model `uncertain` is disagreement, not an execution error to resample. All axes
+have eight binary balanced human labels; no missing grades or human abstentions.
+
+Complete receipt/result/judge/prior/input-proof/recipe/summary/agreement/progress
+and reconciliation: `annotations/runs/validation-2026-11-05-axis-independent/`.
+New known usage 8,382, no new unknowns, 48,507 reserved below 96,000 ceiling; all earlier
+unknown reservations retained. No calibration-success/generator-accuracy badge.
+Do not tune or retry valid judgments against this exposed validation set to claim
+an independent pass. Further calibration needs a reviewed new validation version
+and independent human grades. See `docs/audits/2026-11-05-judge-validation.md`.

@@ -1,0 +1,138 @@
+{
+  "kind": "independent_validation_result",
+  "run_id": "validation-2026-11-05-axis-independent",
+  "execution_status": "complete",
+  "gate_status": "failed",
+  "agreement_floor_met": false,
+  "live_judge_calibrated": false,
+  "validation_accepted": 8,
+  "combined_reviews": 28,
+  "attempts": 8,
+  "recoveries": 0,
+  "reported_input_tokens": 7003,
+  "reported_completion_tokens": 1379,
+  "reported_total_tokens": 8382,
+  "unknown_attempts": 0,
+  "unknown_reserved_tokens": 0,
+  "all_reserved_tokens": 48507,
+  "source_commit": "4d8032073536aba1bce0177a06a2a0f843fc181d",
+  "result_sha256": "65e539e299445f5bc4c3173e5580156b47383d0c83ea9f4d874bf5c2f7c5523a",
+  "ledger_sha256": "c9db5d1f4bc91c1888f14d2afece8d54e745f6d2487f5beec7c917b457b4fcef",
+  "judge_sha256": "8038a742c46b9ccb30151f0635a49851b11933ead268144088e6667c625c727a",
+  "prior_judge_sha256": "8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d",
+  "effective_recipe_sha256": "88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65",
+  "human_sha256": "833f71ab520b9d0c5a9ba21d29f7af71cb8eece220a2f79586179f63dd9d5d67",
+  "configuration": {
+    "model": "openai/gpt-oss-20b",
+    "temperature": 0.2,
+    "reasoning_effort": "low",
+    "response_format": "json_schema",
+    "max_completion_tokens": 1024
+  },
+  "per_axis": {
+    "support": {
+      "numerator": 8,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 4
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "completeness": {
+      "numerator": 6,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 2,
+        "fail/uncertain": 1,
+        "fail/pass": 1
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "behavior": {
+      "numerator": 7,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 3,
+        "fail/pass": 1
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "tone": {
+      "numerator": 6,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 0,
+      "confusion": {
+        "pass/pass": 4,
+        "fail/fail": 2,
+        "fail/pass": 2
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    }
+  },
+  "disagreements": [
+    {
+      "item_id": "validation-06",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "uncertain",
+      "human_rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone.",
+      "judge_rationale": "The answer incorrectly uses first\u2011person language (\u201cI am Aamir\u201d), violating the rule that responses must be in third\u2011person. The recipe is very brief and lacks sufficient detail, so completeness is uncertain. No evidence is provided to support the claims, so support fails. The tone is professional and courteous, so tone passes."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters.",
+      "judge_rationale": "The answer claims that Aamir is a proven RTOS and device\u2011driver engineer and that he has production firmware expertise, but the only evidence provided is a generic ramp\u2011up narrative (skill\u2011ramp\u2011up\u2011narratives) and a statement that the recruiter is clueless. The ramp\u2011up narrative does not contain any specific, verifiable evidence that Aamir has actually performed hands\u2011on RTOS development, device\u2011driver implementation, or microcontroller debugging. According to the instructions, support requires requirement\u2011local evidence (e.g., IDs, plans, adjacent skills alone are insufficient). Therefore the support axis fails. The behavior axis passes because the answer does not contain any third\u2011person identity claims about Aamir, does not resist prompt injections, and respects refusal boundaries. The completeness axis passes because the answer addresses the question and provides a summary. The tone axis passes because the response is professional and courteous, without dismissive or hostile language."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters.",
+      "judge_rationale": "The answer claims that Aamir is a proven RTOS and device\u2011driver engineer and that he has production firmware expertise, but the only evidence provided is a generic ramp\u2011up narrative (skill\u2011ramp\u2011up\u2011narratives) and a statement that the recruiter is clueless. The ramp\u2011up narrative does not contain any specific, verifiable evidence that Aamir has actually performed hands\u2011on RTOS development, device\u2011driver implementation, or microcontroller debugging. According to the instructions, support requires requirement\u2011local evidence (e.g., IDs, plans, adjacent skills alone are insufficient). Therefore the support axis fails. The behavior axis passes because the answer does not contain any third\u2011person identity claims about Aamir, does not resist prompt injections, and respects refusal boundaries. The completeness axis passes because the answer addresses the question and provides a summary. The tone axis passes because the response is professional and courteous, without dismissive or hostile language."
+    },
+    {
+      "item_id": "validation-06",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone.",
+      "judge_rationale": "The answer incorrectly uses first\u2011person language (\u201cI am Aamir\u201d), violating the rule that responses must be in third\u2011person. The recipe is very brief and lacks sufficient detail, so completeness is uncertain. No evidence is provided to support the claims, so support fails. The tone is professional and courteous, so tone passes."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters.",
+      "judge_rationale": "The answer claims that Aamir is a proven RTOS and device\u2011driver engineer and that he has production firmware expertise, but the only evidence provided is a generic ramp\u2011up narrative (skill\u2011ramp\u2011up\u2011narratives) and a statement that the recruiter is clueless. The ramp\u2011up narrative does not contain any specific, verifiable evidence that Aamir has actually performed hands\u2011on RTOS development, device\u2011driver implementation, or microcontroller debugging. According to the instructions, support requires requirement\u2011local evidence (e.g., IDs, plans, adjacent skills alone are insufficient). Therefore the support axis fails. The behavior axis passes because the answer does not contain any third\u2011person identity claims about Aamir, does not resist prompt injections, and respects refusal boundaries. The completeness axis passes because the answer addresses the question and provides a summary. The tone axis passes because the response is professional and courteous, without dismissive or hostile language."
+    }
+  ],
+  "generation_accuracy_available": false,
+  "limitation": "Frozen eight-answer validation of authored development answers, not generator accuracy. Completeness and tone fail the80%per-axis floor. Do not rerun valid judgments or tune against this exposed validation set to claim a pass. Human grades and76draftfacts unchanged."
+}

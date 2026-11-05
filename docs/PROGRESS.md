@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. Axis-independent rerun completed **20/20 in 20 attempts**, no failures/recoveries. Agreement: **Support 18/20(90%), Completeness 17/20(85%), Behavior 17/20(85%), Tone 17/20(85%)**. All four exceed 80% on the calibration slice; independent 8-answer validation is unexecuted, so no formal calibrated/accuracy claim. Human labels and all 76 draft facts unchanged. [Full results](audits/2026-11-05-judge-calibration.md).
+**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. **Independent validation completed 8/8 but gate FAILED**: Support 8/8(100%), Completeness 6/8(75%), Behavior 7/8(87.5%), Tone 6/8(75%). Same frozen calibrated recipe; eight attempts, no failures/retries, 8,382 reported tokens. Human labels and all 76 draft facts unchanged. No calibrated/accuracy badge claim. [Validation result](audits/2026-11-05-judge-validation.md).
 
 **Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
@@ -9,7 +9,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Review the completed calibration result, then separately authorize/budget the independent eight-answer validation run. No further tuning against validation outcomes. Increment 5 has not started; publication/fact approval remain separate.
+Next: Review semantic validation failures on 06/08. Do not retry valid judgments or tune and reuse this exposed validation set as independent evidence; further calibration needs a reviewed fresh validation version/human grades. Increment 5 has not started; publication remains blocked.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +34,7 @@ Next: Review the completed calibration result, then separately authorize/budget 
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 Calibration20/20 collected; all axes ≥85%; independent validation pending | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟡 Validation 8/8 complete; gate failed Completeness/Tone; review pending | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -191,7 +191,7 @@ Next: Review the completed calibration result, then separately authorize/budget 
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. All 28 human grades are validated; fresh axis-independent calibration collected 20/20. Agreement 90%/85%/85%/85%. The separate 8-answer validation slice is unexecuted; human labels/eleven current disagreements remain visible.
+1. All 28 human grades are unchanged. Calibration 20/20 passed its development thresholds; independent validation 8/8 completed but failed Completeness/Tone at 6/8 each. Preserve five disagreements and the failed gate; no new live call or data/prompt change without reviewed scope/budget.
 2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
 3. Human grading has been supplied and is unchanged. Fact approval and any further live budget remain separate; no blanket approval of 76 draft facts, validation calls or public accuracy badge is implied.
 
@@ -363,8 +363,16 @@ Next: Review the completed calibration result, then separately authorize/budget 
 - At clean `d2db83d`, exact plan SHA `4ada9aed95decadd680ab83466c3e7378675f82351a34af61ee8f5f2d0dbcada`, completed all20 in20 attempts with **zero failures/recoveries**, finished **17:38:26 IST** before17:55:11expiry. Strict20b/low/1,024/zero visitors unchanged; no source edits during execution.
 - Updated agreement **Support18/20(90%), Completeness17/20(85%), Behavior17/20(85%), Tone17/20(85%)**. All calibration axes exceed80%. Eleven disagreements and human rationales preserved. Independent validation is0/8; formal report still `insufficient`, no calibrated/generator-accuracy claim. No grades mixed from prior recipe.
 - Usage **15,246 input+3,772 output=19,018 reported**, no new unknowns. Reservations112,123 fit106,000input/22,528output/128,528total; daily projected maximum199,766 respected. Explicit known-use reconciliation charges19,018 and leaves every historical unknown reservation intact. Across six runs **71attempts /60,677 known+29,579 unknown-reserved=90,256charged**; local accounting, not provider telemetry.
-- Exact receipt/result/judge/runtime/schema/progress/summary/gate/reconciliation archived in `evals/annotations/runs/calibration-2026-11-05-axis-independent/`. Result SHA `6595e3a051695b25d4e19d0edeb4a4a36920eda80577e9915bc9b71350655c67`; judge SHA `8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d`; recipe SHA `88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65`. Original bytes/hashes/exact20IDs and current recipe verified; human hash unchanged; all76facts draft.
-- Final read-only artifact audit found no blocker: verified canonical hashes, approved plan, recipe/schema,20IDs, metrics,19,018known/112,123reserved and zero unknowns/recoveries. No reviewer edits/APIcalls. Implementation checks remain **477passed,1 existing warning in75.24s**; current Ruff/formatter/diff clean. Only docs/artifacts changed after execution. Study guide/result review updated. No validation/held-out call, badge, tag, push, deployment or Increment5 work.
+- Exact receipt/result/judge/runtime/schema/progress/summary/gate/reconciliation archived in `evals/annotations/runs/calibration-2026-11-05-axis-independent/`. Result SHA `6595e3a051695b25d4e19d0edeb4a4a36920eda80577e9915bc9b71350655c67`; judge SHA `8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d`; recipe SHA `88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65`. Original bytes/hashes/exact20IDs and current recipe verified; human hash unchanged; all 76facts draft.
+- Final read-only artifact audit found no blocker: verified canonical hashes, approved plan, recipe/schema,20IDs, metrics,19,018known/112,123reserved and zero unknowns/recoveries. No reviewer edits/APIcalls. Implementation checks remain **477passed,1 existing warning in75.24s**; current Ruff/formatter/diff clean. Only docs/artifacts changed after execution. Study guide/result review updated. No validation/held-out call, badge, tag, push, deployment or Increment 5 work.
+
+## Independent validation completed — gate failed — 2026-11-05
+- Explicitly authorized eight validation items, amplecapacity/actual-use/zero visitors and recoverable retries. Exact same recipe `88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65`, prior judge SHA `8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d`,20b/low/1,024/strict schema. Clean `4d80320`; approved plan SHA `66af1537d61003f2372629ad62af64cefa42ed3587f141919f5fe450fecefe25`. No source/prompt changes during execution.
+- Completed **8/8 in 8 attempts, zero failures/recoveries**, at **17:59:38 IST** before 18:34:35 expiry. Results **Support 8/8(100%), Completeness 6/8(75%), Behavior 7/8(87.5%), Tone 6/8(75%)**. Formal gate `failed`, `live_judge_calibrated:false`. Each human axis has 4 pass/4 fail, no abstentions/missing grades. Completeness uncertainty on 06 counts as disagreement; it is not a retryable execution error.
+- Five disagreements preserved:06 Completeness/Tone,08 Completeness/Behavior/Tone. Human grades and prior 20 calibration judgments remain byte/canonical-equivalent; all 76facts draft. No tuning/resampling on exposed validation outcomes or generator-accuracy/badge claim. Review scope requires fresh validation version after further calibration per frozen rubric.
+- Usage **7,003 input+1,379 output=8,382 reported**, no new unknowns. Reservations 48,507 fit 83,712 input/12,288 output/96,000 total; declared daily maximum 186,256 includes prior 90,256. Explicit reconciliation charges 8,382 known, preserves every historical unknown. Across seven runs **79 attempts /69,059 known+29,579 unknown-reserved=98,638 charged**, local accounting only.
+- Exact receipt/result/judge/prior-judge/inputproof/runtime/schema/progress/summary/agreement/reconciliation archived in `evals/annotations/runs/validation-2026-11-05-axis-independent/`. Result SHA `65e539e299445f5bc4c3173e5580156b47383d0c83ea9f4d874bf5c2f7c5523a`; judge SHA `8038a742c46b9ccb30151f0635a49851b11933ead268144088e6667c625c727a`; ledger SHA `c9db5d1f4bc91c1888f14d2afece8d54e745f6d2487f5beec7c917b457b4fcef`. Normal validation, original bytes/hashes, exact 8 IDs, unchanged prior 20/config/human/recipe verified.
+- Fresh offline focused validation tests **3 passed in 6.83s**, fakes/MockTransport only. Previous 477-test full pass is historical for unchanged implementation, not rerun. Read-only final artifact audit reproduced all tallies/failed gate and found no artifact blocker; no edits/APIcalls. Post-run work only docs/artifacts. No new dependency, frontend change, further live call, push, deploy, completion tag or Increment 5 work.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
@@ -388,7 +396,9 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-All twenty revised calibration answers are collected and every axis exceeds 80%
-on this development slice. The independent eight-answer validation gate remains
-unexecuted, so no formal calibrated/accuracy claim or badge. Human labels remain
-unchanged and all 76 facts remain draft. Increment 5 has not started.
+Independent validation execution is complete, but its quality gate failed:
+Completeness and Tone each 6/8(75%), below 80%. No missing items or transport errors.
+Preserve human grades and the failed result; do not resample/retune this exposed
+validation set to claim a pass. Further calibration needs a reviewed fresh
+validation version with human grading. All76facts remain draft; no calibrated
+accuracy badge or Phase 8 completion. Increment 5 has not started.

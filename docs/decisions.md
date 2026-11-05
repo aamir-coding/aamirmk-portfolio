@@ -3,6 +3,15 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-050: Frozen validation outcome is a quality result, not a retryable error
+
+**Date:** 2026-11-05
+**Authorization/execution:** Aamir authorized validation01–08 against existing human grades, the exact calibrated strict recipe/20b/low/1,024 settings, actual-use reconciliation, zero visitors and recoverable retries. No instructions, schema, human labels or prior calibration judgments changed. Fresh input proof binds the prior judge hash and exact recipe. The reviewed numeric plan allowed 12 attempts/four recoveries, 96,000 tokens; prior 90,256 includes all historical unknown reservations, daily maximum 186,256. Eight calls completed without a failure/retry, 8,382 reported tokens, no new unknowns.
+**Outcome:** Support 8/8, Completeness 6/8, Behavior 7/8, Tone 6/8. The80% per-axis gate therefore fails Completeness/Tone. Coverage is sufficient: all 8human labels per axis are binary, balanced 4 pass/4 fail, no missing model grades. A model `uncertain` completeness label is a valid judgment and counts as disagreement; it is not a malformed response to resample.
+**Choice:** Preserve the failed report and all five disagreements. The user's permission to resolve execution errors does not authorize selecting favorable valid judgments. Do not tune and reuse this now-exposed validation set as independent evidence. Further calibration requires a reviewed new validation version with independently supplied human grading under the frozen rubric's policy. No new run, human-label edit, accuracy badge or calibration-success claim follows from this failure. This judges authored examples, not actual generator accuracy or truth of 76 draft facts. Increment 5/phase completion remain pending.
+
+---
+
 ### DRN-049: Explicit axis independence and completed-run actual-use accounting
 
 **Date:** 2026-11-05

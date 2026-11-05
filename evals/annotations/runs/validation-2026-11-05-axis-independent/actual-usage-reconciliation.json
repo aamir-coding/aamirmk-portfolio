@@ -1,0 +1,15 @@
+{
+  "purpose": "explicit_reported_actual_usage",
+  "run_id": "validation-2026-11-05-axis-independent",
+  "receipt_sha256": "e7f80e0e1a24db126f97b478fb614c35392936791ad3c30c114feada6d542366",
+  "result_sha256": "65e539e299445f5bc4c3173e5580156b47383d0c83ea9f4d874bf5c2f7c5523a",
+  "ledger_sha256": "c9db5d1f4bc91c1888f14d2afece8d54e745f6d2487f5beec7c917b457b4fcef",
+  "actor": "Aamir explicit validation/actual-use authorization; Codex verified accounting",
+  "reference": "Eight validation answers completed; reconcile reported usage, preserve all historical unknown reservations, no further live call",
+  "created_at": "2026-11-05T12:30:48.771059Z",
+  "process_exit_verified": true,
+  "charged_requests": 8,
+  "charged_reserved_tokens": 48507,
+  "reported_tokens": 8382,
+  "unreported_reserved_tokens": 0
+}
