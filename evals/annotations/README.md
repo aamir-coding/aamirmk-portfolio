@@ -18,8 +18,15 @@ human labels remain unchanged and need no re-grading for this follow-up.
 
 **Approved amendment:** Aamir requested 1,024 output tokens with low effort.
 Concise runtime instructions retain the full evidence and rubric criteria and
-keep the same total reservation. Execution awaits a start window after the
-prior daily hold clears at 05:30 IST on 6 November; no new calls have run.
+keep the same total reservation. Aamir then explicitly requested immediate start;
+the first run's known incomplete-output stop was reconciled with all attempted
+reservations retained. Recovery ran at clean `d609e12` on **5 November UTC**
+(despite its `calibration-2026-11-06-low` identifier). It stopped after one HTTP 200
+response, 625 input/131 completion tokens, finish reason `stop`, zero accepted
+grades. The generic task error's exception/output were not retained; the exact
+cause is unknown. See `runs/calibration-2026-11-06-low/`. Combined actual usage is
+four calls/4,098 tokens. No retry occurred; both approvals are consumed. Offline
+follow-up adds explicit JSON shape and safe diagnostics without changing grades.
 
 The committed template contains **no human grades**. Aamir chose to fill a copied
 JSON file on 4 November 2026. `build/human-v1.json` is an ignored working copy;

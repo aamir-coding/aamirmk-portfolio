@@ -1,0 +1,72 @@
+{
+  "plan": {
+    "version": 2,
+    "run_id": "calibration-2026-11-06-low",
+    "stage": "judge_calibration",
+    "case_ids": [],
+    "budget": {
+      "models": {
+        "openai/gpt-oss-20b": {
+          "max_attempts": 20,
+          "input_tokens": 129760,
+          "output_tokens": 20480,
+          "per_call_input": 6488,
+          "per_call_output": 1024
+        }
+      },
+      "shared_rpm": 30,
+      "shared_tpm": 8000,
+      "shared_rpd": 1000,
+      "shared_tpd": 200000,
+      "prior_requests_today": 880,
+      "prior_tokens_today": 29760,
+      "visitor_rpm": 10,
+      "visitor_tpm": 400,
+      "visitor_rpd": 100,
+      "visitor_tpd": 20000,
+      "min_interval_seconds": 3.0,
+      "deadline_seconds": 2700.0,
+      "request_timeout_seconds": 60.0
+    },
+    "source": {
+      "commit": "d609e12af6092065e3b8e36f7aa25d8a3bdcff20",
+      "dirty": false,
+      "code_sha256": "b171b172c9113690078840230eb202aac739a1448f90f5ab23e3f87d9e3207c9",
+      "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+      "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "versions": {
+        "groq": "1.7.0",
+        "pydantic": "2.10.6",
+        "httpx": "0.28.1",
+        "fastapi": "0.115.11",
+        "fastembed": "0.9.1",
+        "numpy": "2.5.4"
+      },
+      "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+    },
+    "inputs_sha256": "2fea9f776e3433b22aee03d3e862d528e7179bae48d8b727565cffa2bdec410d",
+    "judge_configuration": {
+      "model": "openai/gpt-oss-20b",
+      "temperature": 0.2,
+      "reasoning_effort": "low",
+      "response_format": "json_object",
+      "max_completion_tokens": 1024
+    }
+  },
+  "approval": {
+    "purpose": "live_groq_authorization",
+    "approved_by": "Aamir Mohammed Khan",
+    "reference": "User approved calibration-2026-11-06-low withloweffort and1024 output, reaffirmed limits/capacity, then explicitly requested startnow after hold explanation. Known stopped usage is explicitly reconciled without per-attempt refunds.",
+    "plan_sha256": "aff966c3252770637c3b77d6e336ebe23032a359b92c1d11057c45677b39af2c",
+    "approved_at": "2026-11-05T06:26:29.586027Z",
+    "expires_at": "2026-11-05T07:11:29.586027Z",
+    "limits_verified_at": "2026-11-05T06:26:29.586027Z",
+    "limits_reference": "User confirmed30RPM/1000RPD/8000TPM/200000TPD and170240 daily tokens/120 requests remaining including visitor reserves for this recovery.",
+    "visitor_allowance_acknowledged": true,
+    "draft_corpus_acknowledged": true,
+    "input_reservation_policy_acknowledged": true
+  },
+  "state": "started_consumption_unknown_until_result",
+  "started_at": "2026-11-05T06:38:26.972471+00:00"
+}

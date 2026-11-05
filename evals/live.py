@@ -18,7 +18,12 @@ backend_dir = str(Path(__file__).resolve().parents[1] / "backend")
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-from pydantic import AwareDatetime, Field, model_validator  # noqa: E402
+from pydantic import (  # noqa: E402
+    AwareDatetime,
+    Field,
+    ValidationError,
+    model_validator,
+)
 
 from app.llm import Message, ToolCall  # noqa: E402
 from app.retrieval.artifacts import (  # noqa: E402
@@ -454,6 +459,9 @@ async def run_jobs(
     reviews: list[Review] = list(prior.reviews) if prior else []
     status = "complete"
     system_prompt = None
+    judge_outputs: list[dict[str, Any]] = []
+    failed_judge_outputs: list[dict[str, Any]] = []
+    failure: dict[str, Any] | None = None
     try:
         async with asyncio.timeout(runtime_budget.deadline_seconds):
             if plan.stage == "generation":
@@ -486,7 +494,27 @@ async def run_jobs(
                         model=UTILITY,
                         response_format={"type": "json_object"},
                     )
-                    grade = JudgePayload.model_validate_json(response.content)
+                    raw_output = {
+                        "item_id": item.id,
+                        "item_sha256": item.sha256,
+                        "output": response.content,
+                    }
+                    judge_outputs.append(raw_output)
+                    try:
+                        grade = JudgePayload.model_validate_json(response.content)
+                    except ValidationError as exc:
+                        failed_judge_outputs.append(raw_output)
+                        failure = {
+                            "error_type": type(exc).__name__,
+                            "task_id": item.id,
+                            "issues": exc.errors(
+                                include_url=False,
+                                include_input=False,
+                                include_context=False,
+                            ),
+                        }
+                        llm.stop_reason = "judge_contract_error"
+                        raise
                     reviews.append(
                         Review(
                             item_id=item.id,
@@ -495,9 +523,10 @@ async def run_jobs(
                             rationale=grade.rationale,
                         )
                     )
-    except (Exception, asyncio.CancelledError):
+    except (Exception, asyncio.CancelledError) as exc:
         status = "stopped"
         llm.stop_reason = llm.stop_reason or "task_error_or_deadline"
+        failure = failure or {"error_type": type(exc).__name__, "task_id": llm.task_id}
     ledger = [a.model_dump(mode="json") for a in llm.attempts]
     return {
         "kind": "live_eval_attempts",
@@ -515,6 +544,9 @@ async def run_jobs(
         "source": plan.source,
         "finished_at": datetime.now(UTC).isoformat(),
         "stop_reason": llm.stop_reason,
+        "failure": failure,
+        "judge_outputs": judge_outputs,
+        "failed_judge_outputs": failed_judge_outputs,
         "attempts": ledger,
         "ledger_sha256": canonical_sha256(ledger),
         "results": results,

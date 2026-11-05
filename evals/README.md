@@ -375,8 +375,8 @@ ledger conservatively holds the entire stopped run's approved ceiling for that
 UTC budget day; this is **not** actual provider consumption. Do not delete its
 build receipt, reset the hold, or reinterpret the unused allowance as permission
 for retries. A new plan needs fresh approval and account capacity, normally in a
-later UTC budget day. Aamir subsequently approved the amendment below; it has not
-been executed.
+later UTC budget day. Aamir subsequently approved and executed the amendment
+below; its stopped outcome is recorded after the preparation details.
 
 ### Approved 1,024-output amendment
 
@@ -408,3 +408,31 @@ or fail closed. The separate record for the first run retains three requests and
 exact approval, cooldown, daily/visitor caps and confirmation-anchored quiet-window
 expiry still apply. This is not an automatic refund, and no scheduled task is used.
 The amendment does not authorize validation calls.
+
+### Recovery stopped; offline diagnostics follow-up
+
+The approved `calibration-2026-11-06-low` recovery actually ran on **5 November
+UTC**, at clean `d609e12`, using v2 instructions, low effort and 1,024 output tokens.
+It stopped after one HTTP 200 response: **625 input + 131 completion = 756 tokens**,
+provider finish reason `stop`, zero accepted grades. Its generic
+`task_error_or_deadline` artifact did not retain the exception or final response;
+the exact post-response cause cannot be established. It was not an output cutoff.
+See `annotations/runs/calibration-2026-11-06-low/`. Neither stopped approval permits
+another attempt. Across both runs, actual usage is four calls/4,098 tokens.
+
+The current runtime prefix is now `rubrics/judge-v3.txt`: it explicitly demonstrates
+the required `labels` object and string `rationale`, using neutral `LABEL`
+placeholders. Full evidence and the same rubric criteria remain intact. Planning
+and judge compatibility bind this new effective prompt. Frozen v1/v2 inputs and
+all human labels remain unchanged; this follow-up does not prove the lost
+response's shape or certify future provider behavior.
+
+Future judge artifacts retain each returned final content string before parsing
+(`judge_outputs`), and a malformed contract stops with `judge_contract_error`,
+structured validation issues and `failed_judge_outputs`. Diagnostics omit exception
+input/context and arbitrary exception text. Only authored public evaluation
+inputs/final judge output are in scope; hidden reasoning, credentials and visitor
+transcripts are not captured. No automatic retry is added. The generic task-error
+run is ineligible for incomplete-output reconciliation and keeps its full local
+hold. A new plan, fresh capacity and separate approval are required for another
+live attempt; validation remains separately budgeted.

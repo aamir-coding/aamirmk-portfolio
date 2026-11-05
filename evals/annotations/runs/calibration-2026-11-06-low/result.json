@@ -1,0 +1,58 @@
+{
+  "kind": "live_eval_attempts",
+  "status": "stopped",
+  "stage": "judge_calibration",
+  "runtime_deadline_seconds": 1982.375957,
+  "effective_prompt_sha256": "1ef485057bee23773a403d221d62b7160c23fc9dea82b988ca3a90e0c36e4023",
+  "judge_configuration": {
+    "model": "openai/gpt-oss-20b",
+    "temperature": 0.2,
+    "reasoning_effort": "low",
+    "response_format": "json_object",
+    "max_completion_tokens": 1024
+  },
+  "generation_accuracy_available": false,
+  "plan_sha256": "aff966c3252770637c3b77d6e336ebe23032a359b92c1d11057c45677b39af2c",
+  "source": {
+    "commit": "d609e12af6092065e3b8e36f7aa25d8a3bdcff20",
+    "dirty": false,
+    "code_sha256": "b171b172c9113690078840230eb202aac739a1448f90f5ab23e3f87d9e3207c9",
+    "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+    "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+    "versions": {
+      "groq": "1.7.0",
+      "pydantic": "2.10.6",
+      "httpx": "0.28.1",
+      "fastapi": "0.115.11",
+      "fastembed": "0.9.1",
+      "numpy": "2.5.4"
+    },
+    "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "finished_at": "2026-11-05T06:38:28.705274+00:00",
+  "stop_reason": "task_error_or_deadline",
+  "attempts": [
+    {
+      "number": 1,
+      "task_id": "calibration-01",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 10358.6839443,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "6a8b3d4093aaf4a2afd325c2c5af2021b8979f10d0645b41b655858eaf392efe",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 625,
+        "completion_tokens": 131,
+        "total_tokens": 756
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 10359.6026788,
+      "finish_reason": "stop"
+    }
+  ],
+  "ledger_sha256": "54cca01ded40719cdc07b9f1f1f74fa30d2aa2560fea2edc2f482f660b164e0f",
+  "results": [],
+  "reviews": []
+}

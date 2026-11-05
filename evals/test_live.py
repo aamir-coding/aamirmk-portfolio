@@ -752,6 +752,55 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
     assert all(a["finish_reason"] == "stop" for a in report["attempts"])
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "payload",
+    [
+        '{"support":"pass"}',
+        '{"labels":{"support":"pass","completeness":"pass","behavior":"pass","tone":"pass"},"rationale":{"support":"explanation"}}',
+        "not JSON",
+    ],
+)
+async def test_bad_judge_contract_retains_diagnostics(
+    monkeypatch: pytest.MonkeyPatch, payload: str
+) -> None:
+    import evals.live as live
+    from evals.calibration import JudgeConfiguration
+
+    inject_clock(monkeypatch)
+    provider = ScriptProvider([payload])
+    limits = {
+        "max_attempts": 20,
+        "input_tokens": 129760,
+        "output_tokens": 20480,
+        "per_call_input": 6488,
+        "per_call_output": 1024,
+    }
+    proposal = LivePlan(
+        run_id="test-diagnostics",
+        stage="judge_calibration",
+        budget=budget(
+            models={"openai/gpt-oss-20b": limits},
+            deadline_seconds=2700,
+            visitor_tpm=400,
+        ),
+        source={"dirty": False},
+        inputs_sha256="TEST ONLY",
+        judge_configuration=JudgeConfiguration(max_completion_tokens=1024),
+    )
+    result = await live.run_jobs(proposal, provider)
+    assert result["status"] == "stopped"
+    assert result["stop_reason"] == "judge_contract_error"
+    assert result["failure"]["error_type"] == "ValidationError"
+    assert result["failed_judge_outputs"][0]["output"] == payload
+    assert all(
+        "input" not in issue and "ctx" not in issue
+        for issue in result["failure"]["issues"]
+    )
+    assert provider.calls == 1
+    assert result["reviews"] == []
+
+
 def test_validation_cannot_mix_judge_output_settings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

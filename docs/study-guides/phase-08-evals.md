@@ -572,6 +572,41 @@ deleted, cooldown/one-shot/day/visitor checks remain, and the quiet-window expir
 is anchored to the user's confirmation. No scheduled task is created. Human
 grading remains unchanged; validation still needs its own compatible budget.
 
+## A finished provider response can still fail the application contract
+
+The 1,024-output recovery returned HTTP 200, 625 input/131 completion tokens and
+provider finish reason `stop`. The run nevertheless stopped with zero accepted
+grades. Transport success and a finished response do not establish that its JSON
+satisfies `JudgePayload`, or that a grade is semantically correct. This version
+saved only a generic task error, so the exact cause and response shape are unknown.
+Do not turn a plausible schema-error hypothesis into a historical diagnosis.
+
+`evals/calibration.py:36` selects runtime v3; `judge_system_prompt()` appends the
+same rubric definitions. `evals/rubrics/judge-v3.txt` explicitly demonstrates the
+nested `labels` object and string `rationale`, with neutral placeholders to avoid
+an all-pass example. The largest complete input reservation is **6,464**, below
+the unchanged 6,488 cap. Effective-prompt hashes invalidate old plans/results;
+the original v2 prompt, recorded runs, frozen grading inputs and labels are intact.
+
+`evals/live.py:497` now captures future final judge content before validation.
+The `ValidationError` handler at line 505 records safe structured issues, marks
+`judge_contract_error`, and stops without accepting the item or retrying it.
+At line 529 other failures retain exception class/task ID, excluding arbitrary
+exception text. These records cover authored public eval inputs and final judge
+content; hidden reasoning, credentials and visitor transcripts are not collected.
+The fake-provider regression `test_bad_judge_contract_retains_diagnostics` exercises
+flat labels, a nested rationale object and invalid JSON. It proves the diagnostic
+path works; it does not reconstruct the lost real response or prove future success.
+
+Interview Q&A: **Why not retry automatically after HTTP 200?** An attempted model
+call has already consumed capacity. The approved run stops on a contract failure;
+a new call needs a distinct plan/budget approval. **Can we count this response as
+a failed support grade?** No. Contract validity and support are different axes;
+an unparsed response is not a human-calibrated judgment. **Can the earlier two
+grades complete the recovery?** No. Prompt/settings differ, and partial diagnostic
+records are not one reproducible complete calibration. The two stopped runs total
+four actual calls/4,098 tokens, and no semantic accuracy badge is available.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

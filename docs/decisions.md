@@ -3,6 +3,15 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-043: Explicit judge output shape and post-response failure evidence
+
+**Date:** 2026-11-05
+**Context:** The approved low-effort/1,024-output recovery at clean `d609e12` stopped after one response (625 input/131 completion tokens, finish reason `stop`) with a generic task error. The version retained neither the original exception nor final response. An output cutoff is excluded by the recorded finish reason; the exact cause is unknown. A malformed JSON contract is a plausible failure mode, not a recovered historical fact.
+**Choice:** Retain the actual v2 template/run unchanged. Add runtime v3 with an explicit nested `labels` object and string `rationale`, neutral `LABEL` placeholders, unchanged full evidence and rubric definitions. Effective-prompt hashes invalidate older plans/results. Capture future final judge content before typed validation; malformed payloads stop without retries or accepted grades and retain structured issues with input/context excluded. Other failures retain safe exception class/task ID only. Raw exception messages, provider credentials, hidden reasoning and visitor transcripts are outside this capture scope.
+**Evidence/limits:** Fake-provider regressions cover flat labels, nested rationale and invalid JSON. These reproduce the diagnostics gap; they do not establish which error occurred in the lost live response. Current full prompts still fit the unchanged 6,488 input reservation. Both live runs remain incomplete and archived, totaling four calls/4,098 actual tokens. This generic task-error stop does not qualify for DRN-042 reconciliation. No new provider call or authorization is implied by the offline fix.
+
+---
+
 ### DRN-042: Explicit reconciliation of a fully reported stopped evaluation
 
 **Date:** 2026-11-05
