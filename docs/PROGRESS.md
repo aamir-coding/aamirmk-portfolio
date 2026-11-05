@@ -474,3 +474,8 @@ generation/held-out results before any model accuracy badge. Production-wide quo
 reservation/SDK HTTP attempts, proxy trust, Linux resource acceptance, broad SSE/cache/
 URL/dialog/session hardening and durable analytics remain tracked P7/P10/P9 work from
 the approved brief. The new receipt does not certify those defects fixed.
+
+Final result data: clean source `acc35c4f84b3cfb1527181ed6a88dfa24799e6cb` produced the
+committed offline artifact with zero Groq calls and no gate failures. The public
+projection was refreshed from it; 13 focused artifact/endpoint tests passed afterward.
+Initial JS: 166,077 gzip bytes (<200,000). Completion is local only.

@@ -55,3 +55,11 @@ Study guide is complete for the accepted offline scope; three practice questions
 included, with answers waived and none assessed. Phase 8 can be locally tagged complete
 without claiming the judge gate passed. Remote integration/push/deployment and the next
 phase have not been performed.
+
+Final artifact refresh: `python -m evals.run --full --output evals/results.json` ran from
+clean implementation commit `acc35c4f84b3cfb1527181ed6a88dfa24799e6cb`; all compatible
+baseline/critical gates passed with the original scores unchanged. The public projection
+was regenerated from that exact result without any model calls. Thirteen focused
+artifact/projection/endpoint regressions passed after the data refresh. The following
+commit records result data/documentation only, so the artifact truthfully names the
+clean source commit that produced it rather than inventing a self-referential commit.
