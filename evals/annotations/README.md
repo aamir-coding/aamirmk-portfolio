@@ -4,7 +4,17 @@
 hash and coverage validation passed; the unchanged submission is archived as
 `human-v1-aamir-2026-11-05.json`. Validation labels have four passes/four failures
 on each axis and no abstentions. Genuine judge outputs/agreement and separate live
-budget approval remain pending. The original template below stays blank.
+budget approval were then pending. The original template below stays blank.
+
+**Live attempt, 5 November 2026:** Aamir approved the twenty-answer calibration
+proposal. It stopped after three calls and two accepted grades; all calls reported
+usage, totaling 3,342 tokens. The third incomplete response consumed its full
+512-token output cap. No retry or higher cap was attempted. See
+`runs/calibration-2026-11-05-a/`. Calibration remains incomplete, validation is
+unexecuted, and any new live attempt needs fresh approval. The offline follow-up
+binds explicit low reasoning effort/output settings and records finish reasons;
+it does not retroactively fill missing settings/reasons in the old run. Your
+human labels remain unchanged and need no re-grading for this follow-up.
 
 The committed template contains **no human grades**. Aamir chose to fill a copied
 JSON file on 4 November 2026. `build/human-v1.json` is an ignored working copy;

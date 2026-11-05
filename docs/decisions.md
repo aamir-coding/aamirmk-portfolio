@@ -3,6 +3,16 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-040: Explicit judge settings after a bounded incomplete calibration run
+
+**Date:** 2026-11-05
+**Evidence:** Aamir confirmed the numeric twenty-call calibration proposal and account capacity. The clean `1927818` run made three real 20b requests, all with reported usage: 2,306 input + 1,036 completion = 3,342 tokens. Two grades parsed; the third reported the full 512 completion tokens and failed the runner's completion-status gate. It stopped without a retry or higher limit. The exact third finish reason was not retained by that version; do not retroactively assert it. Partial receipt/result are archived unchanged, never promoted to a complete judge artifact or an accuracy result.
+**Choice:** Keep the approved stop, output ceiling, retry prohibition and quota holds intact. In the offline follow-up, record `Attempt.finish_reason`, make `reasoning_effort: low` explicit for future evaluation judging only, and require typed judge configuration (model, temperature, effort, JSON format, output cap) in plan v2, results and judge artifacts. Validation must match calibration settings exactly, including output cap. Old plans and unrecorded configurations fail closed; do not guess the original provider-default effort. Production generation settings, frozen prompts/rubric, examples, splits and human grades remain unchanged.
+**Why:** Missing output and known usage are separate outcomes. The existing gate prevented an incomplete response from becoming a grade, but the missing finish metadata limited diagnosis. Explicit low effort is a supported Groq control and a bounded mitigation for future output pressure, not a demonstrated cure or evidence of better judging. Mocks verify request construction and failure behavior; they cannot prove that the next real response will fit or agree with a human.
+**Budget/provenance:** No unused part of a stopped authorization is silently reused. Preserve original build receipts for local quota accounting and archive copies for reproducibility. The conservative local ledger still charges the full approved ceiling for a stopped run; that is not actual provider consumption. A restart needs a new run ID, matching clean-source plan, fresh capacity verification and new approval, normally in a later UTC budget day. Recalibrate all twenty under one explicit configuration; the two old grades are diagnostic evidence only. The eight validation calls, held-out questions and publication remain outside this authorization.
+
+---
+
 ### DRN-039: Independent human grading and a separately authorized bounded runner
 
 **Date:** 2026-11-04

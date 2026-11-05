@@ -1,8 +1,9 @@
 # Phase 8 — Evaluation inputs and reproducible evidence
 
 Incremental study guide. Increments 1–3 and Increment 4's offline calibration/runner
-infrastructure are covered here. Human grading and genuine judge calibration are
-pending; telemetry and result-backed publication follow later. Aamir waived
+infrastructure are covered here. Human grading is validated; the first live judge
+run stopped incomplete. The follow-up and next-budget requirements are below;
+telemetry and result-backed publication follow later. Aamir waived
 waiting for teach-back answers on 4 November 2026 once the material was verified.
 This does not waive the separate human calibration grading required at Increment 4.
 
@@ -389,7 +390,7 @@ extraction, judge batches and synthesize a summary. An endpoint-level counter
 cannot bound those attempts. The standalone runner places its accounting seam
 below the production logic so all completion calls cross the same ledger.
 
-Read `evals/budget.py:163`, `MeteredLLM`, alongside `evals/live.py`:
+Read `evals/budget.py:165`, `MeteredLLM`, alongside `evals/live.py`:
 
 1. `Budget` requires approved per-model attempt/input/output ceilings and per-call
    reservations, shared rate/day limits, declared prior consumption, positive
@@ -476,9 +477,62 @@ Optional practice; responses are waived, not assessed:
 3. A local run crosses UTC midnight, then another starts immediately. Which daily
    charges and minute cooldown must the standalone runner preserve?
 
-The guide is complete for implemented Increment 4 infrastructure. Human grading,
-genuine judge agreement and live-budget authorization remain incomplete. Ask for
+The guide is complete for implemented Increment 4 infrastructure. Human grading is
+validated; genuine judge agreement and authorization for a new live run remain
+incomplete. Ask for
 clarification on any step; the teach-back waiver does not waive those inputs.
+
+## First live attempt — observed failure and bounded recovery
+
+On 5 November 2026, after human grading and explicit budget/capacity confirmation,
+the first live calibration run made three 20b requests. It accepted two grades
+and stopped at the third incomplete response. Reported usage was 2,306 input plus
+1,036 completion tokens, 3,342 total. The third call reported the entire 512-token
+completion ceiling. Its exact finish reason was not retained by that runner
+version; do not fill in a guessed `length` field in historical evidence.
+
+This separates two facts: usage can be fully known while output is invalid. A
+successful HTTP 200 does not prove that a complete grade exists. Two valid
+responses also cannot establish agreement on twenty calibration answers or the
+separate validation slice. The safety gate worked; the calibration task remains
+incomplete. See the preserved receipt/result in
+`evals/annotations/runs/calibration-2026-11-05-a/`.
+
+The offline follow-up makes future judge reasoning effort explicitly `low`, a
+supported control that may reduce output pressure. That is a mitigation hypothesis,
+not a live-tested fix or proof of better judgment. It keeps the 512-token limit,
+hard stop and no-retry policy. Future attempts retain the actual finish reason.
+Production generation settings and human grading material are unchanged.
+
+`JudgeConfiguration` now records model, temperature, reasoning effort, JSON format
+and maximum completion tokens. Plan schema v2 requires it for judge stages, and
+the result/JudgeSet retains it. `preflight` compares validation settings to the
+calibration artifact, including output cap. Legacy plans or missing configuration
+are rejected rather than assigned invented defaults. Effective prompt text and
+execution configuration are separate compatibility requirements: changing either
+can invalidate a calibration claim.
+
+Why not combine the two old grades with eighteen new ones? The old run left effort
+to a provider default; the next proposal explicitly selects low effort. Mixing
+their outputs would hide a changed judge configuration. Keep the old grades as
+diagnostic evidence and collect all twenty again under one recorded configuration.
+The unchanged human labels remain valid for their same frozen answers/evidence;
+no new human grading is inferred or required by the metadata change.
+
+Three attempted reservations were 22,536 tokens, while reported actual consumption
+was only 3,342. The standalone ledger additionally conservatively holds the whole
+stopped run's approved 150,240-token ceiling for that UTC budget day. These are
+three different quantities. Do not call a reservation or local hold actual
+provider usage, and do not release it by deleting the receipt. A restart needs a
+new plan/run ID, fresh remaining-capacity evidence and explicit approval, normally
+after the next local UTC budget day begins. The eight validation calls still need
+their own compatible budget. No further live call occurred during the follow-up.
+
+The fake/MockTransport regressions verify explicit SDK settings, finish-reason
+retention, old-plan rejection and cross-slice configuration compatibility. They
+cannot establish that a future real response fits in 512 tokens. Optional practice:
+explain why known usage, HTTP success, complete output and calibrated judging are
+four separate observations.
 
 ## Official references
 
@@ -494,3 +548,4 @@ clarification on any step; the teach-back waiver does not waive those inputs.
 - [Groq Python SDK retries/timeouts](https://github.com/groq/groq-python#retries): checked with installed Groq 1.7.0; standalone evaluation explicitly sets `max_retries=0` and per-request timeouts.
 - [Groq completion API](https://console.groq.com/docs/api-reference#chat-create): output caps and provider usage. The runner refuses missing or inconsistent reported usage.
 - [Groq organization rate limits](https://console.groq.com/docs/rate-limits): exact account limits and remaining capacity must be freshly reviewed before a live budget.
+- [Groq GPT-OSS reasoning effort](https://console.groq.com/docs/reasoning): low, medium and high effort are supported; an effort setting does not guarantee a response will fit an output ceiling. Checked alongside installed SDK 1.7.0.

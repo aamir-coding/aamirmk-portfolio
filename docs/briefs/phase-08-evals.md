@@ -8,6 +8,8 @@ Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later th
 
 **Increment 4, 2026-11-04:** Aamir authorized beginning Increment 4 and chose to fill a copied annotation JSON. Offline grading/runner infrastructure is implemented and verified; the packet contains 20 authored calibration and eight separate development validation answers. Human grades, real judge outputs/agreement and live-budget authorization remain pending. The guide covers this implemented infrastructure. Increment 4 is not declared calibrated or fully complete.
 
+**Bounded live run, 2026-11-05:** All 28 attested human grades passed offline validation. Aamir confirmed the concrete twenty-call calibration proposal, account capacity and quiet window. It stopped after three calls/two accepted grades, reporting 3,342 tokens; the third response consumed its 512-token output cap and was incomplete. No retry or validation call occurred. Offline follow-up makes judge reasoning/settings explicit and retains finish reasons. Another full twenty-answer run needs a new plan, fresh capacity and new approval; the stopped authorization is not reusable. Increment 4 remains uncalibrated/incomplete and Increment 5 has not started.
+
 ## Remaining audit disposition
 
 ### 1. Offline implementation

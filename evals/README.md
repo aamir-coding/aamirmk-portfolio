@@ -1,8 +1,9 @@
 # Offline evaluations — Phase 8, Increments 1–4 infrastructure
 
 These increments supply frozen inputs, retrieval diagnostics, recorded-output
-checks and calibration/budget infrastructure. Human grading and live model runs
-remain pending. No model accuracy is reported and no draft fact is certified.
+checks and calibration/budget infrastructure. Human grading is validated; the
+first bounded live calibration run stopped incomplete. No model accuracy is
+reported and no draft fact is certified.
 
 ## Dataset and approval status
 
@@ -248,7 +249,8 @@ The first command validates existing grading material; `--freeze` is write-once
 initial creation and refuses overwrites. The second reports pending until genuine
 grades/judge outputs exist. `--judge <judge.json>` compares saved judge output
 offline; it never generates labels. The third prints offline-only/zero Groq calls.
-None grants authorization. Current grading/calibration status is pending.
+None grants authorization. Human grading is complete; judge calibration remains
+incomplete after the bounded run described below.
 
 Agreement uses validation only, after twenty human calibration answers and twenty
 judge calibration answers exist. It requires at least 80% agreement on every axis,
@@ -311,8 +313,9 @@ window, fresh exact-account-limit evidence and acknowledgments for visitor
 allowance, draft corpus and input reservation policy. It rejects dirty/changed
 source, data, runtime or grading inputs. It reads the API key only from the process
 environment after these gates; no key is accepted/stored in plans. The owned SDK
-client pins Groq's host and disables SDK retries. This session has **no such
-authorization**, and no execution command was run.
+client pins Groq's host and disables SDK retries. Aamir authorized the first
+twenty-answer proposal on 5 November 2026. It stopped after three calls/two grades;
+that stopped authorization cannot be reused for another attempt.
 
 Each provider error, timeout, cancellation, missing/inconsistent usage, model
 mismatch, truncation or exhausted cap stops further attempts; production fallback
@@ -344,3 +347,32 @@ held-out outcome, public badge, schedule, push or deployment is implied here.
 - [Groq SDK retry/timeout controls](https://github.com/groq/groq-python#retries)
 - [Groq completion caps and usage](https://console.groq.com/docs/api-reference#chat-create)
 - [Organization/account-specific rate limits](https://console.groq.com/docs/rate-limits)
+
+### First live attempt and offline follow-up — 5 November 2026
+
+`annotations/runs/calibration-2026-11-05-a/` archives the original receipt/result
+and a partial-run summary. The run at clean `1927818` made **three** real 20b
+requests, completed **two of twenty** grades and reported **2,306 input + 1,036
+completion = 3,342 total tokens**. The third response used its full 512 completion
+tokens and was rejected as incomplete. No request was retried or cap increased.
+The old runner did not retain its exact finish reason, so none is invented now.
+No validation, generator or held-out call occurred; no complete `judge.json`,
+calibrated status or accuracy result was produced.
+
+Future judge plans are schema v2 and require explicit `JudgeConfiguration`:
+20b, temperature 0.2, JSON object format, `reasoning_effort: low`, and the approved
+output cap. The SDK supports low effort; it is a mitigation, not a verified cure
+for truncation. Generation retains its application settings. Each new attempt
+records the provider finish reason. Plans, run results and judge artifacts retain
+the configuration, and validation rejects settings/output caps differing from
+calibration. Legacy plans/configurations are rejected rather than assigned guessed
+defaults. The archived v1 run remains valid historical evidence, not a v2 result.
+
+A fresh complete twenty-answer calibration is required under one explicit
+configuration; the two older grades cannot be mixed into it. Human annotations,
+examples, evidence, static prompt/rubric and split files are unchanged. The local
+ledger conservatively holds the entire stopped run's approved ceiling for that
+UTC budget day; this is **not** actual provider consumption. Do not delete its
+build receipt, reset the hold, or reinterpret the unused allowance as permission
+for retries. A new plan needs fresh approval and account capacity, normally in a
+later UTC budget day. No follow-up live call has been authorized or made.
