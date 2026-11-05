@@ -758,6 +758,23 @@ base input bounds91,643 +two worst-case extras13,952=105,595 fit106,000 input;
 22output caps total22,528. This preserves the200,000 daily ceiling and gives two
 recovery slots, rather than silently granting the previous larger allowance.
 
+## Latest measurement after explicit axis independence
+
+The authorized rerun completed all 20 answers in 20 attempts with no failure or
+recovery. Support 18/20(90%); Completeness, Behavior, Tone each 17/20(85%). Behavior's
+observed agreement rose from 75% to 85%, while Support/Completeness each fell 5 points;
+this is a stochastic development comparison, not a controlled causal proof. All
+axes exceed 80% on calibration. The independent eight validation answers remain
+unexecuted, so the formal gate remains `insufficient`.
+
+Eleven disagreements remain with unchanged human grades, including Behavior on
+08/17/20. Never change labels silently to improve agreement. New known usage 19,018
+adds no unknown consumption; all older unknown reservations remain fully charged.
+The new recipe is distinct from the archived prior prefix/schema, and normal
+prior-result validation checks all 20 IDs and the actual current fingerprint. The
+[latest result](../audits/2026-11-05-judge-calibration.md) records metrics/provenance/
+budget. All76facts remain draft; no badge, phase tag or publication follows.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

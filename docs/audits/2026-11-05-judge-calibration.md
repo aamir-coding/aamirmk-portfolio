@@ -1,86 +1,71 @@
-# Judge calibration result — all twenty answers collected
+# Judge calibration — axis-independent rerun completed
 
-The strict v4 calibration run completed **all 20 answers in 22 attempts**, recovering
-HTTP 400 `json_validate_failed` on items 05 and 20 without pausing for user action.
-It finished at **16:24:58 IST on 5 November 2026**, before the 16:37:18 deadline.
-This completes the requested collection run. It does **not** pass the calibration
-quality gate: behavior agreement is below 80% on this development slice, and the
-separate eight-answer validation set has not been model-judged.
+All **20 calibration answers completed in 20 attempts**, with no failures or
+recoveries, at **17:38:26 IST on 5 November 2026**. The clarified prompt explicitly
+forbids failing Behavior for factual falsity/unsupportedness; Behavior covers only
+identity, injection resistance and refusal boundaries. Human labels are unchanged.
 
-## Agreement with Aamir's unchanged human labels
+| Axis | Exact matches | Agreement |
+|---|---:|---:|
+| Support |18/20|90%|
+| Completeness |17/20|85%|
+| Behavior |17/20|85%|
+| Tone |17/20|85%|
 
-| Axis | Exact matches | Denominator | Agreement |
-|---|---:|---:|---:|
-| Support | 19 | 20 | 95% |
-| Completeness | 18 | 20 | 90% |
-| Behavior | 15 | 20 | 75% |
-| Tone | 17 | 20 | 85% |
+All four axes exceed 80% on this **calibration development slice**. The independent
+eight-answer validation slice is still unexecuted; the formal gate is `insufficient`,
+not a calibrated judge or generator accuracy result. No public accuracy badge.
+The prior completed recipe scored 95%/90%/75%/85% respectively; the new run scores
+90%/85%/85%/85%. This is an observed comparison, not a controlled causal study.
 
-No item is missing; all eleven item/axis disagreements and both rationales are
-preserved in the derived summary. These are authored calibration examples, not
-live generator accuracy or factual approval. The formal agreement report remains
-`insufficient`: calibration judged 20, validation judged 0. No accuracy badge is
-available. Human labels, including disagreements, are authoritative and unchanged.
+All eleven current disagreements and both rationales remain in `summary.json`:
+Support09/10; Completeness05/10/18; Behavior08/17/20; Tone06/10/18. No label was
+silently changed to improve agreement. In particular, a Support false positive
+remains on10 and a false negative on09. Review semantics separately from coverage,
+valid JSON, citations or passing development thresholds.
 
-The behavior disagreements are items 06, 08, 10, 12 and 14. Four have human pass /
-judge fail; item 08 has human fail / judge pass. Several model rationales assign a
-behavior failure because an answer is factually wrong, mixing support with the
-identity/privacy/injection/refusal axis. Tone still disagrees on items 06, 08 and
-10. Support disagrees on item 09; completeness on 08 and 13. Review these
-calibration interpretations before another live budget. Do not edit human labels
-to improve agreement or tune against unseen validation model outcomes.
+## Provenance
 
-## Exact configuration and provenance
+- Run: `calibration-2026-11-05-axis-independent`, clean source `d2db83d`.
+- Model `openai/gpt-oss-20b`, temperature 0.2, low reasoning, max completion 1,024, strict JSON schema.
+- Exact plan SHA: `4ada9aed95decadd680ab83466c3e7378675f82351a34af61ee8f5f2d0dbcada`.
+- Effective instruction/schema recipe:
+  `88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65`.
+- Result SHA: `6595e3a051695b25d4e19d0edeb4a4a36920eda80577e9915bc9b71350655c67`.
+- Judge SHA: `8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d`.
+- Ledger SHA: `762706ee9d156347a963299ec92c0fb5b999dfff82cfea71ff448ffc1ff76e09`.
 
-- Run: `calibration-2026-11-05-v4-strict`; clean source `28fd20c`.
-- Model: `openai/gpt-oss-20b`, temperature 0.2, low reasoning, 1,024 completion cap.
-- Response format: strict JSON schema derived from typed grade/labels; local
-  validation retains nonblank rationale. The separate `judge-v4-strict.txt` retains
-  the user's explicit behavior/tone/rationale requirements. Used v4 remains intact.
-- Plan SHA: `35c3af183b951e6ccd7fcbcdfff4f9cb3927187ecf1e56d7fdd21b39890f2f4b`.
-- Recipe SHA (actual instructions plus actual schema):
-  `4e1594a36321794a3a61494b0c8a5456743f61f42d5d7e207c93bf7cbf4346cd`.
-- Result SHA: `9613df9839ae28e44c08ed777553fa971787fb8bb4c93d5c889580bddc60d60c`.
-- Ledger SHA: `5d28588cfe0fd6705c643eef05038cd7556a3e1ee7a960975b6135c6290d7ed0`.
-- Judge SHA: `9388a686663570daac88420bfc7b46760cf8091148d2fa64f82f173176194db0`.
+Exact receipt/result/judge, runtime prefix/schema snapshots, summary, formal gate
+report, HTTP progress and explicit usage reconciliation are archived in
+[`evals/annotations/runs/calibration-2026-11-05-axis-independent/`](../../evals/annotations/runs/calibration-2026-11-05-axis-independent/).
+Original receipt/result/judge bytes and canonical hashes match; normal prior-result
+validation confirms exactly 20 calibration IDs and the actual recipe. The original
+human fingerprint is unchanged and all 76 public fact chunks remain draft.
 
-Exact receipt/result/judge, HTTP progress, diagnostic summary and formal gate
-report are archived in
-[`evals/annotations/runs/calibration-2026-11-05-v4-strict/`](../../evals/annotations/runs/calibration-2026-11-05-v4-strict/).
-Archived receipt/result/judge bytes match the original build artifacts. All twenty
-IDs/item hashes and the effective recipe pass normal prior-result validation.
-The original human fingerprint is unchanged; all 76 public facts remain draft.
+The prior recipe, full 20 judgments, two automatic recoveries and prior metrics
+remain under `calibration-2026-11-05-v4-strict/`, with its exact old runtime/schema
+snapshot and verified historical hash. Earlier partial attempts remain intact.
+No earlier grades were imported into this fresh recipe.
 
-## Quota and recovery evidence
+## Budget and checks
 
-- Maximum authorized continuation: 24 attempts / 160,000 tokens, zero visitors;
-  projected daily maximum 197,808 including earlier unknown reservations.
-- Actual: 22 attempts; 20 accepted responses; two recoveries under the same ledger,
-  deadline and rolling minute gate. No SDK-hidden retry or quota reset.
-- Reported: **15,306 input + 4,057 completion = 19,363 tokens**.
-- Two failed requests have unknown consumption; retain **14,067** full calculated
-  request reservations. Their error bodies/hidden generation were not captured.
-- All attempt reservations: 103,262 input + 22,528 output = **125,790**, within
-  the 135,424 / 24,576 component ceilings. No failed reservation was refunded.
-- Across today's five runs: 51 attempts, **41,659 reported tokens** and four
-  unknown requests retaining **29,579** reservations. These are local evidence,
-  not independently measured account-wide remaining capacity.
+The plan allowed 22 attempts/two recoveries,106,000 input+22,528 output=128,528 reserved,
+zero visitors, and a 17:55:11 hard expiry. The largest complete input bound 6,973
+fits 6,976; 20 base bounds91,643+two worst-case extras 13,952=105,595 fits 106,000.
+Prior daily charge 71,238 included every historical unknown reservation; the new
+projected daily maximum 199,766 stayed below 200,000.
 
-The strict run still encountered provider JSON validation errors. Its bounded
-recovery succeeded; do not claim strict mode eliminates every provider failure or
-infer an output cutoff from a 400. Full input/schema bounds remain at most 6,953,
-under the 6,976 cap. Earlier v3/v4 partial grades are not mixed into this result.
+Actual: **15,246 input+3,772 completion=19,018 reported tokens**. No new unknown
+usage. All attempt reservations total 112,123 (91,643 input+20,480 output), within
+component ceilings. Explicit completed-run reconciliation charges 19,018 actual,
+leaving all earlier unknown reservations untouched. Across today's six runs:
+**71 attempts,60,677 reported tokens+29,579 unknown-reserved=90,256 charged**.
+This is local accounting, not independent provider-account telemetry.
 
-## Historical partial runs
-
-The v3 run collected 19/20 before an unclassified HTTP 400; its original body was
-not retained. The first v4/JSON-object run collected 4/20 before a safely identified
-`json_validate_failed` (3,857 known tokens plus 8,000 unknown-reserved). Exact
-historical records remain under their distinct run directories. The earlier two
-runs likewise remain preserved; no missing grade or finish reason was invented.
-
-Offline verification for the final implementation: **473 passed, one existing
-warning in 67.40s**; configured Ruff and formatter passed. Read-only reviews checked
-schema provenance, emitted hashes, recovery limits and reservation arithmetic.
-All automated tests use fakes/MockTransport. No new dependencies, factual approval,
-validation/held-out calls, public badge, phase completion tag, push or deployment.
+Fresh pre-run checks: **477 backend/eval tests passed, one existing warning in
+75.24s**; configured Ruff/formatter/diff clean. Automated checks used only fakes
+and MockTransport; the authorized calibration above is separately recorded as
+live. Read-only review ran 6 pure tests in 9.37s and found no blocker. Final artifact
+audit confirmed hashes, plan/recipe binding, metrics, usage and all 20 IDs. No source
+changed during execution; post-run changes are docs/artifacts only. No new
+dependencies, validation/held-out calls, phase-completion tag, push or deployment.

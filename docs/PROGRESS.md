@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. **All twenty calibration answers collected** under strict v4 in 22 attempts, with two automatic recoveries. Agreement: support 19/20 (95%), completeness 18/20 (90%), behavior 15/20 (75%), tone 17/20 (85%). Known usage 19,363; two failed calls retain 14,067 reservations. Behavior remains below 80% and the independent eight-answer validation gate is unexecuted; no calibrated/accuracy claim. Human grades and all 76 draft facts are unchanged. [Full result](audits/2026-11-05-judge-calibration.md).
+**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. Axis-independent rerun completed **20/20 in 20 attempts**, no failures/recoveries. Agreement: **Support 18/20(90%), Completeness 17/20(85%), Behavior 17/20(85%), Tone 17/20(85%)**. All four exceed 80% on the calibration slice; independent 8-answer validation is unexecuted, so no formal calibrated/accuracy claim. Human labels and all 76 draft facts unchanged. [Full results](audits/2026-11-05-judge-calibration.md).
 
 **Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
@@ -9,7 +9,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Execute Aamir's explicitly authorized fresh calibration rerun with strict axis independence: factual falsity/unsupportedness cannot automatically fail Behavior. New plan reserves 128,528 tokens (up to22 attempts) with all prior unknown reservations retained; daily maximum199,766, zero visitors. Hard expiry **17:55:11 IST on 5 November**. Human labels and the unexecuted eight-answer validation set remain unchanged; Increment5 has not started.
+Next: Review the completed calibration result, then separately authorize/budget the independent eight-answer validation run. No further tuning against validation outcomes. Increment 5 has not started; publication/fact approval remain separate.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +34,7 @@ Next: Execute Aamir's explicitly authorized fresh calibration rerun with strict 
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 20/20 calibration collected; behavior 75%; validation pending | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟡 Calibration20/20 collected; all axes ≥85%; independent validation pending | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -191,7 +191,7 @@ Next: Execute Aamir's explicitly authorized fresh calibration rerun with strict 
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. All 28 human grades are validated; all 20 calibration answers are now judged under one strict configuration. Agreement95% support/90% completeness/75% behavior/85% tone. Review the five behavior disagreements; independent 8-answer validation remains unexecuted. Exact results and all disagreements are archived.
+1. All 28 human grades are validated; fresh axis-independent calibration collected 20/20. Agreement 90%/85%/85%/85%. The separate 8-answer validation slice is unexecuted; human labels/eleven current disagreements remain visible.
 2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
 3. Human grading has been supplied and is unchanged. Fact approval and any further live budget remain separate; no blanket approval of 76 draft facts, validation calls or public accuracy badge is implied.
 
@@ -342,15 +342,29 @@ Next: Execute Aamir's explicitly authorized fresh calibration rerun with strict 
 - Exact agreement: **19/20 support (95%),18/20 completeness (90%),15/20 behavior (75%),17/20 tone (85%)**. All eleven disagreements preserved. Behavior still mixes factual support failures with behavior; review items06/08/10/12/14 without silently editing human labels. This is development calibration agreement, not generator accuracy. Formal report is `insufficient` because independent validation is **0/8**; no calibrated/badge claim.
 - Usage **15,306 input +4,057 completion = 19,363 reported tokens**. Two unknown calls retain **14,067** full request reservations. All reservations **103,262 input +22,528 output =125,790**, below 135,424/24,576 and max24 attempts. Across today's five runs: **51 attempts /41,659 known tokens +29,579 unknown-reserved**. These are local records, not an independently measured account balance.
 - Complete receipt/result/judge/progress/summary/gate report archived unchanged in `evals/annotations/runs/calibration-2026-11-05-v4-strict/`; original bytes/hashes and exact20 item IDs verified. Result SHA `9613df9839ae28e44c08ed777553fa971787fb8bb4c93d5c889580bddc60d60c`; judge SHA `9388a686663570daac88420bfc7b46760cf8091148d2fa64f82f173176194db0`; ledger SHA `5d28588cfe0fd6705c643eef05038cd7556a3e1ee7a960975b6135c6290d7ed0`. Effective recipe includes instructions+actualschema and passes normal prior-result validation. Human hash unchanged; all 76 facts still draft.
-- Final source verification remains **473 passed,1 existing warning in 67.40s**, configured Ruff/formatter/diff clean; only docs/artifacts changed after the run. Full calibration review/study guide updated; no repeated broad tests required. No validation/held-out call, new dependency, push, deployment, completion tag or Increment5 work. Requested20-answer collection complete; calibration quality/validation gates remain pending.
+- Final source verification remains **473 passed,1 existing warning in 67.40s**, configured Ruff/formatter/diff clean; only docs/artifacts changed after the run. Full calibration review/study guide updated; no repeated broad tests required. No validation/held-out call, new dependency, push, deployment, completion tag or Increment 5 work. Requested20-answer collection complete; calibration quality/validation gates remain pending.
 
 ## Axis-independence rerun preparation — 2026-11-05
 - Aamir explicitly authorized a fresh20-answer run with Behavior ONLY identity/injection/refusal boundaries, and factual errors assigned to Support. Updated requested strict prompt without editing human labels or evidence. Prior exact runtime prefix/schema archived under `calibration-2026-11-05-v4-strict/`; their combined recipe hash matches the previous actual run. Current complete input bound **6,973 <= 6,976**; base20 sum **91,643**.
 - Completed-run reconciliation retains every unknown reservation while charging reported usage at actual tokens. Validates original bindings, client chronology, approved caps/recovery allowance and matching recovery proof for nonterminal unknowns. Test-first completed-run case failed, then **52 reconciliation tests passed in11.98s**, including missing-proof/false-usage/reversed-time negatives. Prior daily charge **71,238 =41,659 reported +29,579 unknown-reserved**, 51 attempts. Original receipts/results/judge unchanged.
 - New ceiling **106,000 input +22,528 output =128,528**, maximum22 attempts/two recoveries, zero visitors. Required input including two worst-case recoveries105,595 fits. Daily maximum **199,766**, below200,000; per-call cap and8,000TPM unchanged. New hard expiry **17:55:11 IST** anchored to current authorization. No model-call quota claim about production or independently verified account balance.
-- Fresh full offline suite **477 passed,1 existing warning in75.24s**; configured Ruff/formatter/diff checks passed. Tests use only fakes/MockTransport and existing embedding cache outside the known sandbox asyncio issue. No frontend changes/checks. DRN-049/study guide document the clarification. Preparing exact clean-source plan; no new live call at this preparation point. Validation/held-out/badge/phase completion remain outside this rerun.
+- Fresh full offline suite **477 passed,1 existing warning in 75.24s**; configured Ruff/formatter/diff checks passed. Tests use only fakes/MockTransport and existing embedding cache outside the known sandbox asyncio issue. No frontend changes/checks. DRN-049/study guide document the clarification. Preparing exact clean-source plan; no new live call at this preparation point. Validation/held-out/badge/phase completion remain outside this rerun.
 
-- Scoped read-only review found no blocker; **6 pure tests passed in9.37s**. Independently confirmed prior recipe preservation, changed new recipe, completed-run unknown charges, prompt bound6,973 and daily ceiling199,766. No reviewer edits/provider calls.
+- Scoped read-only review found no blocker; **6 pure tests passed in9.37s**. Independently confirmed prior recipe preservation, changed new recipe, completed-run unknown charges, prompt bound6,973 and daily ceiling 199,766. No reviewer edits/provider calls.
+
+## Axis-independent calibration rerun completed — 2026-11-05
+- Completed all 20 in 20 attempts, zero failures/recoveries, at **17:38:26 IST**, before 17:55:11 expiry. Clean source `d2db83d`; plan SHA `4ada9aed95decadd680ab83466c3e7378675f82351a34af61ee8f5f2d0dbcada`. Fixed 20b/low/1,024/strict schema/zero visitors; no source changes during execution.
+- Measured **Support 18/20(90%), Completeness 17/20(85%), Behavior 17/20(85%), Tone 17/20(85%)**. All axes exceed 80% on calibration examples. Eleven disagreements and unchanged human rationales retained. Formal gate is `insufficient` because independent validation is 0/8; no generator accuracy/badge claim.
+- Usage **15,246 input+3,772 completion=19,018 known tokens**, no new unknown usage. Reservations 112,123 within 106,000 input/22,528 output and128,528 total. Declared daily maximum 199,766 respected. Explicit completed-run reconciliation charges 19,018 actual, preserves all historical unknowns. Today's totals **71 attempts /60,677 reported+29,579 unknown-reserved=90,256 charged**; not independent account telemetry.
+- Exact receipt/result/judge/runtime/schema/summary/gate/progress/reconciliation archived under `evals/annotations/runs/calibration-2026-11-05-axis-independent/`. Result SHA `6595e3a051695b25d4e19d0edeb4a4a36920eda80577e9915bc9b71350655c67`; judge SHA `8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d`; recipe SHA `88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65`. Original bytes/hash/20 IDs and prior-result validation verified. Previous complete/partial runs remain intact; no grades mixed. Human hash unchanged; all 76chunks draft.
+- Read-only final audit found no blocker, confirmed hashes/plan/recipe/tallies/usage/20 IDs, no edits or provider calls. Final implementation checks remain **477 passed,1 warning in 75.24s**, configured Ruff/formatter/diff clean; only docs/artifacts changed after execution. Guide/result review updated. No validation/held-out call, phase tag, push, deploy or Increment 5 work.
+
+## Axis-independent rerun result — 2026-11-05
+- At clean `d2db83d`, exact plan SHA `4ada9aed95decadd680ab83466c3e7378675f82351a34af61ee8f5f2d0dbcada`, completed all20 in20 attempts with **zero failures/recoveries**, finished **17:38:26 IST** before17:55:11expiry. Strict20b/low/1,024/zero visitors unchanged; no source edits during execution.
+- Updated agreement **Support18/20(90%), Completeness17/20(85%), Behavior17/20(85%), Tone17/20(85%)**. All calibration axes exceed80%. Eleven disagreements and human rationales preserved. Independent validation is0/8; formal report still `insufficient`, no calibrated/generator-accuracy claim. No grades mixed from prior recipe.
+- Usage **15,246 input+3,772 output=19,018 reported**, no new unknowns. Reservations112,123 fit106,000input/22,528output/128,528total; daily projected maximum199,766 respected. Explicit known-use reconciliation charges19,018 and leaves every historical unknown reservation intact. Across six runs **71attempts /60,677 known+29,579 unknown-reserved=90,256charged**; local accounting, not provider telemetry.
+- Exact receipt/result/judge/runtime/schema/progress/summary/gate/reconciliation archived in `evals/annotations/runs/calibration-2026-11-05-axis-independent/`. Result SHA `6595e3a051695b25d4e19d0edeb4a4a36920eda80577e9915bc9b71350655c67`; judge SHA `8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d`; recipe SHA `88926e448192c20befd86c38b92c68e6b67456773025a380091229b5f1d18f65`. Original bytes/hashes/exact20IDs and current recipe verified; human hash unchanged; all76facts draft.
+- Final read-only artifact audit found no blocker: verified canonical hashes, approved plan, recipe/schema,20IDs, metrics,19,018known/112,123reserved and zero unknowns/recoveries. No reviewer edits/APIcalls. Implementation checks remain **477passed,1 existing warning in75.24s**; current Ruff/formatter/diff clean. Only docs/artifacts changed after execution. Study guide/result review updated. No validation/held-out call, badge, tag, push, deployment or Increment5 work.
 
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
@@ -374,8 +388,7 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-All twenty calibration answers are collected. Behavior agreement remains 15/20;
-the eight-answer validation gate is unexecuted, so judge calibration/accuracy
-publication is not approved. Preserve all human disagreements and unknown-call
-reservations. All 76 fact chunks remain draft. Phase 8 remains in progress;
-Increment 5 has not started. See the calibration result for next review scope.
+All twenty revised calibration answers are collected and every axis exceeds 80%
+on this development slice. The independent eight-answer validation gate remains
+unexecuted, so no formal calibrated/accuracy claim or badge. Human labels remain
+unchanged and all 76 facts remain draft. Increment 5 has not started.

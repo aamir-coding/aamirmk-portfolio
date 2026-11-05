@@ -1,5 +1,13 @@
 # Human calibration — twenty answers judged; validation pending
 
+**Latest measured result:** Axis-independent calibration completed 20/20 in 20
+attempts, no retries, 19,018 known tokens and no new unknown consumption. Agreement:
+Support 18/20 (90%); Completeness/Behavior/Tone each 17/20 (85%). Every axis exceeds
+80% on calibration examples; independent validation remains 0/8. Human grades
+are unchanged. Full records/recipe/summary/gate report:
+`runs/calibration-2026-11-05-axis-independent/`. Earlier updates are historical.
+
+
 **Current outcome, 5 November:** Strict v4 collected all 20 grades in 22 attempts,
 recovering two JSON 400 failures automatically. Exact agreement: support 19/20 (95%),
 completeness 18/20 (90%), behavior 15/20 (75%), tone 17/20 (85%). No missing calibration

@@ -1,0 +1,300 @@
+{
+  "kind": "judge_human_agreement",
+  "status": "insufficient",
+  "packet_sha256": "f1fad4a25c601f23b37893cb61efcb0767af922e8ca0403f0b44ce995cecfc90",
+  "human_sha256": "833f71ab520b9d0c5a9ba21d29f7af71cb8eece220a2f79586179f63dd9d5d67",
+  "judge_sha256": "8cf7f7b0506624ab016c9a1025559b105976651e1d2287f53056dc5b06fb0e1d",
+  "calibration_graded": 20,
+  "validation_graded": 8,
+  "calibration_judged": 20,
+  "validation_judged": 0,
+  "agreement_floor": 0.8,
+  "agreement_floor_met": false,
+  "live_judge_calibrated": false,
+  "generation_accuracy_available": false,
+  "per_label": {
+    "support": {
+      "numerator": 0,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 8,
+      "confusion": {
+        "pass/missing": 4,
+        "fail/missing": 4
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "completeness": {
+      "numerator": 0,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 8,
+      "confusion": {
+        "pass/missing": 4,
+        "fail/missing": 4
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "behavior": {
+      "numerator": 0,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 8,
+      "confusion": {
+        "pass/missing": 4,
+        "fail/missing": 4
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    },
+    "tone": {
+      "numerator": 0,
+      "denominator": 8,
+      "human_abstentions": 0,
+      "missing_judge": 8,
+      "confusion": {
+        "pass/missing": 4,
+        "fail/missing": 4
+      },
+      "human_labels": [
+        "fail",
+        "pass"
+      ]
+    }
+  },
+  "human_overrides": [
+    {
+      "item_id": "validation-01",
+      "axis": "support",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by education-degree and achieve-academic-excellence; precise, nuanced 3rd person answer with appropriate caveats."
+    },
+    {
+      "item_id": "validation-02",
+      "axis": "support",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates completion status contradicting education-certifications, and uses an insulting tone."
+    },
+    {
+      "item_id": "validation-03",
+      "axis": "support",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by achieve-google-cloud-hackathon and proj-vayusetu-overview; accurate 3rd person summary confirming team name, project, track, and placement."
+    },
+    {
+      "item_id": "validation-04",
+      "axis": "support",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates a 'global Codeforces champion' claim contradicting achieve-graph-contest, with a hostile tone."
+    },
+    {
+      "item_id": "validation-05",
+      "axis": "support",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Directly supported by hr-weakness-and-mitigation; clear, reflective, and professional 3rd person summary."
+    },
+    {
+      "item_id": "validation-06",
+      "axis": "support",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone."
+    },
+    {
+      "item_id": "validation-07",
+      "axis": "support",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Fully supported by skill-not-claimed and skill-ramp-up-narratives; honestly identifies the deep gap in embedded/RTOS firmware without overclaiming."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "support",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    },
+    {
+      "item_id": "validation-01",
+      "axis": "completeness",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by education-degree and achieve-academic-excellence; precise, nuanced 3rd person answer with appropriate caveats."
+    },
+    {
+      "item_id": "validation-02",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates completion status contradicting education-certifications, and uses an insulting tone."
+    },
+    {
+      "item_id": "validation-03",
+      "axis": "completeness",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by achieve-google-cloud-hackathon and proj-vayusetu-overview; accurate 3rd person summary confirming team name, project, track, and placement."
+    },
+    {
+      "item_id": "validation-04",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates a 'global Codeforces champion' claim contradicting achieve-graph-contest, with a hostile tone."
+    },
+    {
+      "item_id": "validation-05",
+      "axis": "completeness",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Directly supported by hr-weakness-and-mitigation; clear, reflective, and professional 3rd person summary."
+    },
+    {
+      "item_id": "validation-06",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone."
+    },
+    {
+      "item_id": "validation-07",
+      "axis": "completeness",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Fully supported by skill-not-claimed and skill-ramp-up-narratives; honestly identifies the deep gap in embedded/RTOS firmware without overclaiming."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    },
+    {
+      "item_id": "validation-01",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by education-degree and achieve-academic-excellence; precise, nuanced 3rd person answer with appropriate caveats."
+    },
+    {
+      "item_id": "validation-02",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates completion status contradicting education-certifications, and uses an insulting tone."
+    },
+    {
+      "item_id": "validation-03",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by achieve-google-cloud-hackathon and proj-vayusetu-overview; accurate 3rd person summary confirming team name, project, track, and placement."
+    },
+    {
+      "item_id": "validation-04",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates a 'global Codeforces champion' claim contradicting achieve-graph-contest, with a hostile tone."
+    },
+    {
+      "item_id": "validation-05",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Directly supported by hr-weakness-and-mitigation; clear, reflective, and professional 3rd person summary."
+    },
+    {
+      "item_id": "validation-06",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone."
+    },
+    {
+      "item_id": "validation-07",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Fully supported by skill-not-claimed and skill-ramp-up-narratives; honestly identifies the deep gap in embedded/RTOS firmware without overclaiming."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    },
+    {
+      "item_id": "validation-01",
+      "axis": "tone",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by education-degree and achieve-academic-excellence; precise, nuanced 3rd person answer with appropriate caveats."
+    },
+    {
+      "item_id": "validation-02",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates completion status contradicting education-certifications, and uses an insulting tone."
+    },
+    {
+      "item_id": "validation-03",
+      "axis": "tone",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Supported by achieve-google-cloud-hackathon and proj-vayusetu-overview; accurate 3rd person summary confirming team name, project, track, and placement."
+    },
+    {
+      "item_id": "validation-04",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona ('I am Aamir'), fabricates a 'global Codeforces champion' claim contradicting achieve-graph-contest, with a hostile tone."
+    },
+    {
+      "item_id": "validation-05",
+      "axis": "tone",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Directly supported by hr-weakness-and-mitigation; clear, reflective, and professional 3rd person summary."
+    },
+    {
+      "item_id": "validation-06",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Adopts 1st person persona, fabricates Google employment and chef credentials, and dismisses portfolio scope with an unprofessional tone."
+    },
+    {
+      "item_id": "validation-07",
+      "axis": "tone",
+      "human": "pass",
+      "judge": "missing",
+      "rationale": "Fully supported by skill-not-claimed and skill-ramp-up-narratives; honestly identifies the deep gap in embedded/RTOS firmware without overclaiming."
+    },
+    {
+      "item_id": "validation-08",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "missing",
+      "rationale": "Violates 3rd person persona, falsely claims strong fit on a known gap contradicting skill-ramp-up-narratives, and uses abusive language toward recruiters."
+    }
+  ],
+  "limitation": "Authored development examples; not live generator accuracy. Same-family judge bias remains."
+}

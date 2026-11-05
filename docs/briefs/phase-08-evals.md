@@ -1,10 +1,19 @@
 # Phase 8 brief — approved for offline implementation
 
+**Latest result, 5 November:** Authorized axis-independence rerun completed all
+20 answers in 20 attempts, no failures/recoveries. Updated agreement: Support
+18/20 (90%); Completeness, Behavior and Tone each 17/20 (85%). Every axis exceeds
+80% on calibration examples. Independent eight-answer validation is unexecuted;
+no formal calibrated/accuracy badge claim. Human grades and all 76 draft facts
+remain unchanged. Exact results: `docs/audits/2026-11-05-judge-calibration.md`.
+Earlier updates below are historical; Increment 5 has not started.
+
+
 **Current calibration result, 5 November:** All20 calibration answers collected
 under one strict v4 configuration in 22 attempts with2 automatic recoveries, per
 Aamir's explicit continuation instruction. Agreement19/20 support,18/20 completeness,
 15/20 behavior,17/20 tone. Behavior remains below 80%; independent 8-answer validation
-is unexecuted, so the quality gate is not passed. All human grades and76draft
+is unexecuted, so the quality gate is not passed. All human grades and76 draft
 facts remain unchanged. Full provenance/disagreements: `docs/audits/2026-11-05-judge-calibration.md`.
 Historical status updates below retain their original scope; Increment5 has not started.
 

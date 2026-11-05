@@ -532,3 +532,23 @@ behavior 15/20(75%),tone 17/20(85%). Behavior still falls below 80%; validation 
 The twenty-answer collection is complete; judge calibration/accuracy gate is not
 passed. See `docs/audits/2026-11-05-judge-calibration.md` for all disagreements,
 provenance and quota evidence. No additional live calls are implied by collection.
+
+
+### Axis-independent rerun completed
+
+The user-authorized clarification prevents factual falsity/unsupportedness from
+automatically failing Behavior, which now covers only identity, injection resistance
+and refusal boundaries. Previous exact runtime/schema and all human labels remain
+intact; a new recipe hash binds the revised runtime and actual response schema.
+
+`calibration-2026-11-05-axis-independent` completed 20/20 in 20 attempts, no recovery.
+Support 18/20 (90%); Completeness/Behavior/Tone each 17/20 (85%). Reported 19,018 tokens,
+no new unknown usage; reserved 112,123 <=128,528. Daily projected ceiling 199,766 was
+respected, zero visitors. Completed-run reconciliation charges actual known usage;
+all previous unknown reservations stay fully charged. Across all runs:60,677 known
++29,579 unknown-reserved=90,256 charged, 71 attempts (local accounting).
+
+Exact records/recipe/summary/gate report:
+`annotations/runs/calibration-2026-11-05-axis-independent/`. All calibration axes
+exceed 80%; independent validation 0/8 means no formal calibrated/generator-accuracy
+claim. See `docs/audits/2026-11-05-judge-calibration.md` for disagreements/provenance.
