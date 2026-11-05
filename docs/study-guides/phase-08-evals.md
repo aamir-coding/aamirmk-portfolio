@@ -736,6 +736,28 @@ recovery records and unknown reservations. Existing 473 fake-only tests, configu
 Ruff/formatter and read-only reviews cover the final implementation; post-run work
 adds only docs/artifacts. All76facts remain draft; no phase tag or badge follows.
 
+## Clarifying a judge axis is a new calibration recipe
+
+Aamir requested explicit axis independence: false/unsupported content belongs to
+Support and must not by itself fail Behavior. Behavior now covers only identity,
+injection resistance and refusal boundaries. The runtime includes the exact
+negative instruction and first-person impersonation examples. This supersedes
+the older `I refuse` and false-premise wording; it does not rewrite human grades.
+The old prefix/schema are archived with a verified old recipe hash, while the
+new prefix gets a fresh hash and complete calibration run. Validation remains
+untouched, so this is calibration tuning rather than tuning to validation results.
+
+The prior completed run has two unknown calls with known client completion times
+and recovery-journal entries. Explicit actual-use reconciliation can charge known
+usage at actual tokens while retaining **every unknown reservation**. Matching
+attempt/task/reason, original allowance, chronology, caps and hashes are checked;
+unfinished unknowns remain terminal stops. Missing proof, forged usage or reversed
+times fail closed. Original result files are not edited. Prior daily charge is
+71,238; new bounded rerun ceiling128,528 gives199,766, all visitors zero. Twenty
+base input bounds91,643 +two worst-case extras13,952=105,595 fit106,000 input;
+22output caps total22,528. This preserves the200,000 daily ceiling and gives two
+recovery slots, rather than silently granting the previous larger allowance.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

@@ -1,0 +1,15 @@
+{
+  "purpose": "explicit_reported_with_unknown_reservations",
+  "run_id": "calibration-2026-11-05-v4-strict",
+  "receipt_sha256": "fdd1213ed7d36fcc60a75b55650fa5194194f55c0b446195310be770553898cd",
+  "result_sha256": "9613df9839ae28e44c08ed777553fa971787fb8bb4c93d5c889580bddc60d60c",
+  "ledger_sha256": "5d28588cfe0fd6705c643eef05038cd7556a3e1ee7a960975b6135c6290d7ed0",
+  "actor": "Aamir standing actual-use authorization; Codex verified record",
+  "reference": "Explicit axis-independence rerun under existing budget; completed run reported tokens + every unknown reservation retained",
+  "created_at": "2026-11-05T11:46:03.768880Z",
+  "process_exit_verified": true,
+  "charged_requests": 22,
+  "charged_reserved_tokens": 125790,
+  "reported_tokens": 19363,
+  "unreported_reserved_tokens": 14067
+}

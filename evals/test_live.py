@@ -665,6 +665,74 @@ def test_explicit_partial_reconciliation_keeps_unknown_reservation(
     assert (old / "result.json").read_bytes() == original
 
 
+@pytest.mark.parametrize("fault", [None, "missing_recovery", "false_usage", "bad_time"])
+def test_completed_recovery_reconciliation_preserves_unknowns(
+    tmp_path: Path, fault: str | None
+) -> None:
+    from evals.live import build_known_stop_reconciliation, check_local_prior_usage
+
+    old = stopped_run(tmp_path)
+    receipt = json.loads((old / "receipt.json").read_text())
+    receipt["plan"]["judge_recovery_attempts"] = 1
+    receipt["approval"]["plan_sha256"] = canonical_sha256(receipt["plan"])
+    (old / "receipt.json").write_text(json.dumps(receipt))
+    data = json.loads((old / "result.json").read_text())
+    good = data["attempts"][0]
+    data.update(
+        status="complete",
+        stop_reason=None,
+        plan_sha256=canonical_sha256(receipt["plan"]),
+        recoveries=[
+            {
+                "attempt_number": 1,
+                "task_id": good["task_id"],
+                "reason": "provider_consumption_unknown",
+            }
+        ],
+    )
+    unknown = dict(good, status="unknown", usage=None, reported_model=None)
+    data["attempts"] = [
+        unknown,
+        dict(good, number=2, start_seconds=2, finished_seconds=3),
+    ]
+    if fault == "missing_recovery":
+        data["recoveries"] = []
+    if fault == "false_usage":
+        data["attempts"][0]["usage"] = good["usage"]
+    if fault == "bad_time":
+        data["attempts"][0]["finished_seconds"] = 4
+    data["ledger_sha256"] = canonical_sha256(data["attempts"])
+    (old / "result.json").write_text(json.dumps(data))
+    if fault:
+        with pytest.raises(ValueError):
+            build_known_stop_reconciliation(
+                old,
+                actor="TEST ONLY",
+                reference="TEST ONLY",
+                process_exit_verified=True,
+                actual_usage=True,
+                preserve_unknown=True,
+            )
+        return
+    rec = build_known_stop_reconciliation(
+        old,
+        actor="TEST ONLY",
+        reference="TEST ONLY explicit actual accounting",
+        process_exit_verified=True,
+        actual_usage=True,
+        preserve_unknown=True,
+    )
+    assert rec.reported_tokens == 25 and rec.unreported_reserved_tokens == 6100
+    (old / "actual-usage-reconciliation.json").write_text(rec.model_dump_json())
+    check_local_prior_usage(
+        plan().model_copy(
+            update={"budget": budget(prior_requests_today=2, prior_tokens_today=6125)}
+        ),
+        tmp_path,
+        datetime.now(UTC),
+    )
+
+
 @pytest.mark.parametrize(
     "fault",
     [

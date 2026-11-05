@@ -653,26 +653,33 @@ def _known_stop_charge(
     approved = LiveApproval.model_validate(receipt.get("approval", {}))
     if result.get("plan_sha256") != plan_hash or approved.plan_sha256 != plan_hash:
         raise ValueError("Stopped usage must bind to its original approved plan")
+    completed = (
+        actual_usage
+        and result.get("status") == "complete"
+        and result.get("stop_reason") is None
+    )
+    allowed_stops = (
+        {"provider_consumption_unknown"}
+        if preserve_unknown
+        else (
+            {
+                "incomplete_provider_output",
+                "task_error_or_deadline",
+                "judge_contract_error",
+            }
+            if actual_usage
+            else {"incomplete_provider_output"}
+        )
+    )
+    stopped = (
+        result.get("status") == "stopped" and result.get("stop_reason") in allowed_stops
+    )
     if (
         receipt["plan"]["run_id"] != run_id
         or result.get("kind") != "live_eval_attempts"
-        or result.get("status") != "stopped"
-        or result.get("stop_reason")
-        not in (
-            {"provider_consumption_unknown"}
-            if preserve_unknown
-            else (
-                {
-                    "incomplete_provider_output",
-                    "task_error_or_deadline",
-                    "judge_contract_error",
-                }
-                if actual_usage
-                else {"incomplete_provider_output"}
-            )
-        )
+        or not (completed or stopped)
     ):
-        raise ValueError("Only a fully reported incomplete-output stop is reconcilable")
+        raise ValueError("Run is not eligible for the requested reconciliation")
     rows = result.get("attempts", [])
     finished = datetime.fromisoformat(result.get("finished_at", ""))
     started = datetime.fromisoformat(receipt.get("started_at", ""))
@@ -692,6 +699,16 @@ def _known_stop_charge(
     counts: dict[str, int] = {}
     previous_finish = 0.0
     unreported_reserved = 0
+    recoveries = result.get("recoveries", [])
+    if not isinstance(recoveries, list) or len(recoveries) > receipt["plan"].get(
+        "judge_recovery_attempts", 0
+    ):
+        raise ValueError("Recovery journal exceeds the approved recovery allowance")
+    recovered = {
+        row.get("attempt_number"): row for row in recoveries if isinstance(row, dict)
+    }
+    if len(recovered) != len(recoveries):
+        raise ValueError("Duplicate or malformed recovery journal")
     for position, a in enumerate(attempts):
         cap = budget.models.get(a.model)
         counts[a.model] = counts.get(a.model, 0) + 1
@@ -712,9 +729,7 @@ def _known_stop_charge(
             raise ValueError("Unknown or inconsistent usage cannot release a hold")
         if preserve_unknown and a.status == "unknown":
             if (
-                position != len(attempts) - 1
-                or a.usage is not None
-                or a.finished_seconds is not None
+                a.usage is not None
                 or a.reported_model is not None
                 or a.finish_reason is not None
                 or not previous_finish <= a.start_seconds < float("inf")
@@ -722,6 +737,22 @@ def _known_stop_charge(
                 raise ValueError(
                     "Only a terminal unknown attempt can retain its reservation"
                 )
+            if a.finished_seconds is None:
+                if position != len(attempts) - 1 or result.get("status") != "stopped":
+                    raise ValueError(
+                        "Unfinished unknown attempt must be a terminal stop"
+                    )
+            else:
+                proof = recovered.get(a.number, {})
+                if (
+                    not a.start_seconds <= a.finished_seconds
+                    or proof.get("task_id") != a.task_id
+                    or proof.get("reason") != "provider_consumption_unknown"
+                ):
+                    raise ValueError(
+                        "Completed unknown request needs its approved recovery proof"
+                    )
+                previous_finish = a.finished_seconds
             unreported_reserved += a.reserved_input + a.reserved_output
             continue
         if (

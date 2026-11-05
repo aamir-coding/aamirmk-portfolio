@@ -3,6 +3,16 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-049: Explicit axis independence and completed-run actual-use accounting
+
+**Date:** 2026-11-05
+**Authorization:** Aamir explicitly requested a fresh twenty-answer rerun with Behavior limited to third-person identity, injection resistance and refusal boundaries. False or unsupported content must affect Support, not automatically fail Behavior. This supersedes the earlier runtime's first-person `I refuse` example and false-premise wording. Human labels, corpus, packet and validation assignments remain unchanged; do not adjust them to improve agreement.
+**Prompt/provenance:** Update the requested `judge-v4-strict.txt` with the explicit axis rule. Compact surrounding instructions without truncating evidence or dropping independent tone/completeness checks. Archive the prior exact runtime prefix and response format under its existing run; reconstructing their combined hash matches the old recipe fingerprint. New instructions get a new fingerprint; the fresh run imports no previous labels or judgments. Maximum complete input bound 6,973 <= 6,976, including schema.
+**Quota:** Completed runs with recorded recoveries can now use explicit actual-use reconciliation. All original plan/approval/receipt/result/ledger bindings, finite client chronology, usage/cap checks and verified process exit remain required. An unknown request with a recorded completion time must have a matching recovery-journal attempt/task/reason within the original allowance; an unfinished unknown remains allowed only as a terminal stopped call. Every unknown reservation stays fully charged. Regression cases reject missing proof, fabricated usage and reversed chronology. Original artifacts are unchanged.
+**Budget:** Prior completed strict run charges 19,363 known + 14,067 unknown-reserved; all prior daily charge is **71,238** across 51 attempts, including all 29,579 unknown reservations. Fresh plan: 20 answers plus up to 2 recoveries, 106,000 input + 22,528 output = **128,528**, zero visitors. Base input bounds total 91,643; two worst-case extras require 105,595 <= 106,000. Projected daily maximum **199,766 tokens / 73 attempts**. The existing 200,000 daily ceiling, 8,000 TPM, low effort and 1,024 output cap remain unchanged. New hard expiry 17:55:11 IST is anchored to the current rerun authorization, not an extension of an old window. Calibration development agreement and separate validation remain distinct; no result is guaranteed or badge approved.
+
+---
+
 ### DRN-048: User-authorized bounded recovery to collect all twenty answers
 
 **Date:** 2026-11-05

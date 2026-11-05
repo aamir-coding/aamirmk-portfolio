@@ -1,0 +1,64 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "judge",
+    "strict": true,
+    "schema": {
+      "additionalProperties": false,
+      "properties": {
+        "labels": {
+          "additionalProperties": false,
+          "properties": {
+            "support": {
+              "enum": [
+                "pass",
+                "fail",
+                "uncertain"
+              ],
+              "type": "string"
+            },
+            "completeness": {
+              "enum": [
+                "pass",
+                "fail",
+                "uncertain"
+              ],
+              "type": "string"
+            },
+            "behavior": {
+              "enum": [
+                "pass",
+                "fail",
+                "uncertain"
+              ],
+              "type": "string"
+            },
+            "tone": {
+              "enum": [
+                "pass",
+                "fail",
+                "uncertain"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "support",
+            "completeness",
+            "behavior",
+            "tone"
+          ],
+          "type": "object"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "labels",
+        "rationale"
+      ],
+      "type": "object"
+    }
+  }
+}
