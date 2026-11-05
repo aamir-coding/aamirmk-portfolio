@@ -607,6 +607,21 @@ grades complete the recovery?** No. Prompt/settings differ, and partial diagnost
 records are not one reproducible complete calibration. The two stopped runs total
 four actual calls/4,098 tokens, and no semantic accuracy badge is available.
 
+## An explicit accounting policy change is different from deleting a ledger
+
+Aamir subsequently authorized same-day recovery by reconciling the four fully
+reported calls to 4,098 actual tokens and setting all visitor reserves to zero.
+DRN-044 records this change. The original reservations remain preserved: new
+`actual-usage-reconciliation.json` records bind original approval/receipt/result/
+ledger hashes, verify process exit, chronology and complete known usage, then
+select actual tokens for daily charging. Unknown/lifecycle consumption cannot
+qualify. Without an explicit valid record the conservative hold still applies.
+The current run still reserves every new attempt's full cap and never retries
+automatically. The projected local daily ceiling is 4,098 + 150,240 = 154,338;
+account-wide availability still comes from the user's fresh statement. Zero
+visitor headroom is an explicit priority choice during the confirmed quiet window,
+not proof that the standalone runner controls production traffic.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

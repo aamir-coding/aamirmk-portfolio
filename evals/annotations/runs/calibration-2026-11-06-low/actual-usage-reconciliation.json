@@ -1,0 +1,14 @@
+{
+  "purpose": "explicit_reported_actual_usage",
+  "run_id": "calibration-2026-11-06-low",
+  "receipt_sha256": "19eab25ce624334dc17b22001ca97f416997efd0acbb4b85cbb9260ab7e43633",
+  "result_sha256": "9c341bcc4e2478bf4cad9e2f14130319ba90bc881c052dfccf12f3dafc9c79d8",
+  "ledger_sha256": "54cca01ded40719cdc07b9f1f1f74fa30d2aa2560fea2edc2f482f660b164e0f",
+  "actor": "Aamir (explicit authorization); Codex (verified record)",
+  "reference": "2026-11-05 explicit same-day actual-usage reconciliation approval; actual-usage-consent.json",
+  "created_at": "2026-11-05T07:07:36.341153Z",
+  "process_exit_verified": true,
+  "charged_requests": 1,
+  "charged_reserved_tokens": 7512,
+  "reported_tokens": 756
+}

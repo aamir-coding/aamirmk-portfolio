@@ -555,9 +555,9 @@ async def run_jobs(
 
 
 class KnownStopReconciliation(ReplayModel):
-    purpose: Literal["fully_reported_incomplete_output"] = (
-        "fully_reported_incomplete_output"
-    )
+    purpose: Literal[
+        "fully_reported_incomplete_output", "explicit_reported_actual_usage"
+    ] = "fully_reported_incomplete_output"
     run_id: Identifier
     receipt_sha256: Sha256
     result_sha256: Sha256
@@ -572,7 +572,11 @@ class KnownStopReconciliation(ReplayModel):
 
 
 def _known_stop_charge(
-    receipt: dict[str, Any], result: dict[str, Any], run_id: str
+    receipt: dict[str, Any],
+    result: dict[str, Any],
+    run_id: str,
+    *,
+    actual_usage: bool = False,
 ) -> tuple[int, int, int]:
     plan_hash = canonical_sha256(receipt["plan"])
     approved = LiveApproval.model_validate(receipt.get("approval", {}))
@@ -582,7 +586,16 @@ def _known_stop_charge(
         receipt["plan"]["run_id"] != run_id
         or result.get("kind") != "live_eval_attempts"
         or result.get("status") != "stopped"
-        or result.get("stop_reason") != "incomplete_provider_output"
+        or result.get("stop_reason")
+        not in (
+            {
+                "incomplete_provider_output",
+                "task_error_or_deadline",
+                "judge_contract_error",
+            }
+            if actual_usage
+            else {"incomplete_provider_output"}
+        )
     ):
         raise ValueError("Only a fully reported incomplete-output stop is reconcilable")
     rows = result.get("attempts", [])
@@ -638,14 +651,24 @@ def _known_stop_charge(
 
 
 def build_known_stop_reconciliation(
-    run_dir: Path, *, actor: str, reference: str, process_exit_verified: bool
+    run_dir: Path,
+    *,
+    actor: str,
+    reference: str,
+    process_exit_verified: bool,
+    actual_usage: bool = False,
 ) -> KnownStopReconciliation:
     if (run_dir.parent / "active.lock").exists():
         raise ValueError("Cannot reconcile while a runner is active")
     receipt = json.loads((run_dir / "receipt.json").read_text(encoding="utf-8"))
     result = json.loads((run_dir / "result.json").read_text(encoding="utf-8"))
-    requests, reserved, reported = _known_stop_charge(receipt, result, run_dir.name)
+    requests, reserved, reported = _known_stop_charge(
+        receipt, result, run_dir.name, actual_usage=actual_usage
+    )
     return KnownStopReconciliation(
+        purpose="explicit_reported_actual_usage"
+        if actual_usage
+        else "fully_reported_incomplete_output",
         run_id=run_dir.name,
         receipt_sha256=canonical_sha256(receipt),
         result_sha256=canonical_sha256(result),
@@ -674,6 +697,10 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
         )
         result_path = receipt_path.parent / "result.json"
         reconciliation_path = receipt_path.parent / "reconciliation.json"
+        actual_path = receipt_path.parent / "actual-usage-reconciliation.json"
+        actual_usage = actual_path.exists()
+        if actual_usage:
+            reconciliation_path = actual_path
         if reconciliation_path.exists() and not result_path.exists():
             raise ValueError("A reconciliation cannot replace a missing result")
         if result_path.exists():
@@ -697,7 +724,13 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                     reconciliation_path.read_text(encoding="utf-8")
                 )
                 if (
-                    record.run_id != receipt_path.parent.name
+                    record.purpose
+                    != (
+                        "explicit_reported_actual_usage"
+                        if actual_usage
+                        else "fully_reported_incomplete_output"
+                    )
+                    or record.run_id != receipt_path.parent.name
                     or record.receipt_sha256 != canonical_sha256(receipt)
                     or record.result_sha256 != canonical_sha256(result)
                     or record.ledger_sha256 != result.get("ledger_sha256")
@@ -705,7 +738,7 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                 ):
                     raise ValueError("Stopped-run reconciliation is stale or invalid")
                 requests, reserved, reported = _known_stop_charge(
-                    receipt, result, record.run_id
+                    receipt, result, record.run_id, actual_usage=actual_usage
                 )
                 if (
                     record.charged_requests,
@@ -715,7 +748,10 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                     raise ValueError(
                         "Reconciliation cannot reduce attempted-call reservations"
                     )
-                request_charge, token_charge = requests, reserved
+                request_charge, token_charge = (
+                    requests,
+                    reported if actual_usage else reserved,
+                )
         if now < finished + timedelta(seconds=60):
             raise ValueError(
                 "Local run cooldown has not elapsed; do not reset minute usage"

@@ -531,6 +531,54 @@ def test_explicit_known_stop_reconciliation_keeps_attempt_reservations(
 
 
 @pytest.mark.parametrize(
+    "reason", ["incomplete_provider_output", "task_error_or_deadline"]
+)
+def test_explicit_actual_usage_reconciliation(tmp_path: Path, reason: str) -> None:
+    from evals.live import build_known_stop_reconciliation, check_local_prior_usage
+
+    old = stopped_run(tmp_path)
+    result = json.loads((old / "result.json").read_text())
+    result["stop_reason"] = reason
+    (old / "result.json").write_text(json.dumps(result))
+    original = [(old / name).read_bytes() for name in ("receipt.json", "result.json")]
+    proposal = plan().model_copy(
+        update={
+            "budget": budget(
+                prior_requests_today=1,
+                prior_tokens_today=25,
+                visitor_rpm=0,
+                visitor_tpm=0,
+                visitor_rpd=0,
+                visitor_tpd=0,
+            )
+        }
+    )
+    with pytest.raises(ValueError, match="prior usage"):
+        check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+    record = build_known_stop_reconciliation(
+        old,
+        actor="TEST ONLY",
+        reference="TEST ONLY explicit actual-usage approval",
+        process_exit_verified=True,
+        actual_usage=True,
+    )
+    assert record.purpose == "explicit_reported_actual_usage"
+    assert record.charged_reserved_tokens == 6100
+    assert record.reported_tokens == 25
+    path = old / "actual-usage-reconciliation.json"
+    path.write_text(record.model_dump_json())
+    check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+    assert original == [
+        (old / name).read_bytes() for name in ("receipt.json", "result.json")
+    ]
+    forged = record.model_dump(mode="json")
+    forged["reported_tokens"] = 1
+    path.write_text(json.dumps(forged))
+    with pytest.raises(ValueError):
+        check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+
+
+@pytest.mark.parametrize(
     "fault",
     [
         "unknown",
@@ -548,8 +596,9 @@ def test_explicit_known_stop_reconciliation_keeps_attempt_reservations(
         "overlap",
     ],
 )
+@pytest.mark.parametrize("actual_usage", [False, True])
 def test_uncertain_stopped_runs_cannot_be_reconciled(
-    tmp_path: Path, fault: str
+    tmp_path: Path, fault: str, actual_usage: bool
 ) -> None:
     from evals.live import build_known_stop_reconciliation
 
@@ -594,7 +643,11 @@ def test_uncertain_stopped_runs_cannot_be_reconciled(
     (old / "result.json").write_text(json.dumps(result), encoding="utf-8")
     with pytest.raises(ValueError):
         build_known_stop_reconciliation(
-            old, actor="TEST ONLY", reference="TEST ONLY", process_exit_verified=True
+            old,
+            actor="TEST ONLY",
+            reference="TEST ONLY",
+            process_exit_verified=True,
+            actual_usage=actual_usage,
         )
 
 

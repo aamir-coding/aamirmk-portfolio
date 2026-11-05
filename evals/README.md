@@ -436,3 +436,22 @@ transcripts are not captured. No automatic retry is added. The generic task-erro
 run is ineligible for incomplete-output reconciliation and keeps its full local
 hold. A new plan, fresh capacity and separate approval are required for another
 live attempt; validation remains separately budgeted.
+
+### Explicit same-day policy override (5 November)
+
+Aamir subsequently authorized actual-usage reconciliation of both stopped runs,
+zero visitor allowances, and immediate schema-v3 calibration with low effort and
+1,024 output. `actual-usage-reconciliation.json` is a separate, explicit-purpose
+record; original receipts/results and conservative reconciliation remain intact.
+Only fully reported, hash/approval/chronology-bound task/contract/incomplete-output
+stops qualify. Unknown consumption/lifecycle failures do not. The two records
+retain all 30,048 attempted reservations and set the daily charge to four calls /
+4,098 actual tokens. New in-run admission still reserves the full approved caps.
+
+Budget fields now allow zero visitor allowances; this run explicitly sets all four
+to zero. Prior 4,098 + new 150,240 = **154,338 projected daily tokens**, with four
+prior + twenty new = **24 requests**. These are local projections under Aamir's
+fresh account statement (>195,000 tokens/>990 requests available), not independent
+account telemetry. The quiet window expires at **13:20:28 IST on 5 November**,
+anchored to confirmation. No old approval is reused, retry added, or failure gate
+removed. Separate validation authorization remains necessary.

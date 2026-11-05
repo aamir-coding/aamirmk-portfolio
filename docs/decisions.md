@@ -3,6 +3,15 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-044: User-authorized actual-usage reconciliation and zero visitor reserves
+
+**Date:** 2026-11-05
+**Context:** Aamir explicitly prioritized same-day calibration, authorized reconciling both aborted runs to four calls/4,098 reported tokens, zeroing visitor allowances, and executing schema-v3 with low effort/1,024 output. He confirmed more than 195,000 tokens/990 requests remaining and a quiet 45-minute window. This supersedes the earlier conservative holds/reserves for this requested run; it is not a provider-account measurement by Codex.
+**Choice:** Add separately named `actual-usage-reconciliation.json` records, with explicit purpose, actor/reference, verified exit and original receipt/result/ledger hashes. Reuse all existing complete-ledger, known-usage, model/cap, approval-binding and chronology checks. Permit only known post-response task/contract/incomplete-output stops; lifecycle/unknown usage is still ineligible. Retain original receipts, results and prior reconciliation unchanged. Records retain 30,048 original attempted reservations but explicitly set daily charges to the fully reported 4,098 tokens/four calls. Missing or invalid records retain holds or fail closed. Future in-run admission remains reservation-based, with no automatic refund or retry.
+**Budget:** Permit nonnegative visitor fields and set all four to zero only in the approved standalone run budget. Prior daily charge: 4,098 tokens/four requests; new run ceiling: 150,240 tokens/20 attempts; total local projection: **154,338 tokens/24 requests**, within confirmed 200,000/1,000 caps and the user's remaining-capacity statement. Per-call 6,488 input + 1,024 output = 7,512 remains below 8,000 TPM. Global visitor/production traffic is not controlled by this standalone runner; the user's quiet-window statement is binding. Source/inputs/approval, cooldown, one-shot IDs, known-usage checks and all failure stops remain enforced. The 45-minute window is anchored at 07:05:28 UTC (12:35:28 IST), never extended by preparation.
+
+---
+
 ### DRN-043: Explicit judge output shape and post-response failure evidence
 
 **Date:** 2026-11-05
