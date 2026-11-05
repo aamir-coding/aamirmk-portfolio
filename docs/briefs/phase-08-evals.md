@@ -1,5 +1,13 @@
 # Phase 8 brief — approved for offline implementation
 
+**Current calibration result, 5 November:** All20 calibration answers collected
+under one strict v4 configuration in 22 attempts with2 automatic recoveries, per
+Aamir's explicit continuation instruction. Agreement19/20 support,18/20 completeness,
+15/20 behavior,17/20 tone. Behavior remains below 80%; independent 8-answer validation
+is unexecuted, so the quality gate is not passed. All human grades and76draft
+facts remain unchanged. Full provenance/disagreements: `docs/audits/2026-11-05-judge-calibration.md`.
+Historical status updates below retain their original scope; Increment5 has not started.
+
 Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later that day. He explicitly authorized starting Increment 1 on `phase-8-evals`, offline, and will provide human calibration grading at Increment 4. This approval narrows the remaining handoff audit gates; it does not accept every retrospective recommendation or promote facts. Remediation teach-back and `handoff-remediation-done` remain pending. Their recommended pre-phase close-out was superseded by the explicit authorization to begin, not declared complete.
 
 **Later instruction, 2026-11-04:** Aamir waived waiting for teach-back answers once the study guide is verified complete/correct for implemented work, and authorized Increment 2. The remediation guide was verified and its local completion tag created at `88fae8c`; no answers were assessed or tag pushed. Phase 8 study material continues incrementally; human calibration at Increment 4 and live-budget approval remain separate gates.

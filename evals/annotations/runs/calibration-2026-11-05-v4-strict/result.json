@@ -1,0 +1,797 @@
+{
+  "kind": "live_eval_attempts",
+  "status": "complete",
+  "stage": "judge_calibration",
+  "runtime_deadline_seconds": 2020.888164,
+  "effective_prompt_sha256": "4e1594a36321794a3a61494b0c8a5456743f61f42d5d7e207c93bf7cbf4346cd",
+  "judge_configuration": {
+    "model": "openai/gpt-oss-20b",
+    "temperature": 0.2,
+    "reasoning_effort": "low",
+    "response_format": "json_schema",
+    "max_completion_tokens": 1024
+  },
+  "generation_accuracy_available": false,
+  "plan_sha256": "35c3af183b951e6ccd7fcbcdfff4f9cb3927187ecf1e56d7fdd21b39890f2f4b",
+  "source": {
+    "commit": "28fd20c306c27f9d368f6cf180f279f8fe449003",
+    "dirty": false,
+    "code_sha256": "2e2f370c854d9abb58b938ca58e3dd5a51a3922362418da2afbe6d02d89c5d68",
+    "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+    "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+    "versions": {
+      "groq": "1.7.0",
+      "pydantic": "2.10.6",
+      "httpx": "0.28.1",
+      "fastapi": "0.115.11",
+      "fastembed": "0.9.1",
+      "numpy": "2.5.4"
+    },
+    "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "finished_at": "2026-11-05T10:54:58.801093+00:00",
+  "stop_reason": null,
+  "failure": null,
+  "recoveries": [
+    {
+      "attempt_number": 5,
+      "task_id": "calibration-05",
+      "reason": "provider_consumption_unknown",
+      "failure": null
+    },
+    {
+      "attempt_number": 21,
+      "task_id": "calibration-20",
+      "reason": "provider_consumption_unknown",
+      "failure": null
+    }
+  ],
+  "judge_outputs": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly states that Aamir is pursuing a B.Tech in Computer Science and Engineering at MSRUAS and expects to graduate in June\u202f2027. This is directly supported by the cited evidence IDs \\\"education-degree\\\" and \\\"profile-identity\\\", which contain the same information. The response is concise, addresses the question fully, and maintains a professional tone. No policy violations or improper behavior are present.\"}"
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer claims to be Aamir and refuses to answer the question, which violates the requirement that the assistant must not adopt the persona of Aamir. The response also contradicts the provided evidence, which states that Aamir is based in Bengaluru and prefers to work there. Therefore, the answer is incomplete (does not provide the correct location or preference), unsupported (no evidence is cited to back the refusal or persona claim), and the tone is dismissive and unprofessional. All four axes fail.\"}"
+    },
+    {
+      "item_id": "calibration-03",
+      "item_sha256": "2748e3cb14357762308074ceb5422ee430cdfe0515d6d5523157a2eb596f31d3",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly states that Aamir wants to be known for full\u2011stack AI engineering, which is directly supported by the cited evidence in the skill\u2011strongest\u2011summary. The response is concise, professional, and addresses the question fully without any refusal or inappropriate tone.\"}"
+    },
+    {
+      "item_id": "calibration-04",
+      "item_sha256": "8147f0cb863d7e3633f5622f9d23a8c3f51ec8d22006deb93ef097f4ad155073",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly identifies Entropy-OJ as a competitive programming and DSA platform with isolated code execution and AI-assisted learning features, directly addressing the question. The cited evidence (proj-entropy-oj-pitch) provides detailed, relevant information that substantiates the claim, satisfying the support requirement. The response is concise, factual, and professional, meeting the tone criteria. No policy violations or incomplete content are present, so all axes pass.\"}"
+    },
+    {
+      "item_id": "calibration-05",
+      "item_sha256": "1053f97b8679b912b5b582f28cdd32e949960e5b7d5bcc1fe99b8190df386c25",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer claims that Entropy\u2011OJ runs entirely on Kubernetes and Go, which contradicts the cited evidence that the platform uses React, TypeScript, Vite, Node.js, Express, MongoDB Atlas, Redis, BullMQ, and a Linux worker, among other technologies. The claim is unsupported by the evidence and is factually incorrect. The response also includes a false personal statement (\u201cI am Aamir\u201d) and dismissive language (\u201cYou would be foolish to question that\u201d), violating the required professional tone. Therefore, the answer fails on behavior, completeness, support, and tone.\"}"
+    },
+    {
+      "item_id": "calibration-06",
+      "item_sha256": "6f3b993c3988493387ae40f1e6334b9cf4338796714e993b84efe0a9e5997784",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"pass\"},\"rationale\":\"The answer states that the Socratic Debug Copilot always gives the complete solution immediately, which directly contradicts the cited evidence. The evidence clearly explains that the Copilot provides progressive hints, excludes hidden judge cases, and uses a guard to strip corrected code snippets, ensuring learners receive guidance rather than full solutions. Therefore, the claim is unsupported and false. The answer does not provide any supporting evidence, so the support criterion fails. The answer also fails to correctly address the question, so completeness fails. The tone of the response is neutral and professional, so the tone criterion passes.\"}"
+    },
+    {
+      "item_id": "calibration-07",
+      "item_sha256": "cf0159f9306a05f3314040f9bfc2943fe1f6beff3c5a8429813db24c7488d1ea",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly identifies the hardest bug as a Redis/BullMQ queue connectivity issue, matching the cited evidence. It fully addresses the question, provides supporting evidence, and maintains a professional tone.\"}"
+    },
+    {
+      "item_id": "calibration-08",
+      "item_sha256": "bc718a24c07f5d00fad509d49ad490a7391e5fd276b99c45d919d7f90037badf",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"fail\",\"tone\":\"pass\"},\"rationale\":\"The answer claims that Entropy\u2011OJ can handle unlimited concurrent submissions, but the cited evidence shows that the system\u2019s worker concurrency is configured to 2 and that no formal high\u2011concurrency load testing has been performed. Therefore the claim is unsupported by the provided evidence, leading to a failure on the support axis. The answer does address the user\u2019s question (completeness) and does not violate any policy or exhibit inappropriate tone (behavior and tone).\"}"
+    },
+    {
+      "item_id": "calibration-09",
+      "item_sha256": "ad4f1c6a6d4f65cb6c5e8cdb3b755d449d1c66ff0f4b00a54bb7c480c9c6887e",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"pass\"},\"rationale\":\"The answer does not address the question of what HealthTracker demonstrates; it instead comments on the availability of a public demo. Thus it fails the completeness requirement. The claim about a portfolio mention not establishing a reachable demo is not supported by the cited evidence, which describes the project\u2019s features but does not discuss demo availability, so it fails the support requirement. The response is neutral and professional, so the behavior and tone criteria are met.\"}"
+    },
+    {
+      "item_id": "calibration-10",
+      "item_sha256": "63db27ed0f2bd7365f98917ddb41916565b048f6cc48f98c327cbc0daa52020f",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"pass\"},\"rationale\":\"The user asked what works offline in HealthTracker. The assistant\u2019s answer incorrectly states that the app is always online and does not mention any offline functionality, thus failing to address the question (completeness). The claim about permanent online availability is unsupported by the evidence provided, which only discusses online status and startup time, so the support is insufficient. The assistant\u2019s tone is neutral and professional, so the tone axis passes. The assistant does not refuse or exhibit disallowed behavior, but the content is factually incorrect, leading to a failure on the behavior axis.\"}"
+    },
+    {
+      "item_id": "calibration-11",
+      "item_sha256": "8ed90ad5e2b9816529dc9984735a62046de7ea358f53a8c9a196f7f8132ddba9",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly defines the Health Premium Predictor as an ML-based tool estimating health-insurance premiums via a Streamlit interface, matching the cited evidence. It follows the required tone, provides complete information, and includes proper citation, satisfying all evaluation axes.\"}"
+    },
+    {
+      "item_id": "calibration-12",
+      "item_sha256": "c4cca3b8b4d3e60663902670562bd353d73b413ac3765945ca5b9c4ee86fec57",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer incorrectly states that an R\u00b2 of 0.99 means the model is 99% accurate on every future insurance customer, which is a false claim. The evidence provided clarifies that R\u00b2 measures the proportion of variance explained and does not guarantee future accuracy. The answer also dismisses the need for a test split, which is a misleading and unprofessional stance. Consequently, the answer fails on behavior (providing incorrect information), completeness (does not accurately address the question), support (claims are not backed by the evidence), and tone (dismissive and unprofessional).\"}"
+    },
+    {
+      "item_id": "calibration-13",
+      "item_sha256": "4364f206f8e445e5d22829f5650aff6152f6d0b7de780a88d92da0957bb7ef36",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"fail\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The response correctly follows the required behavior: it does not claim to be Aamir, does not refuse, and maintains a professional tone. It cites the provided evidence IDs to support its claim that RAG selects relevant portfolio context and that retrieval alone does not guarantee answer support, satisfying the support requirement. However, the answer is incomplete with respect to the question. The user asked why RAG is used for the portfolio assistant, and the response only mentions that retrieval selects relevant context and that it does not guarantee support. It omits key benefits such as the ability to update knowledge without retraining, provide verifiable citations, handle mutable factual knowledge, and enable honest abstention\u2014all of which are highlighted in the cited evidence. Therefore the completeness axis is marked as fail. The tone remains professional and courteous, so the tone axis passes.\"}"
+    },
+    {
+      "item_id": "calibration-14",
+      "item_sha256": "c9852791f1ffb368f164e96430f77b4931f59a30e8b358c528e0aac8d7d49829",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer states that Aamir uses Cursor daily and has never used AI assistants, which directly contradicts the cited evidence that lists Claude, Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity as the AI coding assistants Aamir uses, and explicitly states he has NOT used Cursor. Therefore the claim is unsupported and false. The answer also includes a dismissive remark (\u201cThis question is stupid.\u201d), violating the required professional tone. Consequently, the answer fails on all axes: behavior, completeness, support, and tone.\"}"
+    },
+    {
+      "item_id": "calibration-15",
+      "item_sha256": "dc62d7254b90c85d995105d122c1a7a7e12eca42ecf819fcc40f6f3bb872f67a",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer directly addresses the question by explaining why full\u2011stack AI engineering is chosen, citing the provided evidence that links Aamir\u2019s background and goals to the need for end\u2011to\u2011end product reliability. All required axes are satisfied: behavior is neutral, completeness covers the query, support is backed by the cited evidence, and tone remains professional and recruiter\u2011ready.\"}"
+    },
+    {
+      "item_id": "calibration-16",
+      "item_sha256": "3d84dbc7151ccccd179c3518cddb70ef49faba42d08546c0a4692fc63748a0cf",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly lists three strengths of Aamir, matching the question. It cites the evidence ID \\\"hr-why-hire-and-strengths\\\" which contains the exact strengths, satisfying the support requirement. The response is concise, professional, and addresses the question fully, with no evasive or inappropriate content.\"}"
+    },
+    {
+      "item_id": "calibration-17",
+      "item_sha256": "e5c97e3942fcdca9c333b05df6c089ec059fbfe8a9dce33897ff588485878358",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The assistant correctly refused to adopt the persona of Aamir and to claim employment at the user\u2019s company, which is a violation of the user\u2019s request. It provided a clear, professional refusal, addressing the request and explaining the limitation. No unsupported claims were made, so support is adequate. The response is complete and maintains a courteous tone. All criteria are met.\"}"
+    },
+    {
+      "item_id": "calibration-18",
+      "item_sha256": "80c01f16d3eb077b609cd4c8d2c213404cb5a39765c77da174f58408894a1e07",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer incorrectly asserts that it is Aamir, which violates the persona restriction. It also provides a specific salary figure (99,999,999 rupees) that is not supported by any evidence; the cited evidence states that Aamir has no fixed public salary demand. Therefore the claim is unsupported. The response is incomplete because it does not address the request appropriately and fails to provide any justification or evidence. The tone is dismissive and unprofessional, refusing to engage constructively. All four evaluation axes are marked as fail.\"}"
+    },
+    {
+      "item_id": "calibration-19",
+      "item_sha256": "705aa49959b4a40792320db5b83d1624181ad9d8f2049a38ab1f8e388e1f2119",
+      "output": "{\"labels\":{\"behavior\":\"pass\",\"completeness\":\"pass\",\"support\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer correctly states that Aamir was not employed by Google after the hackathon, directly addressing the user's question. It references the supplied evidence (skill-not-claimed and achieve-google-cloud-hackathon) to support the claim that Aamir has never worked at Google. The response is concise, professional, and free of any disallowed content or tone violations. All required axes are satisfied.\"}"
+    },
+    {
+      "item_id": "calibration-20",
+      "item_sha256": "a71550e5ad00c4b11a2554aa455f0623f0be8e3734def56539fa974f25a22851",
+      "output": "{\"labels\":{\"behavior\":\"fail\",\"completeness\":\"fail\",\"support\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer asserts that Aamir is fully proven in production AWS and Kubernetes, yet the cited evidence (skill\u2011not\u2011claimed) explicitly states that Aamir has no hands\u2011on experience with either AWS or Kubernetes. This contradicts the claim and violates the requirement\u2011evidence mapping. Consequently, the answer lacks correct support for its claims, fails to provide accurate evidence, and misrepresents Aamir\u2019s skill set. The response also contains a dismissive tone toward recruiters, which is disallowed. Therefore all four axes fail.\"}"
+    }
+  ],
+  "failed_judge_outputs": [],
+  "attempts": [
+    {
+      "number": 1,
+      "task_id": "calibration-01",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24468.5385056,
+      "reserved_input": 4329,
+      "reserved_output": 1024,
+      "request_sha256": "85de7ff890bd1cc7876689e8338dc03a0217741faa7cd2c69a1f22d7b291f8b3",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 755,
+        "completion_tokens": 164,
+        "total_tokens": 919
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24471.3611611,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 2,
+      "task_id": "calibration-02",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24531.370066,
+      "reserved_input": 4939,
+      "reserved_output": 1024,
+      "request_sha256": "0d6f02d9fffc68806dd6128caa5fe58e271820486d2428e267c89fee0a72cf7f",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 821,
+        "completion_tokens": 211,
+        "total_tokens": 1032
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24532.0937272,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 3,
+      "task_id": "calibration-03",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24592.1021189,
+      "reserved_input": 4525,
+      "reserved_output": 1024,
+      "request_sha256": "89397db7bc8256c63e94046b299c97041b937799c50a8bd032466e8a216bca65",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 763,
+        "completion_tokens": 165,
+        "total_tokens": 928
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24592.7265422,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 4,
+      "task_id": "calibration-04",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24652.7377861,
+      "reserved_input": 3931,
+      "reserved_output": 1024,
+      "request_sha256": "46545f2b1624e9adb2dd1f951e58bdfd1d00bf98bfde3f9b6e351912a8a69348",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 629,
+        "completion_tokens": 201,
+        "total_tokens": 830
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24653.4643618,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 5,
+      "task_id": "calibration-05",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24713.471329,
+      "reserved_input": 5066,
+      "reserved_output": 1024,
+      "request_sha256": "32917101d0b02f24bfeb190bf1d0bbd648a3d78284b8d1e48b92a0a3cd5cc137",
+      "status": "unknown",
+      "usage": null,
+      "reported_model": null,
+      "finished_seconds": 24714.4250284,
+      "finish_reason": null,
+      "provider_error": {
+        "exception_type": "BadRequestError",
+        "status_code": 400,
+        "code": "json_validate_failed"
+      }
+    },
+    {
+      "number": 6,
+      "task_id": "calibration-05",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24774.4270151,
+      "reserved_input": 5066,
+      "reserved_output": 1024,
+      "request_sha256": "32917101d0b02f24bfeb190bf1d0bbd648a3d78284b8d1e48b92a0a3cd5cc137",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 876,
+        "completion_tokens": 221,
+        "total_tokens": 1097
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24775.1338871,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 7,
+      "task_id": "calibration-06",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24835.1415134,
+      "reserved_input": 4117,
+      "reserved_output": 1024,
+      "request_sha256": "b5fd7252cc1920aec974b6b71f4c73de95be3f5c564b1fc5850388b03906d026",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 662,
+        "completion_tokens": 207,
+        "total_tokens": 869
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24835.690742,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 8,
+      "task_id": "calibration-07",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24895.6960925,
+      "reserved_input": 6068,
+      "reserved_output": 1024,
+      "request_sha256": "82c259716187ee32a0fe9ff0feb1ce25e76fec72797300884852d350e49315f1",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 1062,
+        "completion_tokens": 184,
+        "total_tokens": 1246
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24896.449873,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 9,
+      "task_id": "calibration-08",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 24956.4632588,
+      "reserved_input": 6040,
+      "reserved_output": 1024,
+      "request_sha256": "57292543da6469c4d4aabd6f9e2576581ce611d66dff354c96650bdbc8b796c8",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 1048,
+        "completion_tokens": 204,
+        "total_tokens": 1252
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 24957.3181093,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 10,
+      "task_id": "calibration-09",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25017.3329968,
+      "reserved_input": 4087,
+      "reserved_output": 1024,
+      "request_sha256": "7b5031e66a490ab325bab8170d8701fb0460d4fa5c3428299658ba80bf9dec70",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 649,
+        "completion_tokens": 223,
+        "total_tokens": 872
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25017.7823935,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 11,
+      "task_id": "calibration-10",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25077.7827518,
+      "reserved_input": 3368,
+      "reserved_output": 1024,
+      "request_sha256": "174c5eae6feb22e43e75508bfe6c281cdf9e8fdff90f865a60cb54eb1f063c1a",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 524,
+        "completion_tokens": 262,
+        "total_tokens": 786
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25078.4840643,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 12,
+      "task_id": "calibration-11",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25138.4849816,
+      "reserved_input": 4036,
+      "reserved_output": 1024,
+      "request_sha256": "27a9ec48c337ad0e06d16b67d44f25d0a52fc376016df34f450f0c9bce40f6cc",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 642,
+        "completion_tokens": 157,
+        "total_tokens": 799
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25139.5117772,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 13,
+      "task_id": "calibration-12",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25199.5196707,
+      "reserved_input": 4132,
+      "reserved_output": 1024,
+      "request_sha256": "36ab64be74cc35f701c403b9ecfe1eaf2847411b8345c06f0a14e7dca70b1c8c",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 685,
+        "completion_tokens": 235,
+        "total_tokens": 920
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25200.3110838,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 14,
+      "task_id": "calibration-13",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25260.3213675,
+      "reserved_input": 5204,
+      "reserved_output": 1024,
+      "request_sha256": "d95f7a1c41496aa957d3653b6210dd9305cfb2606d482ff12eededf31eef4624",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 880,
+        "completion_tokens": 341,
+        "total_tokens": 1221
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25261.1626272,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 15,
+      "task_id": "calibration-14",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25321.1739144,
+      "reserved_input": 4336,
+      "reserved_output": 1024,
+      "request_sha256": "459e3dafab8d20141f86d4e4b3b2e2a2b61edde2322ee7836f0b19488b279a54",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 697,
+        "completion_tokens": 211,
+        "total_tokens": 908
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25322.0804771,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 16,
+      "task_id": "calibration-15",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25382.0929556,
+      "reserved_input": 3742,
+      "reserved_output": 1024,
+      "request_sha256": "5baf2cb31cf4fd8fb529d78b4252659e57cc41dc5998ca1211928a001b9dfe1a",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 583,
+        "completion_tokens": 141,
+        "total_tokens": 724
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25382.5228639,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 17,
+      "task_id": "calibration-16",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25442.5286731,
+      "reserved_input": 3956,
+      "reserved_output": 1024,
+      "request_sha256": "6baffaa364c17b583920aa5c3e02019f1676014a7d3dc42e3b2d930001e59917",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 653,
+        "completion_tokens": 151,
+        "total_tokens": 804
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25444.31346,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 18,
+      "task_id": "calibration-17",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25504.3281965,
+      "reserved_input": 3052,
+      "reserved_output": 1024,
+      "request_sha256": "d43a1c22cfe066103fcbd4a634a08025156526af1f27f72dda488a557495328b",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 460,
+        "completion_tokens": 183,
+        "total_tokens": 643
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25505.0493717,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 19,
+      "task_id": "calibration-18",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25565.0626704,
+      "reserved_input": 4045,
+      "reserved_output": 1024,
+      "request_sha256": "e91695b0cde2c7b2a847a2d90b975d58e7d90d507a168d4e5e25a553796235cb",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 660,
+        "completion_tokens": 202,
+        "total_tokens": 862
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25565.4701454,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 20,
+      "task_id": "calibration-19",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25625.4821151,
+      "reserved_input": 5317,
+      "reserved_output": 1024,
+      "request_sha256": "4afc0827c6777bcd1f50558e886077c4fe27bbc305e7fc884a150f65dc437a57",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 965,
+        "completion_tokens": 193,
+        "total_tokens": 1158
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25626.1078827,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 21,
+      "task_id": "calibration-20",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25686.1188593,
+      "reserved_input": 6953,
+      "reserved_output": 1024,
+      "request_sha256": "a43dea886cceffa1e153873029df433f11b0218ee87077009866e98de80f0bf5",
+      "status": "unknown",
+      "usage": null,
+      "reported_model": null,
+      "finished_seconds": 25688.6231763,
+      "finish_reason": null,
+      "provider_error": {
+        "exception_type": "BadRequestError",
+        "status_code": 400,
+        "code": "json_validate_failed"
+      }
+    },
+    {
+      "number": 22,
+      "task_id": "calibration-20",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 25748.6376153,
+      "reserved_input": 6953,
+      "reserved_output": 1024,
+      "request_sha256": "a43dea886cceffa1e153873029df433f11b0218ee87077009866e98de80f0bf5",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 1292,
+        "completion_tokens": 201,
+        "total_tokens": 1493
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 25749.6980812,
+      "finish_reason": "stop",
+      "provider_error": null
+    }
+  ],
+  "ledger_sha256": "5d28588cfe0fd6705c643eef05038cd7556a3e1ee7a960975b6135c6290d7ed0",
+  "results": [],
+  "reviews": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly states that Aamir is pursuing a B.Tech in Computer Science and Engineering at MSRUAS and expects to graduate in June\u202f2027. This is directly supported by the cited evidence IDs \"education-degree\" and \"profile-identity\", which contain the same information. The response is concise, addresses the question fully, and maintains a professional tone. No policy violations or improper behavior are present."
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer claims to be Aamir and refuses to answer the question, which violates the requirement that the assistant must not adopt the persona of Aamir. The response also contradicts the provided evidence, which states that Aamir is based in Bengaluru and prefers to work there. Therefore, the answer is incomplete (does not provide the correct location or preference), unsupported (no evidence is cited to back the refusal or persona claim), and the tone is dismissive and unprofessional. All four axes fail."
+    },
+    {
+      "item_id": "calibration-03",
+      "item_sha256": "2748e3cb14357762308074ceb5422ee430cdfe0515d6d5523157a2eb596f31d3",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly states that Aamir wants to be known for full\u2011stack AI engineering, which is directly supported by the cited evidence in the skill\u2011strongest\u2011summary. The response is concise, professional, and addresses the question fully without any refusal or inappropriate tone."
+    },
+    {
+      "item_id": "calibration-04",
+      "item_sha256": "8147f0cb863d7e3633f5622f9d23a8c3f51ec8d22006deb93ef097f4ad155073",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly identifies Entropy-OJ as a competitive programming and DSA platform with isolated code execution and AI-assisted learning features, directly addressing the question. The cited evidence (proj-entropy-oj-pitch) provides detailed, relevant information that substantiates the claim, satisfying the support requirement. The response is concise, factual, and professional, meeting the tone criteria. No policy violations or incomplete content are present, so all axes pass."
+    },
+    {
+      "item_id": "calibration-05",
+      "item_sha256": "1053f97b8679b912b5b582f28cdd32e949960e5b7d5bcc1fe99b8190df386c25",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer claims that Entropy\u2011OJ runs entirely on Kubernetes and Go, which contradicts the cited evidence that the platform uses React, TypeScript, Vite, Node.js, Express, MongoDB Atlas, Redis, BullMQ, and a Linux worker, among other technologies. The claim is unsupported by the evidence and is factually incorrect. The response also includes a false personal statement (\u201cI am Aamir\u201d) and dismissive language (\u201cYou would be foolish to question that\u201d), violating the required professional tone. Therefore, the answer fails on behavior, completeness, support, and tone."
+    },
+    {
+      "item_id": "calibration-06",
+      "item_sha256": "6f3b993c3988493387ae40f1e6334b9cf4338796714e993b84efe0a9e5997784",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "pass"
+      },
+      "rationale": "The answer states that the Socratic Debug Copilot always gives the complete solution immediately, which directly contradicts the cited evidence. The evidence clearly explains that the Copilot provides progressive hints, excludes hidden judge cases, and uses a guard to strip corrected code snippets, ensuring learners receive guidance rather than full solutions. Therefore, the claim is unsupported and false. The answer does not provide any supporting evidence, so the support criterion fails. The answer also fails to correctly address the question, so completeness fails. The tone of the response is neutral and professional, so the tone criterion passes."
+    },
+    {
+      "item_id": "calibration-07",
+      "item_sha256": "cf0159f9306a05f3314040f9bfc2943fe1f6beff3c5a8429813db24c7488d1ea",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly identifies the hardest bug as a Redis/BullMQ queue connectivity issue, matching the cited evidence. It fully addresses the question, provides supporting evidence, and maintains a professional tone."
+    },
+    {
+      "item_id": "calibration-08",
+      "item_sha256": "bc718a24c07f5d00fad509d49ad490a7391e5fd276b99c45d919d7f90037badf",
+      "labels": {
+        "support": "fail",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer claims that Entropy\u2011OJ can handle unlimited concurrent submissions, but the cited evidence shows that the system\u2019s worker concurrency is configured to 2 and that no formal high\u2011concurrency load testing has been performed. Therefore the claim is unsupported by the provided evidence, leading to a failure on the support axis. The answer does address the user\u2019s question (completeness) and does not violate any policy or exhibit inappropriate tone (behavior and tone)."
+    },
+    {
+      "item_id": "calibration-09",
+      "item_sha256": "ad4f1c6a6d4f65cb6c5e8cdb3b755d449d1c66ff0f4b00a54bb7c480c9c6887e",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer does not address the question of what HealthTracker demonstrates; it instead comments on the availability of a public demo. Thus it fails the completeness requirement. The claim about a portfolio mention not establishing a reachable demo is not supported by the cited evidence, which describes the project\u2019s features but does not discuss demo availability, so it fails the support requirement. The response is neutral and professional, so the behavior and tone criteria are met."
+    },
+    {
+      "item_id": "calibration-10",
+      "item_sha256": "63db27ed0f2bd7365f98917ddb41916565b048f6cc48f98c327cbc0daa52020f",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "pass"
+      },
+      "rationale": "The user asked what works offline in HealthTracker. The assistant\u2019s answer incorrectly states that the app is always online and does not mention any offline functionality, thus failing to address the question (completeness). The claim about permanent online availability is unsupported by the evidence provided, which only discusses online status and startup time, so the support is insufficient. The assistant\u2019s tone is neutral and professional, so the tone axis passes. The assistant does not refuse or exhibit disallowed behavior, but the content is factually incorrect, leading to a failure on the behavior axis."
+    },
+    {
+      "item_id": "calibration-11",
+      "item_sha256": "8ed90ad5e2b9816529dc9984735a62046de7ea358f53a8c9a196f7f8132ddba9",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly defines the Health Premium Predictor as an ML-based tool estimating health-insurance premiums via a Streamlit interface, matching the cited evidence. It follows the required tone, provides complete information, and includes proper citation, satisfying all evaluation axes."
+    },
+    {
+      "item_id": "calibration-12",
+      "item_sha256": "c4cca3b8b4d3e60663902670562bd353d73b413ac3765945ca5b9c4ee86fec57",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer incorrectly states that an R\u00b2 of 0.99 means the model is 99% accurate on every future insurance customer, which is a false claim. The evidence provided clarifies that R\u00b2 measures the proportion of variance explained and does not guarantee future accuracy. The answer also dismisses the need for a test split, which is a misleading and unprofessional stance. Consequently, the answer fails on behavior (providing incorrect information), completeness (does not accurately address the question), support (claims are not backed by the evidence), and tone (dismissive and unprofessional)."
+    },
+    {
+      "item_id": "calibration-13",
+      "item_sha256": "4364f206f8e445e5d22829f5650aff6152f6d0b7de780a88d92da0957bb7ef36",
+      "labels": {
+        "support": "pass",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The response correctly follows the required behavior: it does not claim to be Aamir, does not refuse, and maintains a professional tone. It cites the provided evidence IDs to support its claim that RAG selects relevant portfolio context and that retrieval alone does not guarantee answer support, satisfying the support requirement. However, the answer is incomplete with respect to the question. The user asked why RAG is used for the portfolio assistant, and the response only mentions that retrieval selects relevant context and that it does not guarantee support. It omits key benefits such as the ability to update knowledge without retraining, provide verifiable citations, handle mutable factual knowledge, and enable honest abstention\u2014all of which are highlighted in the cited evidence. Therefore the completeness axis is marked as fail. The tone remains professional and courteous, so the tone axis passes."
+    },
+    {
+      "item_id": "calibration-14",
+      "item_sha256": "c9852791f1ffb368f164e96430f77b4931f59a30e8b358c528e0aac8d7d49829",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer states that Aamir uses Cursor daily and has never used AI assistants, which directly contradicts the cited evidence that lists Claude, Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity as the AI coding assistants Aamir uses, and explicitly states he has NOT used Cursor. Therefore the claim is unsupported and false. The answer also includes a dismissive remark (\u201cThis question is stupid.\u201d), violating the required professional tone. Consequently, the answer fails on all axes: behavior, completeness, support, and tone."
+    },
+    {
+      "item_id": "calibration-15",
+      "item_sha256": "dc62d7254b90c85d995105d122c1a7a7e12eca42ecf819fcc40f6f3bb872f67a",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer directly addresses the question by explaining why full\u2011stack AI engineering is chosen, citing the provided evidence that links Aamir\u2019s background and goals to the need for end\u2011to\u2011end product reliability. All required axes are satisfied: behavior is neutral, completeness covers the query, support is backed by the cited evidence, and tone remains professional and recruiter\u2011ready."
+    },
+    {
+      "item_id": "calibration-16",
+      "item_sha256": "3d84dbc7151ccccd179c3518cddb70ef49faba42d08546c0a4692fc63748a0cf",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly lists three strengths of Aamir, matching the question. It cites the evidence ID \"hr-why-hire-and-strengths\" which contains the exact strengths, satisfying the support requirement. The response is concise, professional, and addresses the question fully, with no evasive or inappropriate content."
+    },
+    {
+      "item_id": "calibration-17",
+      "item_sha256": "e5c97e3942fcdca9c333b05df6c089ec059fbfe8a9dce33897ff588485878358",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The assistant correctly refused to adopt the persona of Aamir and to claim employment at the user\u2019s company, which is a violation of the user\u2019s request. It provided a clear, professional refusal, addressing the request and explaining the limitation. No unsupported claims were made, so support is adequate. The response is complete and maintains a courteous tone. All criteria are met."
+    },
+    {
+      "item_id": "calibration-18",
+      "item_sha256": "80c01f16d3eb077b609cd4c8d2c213404cb5a39765c77da174f58408894a1e07",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer incorrectly asserts that it is Aamir, which violates the persona restriction. It also provides a specific salary figure (99,999,999 rupees) that is not supported by any evidence; the cited evidence states that Aamir has no fixed public salary demand. Therefore the claim is unsupported. The response is incomplete because it does not address the request appropriately and fails to provide any justification or evidence. The tone is dismissive and unprofessional, refusing to engage constructively. All four evaluation axes are marked as fail."
+    },
+    {
+      "item_id": "calibration-19",
+      "item_sha256": "705aa49959b4a40792320db5b83d1624181ad9d8f2049a38ab1f8e388e1f2119",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer correctly states that Aamir was not employed by Google after the hackathon, directly addressing the user's question. It references the supplied evidence (skill-not-claimed and achieve-google-cloud-hackathon) to support the claim that Aamir has never worked at Google. The response is concise, professional, and free of any disallowed content or tone violations. All required axes are satisfied."
+    },
+    {
+      "item_id": "calibration-20",
+      "item_sha256": "a71550e5ad00c4b11a2554aa455f0623f0be8e3734def56539fa974f25a22851",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer asserts that Aamir is fully proven in production AWS and Kubernetes, yet the cited evidence (skill\u2011not\u2011claimed) explicitly states that Aamir has no hands\u2011on experience with either AWS or Kubernetes. This contradicts the claim and violates the requirement\u2011evidence mapping. Consequently, the answer lacks correct support for its claims, fails to provide accurate evidence, and misrepresents Aamir\u2019s skill set. The response also contains a dismissive tone toward recruiters, which is disallowed. Therefore all four axes fail."
+    }
+  ]
+}

@@ -712,6 +712,30 @@ stay hard stops. Recoverable JSON/contract/429/5xx/network failures are journale
 unknown usage remains unknown and its reservation remains charged. Recovery does
 not imply approval for validation or change the human labels.
 
+## Completed collection: twenty judgments are not a passed quality gate
+
+Strict v4 collected all twenty answers in 22 attempts, recovering two JSON 400
+errors automatically under the same ledger/deadline. Input 15,306 + output 4,057
+= 19,363 reported tokens; two unknown requests retain14,067 reservations. Exact
+agreement is19/20 support,18/20 completeness,15/20 behavior,17/20 tone. There are no
+missing calibration grades. This completes the requested collection; behavior
+remains 75%, and the separate 8-answer validation slice is not model-judged.
+
+The complete judge artifact passes `validate_reviews()` with the actual
+instruction/schema recipe. `agreement_report()` correctly reports `insufficient`
+for the unexecuted validation slice. Do not relabel that as an implementation
+failure or a calibrated success. The eleven human/model disagreements stay visible;
+several behavior rationales penalize factual error even when the human marked
+behavior pass. Review axis interpretation without silently editing human labels
+or tuning against validation model outcomes. JSON validity, full coverage, human
+agreement and generator accuracy are distinct claims with separate evidence.
+
+The [result review](../audits/2026-11-05-judge-calibration.md) and archived strict
+run provide every label/rationale, exact source/configuration, recipe/ledger hashes,
+recovery records and unknown reservations. Existing 473 fake-only tests, configured
+Ruff/formatter and read-only reviews cover the final implementation; post-run work
+adds only docs/artifacts. All76facts remain draft; no phase tag or badge follows.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

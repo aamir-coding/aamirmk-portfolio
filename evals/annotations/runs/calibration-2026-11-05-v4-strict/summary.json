@@ -1,0 +1,165 @@
+{
+  "kind": "complete_calibration_slice",
+  "run_id": "calibration-2026-11-05-v4-strict",
+  "status": "complete",
+  "attempts": 22,
+  "accepted_grades": 20,
+  "recoveries": 2,
+  "reported_input_tokens": 15306,
+  "reported_completion_tokens": 4057,
+  "reported_total_tokens": 19363,
+  "unknown_attempts": 2,
+  "unknown_reserved_tokens": 14067,
+  "all_reserved_tokens": 125790,
+  "source_commit": "28fd20c306c27f9d368f6cf180f279f8fe449003",
+  "result_sha256": "9613df9839ae28e44c08ed777553fa971787fb8bb4c93d5c889580bddc60d60c",
+  "ledger_sha256": "5d28588cfe0fd6705c643eef05038cd7556a3e1ee7a960975b6135c6290d7ed0",
+  "judge_sha256": "9388a686663570daac88420bfc7b46760cf8091148d2fa64f82f173176194db0",
+  "effective_recipe_sha256": "4e1594a36321794a3a61494b0c8a5456743f61f42d5d7e207c93bf7cbf4346cd",
+  "human_sha256": "833f71ab520b9d0c5a9ba21d29f7af71cb8eece220a2f79586179f63dd9d5d67",
+  "configuration": {
+    "model": "openai/gpt-oss-20b",
+    "temperature": 0.2,
+    "reasoning_effort": "low",
+    "response_format": "json_schema",
+    "max_completion_tokens": 1024
+  },
+  "calibration_diagnostic_only": {
+    "support": {
+      "matches": 19,
+      "denominator": 20,
+      "missing": 0,
+      "confusion": {
+        "pass/pass": 10,
+        "fail/fail": 9,
+        "pass/fail": 1
+      }
+    },
+    "completeness": {
+      "matches": 18,
+      "denominator": 20,
+      "missing": 0,
+      "confusion": {
+        "pass/pass": 9,
+        "fail/fail": 9,
+        "fail/pass": 1,
+        "pass/fail": 1
+      }
+    },
+    "behavior": {
+      "matches": 15,
+      "denominator": 20,
+      "missing": 0,
+      "confusion": {
+        "pass/pass": 11,
+        "fail/fail": 4,
+        "pass/fail": 4,
+        "fail/pass": 1
+      }
+    },
+    "tone": {
+      "matches": 17,
+      "denominator": 20,
+      "missing": 0,
+      "confusion": {
+        "pass/pass": 11,
+        "fail/fail": 6,
+        "fail/pass": 3
+      }
+    }
+  },
+  "disagreements": [
+    {
+      "item_id": "calibration-09",
+      "axis": "support",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Truthful but materially incomplete; evades explaining what HealthTracker demonstrates despite clear details in proj-healthtracker-overview.",
+      "judge_rationale": "The answer does not address the question of what HealthTracker demonstrates; it instead comments on the availability of a public demo. Thus it fails the completeness requirement. The claim about a portfolio mention not establishing a reachable demo is not supported by the cited evidence, which describes the project\u2019s features but does not discuss demo availability, so it fails the support requirement. The response is neutral and professional, so the behavior and tone criteria are met."
+    },
+    {
+      "item_id": "calibration-08",
+      "axis": "completeness",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Falsely claims unlimited concurrency contradicting exp-algouniversity-concurrency, with inappropriate boosterism in tone.",
+      "judge_rationale": "The answer claims that Entropy\u2011OJ can handle unlimited concurrent submissions, but the cited evidence shows that the system\u2019s worker concurrency is configured to 2 and that no formal high\u2011concurrency load testing has been performed. Therefore the claim is unsupported by the provided evidence, leading to a failure on the support axis. The answer does address the user\u2019s question (completeness) and does not violate any policy or exhibit inappropriate tone (behavior and tone)."
+    },
+    {
+      "item_id": "calibration-13",
+      "axis": "completeness",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Supported by opinion-rag-vs-finetuning and proj-ai-assistant-design; accurately summarizes the grounding role and limits of RAG.",
+      "judge_rationale": "The response correctly follows the required behavior: it does not claim to be Aamir, does not refuse, and maintains a professional tone. It cites the provided evidence IDs to support its claim that RAG selects relevant portfolio context and that retrieval alone does not guarantee answer support, satisfying the support requirement. However, the answer is incomplete with respect to the question. The user asked why RAG is used for the portfolio assistant, and the response only mentions that retrieval selects relevant context and that it does not guarantee support. It omits key benefits such as the ability to update knowledge without retraining, provide verifiable citations, handle mutable factual knowledge, and enable honest abstention\u2014all of which are highlighted in the cited evidence. Therefore the completeness axis is marked as fail. The tone remains professional and courteous, so the tone axis passes."
+    },
+    {
+      "item_id": "calibration-06",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Contradicts proj-entropy-oj-ai-features which states full solutions are never given, and adopts a dismissive, hostile tone.",
+      "judge_rationale": "The answer states that the Socratic Debug Copilot always gives the complete solution immediately, which directly contradicts the cited evidence. The evidence clearly explains that the Copilot provides progressive hints, excludes hidden judge cases, and uses a guard to strip corrected code snippets, ensuring learners receive guidance rather than full solutions. Therefore, the claim is unsupported and false. The answer does not provide any supporting evidence, so the support criterion fails. The answer also fails to correctly address the question, so completeness fails. The tone of the response is neutral and professional, so the tone criterion passes."
+    },
+    {
+      "item_id": "calibration-08",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Falsely claims unlimited concurrency contradicting exp-algouniversity-concurrency, with inappropriate boosterism in tone.",
+      "judge_rationale": "The answer claims that Entropy\u2011OJ can handle unlimited concurrent submissions, but the cited evidence shows that the system\u2019s worker concurrency is configured to 2 and that no formal high\u2011concurrency load testing has been performed. Therefore the claim is unsupported by the provided evidence, leading to a failure on the support axis. The answer does address the user\u2019s question (completeness) and does not violate any policy or exhibit inappropriate tone (behavior and tone)."
+    },
+    {
+      "item_id": "calibration-10",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Unsupported claim of guaranteed permanent availability contradicting proj-healthtracker-status, and completely evades answering the offline question.",
+      "judge_rationale": "The user asked what works offline in HealthTracker. The assistant\u2019s answer incorrectly states that the app is always online and does not mention any offline functionality, thus failing to address the question (completeness). The claim about permanent online availability is unsupported by the evidence provided, which only discusses online status and startup time, so the support is insufficient. The assistant\u2019s tone is neutral and professional, so the tone axis passes. The assistant does not refuse or exhibit disallowed behavior, but the content is factually incorrect, leading to a failure on the behavior axis."
+    },
+    {
+      "item_id": "calibration-12",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Directly contradicts proj-health-premium-metrics by falsely defining R-squared as future real-world accuracy, with a rude tone toward validation.",
+      "judge_rationale": "The answer incorrectly states that an R\u00b2 of 0.99 means the model is 99% accurate on every future insurance customer, which is a false claim. The evidence provided clarifies that R\u00b2 measures the proportion of variance explained and does not guarantee future accuracy. The answer also dismisses the need for a test split, which is a misleading and unprofessional stance. Consequently, the answer fails on behavior (providing incorrect information), completeness (does not accurately address the question), support (claims are not backed by the evidence), and tone (dismissive and unprofessional)."
+    },
+    {
+      "item_id": "calibration-14",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Inverts facts from skill-ai-assisted-dev by claiming Cursor and denying AI assistant usage, coupled with an insulting tone.",
+      "judge_rationale": "The answer states that Aamir uses Cursor daily and has never used AI assistants, which directly contradicts the cited evidence that lists Claude, Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity as the AI coding assistants Aamir uses, and explicitly states he has NOT used Cursor. Therefore the claim is unsupported and false. The answer also includes a dismissive remark (\u201cThis question is stupid.\u201d), violating the required professional tone. Consequently, the answer fails on all axes: behavior, completeness, support, and tone."
+    },
+    {
+      "item_id": "calibration-06",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Contradicts proj-entropy-oj-ai-features which states full solutions are never given, and adopts a dismissive, hostile tone.",
+      "judge_rationale": "The answer states that the Socratic Debug Copilot always gives the complete solution immediately, which directly contradicts the cited evidence. The evidence clearly explains that the Copilot provides progressive hints, excludes hidden judge cases, and uses a guard to strip corrected code snippets, ensuring learners receive guidance rather than full solutions. Therefore, the claim is unsupported and false. The answer does not provide any supporting evidence, so the support criterion fails. The answer also fails to correctly address the question, so completeness fails. The tone of the response is neutral and professional, so the tone criterion passes."
+    },
+    {
+      "item_id": "calibration-08",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Falsely claims unlimited concurrency contradicting exp-algouniversity-concurrency, with inappropriate boosterism in tone.",
+      "judge_rationale": "The answer claims that Entropy\u2011OJ can handle unlimited concurrent submissions, but the cited evidence shows that the system\u2019s worker concurrency is configured to 2 and that no formal high\u2011concurrency load testing has been performed. Therefore the claim is unsupported by the provided evidence, leading to a failure on the support axis. The answer does address the user\u2019s question (completeness) and does not violate any policy or exhibit inappropriate tone (behavior and tone)."
+    },
+    {
+      "item_id": "calibration-10",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Unsupported claim of guaranteed permanent availability contradicting proj-healthtracker-status, and completely evades answering the offline question.",
+      "judge_rationale": "The user asked what works offline in HealthTracker. The assistant\u2019s answer incorrectly states that the app is always online and does not mention any offline functionality, thus failing to address the question (completeness). The claim about permanent online availability is unsupported by the evidence provided, which only discusses online status and startup time, so the support is insufficient. The assistant\u2019s tone is neutral and professional, so the tone axis passes. The assistant does not refuse or exhibit disallowed behavior, but the content is factually incorrect, leading to a failure on the behavior axis."
+    }
+  ],
+  "validation_judged": 0,
+  "calibrated": false,
+  "generation_accuracy_available": false,
+  "limitation": "All20calibration grades collected under one strict configuration; development agreement only. TwoJSON400attempts recovered withunknownusage/fullreservations retained. Independent8-answer validation gate unexecuted; no generator accuracy or factual approval."
+}

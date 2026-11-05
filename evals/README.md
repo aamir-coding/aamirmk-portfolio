@@ -519,3 +519,16 @@ budget overruns remain hard stops. A 24-attempt ceiling reserves 135,424 input +
 Preflight covers base input 91,243 + four worst-case extras 27,904 = 119,147.
 `--judge-recovery-attempts 4` is recorded in the plan; input policy is in the budget.
 No validation/held-out calls or human/fact approvals are implied.
+
+### Completed calibration collection
+
+`calibration-2026-11-05-v4-strict` collected all 20 grades in 22 attempts, recovering
+two JSON 400 failures. Reported 19,363 tokens; unknown requests retain 14,067 reservations.
+Actual reservations 125,790 <=160,000. Complete records, judge, summary and formal
+gate report: `annotations/runs/calibration-2026-11-05-v4-strict/`.
+
+Agreement with unchanged human labels: support 19/20(95%),completeness 18/20(90%),
+behavior 15/20(75%),tone 17/20(85%). Behavior still falls below 80%; validation 0/8.
+The twenty-answer collection is complete; judge calibration/accuracy gate is not
+passed. See `docs/audits/2026-11-05-judge-calibration.md` for all disagreements,
+provenance and quota evidence. No additional live calls are implied by collection.

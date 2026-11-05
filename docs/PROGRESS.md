@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. Latest v4 run stopped at **four grades/five attempts** on HTTP 400 **`json_validate_failed`**. Four grades match all human axes, but sixteen answers are missing. V4 reported 3,857 tokens; final usage is unknown and retains 8,000 reserved. Across four runs today: **29 attempts / 22,296 reported tokens plus two unknown calls retaining 15,512 reservations**. Strict schema output and bounded recovery are ready under the explicit continuation authorization. Calibration/validation remain incomplete; Increment 5 has not started. See [review](audits/2026-11-05-judge-calibration.md).
+**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. **All twenty calibration answers collected** under strict v4 in 22 attempts, with two automatic recoveries. Agreement: support 19/20 (95%), completeness 18/20 (90%), behavior 15/20 (75%), tone 17/20 (85%). Known usage 19,363; two failed calls retain 14,067 reservations. Behavior remains below 80% and the independent eight-answer validation gate is unexecuted; no calibrated/accuracy claim. Human grades and all 76 draft facts are unchanged. [Full result](audits/2026-11-05-judge-calibration.md).
 
 **Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
@@ -9,7 +9,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Execute strict-schema calibration under Aamir's explicit continuation instruction to collect all twenty answers without returning after each recoverable failure. New bounded plan: at most 24 attempts/160,000 tokens, same ledger/counters with up to four recoveries, daily ceiling 197,808 including prior unknown reservations, zero visitors. Hard expiry **16:37:18 IST on 5 November**. Human labels/validation/held-out sets remain unchanged.
+Next: Review the five calibration behavior disagreements and axis interpretation before any separately budgeted validation or further calibration. The requested twenty-answer collection is complete. The eight validation answers remain unexecuted; Increment 5 has not started.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +34,7 @@ Next: Execute strict-schema calibration under Aamir's explicit continuation inst
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 V4 stopped at 4 grades/5 attempts; strict follow-up offline; calibration incomplete | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟡 20/20 calibration collected; behavior 75%; validation pending | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -191,9 +191,9 @@ Next: Execute strict-schema calibration under Aamir's explicit continuation inst
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. All 28 human grades are validated. Latest schema-v3 calibration collected 19 grades/20 attempts, then HTTP 400 with unknown consumption. Partial behavior/tone agreement is below the required level even with a matching final item. Today's known usage: 18,439 tokens/24 requests, one request's usage unknown. A further run needs a reviewed calibration revision and new approval. Validation remains unexecuted.
+1. All 28 human grades are validated; all 20 calibration answers are now judged under one strict configuration. Agreement95% support/90% completeness/75% behavior/85% tone. Review the five behavior disagreements; independent 8-answer validation remains unexecuted. Exact results and all disagreements are archived.
 2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
-3. Human calibration grading is a later user input at Increment 4. Fact approval/provenance and a concrete live budget require separate review; no blanket approval of draft facts or live model calls is implied.
+3. Human grading has been supplied and is unchanged. Fact approval and any further live budget remain separate; no blanket approval of 76 draft facts, validation calls or public accuracy badge is implied.
 
 ## User-Reported Live Acceptance — 2026-11-04
 - Aamir reports personally verifying that the live website works, including formatting, raw Markdown handling, continued chat context, links, and contact details.
@@ -337,6 +337,13 @@ Next: Execute strict-schema calibration under Aamir's explicit continuation inst
 - Aamir then explicitly directed continuing through failures until twenty answers, without returning after each failure. Added bounded opt-in recovery and exact per-request conservative reservations. Fake contract/transient/auth cases went red, then **3 passed in 7.83s**. Full offline suite **473 passed, 1 warning in 67.40s**; Ruff/formatter/diff passed (84 files). Read-only reviews found no remaining schema-provenance or recovery/accounting blocker; no edits/provider calls by reviewer. No frontend source/check changes. DRN-047/048 and guide record decisions.
 - New continuation: twenty answers, at most four extra recoverable attempts; maximum 24 attempts, **135,424 input + 24,576 output = 160,000** reserved. Full base input bounds sum 91,243; four worst-case extras require total input 119,147 <= 135,424. Prior 37,808 + new 160,000 = **197,808**, zero visitors. Same ledger/reservations/deadline on recovery; no auth/quota/missing-usage bypass. New hard expiry **16:37:18 IST** anchored to latest continuation. Preparing a distinct clean-source plan under that standing authorization; validation and publication remain outside it.
 
+## Strict calibration collection completed — 2026-11-05
+- At clean `28fd20c`, exact plan SHA `35c3af183b951e6ccd7fcbcdfff4f9cb3927187ecf1e56d7fdd21b39890f2f4b`, collected **all 20** under one strict v4/20b/low/1,024 configuration. **22 attempts / two automatic recoveries** (items05 and20, HTTP400 `json_validate_failed`), no user pause, SDK-hidden retry, ledger reset or fact/human-label changes. Finished **16:24:58 IST**, before 16:37:18 expiry. Item20 completed successfully after its recovery.
+- Exact agreement: **19/20 support (95%),18/20 completeness (90%),15/20 behavior (75%),17/20 tone (85%)**. All eleven disagreements preserved. Behavior still mixes factual support failures with behavior; review items06/08/10/12/14 without silently editing human labels. This is development calibration agreement, not generator accuracy. Formal report is `insufficient` because independent validation is **0/8**; no calibrated/badge claim.
+- Usage **15,306 input +4,057 completion = 19,363 reported tokens**. Two unknown calls retain **14,067** full request reservations. All reservations **103,262 input +22,528 output =125,790**, below 135,424/24,576 and max24 attempts. Across today's five runs: **51 attempts /41,659 known tokens +29,579 unknown-reserved**. These are local records, not an independently measured account balance.
+- Complete receipt/result/judge/progress/summary/gate report archived unchanged in `evals/annotations/runs/calibration-2026-11-05-v4-strict/`; original bytes/hashes and exact20 item IDs verified. Result SHA `9613df9839ae28e44c08ed777553fa971787fb8bb4c93d5c889580bddc60d60c`; judge SHA `9388a686663570daac88420bfc7b46760cf8091148d2fa64f82f173176194db0`; ledger SHA `5d28588cfe0fd6705c643eef05038cd7556a3e1ee7a960975b6135c6290d7ed0`. Effective recipe includes instructions+actualschema and passes normal prior-result validation. Human hash unchanged; all 76 facts still draft.
+- Final source verification remains **473 passed,1 existing warning in 67.40s**, configured Ruff/formatter/diff clean; only docs/artifacts changed after the run. Full calibration review/study guide updated; no repeated broad tests required. No validation/held-out call, new dependency, push, deployment, completion tag or Increment5 work. Requested20-answer collection complete; calibration quality/validation gates remain pending.
+
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
 - [x] Groq limits confirmed (see below) ✅
@@ -359,4 +366,8 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-Human grading is validated; earlier v4 is partial. The user now explicitly authorizes continuing strict-schema calibration through recoverable failures until twenty answers, within bounded quota/deadline. Both earlier unknown calls retain full reservations; human labels remain unchanged. Validation/publication remain pending; all 76 chunks remain draft and Phase 8 is not complete.
+All twenty calibration answers are collected. Behavior agreement remains 15/20;
+the eight-answer validation gate is unexecuted, so judge calibration/accuracy
+publication is not approved. Preserve all human disagreements and unknown-call
+reservations. All 76 fact chunks remain draft. Phase 8 remains in progress;
+Increment 5 has not started. See the calibration result for next review scope.

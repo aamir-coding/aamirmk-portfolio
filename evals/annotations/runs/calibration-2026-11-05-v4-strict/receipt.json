@@ -1,0 +1,74 @@
+{
+  "plan": {
+    "version": 2,
+    "run_id": "calibration-2026-11-05-v4-strict",
+    "stage": "judge_calibration",
+    "case_ids": [],
+    "budget": {
+      "input_reservation": "request_bound",
+      "models": {
+        "openai/gpt-oss-20b": {
+          "max_attempts": 24,
+          "input_tokens": 135424,
+          "output_tokens": 24576,
+          "per_call_input": 6976,
+          "per_call_output": 1024
+        }
+      },
+      "shared_rpm": 30,
+      "shared_tpm": 8000,
+      "shared_rpd": 1000,
+      "shared_tpd": 200000,
+      "prior_requests_today": 29,
+      "prior_tokens_today": 37808,
+      "visitor_rpm": 0,
+      "visitor_tpm": 0,
+      "visitor_rpd": 0,
+      "visitor_tpd": 0,
+      "min_interval_seconds": 3.0,
+      "deadline_seconds": 2700.0,
+      "request_timeout_seconds": 60.0
+    },
+    "source": {
+      "commit": "28fd20c306c27f9d368f6cf180f279f8fe449003",
+      "dirty": false,
+      "code_sha256": "2e2f370c854d9abb58b938ca58e3dd5a51a3922362418da2afbe6d02d89c5d68",
+      "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+      "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "versions": {
+        "groq": "1.7.0",
+        "pydantic": "2.10.6",
+        "httpx": "0.28.1",
+        "fastapi": "0.115.11",
+        "fastembed": "0.9.1",
+        "numpy": "2.5.4"
+      },
+      "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+    },
+    "inputs_sha256": "31225e3b2469333728fc3188be0b71a03cf91b875d8f88938ee814efcc123b72",
+    "judge_configuration": {
+      "model": "openai/gpt-oss-20b",
+      "temperature": 0.2,
+      "reasoning_effort": "low",
+      "response_format": "json_schema",
+      "max_completion_tokens": 1024
+    },
+    "judge_recovery_attempts": 4
+  },
+  "approval": {
+    "purpose": "live_groq_authorization",
+    "approved_by": "Aamir Mohammed Khan",
+    "reference": "Aamir explicit continuation: power through recoverable issues, do not pause for approval after failure, collect all20 calibration answers. Strict v4/20b/low/1024, zero visitors, prior actual-known+fullunknown, bounded24attempts/160000tokens under200000daily.",
+    "plan_sha256": "35c3af183b951e6ccd7fcbcdfff4f9cb3927187ecf1e56d7fdd21b39890f2f4b",
+    "approved_at": "2026-11-05T10:22:18Z",
+    "expires_at": "2026-11-05T11:07:18Z",
+    "limits_verified_at": "2026-11-05T10:22:18Z",
+    "limits_reference": "Standing confirmed30RPM/1000RPD/8000TPM/200000TPD,>180000remaining at v4 approval; latest explicit continuation authorizes bounded recoveries/zero visitors with prior unknowns fully charged.",
+    "visitor_allowance_acknowledged": true,
+    "draft_corpus_acknowledged": true,
+    "input_reservation_policy_acknowledged": true
+  },
+  "state": "started_consumption_unknown_until_result",
+  "started_at": "2026-11-05T10:33:36.947959+00:00"
+}

@@ -1,6 +1,14 @@
-# Human calibration — grading received, judging pending
+# Human calibration — twenty answers judged; validation pending
 
-**Latest outcome, 5 November:** The explicitly approved same-day schema-v3 run
+**Current outcome, 5 November:** Strict v4 collected all 20 grades in 22 attempts,
+recovering two JSON 400 failures automatically. Exact agreement: support 19/20 (95%),
+completeness 18/20 (90%), behavior 15/20 (75%), tone 17/20 (85%). No missing calibration
+item; all eleven disagreements preserved. Known usage 19,363; two unknown requests
+retain 14,067 reservations. Complete judge/provenance/summary/gate report are in
+`runs/calibration-2026-11-05-v4-strict/`. Behavior is below 80% and independent
+validation is 0/8; no calibrated/accuracy claim. Human labels unchanged.
+
+**Earlier outcome, 5 November:** The explicitly approved same-day schema-v3 run
 collected 19 grades in 20 attempts, then HTTP 400 with unknown final-request usage.
 It reported 14,341 tokens and retained the failed request's 7,512 reservation.
 See `runs/calibration-2026-11-05-schema-v3/` for exact records and all disagreements.
