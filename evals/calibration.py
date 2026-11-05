@@ -33,7 +33,7 @@ AXES = ("support", "completeness", "behavior", "tone")
 DEFAULT_PACKET = DEFAULT_ROOT / "annotations/packet-v1.json"
 RUBRIC = DEFAULT_ROOT / "rubrics/support-v1.md"
 JUDGE_PROMPT = DEFAULT_ROOT / "rubrics/judge-v1.txt"
-JUDGE_RUNTIME_PROMPT = DEFAULT_ROOT / "rubrics/judge-v3.txt"
+JUDGE_RUNTIME_PROMPT = DEFAULT_ROOT / "rubrics/judge-v4.txt"
 
 
 def text_sha(path: Path) -> str:
@@ -43,7 +43,9 @@ def text_sha(path: Path) -> str:
 def judge_system_prompt() -> str:
     rubric = RUBRIC.read_text(encoding="utf-8")
     definitions = []
-    for axis in AXES:
+    # Runtime v4 defines behavior/tone explicitly; keep the other frozen rubric
+    # definitions verbatim without duplicating those runtime instructions.
+    for axis in ("support", "completeness"):
         paragraph = rubric.split(f"- **{axis}**:", 1)[1].split("\n- **", 1)[0]
         sentence = " ".join(paragraph.split()).split(". ", 1)[0]
         definitions.append(f"{axis}: {sentence}.")

@@ -3,6 +3,18 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-046: Explicit v4 judging and actual-known accounting with unknown reservations
+
+**Date:** 2026-11-05
+**Context:** Aamir approved twenty fresh v4 calibration calls, fixed 20b/low effort/1,024 output, actual-usage reconciliation, zero visitors and >180,000 remaining tokens. V3's abbreviated axis instructions and ID-only rationale example are a plausible contributor to disagreement, not a proven sole cause. The final HTTP 400 body was lost; do not assert its cause.
+**Choice:** Runtime v4 explicitly grades the supplied answer, defines behavior/tone with the user's exact examples, and requests reasons per axis rather than an ID list. Append frozen support/completeness definitions without duplicating behavior/tone. Preserve frozen v1 authoring template, packets, human labels, evidence and all previous runtime versions. Effective prompt hashes prevent mixing configurations. The user explicitly requires `I refuse` among persona-failure examples; retain that stricter interpretation despite its risk of flagging a legitimate first-person assistant refusal under the older rubric. Do not silently edit human grades to resolve this tension.
+**Item 20:** Installed Groq SDK 1.7.0 with MockTransport serializes the complete item-20 payload and low/JSON-object/1,024 settings without unsupported raw-reasoning/tool parameters. Full input bound is 6,953; input plus output is at most 7,977 by the unchanged reservation policy, well below the documented 131,072 context/65,536 output model limits. No frozen content is shortened or rewritten. This excludes the documented context ceiling as an explanation, not every provider-side 400; existing safe error diagnostics remain enabled.
+**Accounting/budget:** Add an explicit opt-in reconciliation purpose for reported calls plus a terminal unknown call's full reservation. Validate original approval/plan/receipt/result/ledger, chronology, finite times, model/caps and sequence; reject unknown usage masquerading as reported, nonterminal unknowns and lifecycle uncertainty. Preserve receipts/results and original reservations. V3 charges 14,341 reported + 7,512 unknown-reserved = 21,853. With earlier 4,098, prior daily charge is 25,951 across 24 attempts. New per-call cap: 6,976 input + 1,024 output = 8,000 TPM, zero visitors; twenty calls reserve 160,000. Projected local daily maximum: **185,951 tokens / 44 attempts**. New in-run attempts still reserve full caps and never retry automatically. Fresh immediate authorization receives a hard 45-minute deadline anchored at 13:51:03 IST, expiry 14:36:03 IST, without extending the old expired window. No validation calls or success claim are authorized by this preparation.
+
+Official checks: [Groq 20b limits](https://console.groq.com/docs/model/openai/gpt-oss-20b), [JSON modes](https://console.groq.com/docs/structured-outputs), [reasoning controls](https://console.groq.com/docs/reasoning).
+
+---
+
 ### DRN-045: Preserve partial calibration and safe provider-error diagnostics
 
 **Date:** 2026-11-05

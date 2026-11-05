@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import importlib.metadata
 import json
+import math
 import subprocess
 import sys
 from collections.abc import AsyncIterator
@@ -556,7 +557,9 @@ async def run_jobs(
 
 class KnownStopReconciliation(ReplayModel):
     purpose: Literal[
-        "fully_reported_incomplete_output", "explicit_reported_actual_usage"
+        "fully_reported_incomplete_output",
+        "explicit_reported_actual_usage",
+        "explicit_reported_with_unknown_reservations",
     ] = "fully_reported_incomplete_output"
     run_id: Identifier
     receipt_sha256: Sha256
@@ -569,6 +572,7 @@ class KnownStopReconciliation(ReplayModel):
     charged_requests: int = Field(gt=0, strict=True)
     charged_reserved_tokens: int = Field(gt=0, strict=True)
     reported_tokens: int = Field(ge=0, strict=True)
+    unreported_reserved_tokens: int = Field(default=0, ge=0, strict=True)
 
 
 def _known_stop_charge(
@@ -577,7 +581,10 @@ def _known_stop_charge(
     run_id: str,
     *,
     actual_usage: bool = False,
-) -> tuple[int, int, int]:
+    preserve_unknown: bool = False,
+) -> tuple[int, int, int, int]:
+    if preserve_unknown and not actual_usage:
+        raise ValueError("Unknown reservations require explicit actual-use accounting")
     plan_hash = canonical_sha256(receipt["plan"])
     approved = LiveApproval.model_validate(receipt.get("approval", {}))
     if result.get("plan_sha256") != plan_hash or approved.plan_sha256 != plan_hash:
@@ -588,13 +595,17 @@ def _known_stop_charge(
         or result.get("status") != "stopped"
         or result.get("stop_reason")
         not in (
-            {
-                "incomplete_provider_output",
-                "task_error_or_deadline",
-                "judge_contract_error",
-            }
-            if actual_usage
-            else {"incomplete_provider_output"}
+            {"provider_consumption_unknown"}
+            if preserve_unknown
+            else (
+                {
+                    "incomplete_provider_output",
+                    "task_error_or_deadline",
+                    "judge_contract_error",
+                }
+                if actual_usage
+                else {"incomplete_provider_output"}
+            )
         )
     ):
         raise ValueError("Only a fully reported incomplete-output stop is reconcilable")
@@ -616,19 +627,41 @@ def _known_stop_charge(
     budget = Budget.model_validate(receipt["plan"]["budget"])
     counts: dict[str, int] = {}
     previous_finish = 0.0
-    for a in attempts:
+    unreported_reserved = 0
+    for position, a in enumerate(attempts):
         cap = budget.models.get(a.model)
         counts[a.model] = counts.get(a.model, 0) + 1
         if (
             cap is None
+            or not math.isfinite(a.start_seconds)
+            or (
+                a.finished_seconds is not None and not math.isfinite(a.finished_seconds)
+            )
             or counts[a.model] > cap.max_attempts
-            or a.status != "reported"
+            or a.reserved_input != cap.per_call_input
+            or a.reserved_output != cap.per_call_output
+        ):
+            raise ValueError("Unknown or inconsistent usage cannot release a hold")
+        if preserve_unknown and a.status == "unknown":
+            if (
+                position != len(attempts) - 1
+                or a.usage is not None
+                or a.finished_seconds is not None
+                or a.reported_model is not None
+                or a.finish_reason is not None
+                or not previous_finish <= a.start_seconds < float("inf")
+            ):
+                raise ValueError(
+                    "Only a terminal unknown attempt can retain its reservation"
+                )
+            unreported_reserved += a.reserved_input + a.reserved_output
+            continue
+        if (
+            a.status != "reported"
             or a.usage is None
             or a.finished_seconds is None
             or not previous_finish <= a.start_seconds <= a.finished_seconds
             or a.reported_model != a.model
-            or a.reserved_input != cap.per_call_input
-            or a.reserved_output != cap.per_call_output
             or a.usage.prompt_tokens > a.reserved_input
             or a.usage.completion_tokens > a.reserved_output
         ):
@@ -643,10 +676,13 @@ def _known_stop_charge(
             raise ValueError(
                 "Stopped-run reservations exceed the approved model budget"
             )
+    if preserve_unknown and not unreported_reserved:
+        raise ValueError("Unknown-consumption reconciliation needs a terminal unknown")
     return (
         len(attempts),
         sum(a.reserved_input + a.reserved_output for a in attempts),
         sum(a.usage.total_tokens for a in attempts if a.usage is not None),
+        unreported_reserved,
     )
 
 
@@ -657,16 +693,23 @@ def build_known_stop_reconciliation(
     reference: str,
     process_exit_verified: bool,
     actual_usage: bool = False,
+    preserve_unknown: bool = False,
 ) -> KnownStopReconciliation:
     if (run_dir.parent / "active.lock").exists():
         raise ValueError("Cannot reconcile while a runner is active")
     receipt = json.loads((run_dir / "receipt.json").read_text(encoding="utf-8"))
     result = json.loads((run_dir / "result.json").read_text(encoding="utf-8"))
-    requests, reserved, reported = _known_stop_charge(
-        receipt, result, run_dir.name, actual_usage=actual_usage
+    requests, reserved, reported, unreported = _known_stop_charge(
+        receipt,
+        result,
+        run_dir.name,
+        actual_usage=actual_usage,
+        preserve_unknown=preserve_unknown,
     )
     return KnownStopReconciliation(
-        purpose="explicit_reported_actual_usage"
+        purpose="explicit_reported_with_unknown_reservations"
+        if preserve_unknown
+        else "explicit_reported_actual_usage"
         if actual_usage
         else "fully_reported_incomplete_output",
         run_id=run_dir.name,
@@ -680,6 +723,7 @@ def build_known_stop_reconciliation(
         charged_requests=requests,
         charged_reserved_tokens=reserved,
         reported_tokens=reported,
+        unreported_reserved_tokens=unreported,
     )
 
 
@@ -723,12 +767,18 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                 record = KnownStopReconciliation.model_validate_json(
                     reconciliation_path.read_text(encoding="utf-8")
                 )
+                preserve_unknown = (
+                    record.purpose == "explicit_reported_with_unknown_reservations"
+                )
                 if (
                     record.purpose
-                    != (
-                        "explicit_reported_actual_usage"
+                    not in (
+                        {
+                            "explicit_reported_actual_usage",
+                            "explicit_reported_with_unknown_reservations",
+                        }
                         if actual_usage
-                        else "fully_reported_incomplete_output"
+                        else {"fully_reported_incomplete_output"}
                     )
                     or record.run_id != receipt_path.parent.name
                     or record.receipt_sha256 != canonical_sha256(receipt)
@@ -737,20 +787,25 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                     or not finished <= record.created_at <= now
                 ):
                     raise ValueError("Stopped-run reconciliation is stale or invalid")
-                requests, reserved, reported = _known_stop_charge(
-                    receipt, result, record.run_id, actual_usage=actual_usage
+                requests, reserved, reported, unreported = _known_stop_charge(
+                    receipt,
+                    result,
+                    record.run_id,
+                    actual_usage=actual_usage,
+                    preserve_unknown=preserve_unknown,
                 )
                 if (
                     record.charged_requests,
                     record.charged_reserved_tokens,
                     record.reported_tokens,
-                ) != (requests, reserved, reported):
+                    record.unreported_reserved_tokens,
+                ) != (requests, reserved, reported, unreported):
                     raise ValueError(
                         "Reconciliation cannot reduce attempted-call reservations"
                     )
                 request_charge, token_charge = (
                     requests,
-                    reported if actual_usage else reserved,
+                    reported + unreported if actual_usage else reserved,
                 )
         if now < finished + timedelta(seconds=60):
             raise ValueError(

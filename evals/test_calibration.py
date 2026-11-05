@@ -229,11 +229,11 @@ def test_compact_judge_prompt_keeps_all_evidence_and_fits_recorded_limit_policy(
                 request_payload(messages, response_format={"type": "json_object"})
             )
         )
-    assert max(bounds) <= 6488
+    assert max(bounds) <= 6976
     # Feasibility arithmetic, not a proposed or authorized run budget.
-    assert 6488 + 1024 + 400 <= 8000
-    assert 20 * (6488 + 1024) == 150240
-    assert 20 * (6488 + 1024) + 20000 <= 200000
+    assert 6976 + 1024 <= 8000
+    assert 20 * (6976 + 1024) == 160000
+    assert 20 * (6976 + 1024) + 25951 <= 200000
 
 
 def test_changed_effective_prompt_invalidates_prior(

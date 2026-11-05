@@ -475,3 +475,27 @@ behavior/tone below 80% on this slice; review instructions before more spending.
 Future attempts retain typed provider class/status/allowlisted codes, excluding
 arbitrary messages/body/failed-generation/hidden-reasoning text. This does not
 recover the historical HTTP 400 cause. Unknown consumption still stops, no retry.
+
+### Authorized v4 preparation
+
+The user separately authorized twenty fresh v4 calls, low effort/1,024 output,
+actual reconciliation, zero visitors and >180,000 remaining tokens. Runtime
+`rubrics/judge-v4.txt` now defines behavior/tone explicitly and requires reasons
+per axis, with frozen support/completeness definitions appended. No packet,
+evidence or human label changes. Old effective prompts/results are incompatible.
+The literal `I refuse` persona example follows the user's stricter policy despite
+potential conflict with a legitimate AI refusal under the earlier rubric.
+
+SDK MockTransport tests exercise the full item-20 payload and supported JSON-object
+settings, with no real probe. Largest input bound: 6,953. New reservation is
+6,976 input + 1,024 output = 8,000 per call, 160,000 across twenty calls. The model
+documents 131,072 context/65,536 output, so the payload fits those ceilings; this
+does not prove or reconstruct the old 400 cause.
+
+An explicit `preserve_unknown` reconciliation retains the terminal unknown call's
+full reservation while charging reported calls at actual tokens. It validates all
+original bindings, chronology/model/caps/sequence and verified exit, rejecting
+nonterminal or malformed unknowns and lifecycle failures. Prior charge becomes
+18,439 known + 7,512 unknown-reserved = 25,951; new local daily ceiling is 185,951.
+Original records remain unchanged. No new attempt refunds, retry or validation
+permission is added. Fresh hard deadline: **14:36:03 IST on 5 November**.

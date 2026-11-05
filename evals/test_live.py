@@ -296,7 +296,7 @@ async def test_unicode_and_tools_are_included_in_prompt_admission() -> None:
     llm = MeteredLLM(provider, budget(), clock=clock, sleep=clock.sleep)
     with pytest.raises(BudgetStop):
         await llm.complete(
-            [Message(role="user", content="🧪" * 1400)],
+            [Message(role="user", content="ðŸ§ª" * 1400)],
             tools=[{"description": "x" * 1000}],
         )
     assert provider.calls == 0
@@ -615,6 +615,56 @@ def test_explicit_actual_usage_reconciliation(tmp_path: Path, reason: str) -> No
         check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
 
 
+def test_explicit_partial_reconciliation_keeps_unknown_reservation(
+    tmp_path: Path,
+) -> None:
+    from evals.live import build_known_stop_reconciliation, check_local_prior_usage
+
+    old = stopped_run(tmp_path)
+    data = json.loads((old / "result.json").read_text())
+    known = data["attempts"][0]
+    data["attempts"].append(
+        dict(
+            known,
+            number=2,
+            start_seconds=2,
+            status="unknown",
+            usage=None,
+            reported_model=None,
+            finished_seconds=None,
+        )
+    )
+    data["stop_reason"] = "provider_consumption_unknown"
+    data["ledger_sha256"] = canonical_sha256(data["attempts"])
+    (old / "result.json").write_text(json.dumps(data))
+    original = (old / "result.json").read_bytes()
+    record = build_known_stop_reconciliation(
+        old,
+        actor="TEST ONLY",
+        reference="TEST ONLY actual-known plus reserved-unknown approval",
+        process_exit_verified=True,
+        actual_usage=True,
+        preserve_unknown=True,
+    )
+    assert record.reported_tokens == 25
+    assert record.unreported_reserved_tokens == 6100
+    assert record.charged_reserved_tokens == 12200
+    (old / "actual-usage-reconciliation.json").write_text(record.model_dump_json())
+    proposal = plan().model_copy(
+        update={"budget": budget(prior_requests_today=2, prior_tokens_today=6125)}
+    )
+    check_local_prior_usage(proposal, tmp_path, datetime.now(UTC))
+    with pytest.raises(ValueError, match="prior usage"):
+        check_local_prior_usage(
+            proposal.model_copy(
+                update={"budget": budget(prior_requests_today=2, prior_tokens_today=25)}
+            ),
+            tmp_path,
+            datetime.now(UTC),
+        )
+    assert (old / "result.json").read_bytes() == original
+
+
 @pytest.mark.parametrize(
     "fault",
     [
@@ -633,9 +683,11 @@ def test_explicit_actual_usage_reconciliation(tmp_path: Path, reason: str) -> No
         "overlap",
     ],
 )
-@pytest.mark.parametrize("actual_usage", [False, True])
+@pytest.mark.parametrize(
+    "actual_usage,preserve_unknown", [(False, False), (True, False), (True, True)]
+)
 def test_uncertain_stopped_runs_cannot_be_reconciled(
-    tmp_path: Path, fault: str, actual_usage: bool
+    tmp_path: Path, fault: str, actual_usage: bool, preserve_unknown: bool
 ) -> None:
     from evals.live import build_known_stop_reconciliation
 
@@ -685,6 +737,7 @@ def test_uncertain_stopped_runs_cannot_be_reconciled(
             reference="TEST ONLY",
             process_exit_verified=True,
             actual_usage=actual_usage,
+            preserve_unknown=preserve_unknown,
         )
 
 
@@ -813,9 +866,9 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
     provider = ScriptProvider([reply] * 20)
     limits = {
         "max_attempts": 20,
-        "input_tokens": 129760,
+        "input_tokens": 139520,
         "output_tokens": 20480,
-        "per_call_input": 6488,
+        "per_call_input": 6976,
         "per_call_output": 1024,
     }
     proposal = LivePlan(
@@ -825,7 +878,7 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
         budget=budget(
             models={"openai/gpt-oss-20b": limits},
             deadline_seconds=2700,
-            visitor_tpm=400,
+            visitor_tpm=0,
         ),
         source={"dirty": False},
         inputs_sha256="test-only",
@@ -861,9 +914,9 @@ async def test_bad_judge_contract_retains_diagnostics(
     provider = ScriptProvider([payload])
     limits = {
         "max_attempts": 20,
-        "input_tokens": 129760,
+        "input_tokens": 139520,
         "output_tokens": 20480,
-        "per_call_input": 6488,
+        "per_call_input": 6976,
         "per_call_output": 1024,
     }
     proposal = LivePlan(
@@ -872,7 +925,7 @@ async def test_bad_judge_contract_retains_diagnostics(
         budget=budget(
             models={"openai/gpt-oss-20b": limits},
             deadline_seconds=2700,
-            visitor_tpm=400,
+            visitor_tpm=0,
         ),
         source={"dirty": False},
         inputs_sha256="TEST ONLY",
@@ -1183,13 +1236,18 @@ async def test_concurrent_callers_share_one_reservation_ledger() -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("status", [200, 429])
+@pytest.mark.parametrize("item20", [False, True])
 async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
     status: int,
+    item20: bool,
 ) -> None:
     import httpx
     from groq import AsyncGroq
 
-    from evals.live import GroqProvider
+    from evals.calibration import load_packet
+    from evals.live import GroqProvider, judge_messages
+
+    messages = judge_messages(load_packet(), "calibration-20") if item20 else []
 
     calls = 0
 
@@ -1197,9 +1255,18 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
         nonlocal calls
         calls += 1
         body = json.loads(request.content)
-        assert body["max_completion_tokens"] == 100
+        assert body["max_completion_tokens"] == (1024 if item20 else 100)
         assert body["stream"] is False
         assert body["reasoning_effort"] == "low"
+        if item20:
+            assert body["response_format"] == {"type": "json_object"}
+            assert body["model"] == "openai/gpt-oss-20b"
+            assert "reasoning_format" not in body and "tools" not in body
+            item = next(i for i in load_packet().items if i.id == "calibration-20")
+            data = json.loads(body["messages"][1]["content"])
+            assert data["answer"] == item.answer
+            assert data["evidence"] == [e.model_dump() for e in item.evidence]
+            assert "labels" not in data
         if status == 429:
             return httpx.Response(429, json={"error": {"message": "synthetic"}})
         return httpx.Response(
@@ -1232,15 +1299,38 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
     ) as client:
         llm = MeteredLLM(
             GroqProvider(client),
-            budget(),
+            budget(
+                models={
+                    "openai/gpt-oss-20b": {
+                        "max_attempts": 1,
+                        "input_tokens": 6976,
+                        "output_tokens": 1024,
+                        "per_call_input": 6976,
+                        "per_call_output": 1024,
+                    }
+                },
+                visitor_tpm=0,
+            )
+            if item20
+            else budget(),
             clock=clock,
             sleep=clock.sleep,
             reasoning_effort="low",
         )
         if status == 429:
             with pytest.raises(BudgetStop):
-                await llm.complete([])
+                await llm.complete(
+                    messages,
+                    model="openai/gpt-oss-20b" if item20 else None,
+                    response_format={"type": "json_object"} if item20 else None,
+                )
             assert llm.attempts[0].usage is None
         else:
-            assert (await llm.complete([])).content == "ok"
+            assert (
+                await llm.complete(
+                    messages,
+                    model="openai/gpt-oss-20b" if item20 else None,
+                    response_format={"type": "json_object"} if item20 else None,
+                )
+            ).content == "ok"
     assert calls == 1

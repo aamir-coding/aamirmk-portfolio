@@ -653,6 +653,36 @@ and one extra matching item would not fix the observed behavior/tone disagreemen
 without promoting incomplete results. **Can the HTTP error be counted as a fail?**
 No: an unknown/unparsed model result is missing, not an independently graded label.
 
+## V4: clearer axes, unchanged human labels, unknown usage still reserved
+
+Aamir authorized a fresh twenty-answer v4 calibration. The runtime prefix now
+explicitly identifies the supplied answer as the grading target, defines third-
+person behavior and professional tone with his requested examples, and requests
+brief reasons across axes rather than an ID list. Frozen support/completeness
+definitions remain appended; duplicated behavior/tone first sentences are removed.
+The frozen human grades, packet/evidence and earlier prompts remain intact.
+The explicit `I refuse` example is the user's stricter persona policy; it can
+over-flag a legitimate assistant refusal under the older rubric. Preserve this
+trade-off visibly rather than silently changing labels. Prompt changes require a
+new complete calibration; older partial grades are not imported.
+
+Item 20's complete SDK wire payload is checked with MockTransport, never a live
+probe. Its new reservation bound is 6,953 input, below the 6,976 cap; 1,024 output
+is far below the documented model output/context limits. JSON syntax, supported
+settings and complete evidence are checked. This does not reconstruct or prove
+the old HTTP 400's cause; JSON-mode generation can still fail independently of
+valid input. Safe per-attempt diagnostics stay enabled.
+
+The v3 ledger's nineteen reported calls can be charged at 14,341 actual tokens
+while its terminal unknown call still charges its full 7,512 reservation. The
+explicit reconciliation record binds original hashes/approval, sequence, finite
+chronology, model/caps and process exit. Nonterminal/invalid/unknown-as-known and
+lifecycle records fail closed. Prior daily charge is therefore 18,439 known +
+7,512 unknown-reserved = 25,951. New twenty-call reservation is 160,000, giving a
+185,951-token local daily ceiling. Zero visitors is the explicit priority choice;
+the user's account statement supplies remaining capacity. New attempts remain
+fully reserved, with no automatic retry or validation authorization.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.
