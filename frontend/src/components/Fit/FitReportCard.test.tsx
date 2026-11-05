@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { FitReportCard } from "./FitReportCard";
 import type { FitReport, SampleJobDescription } from "../../lib/types";
+import { RequestTelemetrySchema } from "../../lib/contracts";
 
 const mockReport: FitReport = {
   role_title: "Senior AI Engineer",
@@ -72,6 +73,17 @@ const mockPreset: SampleJobDescription = {
 };
 
 describe("<FitReportCard />", () => {
+  it.each(["fresh", "cache"])("server %s origin overrides an active authored preset", (origin) => {
+    const telemetry = RequestTelemetrySchema.parse({
+      version: 1, origin, total_ms: 1, first_text_ms: null, calls: [], retrieval: [],
+      stages_ms: {}, usage_complete: true, input_tokens: 0, output_tokens: 0,
+      prompt_sha256: null, index_sha256: null, index_built_at: null,
+    });
+    render(<FitReportCard report={{ ...mockReport, telemetry }} activePreset={mockPreset} />);
+    expect(screen.queryByText(/CURATED SAMPLE ASSESSMENT/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/None — saved authored response/)).not.toBeInTheDocument();
+    if (origin === "cache") expect(screen.getByText(/Cached report — no model calls/)).toBeInTheDocument();
+  });
   it("renders role title, overall fit badge, headline, and score metrics", () => {
     render(<FitReportCard report={mockReport} />);
 
@@ -109,7 +121,7 @@ describe("<FitReportCard />", () => {
     expect(screen.getByText(/Extrapolates from async Redis/i)).toBeInTheDocument();
   });
 
-  it("renders verified golden benchmark banner and JD preview when activePreset is present", () => {
+  it("renders authored sample banner and JD preview when activePreset is present", () => {
     const handleRerun = vi.fn();
     render(
       <FitReportCard
@@ -120,7 +132,7 @@ describe("<FitReportCard />", () => {
     );
 
     expect(screen.getByText(/CURATED SAMPLE ASSESSMENT \(CACHED SNAPSHOT\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Manually reviewed against current curated facts/i)).toBeInTheDocument();
+    expect(screen.getByText(/Authored development example/i)).toBeInTheDocument();
     expect(screen.getByText(/View Evaluated Job Description/i)).toBeInTheDocument();
 
     const rerunBtn = screen.getByRole("button", { name: /Re-Run Live Pipeline/i });

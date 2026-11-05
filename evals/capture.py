@@ -11,6 +11,7 @@ from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 backend_dir = str(Path(__file__).resolve().parents[1] / "backend")
 if backend_dir not in sys.path:
@@ -46,6 +47,7 @@ from app.safety.rate_limiter import (  # noqa: E402
     check_rate_limit,
 )
 from app.settings import Settings, get_settings  # noqa: E402
+from app.telemetry import Trace  # noqa: E402
 from app.tools.registry import ToolRegistry, get_tool_registry  # noqa: E402
 from evals.checks import (  # noqa: E402
     CaptureBundle,
@@ -64,7 +66,7 @@ from evals.dataset import (  # noqa: E402
     verify_dataset,
 )
 
-DEFAULT_RECORDINGS = DEFAULT_ROOT / "recordings" / "endpoints-v1.json"
+DEFAULT_RECORDINGS = DEFAULT_ROOT / "recordings" / "endpoints-v2-telemetry.json"
 
 
 class TraceFakeLLM(FakeLLM):
@@ -141,6 +143,8 @@ def _capture_app(
     return app
 
 
+@patch("app.api.chat.Trace", lambda: Trace(clock=lambda: 0.0))
+@patch("app.fit.pipeline.Trace", lambda: Trace(clock=lambda: 0.0))
 def capture_contracts() -> CaptureBundle:
     verify_dataset()
     facts = {chunk.id: chunk for chunk in FactLoader().load_all()}

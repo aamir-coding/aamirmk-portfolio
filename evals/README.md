@@ -570,3 +570,36 @@ unknown reservations retained. No calibration-success/generator-accuracy badge.
 Do not tune or retry valid judgments against this exposed validation set to claim
 an independent pass. Further calibration needs a reviewed new validation version
 and independent human grades. See `docs/audits/2026-11-05-judge-validation.md`.
+
+## Final offline suite and public engineering record (Increments 5–7)
+
+From the repository root, using the existing virtual environment and provisioned local
+embedding assets:
+
+```powershell
+.\.venv\Scripts\python.exe -m evals.run --full --output build/evals/results.json
+.\.venv\Scripts\python.exe -m evals.publish --result evals/results.json
+```
+
+The first command emits schema-validated retrieval/replay evidence and checks the reviewed
+compatible baseline; it never updates that baseline or spends model quota. CI runs root
+backend/eval tests, all frontend checks and the strict 200,000-byte initial JS gzip gate.
+It uploads its actual generated JSON. No scheduled/manual-unattended live workflow was
+enabled; each live provider run continues to need its own numeric budget/authorization.
+
+The second command generates the local public projection from the committed result, not a
+deployment. `GET /api/eval-summary`, the header badge and `/evals` share that artifact.
+The engineering badge says `Replay checks: 8/8 (offline)`; it is not model accuracy.
+Judge validation remains failed (8/8 Support, 6/8 Completeness, 7/8 Behavior, 6/8 Tone),
+with five disagreements shown. All 76 chunks remain draft. Ten author-visible held-out
+cases remain reserved/unexecuted, and 36 development cases have no saved answer.
+Changed source/corpus/index/dependencies make the public record stale until explicitly
+regenerated/reviewed. Future baseline updates must never silently lower scores or reuse
+reserved cases. The published projection exposes no reserved text/IDs, raw questions,
+answers, evidence, human rationales or private data.
+
+Request receipts use actual monotonic timings, per-call observed metadata and source
+rank/score; missing provider usage stays null/incomplete. Browser timing is labeled
+separately. Local authored instant responses, seeded curated reports, generated cache
+hits, refusals and cancellations have distinct delivery semantics. No transcript storage
+or production-wide quota repair was added.

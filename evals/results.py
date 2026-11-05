@@ -10,9 +10,11 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
-from app.retrieval.artifacts import Sha256, canonical_sha256
+from app.retrieval.artifacts import Sha256, canonical_sha256, corpus_sha256, file_sha256
+from app.retrieval.dense import DEFAULT_EMBEDDINGS_PATH
+from app.retrieval.loader import FactLoader
 from evals.dataset import DEFAULT_ROOT, REPO_ROOT, load_manifest
-from evals.metrics import MetricModel
+from evals.metrics import MetricModel, summarize_scores
 from evals.replay import ReplayReport, replay_report
 from evals.run import OfflineRetrievalReport, build_report
 
@@ -45,6 +47,22 @@ class OfflineResult(MetricModel):
             raise ValueError("Both retrieval suites are required")
         if self.retrieval.retriever != "local_hybrid_rrf":
             raise ValueError("Artifact requires actual local retrieval")
+        for suite in self.retrieval.suites.values():
+            scored = [c.scores for c in suite.cases if c.scores is not None]
+            if (
+                suite.total_cases != len(suite.cases)
+                or suite.evaluated_cases != len(scored)
+                or suite.excluded_cases != len(suite.cases) - len(scored)
+                or suite.metrics != summarize_scores(scored)
+                or len({c.id for c in suite.cases}) != len(suite.cases)
+            ):
+                raise ValueError("Retrieval counts/metrics differ from case outcomes")
+        if not self.replay.results or len({r.id for r in self.replay.results}) != len(
+            self.replay.results
+        ):
+            raise ValueError("Replay requires unique, nonempty results")
+        if any(r.passed != (not r.failed_checks) for r in self.replay.results):
+            raise ValueError("Replay status differs from failed checks")
         if self.replay.recordings_checked != len(self.replay.results) or (
             self.replay.checks_passed != sum(r.passed for r in self.replay.results)
         ):
@@ -76,10 +94,16 @@ def input_fingerprints() -> dict[str, str]:
         "prompts": list((REPO_ROOT / "backend/app/prompts").glob("*.txt")),
         "checker": [DEFAULT_ROOT / n for n in ("checks.py", "replay.py")],
         "rubric": sorted((DEFAULT_ROOT / "rubrics").glob("*.*")),
-        "recordings": [DEFAULT_ROOT / "recordings/endpoints-v1.json"],
+        "recordings": sorted((DEFAULT_ROOT / "recordings").glob("*.json")),
+        "evaluator": [
+            p
+            for p in sorted(DEFAULT_ROOT.glob("*.py"))
+            if not p.name.startswith("test")
+        ],
+        "application": sorted((REPO_ROOT / "backend/app").rglob("*.py")),
         "cases": sorted((DEFAULT_ROOT / "cases").glob("*.yaml")),
     }
-    return {
+    fingerprints = {
         name: canonical_sha256(
             {
                 p.relative_to(REPO_ROOT).as_posix(): p.read_text(encoding="utf-8")
@@ -88,6 +112,15 @@ def input_fingerprints() -> dict[str, str]:
         )
         for name, paths in groups.items()
     }
+    fingerprints.update(
+        corpus=corpus_sha256(FactLoader().load_all()),
+        index=file_sha256(DEFAULT_EMBEDDINGS_PATH),
+        dataset=canonical_sha256(load_manifest().model_dump(mode="json")),
+        dependencies=canonical_sha256(
+            {name: version(name) for name in ("fastembed", "numpy", "pydantic", "groq")}
+        ),
+    )
+    return fingerprints
 
 
 async def offline_result() -> OfflineResult:

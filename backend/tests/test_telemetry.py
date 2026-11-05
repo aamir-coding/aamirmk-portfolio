@@ -181,3 +181,17 @@ def test_actual_index_provenance_available() -> None:
     metadata = provenance()
     assert metadata["index_built_at"]
     assert len(metadata["index_sha256"]) == 64
+
+
+def test_truncated_optional_metadata_does_not_break_requests(
+    monkeypatch, tmp_path
+) -> None:
+    import app.telemetry
+
+    root = tmp_path / "app"
+    (root / "retrieval").mkdir(parents=True)
+    (root / "prompts").mkdir()
+    (root / "retrieval/facts_embeddings.npz").write_bytes(b"PK\x03\x04truncated")
+    monkeypatch.setattr(app.telemetry, "__file__", str(root / "telemetry.py"))
+    metadata = provenance()
+    assert metadata["index_sha256"] is metadata["index_built_at"] is None

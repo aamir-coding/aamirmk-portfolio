@@ -58,6 +58,15 @@ describe("<FitReportModal />", () => {
     });
   });
 
+  it("exposes unknown usage for a failed request with no final provider receipt", () => {
+    vi.mocked(useFitReportModule.useFitReport).mockReturnValue({
+      ...defaultHookState, status: "error", error: "Provider failed", errorReceipt: {},
+    });
+    render(<FitReportModal isOpen onClose={vi.fn()} onAskGap={vi.fn()} />);
+    expect(screen.getByText(/Unknown \/ incomplete — receipt unavailable/)).toBeInTheDocument();
+    expect(screen.getByText("Under the hood").closest("details")).not.toHaveAttribute("open");
+  });
+
   it("does not render when isOpen is false", () => {
     const { container } = render(
       <FitReportModal isOpen={false} onClose={vi.fn()} onAskGap={vi.fn()} />

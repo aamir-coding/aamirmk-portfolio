@@ -17,7 +17,8 @@ export function FitReportCard({
   onRerunLive,
 }: FitReportCardProps) {
   const { score } = report;
-  const isBenchmark = Boolean(activePreset?.report || report.cached);
+  const origin = report.telemetry?.origin ?? (activePreset?.report ? "curated" : undefined);
+  const isBenchmark = origin === "curated";
 
   const mustHaves = report.requirements.filter(
     (r) => r.requirement.importance === "must_have"
@@ -123,7 +124,7 @@ export function FitReportCard({
             <div className="fit-benchmark-details">
               <strong>CURATED SAMPLE ASSESSMENT (CACHED SNAPSHOT)</strong>
               <span>
-                Manually reviewed against current curated facts; this sample is not a live evaluation.
+                Authored development example; this sample is not a live evaluation or calibrated ground truth.
               </span>
             </div>
           </div>
@@ -140,6 +141,7 @@ export function FitReportCard({
         </div>
       )}
 
+      {origin === "cache" || (!origin && report.cached) ? <p role="status">Cached report — no model calls for this request. The original generation is not re-evaluated.</p> : null}
       {activePreset?.text && (
         <details className="fit-jd-preview-details">
           <summary className="fit-jd-preview-summary">
@@ -202,7 +204,7 @@ export function FitReportCard({
         )}
       </section>
 
-      <UnderHood telemetry={report.telemetry} browserTiming={report.browserTiming} delivery={activePreset?.report ? "curated" : undefined} />
+      <UnderHood telemetry={report.telemetry} browserTiming={report.browserTiming} delivery={!report.telemetry && isBenchmark ? "curated" : undefined} />
       <footer className="fit-report-footer">
         {onReset && (
           <button type="button" className="btn btn-secondary" onClick={onReset}>

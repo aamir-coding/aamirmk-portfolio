@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "offline_engineering_checks",
-  "generated_at": "2026-11-05T12:49:34.968894Z",
+  "generated_at": "2026-11-05T13:23:31.828877Z",
   "generation_accuracy_available": false,
   "configured_models": {
     "generator": "openai/gpt-oss-120b",
@@ -22,11 +22,14 @@
     "prompts": "ca6ceac970f64a4044826b3272c80e80b625bfe9531c3c896e51839a27403178",
     "checker": "ac9f18968a8d81cc1cb54fc059d0a136ef3644f55570f30fbd1bbf819827dfa0",
     "rubric": "135a8bfe0638e48d191bb75f1d05fca2b84b176e3bc5b6089875d79819beb4bb",
-    "recordings": "cce24c1407ba9569cb3f4878b4cf8e3b4ac47561afb38fc6aafa4a9e75d69fbe",
+    "recordings": "58991c6ab38d9a96881443448b719452c3dfbea4bc83cbe1ad492e835c0aa28d",
+    "evaluator": "d8051ee757787dcc3b89445458c4aa84e0959943baaf1de36a5585b4a8806957",
+    "application": "795088a7361fdb399c8705c63a5b5006e00f7f6e514d021ad73f1a9153e7456a",
     "cases": "132aa0aa5f602dbaf149fdb605125aa7cc688f7be3da46ce2b48a9ce97f0e51a",
     "corpus": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
     "index": "809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e",
     "dataset": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "dependencies": "1ff05fc2bbab1da51d2cc61db8528d8e155b66922c187f3a5c3b25bc994f25e4",
     "retrieval": "8a8fa9eab98b6ae588f095f52f4396bfdf7361d196fa5e4cdfc343e5eea3ca95"
   },
   "split_ids": {
@@ -93,8 +96,8 @@
     "held_out_executed": false,
     "groq_calls": 0,
     "provenance": {
-      "created_at": "2026-11-05T12:49:29.895866Z",
-      "commit": "a286a16ff9ffe93ad04ebe31688a48a3df606522",
+      "created_at": "2026-11-05T13:23:26.350118Z",
+      "commit": "bb36a9985464844b72df7203f0b523e66eb79fc5",
       "dirty": true,
       "retrieval_source_sha256": "8a8fa9eab98b6ae588f095f52f4396bfdf7361d196fa5e4cdfc343e5eea3ca95",
       "dataset_manifest_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
@@ -309,7 +312,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 23.273899998457637,
+            "latency_ms": 25.37760000268463,
             "skip_reason": null
           },
           {
@@ -329,7 +332,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.960199998517055,
+            "latency_ms": 17.873400000098627,
             "skip_reason": null
           },
           {
@@ -349,7 +352,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 21.728399999119574,
+            "latency_ms": 23.817900000722148,
             "skip_reason": null
           },
           {
@@ -369,7 +372,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.957399999024346,
+            "latency_ms": 15.431900006660726,
             "skip_reason": null
           },
           {
@@ -389,7 +392,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.755399999761721,
+            "latency_ms": 19.165800003975164,
             "skip_reason": null
           },
           {
@@ -409,7 +412,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.438100000319537,
+            "latency_ms": 21.836899999470916,
             "skip_reason": null
           },
           {
@@ -429,7 +432,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 13.855500001227483,
+            "latency_ms": 16.10420000361046,
             "skip_reason": null
           },
           {
@@ -449,7 +452,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.222599999106023,
+            "latency_ms": 19.090500005404465,
             "skip_reason": null
           },
           {
@@ -469,7 +472,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.567599999485537,
+            "latency_ms": 17.827200004830956,
             "skip_reason": null
           },
           {
@@ -489,7 +492,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.36030000069877,
+            "latency_ms": 21.894899997278117,
             "skip_reason": null
           },
           {
@@ -509,7 +512,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.624900000257185,
+            "latency_ms": 22.407999997085426,
             "skip_reason": null
           },
           {
@@ -529,7 +532,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.776799998799106,
+            "latency_ms": 16.773200004536193,
             "skip_reason": null
           },
           {
@@ -549,7 +552,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.863799999962794,
+            "latency_ms": 22.787699999753386,
             "skip_reason": null
           },
           {
@@ -569,7 +572,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 22.790200000599725,
+            "latency_ms": 23.74440000130562,
             "skip_reason": null
           },
           {
@@ -589,7 +592,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.289100000605686,
+            "latency_ms": 22.677100001601502,
             "skip_reason": null
           },
           {
@@ -609,7 +612,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.18249999935506,
+            "latency_ms": 17.722299999149982,
             "skip_reason": null
           },
           {
@@ -629,7 +632,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.353800001117634,
+            "latency_ms": 15.213599996059202,
             "skip_reason": null
           },
           {
@@ -649,7 +652,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.13379999960307,
+            "latency_ms": 17.990799999097362,
             "skip_reason": null
           },
           {
@@ -669,7 +672,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.050399997358909,
+            "latency_ms": 16.09850000386359,
             "skip_reason": null
           },
           {
@@ -689,7 +692,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 17.961199999263044,
+            "latency_ms": 22.42829999886453,
             "skip_reason": null
           },
           {
@@ -709,7 +712,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.87810000011814,
+            "latency_ms": 22.652299994661007,
             "skip_reason": null
           },
           {
@@ -729,7 +732,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 16.920099998969818,
+            "latency_ms": 16.43039999908069,
             "skip_reason": null
           },
           {
@@ -749,7 +752,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 16.10909999726573,
+            "latency_ms": 16.076299994892906,
             "skip_reason": null
           },
           {
@@ -769,7 +772,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.686400001868606,
+            "latency_ms": 13.203499998780899,
             "skip_reason": null
           },
           {
@@ -789,7 +792,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 16.60789999732515,
+            "latency_ms": 16.951200006587896,
             "skip_reason": null
           },
           {
@@ -809,7 +812,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 22.67809999830206,
+            "latency_ms": 16.74289999937173,
             "skip_reason": null
           },
           {
@@ -829,7 +832,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.074899999191985,
+            "latency_ms": 16.7693000039435,
             "skip_reason": null
           },
           {
@@ -849,7 +852,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.626400000357535,
+            "latency_ms": 16.97530000092229,
             "skip_reason": null
           },
           {
@@ -869,7 +872,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.481999999494292,
+            "latency_ms": 19.952199996623676,
             "skip_reason": null
           },
           {
@@ -889,7 +892,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.966300001105992,
+            "latency_ms": 14.6595000041998,
             "skip_reason": null
           },
           {
@@ -909,7 +912,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 13.665800001035677,
+            "latency_ms": 15.241499997500796,
             "skip_reason": null
           },
           {
@@ -929,7 +932,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.04209999984596,
+            "latency_ms": 16.229299995757174,
             "skip_reason": null
           },
           {
@@ -949,7 +952,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.953800000512274,
+            "latency_ms": 14.621599999372847,
             "skip_reason": null
           },
           {
@@ -969,7 +972,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.44250000087777,
+            "latency_ms": 19.460700001218356,
             "skip_reason": null
           },
           {
@@ -989,7 +992,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.114399997401051,
+            "latency_ms": 15.304100001230836,
             "skip_reason": null
           },
           {
@@ -1009,7 +1012,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.455000000452856,
+            "latency_ms": 17.390699998941272,
             "skip_reason": null
           },
           {
@@ -1029,7 +1032,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.242700000177138,
+            "latency_ms": 22.497300000395626,
             "skip_reason": null
           },
           {
@@ -1049,7 +1052,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.264099999621976,
+            "latency_ms": 19.323300002724864,
             "skip_reason": null
           },
           {
@@ -1069,7 +1072,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.7987000028661,
+            "latency_ms": 20.95270000427263,
             "skip_reason": null
           },
           {
@@ -1089,7 +1092,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.96190000034403,
+            "latency_ms": 14.619699999457225,
             "skip_reason": null
           },
           {
@@ -1109,7 +1112,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.175100002030376,
+            "latency_ms": 19.86360000591958,
             "skip_reason": null
           },
           {
@@ -1129,7 +1132,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.146400001773145,
+            "latency_ms": 22.00029999949038,
             "skip_reason": null
           },
           {
@@ -1149,7 +1152,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 22.088899997470435,
+            "latency_ms": 20.888799997919705,
             "skip_reason": null
           },
           {
@@ -1169,7 +1172,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.521800000598887,
+            "latency_ms": 21.13689999532653,
             "skip_reason": null
           },
           {
@@ -1189,16 +1192,16 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.183999999862863,
+            "latency_ms": 15.292600000975654,
             "skip_reason": null
           }
         ],
         "latency": {
           "count": 45,
-          "mean_ms": 17.560719999811326,
-          "p50_ms": 16.920099998969818,
-          "p95_ms": 22.67809999830206,
-          "p99_ms": 23.273899998457637,
+          "mean_ms": 18.700004445013796,
+          "p50_ms": 17.873400000098627,
+          "p95_ms": 23.74440000130562,
+          "p99_ms": 25.37760000268463,
           "percentile_method": "nearest_rank"
         },
         "quality_passed": true,
@@ -1551,7 +1554,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 21.984599999996135,
+            "latency_ms": 24.300500001118053,
             "skip_reason": null
           },
           {
@@ -1571,7 +1574,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.169800000876421,
+            "latency_ms": 17.581699998117983,
             "skip_reason": null
           },
           {
@@ -1591,7 +1594,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.78609999807668,
+            "latency_ms": 20.161000000371132,
             "skip_reason": null
           },
           {
@@ -1611,7 +1614,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 16.15959999980987,
+            "latency_ms": 15.531000004557427,
             "skip_reason": null
           },
           {
@@ -1631,7 +1634,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 21.575999999186024,
+            "latency_ms": 21.583399997325614,
             "skip_reason": null
           },
           {
@@ -1651,7 +1654,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.30880000043544,
+            "latency_ms": 16.037800000049174,
             "skip_reason": null
           },
           {
@@ -1671,7 +1674,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.684699999837903,
+            "latency_ms": 16.532499997993,
             "skip_reason": null
           },
           {
@@ -1691,7 +1694,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 16.451399998913985,
+            "latency_ms": 18.401799999992363,
             "skip_reason": null
           },
           {
@@ -1711,7 +1714,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.526399999449495,
+            "latency_ms": 22.553000002517365,
             "skip_reason": null
           },
           {
@@ -1731,7 +1734,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 21.00859999700333,
+            "latency_ms": 25.049899995792657,
             "skip_reason": null
           },
           {
@@ -1751,7 +1754,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.439300001162337,
+            "latency_ms": 16.422399996372405,
             "skip_reason": null
           },
           {
@@ -1771,7 +1774,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.62559999790392,
+            "latency_ms": 21.819699999468867,
             "skip_reason": null
           },
           {
@@ -1791,7 +1794,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.174999997834675,
+            "latency_ms": 21.914199998718686,
             "skip_reason": null
           },
           {
@@ -1811,7 +1814,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 19.355200001882622,
+            "latency_ms": 21.789200000057463,
             "skip_reason": null
           },
           {
@@ -1831,7 +1834,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.048100001877174,
+            "latency_ms": 17.672400004812516,
             "skip_reason": null
           },
           {
@@ -1851,7 +1854,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 13.94340000115335,
+            "latency_ms": 13.591900002211332,
             "skip_reason": null
           },
           {
@@ -1871,7 +1874,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.227100000629434,
+            "latency_ms": 15.68760000373004,
             "skip_reason": null
           },
           {
@@ -1891,7 +1894,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.087700001255143,
+            "latency_ms": 13.937300005636644,
             "skip_reason": null
           },
           {
@@ -1911,7 +1914,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 17.987899998843204,
+            "latency_ms": 21.060500002931803,
             "skip_reason": null
           },
           {
@@ -1931,7 +1934,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 20.01159999781521,
+            "latency_ms": 19.44319999893196,
             "skip_reason": null
           },
           {
@@ -1951,7 +1954,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 16.98000000033062,
+            "latency_ms": 17.403999998350628,
             "skip_reason": null
           },
           {
@@ -1971,7 +1974,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.762500002689194,
+            "latency_ms": 16.80610000039451,
             "skip_reason": null
           },
           {
@@ -1991,7 +1994,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.245599999412661,
+            "latency_ms": 14.970600001106504,
             "skip_reason": null
           },
           {
@@ -2011,7 +2014,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.94420000037644,
+            "latency_ms": 18.23580000200309,
             "skip_reason": null
           },
           {
@@ -2031,7 +2034,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.425999997911276,
+            "latency_ms": 14.782599995669443,
             "skip_reason": null
           },
           {
@@ -2051,7 +2054,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.24350000161212,
+            "latency_ms": 16.59529999596998,
             "skip_reason": null
           },
           {
@@ -2071,7 +2074,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 15.967800001817523,
+            "latency_ms": 15.78709999739658,
             "skip_reason": null
           },
           {
@@ -2091,7 +2094,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 18.522499998653075,
+            "latency_ms": 22.398400004021823,
             "skip_reason": null
           },
           {
@@ -2111,7 +2114,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.53150000088499,
+            "latency_ms": 17.08160000271164,
             "skip_reason": null
           },
           {
@@ -2131,7 +2134,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 13.456399999995483,
+            "latency_ms": 14.700700005050749,
             "skip_reason": null
           },
           {
@@ -2151,7 +2154,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.83360000202083,
+            "latency_ms": 18.127799994545057,
             "skip_reason": null
           },
           {
@@ -2171,7 +2174,7 @@
               "recall_at_3": null,
               "recall_at_5": null
             },
-            "latency_ms": 14.609600002586376,
+            "latency_ms": 15.010299997811671,
             "skip_reason": null
           },
           {
@@ -2207,7 +2210,7 @@
               "recall_at_3": 1.0,
               "recall_at_5": 1.0
             },
-            "latency_ms": 28.955299996596295,
+            "latency_ms": 28.062999997928273,
             "skip_reason": null
           },
           {
@@ -2227,7 +2230,7 @@
               "recall_at_3": 1.0,
               "recall_at_5": 1.0
             },
-            "latency_ms": 28.211700002430007,
+            "latency_ms": 27.811100000690203,
             "skip_reason": null
           },
           {
@@ -2265,10 +2268,10 @@
         ],
         "latency": {
           "count": 34,
-          "mean_ms": 17.419032352978213,
-          "p50_ms": 15.94420000037644,
-          "p95_ms": 28.211700002430007,
-          "p99_ms": 28.955299996596295,
+          "mean_ms": 18.789570588363432,
+          "p50_ms": 17.581699998117983,
+          "p95_ms": 27.811100000690203,
+          "p99_ms": 28.062999997928273,
           "percentile_method": "nearest_rank"
         },
         "quality_passed": true,
@@ -2285,8 +2288,8 @@
   "replay": {
     "kind": "recorded_checker_diagnostic",
     "generation_accuracy_available": false,
-    "replayed_at": "2026-11-05T12:49:34.726404Z",
-    "replay_commit": "a286a16ff9ffe93ad04ebe31688a48a3df606522",
+    "replayed_at": "2026-11-05T13:23:31.376975Z",
+    "replay_commit": "bb36a9985464844b72df7203f0b523e66eb79fc5",
     "replay_dirty": true,
     "checker_sha256": "18848307748c461d77883f9032d94a89e1c7187be34923a6a6bd1563e27426ff",
     "recording_file_sha256": "5a3025fcede5778ce95eb48e77b7f55e77b83c25ac8e3870b0ec0c42e947a545",

@@ -133,3 +133,24 @@ describe("useFitReport hook", () => {
     expect(hookResult!.current.status).toBe("idle");
   });
 });
+
+it("keeps cancelled fit usage unknown and ignores late callbacks", async () => {
+  vi.restoreAllMocks();
+  vi.spyOn(apiModule, "fetchFitPresets").mockResolvedValue([]);
+  let captured: sseModule.StreamFitOptions | undefined;
+  let finish: () => void = () => {};
+  const pending = new Promise<void>((resolve) => { finish = resolve; });
+  vi.spyOn(sseModule, "streamFitReport").mockImplementation(async (options) => {
+    captured = options;
+    await pending;
+  });
+  const { result } = renderHook(() => useFitReport());
+  let work: Promise<void> | undefined;
+  act(() => { work = result.current.submit("Synthetic portfolio job requirements. ".repeat(3)); });
+  act(() => { result.current.abort(); captured?.callbacks.onError("Late error"); });
+  await act(async () => { finish(); await work; });
+  expect(result.current.status).toBe("idle");
+  expect(result.current.errorReceipt?.delivery).toBe("cancelled");
+  expect(result.current.errorReceipt?.telemetry).toBeUndefined();
+  expect(result.current.error).toBeNull();
+});

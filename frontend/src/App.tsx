@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { EvalBadge } from "./components/Evals/EvalBadge";
 import { fetchHealth } from "./lib/api";
 import { useChat } from "./hooks/useChat";
 import { useTheme } from "./hooks/useTheme";
@@ -16,7 +17,15 @@ import "./styles/chat.css";
 
 const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
 
+const EvalPage = lazy(() => import("./components/Evals/EvalPage"));
+
 export function App() {
+  return window.location.pathname.replace(/\/$/, "") === "/evals"
+    ? <Suspense fallback={<p role="status">Loading evaluation record…</p>}><EvalPage /></Suspense>
+    : <Portfolio />;
+}
+
+function Portfolio() {
   const [serverState, setServerState] = useState<ServerState>("checking");
   const [healthError, setHealthError] = useState<string | null>(null);
   const [isFitModalOpen, setIsFitModalOpen] = useState(false);
@@ -106,6 +115,7 @@ export function App() {
           <p>AI Digital Assistant — Conversational Portfolio</p>
         </div>
         <div className="header-controls">
+          <EvalBadge />
           <button
             type="button"
             className="btn-header-fit"

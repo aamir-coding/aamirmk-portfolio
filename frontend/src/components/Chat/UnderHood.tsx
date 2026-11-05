@@ -20,6 +20,7 @@ export function UnderHood({ telemetry, browserTiming, delivery }: Props) {
       {delivery === "instant" || delivery === "curated" ? <>
         <dt>Model calls</dt><dd>None — saved authored response</dd>
       </> : null}
+      {!telemetry && !delivery ? <><dt>Usage</dt><dd>Unknown / incomplete — receipt unavailable</dd></> : null}
       {delivery === "cancelled" ? <><dt>Usage</dt><dd>Unknown / incomplete — request stopped</dd></> : null}
       {telemetry ? <>
         <dt>Server total</dt><dd>{ms(telemetry.total_ms)}</dd>
@@ -42,7 +43,9 @@ export function UnderHood({ telemetry, browserTiming, delivery }: Props) {
       {telemetry.calls.length ? <>
         <h4>Model calls</h4>
         <ol>{telemetry.calls.map((call, i) => <li key={i}>
-          {call.stage.replaceAll("_", " ")} — {call.reported_model ?? call.configured_model ?? "Model unavailable"}
+          {call.stage.replaceAll("_", " ")} — {call.reported_model
+            ? `reported ${call.reported_model}`
+            : `configured ${call.configured_model ?? "unavailable"} (reported model unavailable)`}
           {` · ${ms(call.duration_ms)} · ${call.status} · usage ${call.usage_source}`}
           {call.usage_source !== "unknown" ? ` · ${call.input_tokens} in / ${call.output_tokens} out` : ""}
         </li>)}</ol>
@@ -57,7 +60,7 @@ export function UnderHood({ telemetry, browserTiming, delivery }: Props) {
         </div>)}
       </> : null}
     </> : null}
-    <p>Server measurements exclude network transit. Browser measurements include it.
+    <p>Server measurements begin in the handler after admission checks and exclude network transit. Browser measurements include it.
       Missing provider counts are never estimated in this receipt.</p>
   </details>;
 }

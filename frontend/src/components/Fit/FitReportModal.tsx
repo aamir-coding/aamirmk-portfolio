@@ -1,3 +1,4 @@
+import { UnderHood } from "../Chat/UnderHood";
 import { useEffect, useRef, useState } from "react";
 import { useFitReport } from "../../hooks/useFitReport";
 import type { SampleJobDescription } from "../../lib/types";
@@ -25,6 +26,7 @@ export function FitReportModal({
     progress,
     report,
     error,
+    errorReceipt,
     presets,
     activePreset,
     loadPreset,
@@ -112,7 +114,7 @@ export function FitReportModal({
       >
         <header className="fit-modal-header">
           <div className="fit-modal-title-group">
-            <span className="fit-tag">VERIFIED EVALUATION ENGINE</span>
+            <span className="fit-tag">Curated evidence review</span>
             <h2 id="fit-modal-title">Job Description Fit Report</h2>
           </div>
           <button
@@ -144,8 +146,8 @@ export function FitReportModal({
               {presets.length > 0 && (
                 <div className="fit-presets-container" aria-label="Sample Job Description Presets">
                   <div className="fit-presets-header">
-                    <span className="fit-presets-label">1-Click Verified Benchmarks (Instant):</span>
-                    <span className="fit-presets-subtext">Pre-evaluated against dossier to save compute</span>
+                    <span className="fit-presets-label">Curated examples (instant):</span>
+                    <span className="fit-presets-subtext">Authored development examples; not calibrated ground truth</span>
                   </div>
                   <div className="fit-presets-list">
                     {presets.map((preset) => {
@@ -220,11 +222,12 @@ export function FitReportModal({
                 </div>
               )}
 
+              {errorReceipt ? <UnderHood {...errorReceipt} /> : null}
               <div className="fit-form-notice">
                 <p>
-                  <strong>Transparency Guarantee:</strong> Your pasted job description is analyzed
-                  live against Aamir's verified facts. Claims without citations are deterministically
-                  downgraded to gaps. No personal recruiter details are stored.
+                  Your pasted job description is analyzed against curated portfolio facts.
+                  Uncited requirement verdicts are downgraded; citation membership alone does not
+                  prove semantic support. No personal recruiter details are stored.
                 </p>
               </div>
 

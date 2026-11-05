@@ -1,3 +1,5 @@
+import type { RequestTelemetry } from "../lib/contracts";
+import type { BrowserTiming } from "../lib/types";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchFitPresets } from "../lib/api";
 import { streamFitReport } from "../lib/sse";
@@ -5,7 +7,14 @@ import type { FitProgressData, FitReport, SampleJobDescription } from "../lib/ty
 
 export type FitStatus = "idle" | "streaming" | "completed" | "error";
 
+export interface FailureReceipt {
+  telemetry?: RequestTelemetry;
+  browserTiming?: BrowserTiming;
+  delivery?: "cancelled";
+}
+
 export interface UseFitReportReturn {
+  errorReceipt?: FailureReceipt;
   status: FitStatus;
   progress: FitProgressData | null;
   report: FitReport | null;
@@ -20,6 +29,7 @@ export interface UseFitReportReturn {
 }
 
 export function useFitReport(): UseFitReportReturn {
+  const [errorReceipt, setErrorReceipt] = useState<FailureReceipt>();
   const [status, setStatus] = useState<FitStatus>("idle");
   const [progress, setProgress] = useState<FitProgressData | null>(null);
   const [report, setReport] = useState<FitReport | null>(null);
@@ -64,6 +74,7 @@ export function useFitReport(): UseFitReportReturn {
 
   const abort = useCallback(() => {
     if (abortControllerRef.current) {
+      setErrorReceipt({ delivery: "cancelled" });
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
     }
@@ -73,6 +84,7 @@ export function useFitReport(): UseFitReportReturn {
 
   const reset = useCallback(() => {
     abort();
+    setErrorReceipt(undefined);
     setReport(null);
     setError(null);
     setProgress(null);
@@ -83,6 +95,7 @@ export function useFitReport(): UseFitReportReturn {
   const loadPreset = useCallback(
     (preset: SampleJobDescription) => {
       abort();
+      setErrorReceipt(undefined);
       setError(null);
       setProgress(null);
       setActivePreset(preset);
@@ -110,6 +123,7 @@ export function useFitReport(): UseFitReportReturn {
       const controller = new AbortController();
       abortControllerRef.current = controller;
 
+      setErrorReceipt(undefined);
       setStatus("streaming");
       setError(null);
       setReport(null);
@@ -135,8 +149,9 @@ export function useFitReport(): UseFitReportReturn {
               setStatus("completed");
               setProgress(null);
             },
-            onError: (err) => {
+            onError: (err, receipt) => {
               if (controller.signal.aborted) return;
+              setErrorReceipt(receipt ?? {});
               setError(err || "An error occurred during fit evaluation.");
               setStatus("error");
               setProgress(null);
@@ -149,6 +164,7 @@ export function useFitReport(): UseFitReportReturn {
           return;
         }
         const message = err instanceof Error ? err.message : "Fit evaluation failed";
+        setErrorReceipt({});
         setError(message);
         setStatus("error");
         setProgress(null);
@@ -160,6 +176,7 @@ export function useFitReport(): UseFitReportReturn {
   );
 
   return {
+    errorReceipt,
     status,
     progress,
     report,

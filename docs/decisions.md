@@ -684,3 +684,36 @@ not fix production-wide quota reservations, SDK HTTP-attempt accounting or durab
 Original endpoint-v1/human packets are untouched; separate v2 fake-backed captures exercise
 new telemetry through real frontend Zod/SSE contracts. Native details/summary provides the
 collapsed keyboard disclosure in the existing dossier style.
+
+## DRN-053: Result-backed publication remains an engineering record
+
+Aamir explicitly accepted the independent validation failure and closed Increment 4,
+then authorized the remaining offline milestone without further briefs. Completeness
+and Tone remain 6/8; validation is not calibrated. The public projection recomputes
+agreement from unchanged frozen human/judge data offline and preserves five disagreements.
+No new provider calls, approvals of draft facts or claims of generator accuracy follow.
+
+A typed allowlist projects actual offline results into backend/app/data/eval-summary.json.
+The badge is derived by the backend (Replay checks: 8/8 (offline)); frontend Zod verifies
+its equality and /evals shares the same projection. Publication here means generating a
+local artifact; no remote publication is performed. Missing/malformed/mixed/partial/stale
+artifacts return no numeric report. Source-result and projection hashes bind provenance;
+runtime compatibility checks source/prompts, current corpus/index and key dependency
+versions independently of Git availability. Hashes are integrity checks, not signatures.
+Reserved content/IDs, raw recruiter text, raw answers, evidence and human rationales are
+excluded; safe development-validation disagreement IDs/axes/labels remain visible.
+
+Review expanded baseline fingerprints to cover evaluator/application code, v2 endpoint
+contracts, current index/corpus/manifest and installed dependencies. Original scores were
+asserted unchanged before replacing the identity map; floors and critical checks were
+not lowered. The original initial baseline/result are preserved in local commit d3f249a.
+Any future change requires explicit compatibility review, not automatic baseline updates.
+The ten reserved cases remain author-visible and unexecuted, not an independent blind
+assessment. A real factual accuracy badge still needs factual approval, supported human
+labels, a reliable judge and compatible held-out generation evidence.
+
+Review fixes within this increment: bind current assets before projecting old results;
+preserve failed/cancelled fit receipts through Zod/SSE/hooks/modal; prefer server origin
+over active preset when labeling fresh/generated-cache results; allow corrupt optional
+index metadata to degrade to unknown. No production quota, persistence or broad safety
+scope was silently included. Further Phase 7/9/10 work remains tracked separately.

@@ -1,5 +1,17 @@
 # Phase 8 brief — approved for offline implementation
 
+**Close-out authorization, 5 November:** Aamir accepted the failed independent judge
+validation as the authentic empirical baseline, formally closed Increment 4 and
+fully authorized implementing Increments 5–7 without another planning brief or
+approval pause. The offline engineering milestone is implemented; final verification
+and local close-out are recorded in PROGRESS. Judge validation remains failed,
+all 76 facts remain draft, and model accuracy remains unavailable. Public summary
+and badge show actual offline replay results with explicit limitations. No new live
+provider runs, remote push or deployment are included in this implementation.
+
+## Historical increment and calibration checkpoints
+
+
 **Current validation outcome, 5 November:** All 8 independently graded validation
 answers completed in 8 calls, no failures/retries, with the exact accepted calibration
 recipe. Agreement: Support 8/8(100%), Completeness 6/8(75%), Behavior 7/8(87.5%),

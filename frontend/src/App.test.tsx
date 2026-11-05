@@ -9,14 +9,18 @@ describe("<App />", () => {
     vi.restoreAllMocks();
     sessionStorage.clear();
     vi.spyOn(api, "fetchFitPresets").mockResolvedValue([]);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      status: "unavailable", report: null, reason: "Test fixture", badge: "Evaluation results unavailable",
+    }))));
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
     sessionStorage.clear();
   });
 
-  it("renders header, status indicator, and starter chips on mount", () => {
+  it("renders header, status indicator, and starter chips on mount", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     render(<App />);
 
@@ -24,6 +28,7 @@ describe("<App />", () => {
       screen.getByRole("heading", { level: 1, name: /Aamir Mohammed Khan/i })
     ).toBeInTheDocument();
     expect(screen.getByText(/Suggested Inquiries/i)).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Evaluation results unavailable" })).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
         name: /What is Aamir's experience with FastAPI and LLM systems\?/i,

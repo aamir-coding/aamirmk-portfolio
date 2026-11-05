@@ -1,0 +1,13 @@
+.eval-page { max-width: 76rem; margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); color: var(--text-primary); }
+.eval-page p { max-width: 74ch; line-height: 1.7; }
+.eval-page h1 { font-size: clamp(2rem, 5vw, 3rem); }
+.eval-page h2 { margin-top: 2rem; }
+.eval-page table { width: 100%; border-collapse: collapse; font-size: clamp(.7rem, 2.5vw, .95rem); }
+.eval-page caption { text-align: left; padding-block: .7rem; color: var(--text-secondary); }
+.eval-page th, .eval-page td { padding: .6rem .4rem; text-align: left; border-bottom: 1px solid var(--border-strong); overflow-wrap: anywhere; }
+.eval-page dl { font-family: var(--font-mono); font-size: .8rem; }
+.eval-page dt { margin-top: 1rem; font-weight: 600; }
+.eval-page dd { margin-left: 0; overflow-wrap: anywhere; }
+.eval-page a, .eval-badge { color: var(--accent-cobalt); }
+.eval-page a:focus-visible, .eval-badge:focus-visible { outline: 2px solid var(--accent-cobalt); outline-offset: 4px; }
+.eval-badge { font-size: .8rem; padding: .5rem; }

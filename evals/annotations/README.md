@@ -116,3 +116,13 @@ relative to supplied draft evidence; all 76 facts remain draft. Future publicati
 still needs approved factual provenance, genuine held-out outcomes and compatible
 complete result evidence. No human labels or real judge outputs were supplied by
 the agent.
+
+## Accepted validation baseline and Phase 8 offline completion
+
+Aamir formally closed Increment 4 after accepting the authentic independent validation
+failure. The result and all five disagreements are preserved; no labels/prompts were
+changed and no further calls were made for Increments 5–7. The public engineering summary
+shows these counts separately from offline replay checks. It never calls the judge
+calibrated or converts agreement into generator accuracy. New calibration experiments
+require a reviewed fresh validation version/human grading and separately budgeted live
+authorization. Original human packet, annotations and live run archives remain unchanged.

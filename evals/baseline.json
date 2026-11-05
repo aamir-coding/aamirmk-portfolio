@@ -1,15 +1,18 @@
 {
   "schema_version": 1,
-  "review_reference": "Phase 8 Increment 5: initial unchanged development retrieval and critical replay baseline; user approved offline implementation",
+  "review_reference": "DRN-053: reviewed expanded evaluator/application/v2-contract/current-asset/dependency compatibility fingerprints; original scores and thresholds unchanged",
   "fingerprints": {
     "prompts": "ca6ceac970f64a4044826b3272c80e80b625bfe9531c3c896e51839a27403178",
     "checker": "ac9f18968a8d81cc1cb54fc059d0a136ef3644f55570f30fbd1bbf819827dfa0",
     "rubric": "135a8bfe0638e48d191bb75f1d05fca2b84b176e3bc5b6089875d79819beb4bb",
-    "recordings": "cce24c1407ba9569cb3f4878b4cf8e3b4ac47561afb38fc6aafa4a9e75d69fbe",
+    "recordings": "58991c6ab38d9a96881443448b719452c3dfbea4bc83cbe1ad492e835c0aa28d",
+    "evaluator": "d8051ee757787dcc3b89445458c4aa84e0959943baaf1de36a5585b4a8806957",
+    "application": "795088a7361fdb399c8705c63a5b5006e00f7f6e514d021ad73f1a9153e7456a",
     "cases": "132aa0aa5f602dbaf149fdb605125aa7cc688f7be3da46ce2b48a9ce97f0e51a",
     "corpus": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
     "index": "809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e",
     "dataset": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "dependencies": "1ff05fc2bbab1da51d2cc61db8528d8e155b66922c187f3a5c3b25bc994f25e4",
     "retrieval": "8a8fa9eab98b6ae588f095f52f4396bfdf7361d196fa5e4cdfc343e5eea3ca95"
   },
   "scores": {

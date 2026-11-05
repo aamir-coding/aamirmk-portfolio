@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "purpose": "fake_and_curated_endpoint_captures",
-  "captured_at": "2026-11-05T13:00:30.147446Z",
-  "commit": "d3f249ab14dc9ba3ce1b0d230c1c82110fc0e0f2",
+  "captured_at": "2026-11-05T13:05:11.429958Z",
+  "commit": "bb36a9985464844b72df7203f0b523e66eb79fc5",
   "dirty": true,
   "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
   "dataset_manifest_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
   "prompt_files_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
-  "capture_source_sha256": "89ea87d5f07dd773ef8d5bd843f8f16bb2a74d71f36b4de2fcafa51722a303e1",
+  "capture_source_sha256": "6dfb8b7dd679f68f98c8d741530b28887ac1b5d3b58ba374d85b09e0837aac9d",
   "records": [
     {
       "id": "chat-project",
@@ -139,7 +139,7 @@
         "version": 1,
         "sha256": "49de0cf2b8c0ff073360b38362007021f3b8a477bf68f27cee0e98913f254d7d"
       },
-      "raw_sse": "event: sources\ndata: {\"sources\": [{\"chunk_id\": \"proj-entropy-oj-pitch\", \"title\": \"Entropy Online Judge \\u2014 Pitch and Problem\", \"type\": \"project\", \"source_section\": \"J1, J2 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}]}\n\nevent: error\ndata: {\"detail\": \"AI service is currently unavailable. Please try again shortly.\"}\n\n",
+      "raw_sse": "event: sources\ndata: {\"sources\": [{\"chunk_id\": \"proj-entropy-oj-pitch\", \"title\": \"Entropy Online Judge \\u2014 Pitch and Problem\", \"type\": \"project\", \"source_section\": \"J1, J2 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}]}\n\nevent: error\ndata: {\"detail\": \"AI service is currently unavailable. Please try again shortly.\", \"telemetry\": {\"version\": 1, \"origin\": \"fresh\", \"total_ms\": 0.0, \"first_text_ms\": null, \"calls\": [{\"stage\": \"answer\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": null, \"duration_ms\": 0.0, \"status\": \"failed\", \"usage_source\": \"unknown\", \"input_tokens\": null, \"output_tokens\": null}], \"retrieval\": [{\"stage\": \"retrieval\", \"duration_ms\": 0.0, \"chunks\": [{\"id\": \"proj-entropy-oj-pitch\", \"score\": 1.0, \"rank\": 1, \"method\": \"fake\"}]}], \"stages_ms\": {\"preparing\": 0.0, \"rewrite\": 0.0, \"retrieval\": 0.0, \"answer\": 0.0}, \"usage_complete\": false, \"input_tokens\": null, \"output_tokens\": null, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
       "preset_report": null,
       "retrieved_chat_ids": [
         "proj-entropy-oj-pitch"

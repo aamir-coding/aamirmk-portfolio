@@ -7,6 +7,8 @@ from collections.abc import AsyncIterator, Callable
 from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Literal
+from zipfile import BadZipFile
+from zlib import error as ZlibError
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -142,7 +144,7 @@ def provenance() -> dict[str, str | None]:
             index_sha256=file_sha256(root / "retrieval/facts_embeddings.npz"),
             index_built_at=manifest.built_at.isoformat(),
         )
-    except (OSError, ValueError, KeyError):
+    except (OSError, ValueError, KeyError, BadZipFile, EOFError, ZlibError):
         pass
     return result
 

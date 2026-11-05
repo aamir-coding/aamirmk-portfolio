@@ -9,6 +9,7 @@ repo_root = Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
     sys.path.insert(0, str(repo_root))
 
+from evals.capture import DEFAULT_RECORDINGS as CURRENT_CAPTURES  # noqa: E402
 from evals.capture import capture_contracts  # noqa: E402
 from evals.checks import check_recording, decode_recording  # noqa: E402
 from evals.replay import load_recordings  # noqa: E402
@@ -29,7 +30,7 @@ def test_current_endpoint_captures_match_the_committed_cross_language_fixture(
     monkeypatch.setattr(app.llm, "AsyncGroq", forbidden)
     monkeypatch.setattr(fastembed, "TextEmbedding", forbidden)
     actual = capture_contracts()
-    saved = load_recordings()
+    saved = load_recordings(CURRENT_CAPTURES)
     assert actual.records == saved.records
     assert actual.corpus_sha256 == saved.corpus_sha256
     assert actual.prompt_files_sha256 == saved.prompt_files_sha256

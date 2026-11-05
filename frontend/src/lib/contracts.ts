@@ -142,6 +142,7 @@ export const FitProgressDataSchema = z.object({
 });
 
 export const FitErrorPayloadSchema = z.object({
+  telemetry: RequestTelemetrySchema.optional(),
   code: z.string().min(1),
   message: z.string().min(1),
 });

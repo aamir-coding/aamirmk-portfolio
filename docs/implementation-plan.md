@@ -431,7 +431,16 @@ The outcome is a site that cannot exhaust your free quota or be made to misrepre
 
 ## Phase 8: Evals, under-the-hood panel and eval badge
 
-**Current authorization (2026-11-04):** The [scoped Phase 8 brief](briefs/phase-08-evals.md) is approved for offline implementation on `phase-8-evals`, beginning with Increment 1. Human calibration is pending user input at Increment 4. All live Groq evaluation runs require a separate concrete budget approval. Draft facts and curated fit samples are not approved ground truth; offline/replay results must not be presented as fresh model accuracy.
+**Accepted offline milestone (2026-11-05):** The [scoped Phase 8 brief](briefs/phase-08-evals.md)
+was approved and all seven increments implemented on `phase-8-evals`. Aamir supplied
+human labels, authorized bounded judge runs, accepted the failed independent validation
+as the empirical baseline, closed Increment 4 and authorized remaining implementation.
+Offline replay/retrieval artifacts, CI gates, real request telemetry, drawer, public
+summary/page and actual-result engineering badge are complete locally. Model accuracy
+remains unavailable: all 76 facts are draft, validation failed Completeness/Tone, and
+reserved cases remain unexecuted/author-visible. No failure was relabeled as a pass.
+No new live generation, remote push or deployment is part of this offline close-out.
+All future live runs require separate concrete budget approval.
 
 The outcome is proof that the assistant is accurate, plus a panel that lets technical interviewers see how it works. Evals are the habit that most separates AI engineers from people who only call an API. Effort: 3 to 4 days.
 

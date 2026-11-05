@@ -1,7 +1,16 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. **Independent validation completed 8/8 but gate FAILED**: Support 8/8(100%), Completeness 6/8(75%), Behavior 7/8(87.5%), Tone 6/8(75%). Same frozen calibrated recipe; eight attempts, no failures/retries, 8,382 reported tokens. Human labels and all 76 draft facts unchanged. No calibrated/accuracy badge claim. [Validation result](audits/2026-11-05-judge-validation.md).
+**Phase 8: Evals, under-the-hood panel and eval badge — offline engineering milestone complete**
+on `phase-8-evals`. Aamir accepted the authentic failed independent validation baseline,
+closed Increment 4, and authorized finishing Increments 5–7. Reproducible artifacts/CI,
+real request-local telemetry, accessible drawer, `/api/eval-summary`, `/evals` and an
+actual-result engineering badge are implemented. **Judge validation remains FAILED**:
+Support 8/8 (100%), Completeness 6/8 (75%), Behavior 7/8 (87.5%), Tone 6/8 (75%).
+All five disagreements, unchanged human grades and all 76 draft facts are preserved.
+**Model accuracy remains unavailable.** No new Groq calls, remote push or deployment.
+[Validation baseline](audits/2026-11-05-judge-validation.md) ·
+[Close-out review](audits/2026-11-05-phase-08-closeout.md).
 
 **Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
@@ -9,7 +18,12 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Review semantic validation failures on 06/08. Do not retry valid judgments or tune and reuse this exposed validation set as independent evidence; further calibration needs a reviewed fresh validation version/human grades. Increment 5 has not started; publication remains blocked.
+Next: STOP after local Phase 8 close-out; await Aamir's explicit approval before any
+next phase. Remote integration/deployment is not performed. A new factual accuracy claim
+still needs approved facts, reliable judging and compatible held-out generation evidence;
+further judge tuning needs a fresh independently graded validation version, never retuning
+and resampling these exposed eight outcomes. These are experiment/publication gates,
+not unfinished work in the accepted offline engineering milestone.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +48,7 @@ Next: Review semantic validation failures on 06/08. Do not retry valid judgments
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 Validation 8/8 complete; gate failed Completeness/Tone; review pending | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟢 Offline engineering complete; validation failure preserved; model accuracy unavailable | `phase-8-evals` | `phase-8-done` (local) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -420,3 +434,43 @@ cancellation, privacy and shared-pipeline concurrency); 58 existing chat/fit/LLM
 passed; 24 focused frontend receipt/SSE/contract tests passed. Missing stream usage stays
 unknown. New v2 endpoint fixtures preserve original replay and human calibration inputs.
 Full review/checks follow Increment 7; no live provider calls or publication occurred.
+
+
+### Phase 8 Increments 5–7 — final verification and close-out (5 November)
+
+- Fresh complete backend/eval suite: **498 passed**, one upstream Starlette deprecation
+  warning, 76.34s. All provider-backed tests use fakes/MockTransport; cached local ONNX
+  assets only. Original human packet/annotations/run archives and fact flags unchanged.
+- Fresh complete frontend suite: **169 passed**, 22 files, 18.60s. Includes actual
+  backend-to-Zod captures, failed fit receipts, cancelled/late callbacks, delivery-origin
+  precedence, badge identity, stale/mixed-mode handling and native disclosure behavior.
+- Ruff lint and format, ESLint, TypeScript/Vite build and gzip gate checked locally.
+  Final build measurement is recorded in the close-out audit. Remote CI has not run.
+- Offline retrieval/replay gate passed with original floors and unchanged baseline scores:
+  legacy Hit@3 41/45 (.9111), Hit@5 45/45, MRR@5 .8889; versioned development Hit@3
+  31/34 (.9118), Hit@5 34/34, MRR@5 .8897. Exhaustive-source Recall@3/@5 1.0 on only
+  two labeled queries; legacy alternatives have no recall denominator. Replay **8/8**;
+  36 development cases have no saved response. Ten author-visible reserved cases remain
+  unexecuted and are not an independently blind assessment.
+- Independent read-only architecture reviewer found no remaining blocker after four
+  fixes, listed in the close-out audit. No unrelated retrospective work reopened.
+- Cached agent-browser/Chromium local QA used only a fake-backed API on loopback: exact
+  8/8 engineering badge, failed validation table and five disagreement rows; native
+  summary focus + Enter opens the chat drawer with real local timings and unknown fake
+  stream usage; curated preset drawer collapsed and clearly authored; mobile 390×844
+  shows all three result tables at scrollWidth 390 (no horizontal overflow). Screenshots
+  are local ignored `build/phase8-ui/evals-desktop.png` and `evals-mobile.png`. This is
+  not new production acceptance or live Groq model testing.
+- Study guide now covers all seven increments, implementation walkthroughs, theory,
+  placement Q&A, official references and three optional retrieval-practice questions.
+  User waived waiting for teach-back answers; none were assessed. No next phase started.
+- Local conventional commits and `phase-8-done` tag close the accepted offline scope.
+  No merge, remote push or deployment is performed. Existing user-reported 4 November
+  live acceptance remains attributed as such, not reused as agent verification.
+
+Remaining gates/deferrals: factual approval of all 76 drafts or a named approved subset;
+fresh independently graded judge validation for future tuning; separately budgeted live
+generation/held-out results before any model accuracy badge. Production-wide quota
+reservation/SDK HTTP attempts, proxy trust, Linux resource acceptance, broad SSE/cache/
+URL/dialog/session hardening and durable analytics remain tracked P7/P10/P9 work from
+the approved brief. The new receipt does not certify those defects fixed.

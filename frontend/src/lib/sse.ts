@@ -223,7 +223,7 @@ export async function streamChat({
 export interface StreamFitCallbacks {
   onProgress: (progress: FitProgressData) => void;
   onComplete: (report: FitReport) => void;
-  onError: (error: string) => void;
+  onError: (error: string, receipt?: { telemetry?: RequestTelemetry; browserTiming?: BrowserTiming }) => void;
 }
 
 export interface StreamFitOptions {
@@ -304,9 +304,10 @@ export async function streamFitReport({
           }
         } else if (event === "error") {
           const res = FitErrorPayloadSchema.safeParse(parsed);
-          callbacks.onError(
-            res.success ? res.data.message : "Error analyzing job description"
-          );
+          if (res.success && res.data.telemetry) callbacks.onError(res.data.message, {
+            telemetry: res.data.telemetry, browserTiming: { total_ms: performance.now() - started, first_text_ms: null },
+          });
+          else callbacks.onError(res.success ? res.data.message : "Error analyzing job description");
           return true;
         }
       } catch {

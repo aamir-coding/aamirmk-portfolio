@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "report_sha256": "fc627458c2616025fe6f1572deca895f34b11955a3dd730e9ad6594c483c5727",
+  "report": {
+    "kind": "offline_engineering_checks",
+    "generated_at": "2026-11-05T13:23:31.828877Z",
+    "source_commit": "bb36a9985464844b72df7203f0b523e66eb79fc5",
+    "source_dirty": true,
+    "source_result_sha256": "cd6c5baa92fd5f918585ec62139e3cbfb9580ae5a79e62a9bb3f2b33c2d4e0a7",
+    "runtime_sha256": "ce70ba994b1bd12150cb14d235e6c31a09d9eef7260a22ce1201385c8a4f848c",
+    "replay": {
+      "passed": 8,
+      "total": 8
+    },
+    "categories": [
+      {
+        "category": "adversarial",
+        "passed": 1,
+        "total": 1,
+        "skipped": 0
+      },
+      {
+        "category": "contract",
+        "passed": 1,
+        "total": 1,
+        "skipped": 0
+      },
+      {
+        "category": "fit",
+        "passed": 3,
+        "total": 3,
+        "skipped": 0
+      },
+      {
+        "category": "follow_up",
+        "passed": 1,
+        "total": 1,
+        "skipped": 0
+      },
+      {
+        "category": "technical",
+        "passed": 2,
+        "total": 2,
+        "skipped": 0
+      }
+    ],
+    "retrieval": [
+      {
+        "suite": "legacy_development",
+        "metric": "hit_at_3",
+        "numerator": 41.0,
+        "denominator": 45
+      },
+      {
+        "suite": "legacy_development",
+        "metric": "hit_at_5",
+        "numerator": 45.0,
+        "denominator": 45
+      },
+      {
+        "suite": "legacy_development",
+        "metric": "mrr_at_5",
+        "numerator": 40.0,
+        "denominator": 45
+      },
+      {
+        "suite": "legacy_development",
+        "metric": "recall_at_3",
+        "numerator": 0.0,
+        "denominator": 0
+      },
+      {
+        "suite": "legacy_development",
+        "metric": "recall_at_5",
+        "numerator": 0.0,
+        "denominator": 0
+      },
+      {
+        "suite": "versioned_development",
+        "metric": "hit_at_3",
+        "numerator": 31.0,
+        "denominator": 34
+      },
+      {
+        "suite": "versioned_development",
+        "metric": "hit_at_5",
+        "numerator": 34.0,
+        "denominator": 34
+      },
+      {
+        "suite": "versioned_development",
+        "metric": "mrr_at_5",
+        "numerator": 30.25,
+        "denominator": 34
+      },
+      {
+        "suite": "versioned_development",
+        "metric": "recall_at_3",
+        "numerator": 2.0,
+        "denominator": 2
+      },
+      {
+        "suite": "versioned_development",
+        "metric": "recall_at_5",
+        "numerator": 2.0,
+        "denominator": 2
+      }
+    ],
+    "failed_checks": [],
+    "held_out_reserved": 10,
+    "held_out_executed": false,
+    "draft_chunks": 76,
+    "generation_accuracy_available": false,
+    "judge_validation": {
+      "kind": "judge_human_agreement",
+      "status": "failed",
+      "artifact_sha256": "bf052d49e1fcc77248dffa96b56c60287d84076a9f8345c20a7ee7603d00fee2",
+      "rubric_sha256": "d57e502cbe496a1aad145f5208a9bf9edf898e306e0d2f8bf82907168e7b941e",
+      "model": "openai/gpt-oss-20b",
+      "axes": {
+        "support": {
+          "passed": 8,
+          "total": 8
+        },
+        "completeness": {
+          "passed": 6,
+          "total": 8
+        },
+        "behavior": {
+          "passed": 7,
+          "total": 8
+        },
+        "tone": {
+          "passed": 6,
+          "total": 8
+        }
+      },
+      "failures_by_axis": {
+        "support": 0,
+        "completeness": 2,
+        "behavior": 1,
+        "tone": 2
+      },
+      "disagreements": [
+        {
+          "item_id": "validation-06",
+          "axis": "completeness",
+          "human": "fail",
+          "judge": "uncertain"
+        },
+        {
+          "item_id": "validation-08",
+          "axis": "completeness",
+          "human": "fail",
+          "judge": "pass"
+        },
+        {
+          "item_id": "validation-08",
+          "axis": "behavior",
+          "human": "fail",
+          "judge": "pass"
+        },
+        {
+          "item_id": "validation-06",
+          "axis": "tone",
+          "human": "fail",
+          "judge": "pass"
+        },
+        {
+          "item_id": "validation-08",
+          "axis": "tone",
+          "human": "fail",
+          "judge": "pass"
+        }
+      ]
+    },
+    "development_without_recordings": 36
+  }
+}

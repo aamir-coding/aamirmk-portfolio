@@ -1,11 +1,12 @@
 # Phase 8 — Evaluation inputs and reproducible evidence
 
-Incremental study guide. Increments 1–3 and Increment 4's offline calibration/runner
-infrastructure are covered here. Human grading is validated; the first live judge
-run stopped incomplete. The follow-up and next-budget requirements are below;
-telemetry and result-backed publication follow later. Aamir waived
-waiting for teach-back answers on 4 November 2026 once the material was verified.
-This does not waive the separate human calibration grading required at Increment 4.
+Final offline implementation covers Increments 1–7. Aamir accepted the failed
+independent judge validation as the authentic empirical baseline and formally closed
+Increment 4 on 5 November 2026. That acceptance authorizes finishing the engineering
+milestone; it does not turn failed validation into a pass or approve any draft facts.
+The public badge is an explicitly offline replay result. Model accuracy stays unavailable.
+Historical live-run accounts below retain their original scope. Teach-back questions
+remain available for practice; answers are waived and have not been assessed.
 
 ## Why a passing test is not an accuracy claim
 
@@ -798,7 +799,8 @@ Under the frozen policy, further calibration requires a reviewed new validation
 version with independent human grading, not tuning and rerunning this exposed set.
 The [validation result](../audits/2026-11-05-judge-validation.md) records full
 provenance, confusion counts, usage and limitations. All76facts remain draft;
-this result cannot generate an accuracy badge or complete Phase 8.
+this result cannot generate an accuracy badge. Aamir subsequently accepted it as
+the empirical baseline and authorized completing the remaining offline increments.
 
 ## Official references
 
@@ -815,3 +817,172 @@ this result cannot generate an accuracy badge or complete Phase 8.
 - [Groq completion API](https://console.groq.com/docs/api-reference#chat-create): output caps and provider usage. The runner refuses missing or inconsistent reported usage.
 - [Groq organization rate limits](https://console.groq.com/docs/rate-limits): exact account limits and remaining capacity must be freshly reviewed before a live budget.
 - [Groq GPT-OSS reasoning effort](https://console.groq.com/docs/reasoning): low, medium and high effort are supported; an effort setting does not guarantee a response will fit an output ceiling. Checked alongside installed SDK 1.7.0.
+
+
+## Increment 5: trace a reproducible offline result
+
+Read the functions in this order, then follow their tests:
+
+1. `evals/run.py::main` recognizes `--full` and delegates to `results.run_full`.
+   Default execution never reads a Groq key or creates a provider client.
+2. `results.offline_result` runs the actual cached ONNX/hybrid retrieval suites and
+   `replay_report`. The latter checks eight saved fake/curated responses, not all
+   forty development cases. The result explicitly lists the thirty-six uncovered
+   cases; multiple recordings can cover one case. Fifty versioned cases remain
+   forty development / ten reserved, with no held-out execution.
+3. `OfflineResult.coherent` verifies both retrieval suites, unique outcomes,
+   case-level metric arithmetic, replay totals, disjoint splits and prompt identity.
+   Its `scores()` returns exactly the portable metrics compared by CI. Latency is
+   measured and stored, not placed behind a universal machine-independent floor.
+4. `input_fingerprints` binds cases, rubric, original and v2 recordings, evaluator
+   code, application code, current corpus/index/manifest and dependency versions.
+   Text reads normalize Windows/Linux newlines before hashing. A current index hash
+   is checked directly when projecting; a newly stamped runtime hash cannot make
+   old retrieval measurements describe a new index.
+5. `gate` rejects incompatible fingerprint/metric sets, a drop exceeding two
+   percentage points, a retrieval floor failure, or any failed critical recording.
+   Eight passing mocks cannot offset one critical contract/evidence regression.
+   `baseline.json` is reviewed data, not automatically rewritten by the runner.
+   DRN-053 expands identity coverage while asserting every initial score unchanged.
+6. `write_json` writes a temporary file and replaces the destination. The artifact
+   records UTC time, commit/dirty state, runtime/dependency versions, model settings
+   (not executed), origins, actual zero provider calls/tokens, case IDs and skips.
+   Timestamps/latencies differ between runs; score reproducibility is the invariant.
+
+Run from repository root using the existing environment:
+
+```powershell
+$env:FASTEMBED_CACHE_PATH='C:/Users/maqhs/AppData/Local/Temp/fastembed_cache'
+.\.venv\Scripts\python.exe -m evals.run --full --output build/evals/results.json
+.\.venv\Scripts\python.exe -m pytest -c backend/pyproject.toml backend/tests evals -q
+```
+
+`FASTEMBED_CACHE_PATH` must refer to already provisioned assets; substitute your
+local cache path on another machine. Runtime never downloads missing model assets.
+CI provisions the pinned assets before offline tests, runs root backend/eval suites,
+archives its actual JSON via upload-artifact, and separately runs frontend contracts,
+ESLint, TypeScript/Vite, and `node frontend/scripts/check-bundle.mjs`. The latter
+follows the HTML entry and static JS imports/preloads, counts each once, sums gzip
+bytes, and fails at 200,000 bytes. The `/evals` page is lazy-loaded. No live schedule,
+repository Groq secret or unattended provider expenditure was enabled.
+
+Interview question: **Why refuse a baseline comparison after a prompt edit?**
+Saved outputs did not regenerate themselves. An incompatible identity is a review
+request; it cannot silently certify new generation behavior. Even after an explicit
+baseline refresh, replay remains evidence about saved outputs, not the new model.
+
+## Increment 6: trace a request receipt through the streaming application
+
+`backend/app/telemetry.py` keeps observation at the model/retrieval adapter seam.
+This is a deep module: callers use a trace plus the existing interfaces; the module
+owns stage clocks, safe fields, aggregation and unavailable-usage semantics.
+
+- `Trace.__init__` captures a monotonic start. `set_stage` closes the preceding
+  interval. `text` records only the first visible server text; `snapshot` computes
+  elapsed duration, includes each call and source score, and returns aggregate
+  counts only when every call completed with known usage. A legal zero-call
+  refusal/cache differs from a stream whose provider counts were never received.
+- `ObservedLLM.complete` wraps rewrite, extraction, bounded extraction retries,
+  judging batches and summary calls. It records configured/reported model, elapsed
+  time and usage source. JSON parsing happens above it: a malformed extraction
+  still consumed a completed provider response and must stay in the receipt.
+- `GroqLLM.complete` sets `usage_reported=False` when usage is absent. Existing
+  legacy response counters stay backward-compatible; the new receipt never
+  presents those old fallback zeros as measured usage.
+- `GroqLLM.stream` requests usage through `extra_body` because pinned SDK 1.7.0
+  does not expose `stream_options` as a named argument. It recognizes final
+  `usage`/`x_groq.usage`, including an empty choices array, and yields `StreamUsage`.
+  The observer consumes that typed control value, so it never becomes answer text.
+  The provider stream closes in `finally`. Missing final usage stays unknown.
+- `ObservedRetriever` stores duration and only public/indexed IDs, rank, fusion
+  score and method. It does not record query text, fact content, tool arguments,
+  recruiter data or model reasoning. Scores are rank evidence, not semantic proof.
+- Chat creates an explicit request-local trace before rewrite/retrieval and passes
+  observers to both tool-loop turns. Its `done`/error payloads carry the receipt.
+  Non-streaming chat also carries it. Refusals label the zero-call path.
+- `FitPipeline.run` leaves the shared cache in place but installs its ContextVar
+  only while awaiting each `_run.__anext__`, resetting before yielding. The
+  heartbeat transport resumes successive frames in different asyncio tasks;
+  holding a token across a yield can reset it in the wrong context. Concurrent
+  fake-backed heartbeat tests exercise exactly this seam.
+- Cached fit reports copy `cached=True`; seeded authored keys remain `curated`,
+  later generated reports use `cache`. Receipts are transport metadata and never
+  cached with the original report. Optional index metadata is loaded off-thread;
+  missing/truncated archives yield unavailable metadata rather than breaking chat.
+- `contracts.ts` validates the optional receipt; `sse.ts` preserves it and measures
+  browser total/first-text separately. Fit complete is a single final answer, so
+  its browser first-text is completion; progress messages are not answer tokens.
+  Fit errors preserve their calls but no first-answer latency. Aborted requests
+  cannot produce a final receipt; the UI labels them unknown/incomplete and ignores
+  late callbacks from the old controller.
+- `UnderHood.tsx` uses native details/summary, collapsed by default with Enter/Space
+  keyboard behavior. It shows actual server/browser clocks, calls, usage, source
+  scores and prompt/index versions. Local authored instant responses have explicit
+  delivery labels. Server origin overrides a selected preset, preventing a fresh
+  or generated-cached result from being mislabeled as manually curated.
+
+Interview question: **Why is the ContextVar global declaration safe while its
+value is request-local?** The declaration is a context key, not a shared mutable
+trace. Each executing task resolves a value in its own context. Tokens are reset
+in the context that created them, and the shared pipeline stores no trace object.
+
+This is observation, not a replacement production quota ledger. It does not
+account for hidden SDK HTTP retries, reserve quota across workers, persist traces,
+collect real transcripts, or fix the separately tracked P7/P9/P10 concerns.
+
+## Increment 7: trace a public number back to its evidence
+
+`python -m evals.publish` is a local artifact projection command, not a deployment.
+It loads schema-validated `evals/results.json`, validates compatible inputs, and
+recomputes the archived judge/human agreement offline using the frozen packet and
+unchanged labels. It does not call the judge or tune on validation.
+
+`project` constructs an allowlist: replay/category counts, retrieval numerators and
+denominators, safe failure names, number of reserved cases, draft count and exact
+judge disagreement IDs/axes/labels. It excludes raw questions, answers, human
+rationales, evidence text and reserved IDs. The eight judge-validation examples
+are authored development material, distinct from the ten reserved cases.
+
+The resulting `backend/app/data/eval-summary.json` contains a typed projection,
+canonical source-result hash, runtime hash and projection checksum. This checksum
+is an integrity check, not a cryptographic signature or independent attestation.
+`runtime_fingerprint` binds deployed source, prompts, corpus/index and installed
+key dependencies without requiring `.git` on Render. `load_summary` returns no
+numeric report when evidence is missing, malformed, mixed-mode, incomplete or
+incompatible. The sync endpoint runs file work outside the async event loop and
+uses no-store responses. The public model rejects impossible category/metric and
+judge counts rather than trusting display strings.
+
+`GET /api/eval-summary` and the lazy `/evals` view consume that projection. The
+backend derives `Replay checks: 8/8 (offline)` from actual counts; frontend Zod
+rejects a mismatched badge. No hand-edited percentage can replace the result.
+The page separately reports judge validation 8/8, 6/8, 7/8, 6/8 and its failed gate,
+all five disagreements, small-sample/family bias, incomplete replay coverage,
+reserved/unexecuted author-visible cases, all 76 draft facts, and unavailable model
+accuracy. A passing engineering badge does not approve a factual accuracy claim.
+
+Interview question: **What makes a low-quality result publishable?** Correct scope,
+complete compatible provenance, consent for its evidence, and honest disclosure.
+A low score is not corruption. Here publication is a local implementation only;
+remote publication/deployment and any new live run remain separately controlled.
+
+## Close-out retrieval practice (answers optional)
+
+1. Eight saved responses pass, but the generator prompt changes. What can still be
+   claimed, and which identity/gate prevents silently reusing certification?
+2. A fit extraction retries once, then a later stream is cancelled before usage.
+   Which calls remain visible, and why must aggregate tokens be null rather than zero?
+3. Explain how the public 8/8 replay badge can coexist with the failed 6/8 Tone
+   agreement without claiming model accuracy. Which remaining evidence would be
+   needed for a factual accuracy badge?
+
+No teach-back answers were assessed. Aamir waived waiting for responses once the
+study guide is complete; use these questions later for interview retrieval practice.
+
+Additional official references checked with installed versions:
+
+- [Python ContextVar and asyncio support](https://docs.python.org/3.13/library/contextvars.html): context-local state and same-context token resets.
+- [Groq extra request parameters](https://github.com/groq/groq-python#undocumented-request-params): `extra_body` bridge for pinned SDK behavior, verified by a MockTransport test.
+- [React lazy](https://react.dev/reference/react/lazy): module-scope lazy declarations defer the eval page code.
+- [HTML details disclosure](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details): native disclosure behavior.
+- [GitHub workflow artifacts](https://docs.github.com/en/actions/tutorials/store-and-share-data): preserve actual CI outputs rather than fabricating hosted results.
