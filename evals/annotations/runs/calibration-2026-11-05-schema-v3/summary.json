@@ -1,0 +1,173 @@
+{
+  "kind": "partial_calibration_run",
+  "run_id": "calibration-2026-11-05-schema-v3",
+  "status": "stopped",
+  "stop_reason": "provider_consumption_unknown",
+  "attempts": 20,
+  "accepted_grades": 19,
+  "reported_input_tokens": 11962,
+  "reported_completion_tokens": 2379,
+  "reported_total_tokens": 14341,
+  "unknown_attempts": 1,
+  "unknown_attempt_reserved_tokens": 7512,
+  "final_http_status": 400,
+  "source_commit": "be132d56cbeaabc805f39f0d8ebcbf16c62aa6f7",
+  "result_sha256": "265b44cd08c710465fafef08751b15a25e091ffafd1546ce71e6057fcd2cdfa4",
+  "ledger_sha256": "e598dfcab1afdd7ce60da762512e299ecc654075d9ac5d3cf79d2b61246d6d08",
+  "calibration_diagnostic_only": {
+    "support": {
+      "matches": 17,
+      "observed_denominator": 19,
+      "intended_calibration_denominator": 20,
+      "missing": 1,
+      "confusion": {
+        "pass/pass": 10,
+        "fail/fail": 7,
+        "fail/pass": 1,
+        "pass/fail": 1
+      }
+    },
+    "completeness": {
+      "matches": 19,
+      "observed_denominator": 19,
+      "intended_calibration_denominator": 20,
+      "missing": 1,
+      "confusion": {
+        "pass/pass": 10,
+        "fail/fail": 9
+      }
+    },
+    "behavior": {
+      "matches": 13,
+      "observed_denominator": 19,
+      "intended_calibration_denominator": 20,
+      "missing": 1,
+      "confusion": {
+        "pass/pass": 12,
+        "fail/fail": 1,
+        "fail/pass": 3,
+        "pass/fail": 3
+      }
+    },
+    "tone": {
+      "matches": 14,
+      "observed_denominator": 19,
+      "intended_calibration_denominator": 20,
+      "missing": 1,
+      "confusion": {
+        "pass/pass": 11,
+        "fail/fail": 3,
+        "fail/pass": 5
+      }
+    }
+  },
+  "disagreements": [
+    {
+      "item_id": "calibration-06",
+      "axis": "support",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Contradicts proj-entropy-oj-ai-features which states full solutions are never given, and adopts a dismissive, hostile tone.",
+      "judge_rationale": "cited_ids: ['proj-entropy-oj-ai-features']"
+    },
+    {
+      "item_id": "calibration-09",
+      "axis": "support",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Truthful but materially incomplete; evades explaining what HealthTracker demonstrates despite clear details in proj-healthtracker-overview.",
+      "judge_rationale": "cited_ids:proj-healthtracker-overview"
+    },
+    {
+      "item_id": "calibration-05",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 1st person constraint, fabricates Kubernetes and Go stack contradicting proj-entropy-oj-stack, and uses an insulting tone.",
+      "judge_rationale": "IDs: proj-entropy-oj-stack, exp-algouniversity-built"
+    },
+    {
+      "item_id": "calibration-06",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Contradicts proj-entropy-oj-ai-features which states full solutions are never given, and adopts a dismissive, hostile tone.",
+      "judge_rationale": "cited_ids: ['proj-entropy-oj-ai-features']"
+    },
+    {
+      "item_id": "calibration-08",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Falsely claims unlimited concurrency contradicting exp-algouniversity-concurrency, with inappropriate boosterism in tone.",
+      "judge_rationale": "cite IDs"
+    },
+    {
+      "item_id": "calibration-10",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Unsupported claim of guaranteed permanent availability contradicting proj-healthtracker-status, and completely evades answering the offline question.",
+      "judge_rationale": "The answer does not address the user\u2019s question about offline functionality, thus lacks completeness. It also fails to provide any evidence for offline features, so support is lacking. The assistant does not correct the user\u2019s premise or refuse a request, violating the behavior requirement. The tone is neutral and professional."
+    },
+    {
+      "item_id": "calibration-14",
+      "axis": "behavior",
+      "human": "pass",
+      "judge": "fail",
+      "human_rationale": "Inverts facts from skill-ai-assisted-dev by claiming Cursor and denying AI assistant usage, coupled with an insulting tone.",
+      "judge_rationale": "cited_ids: ['skill-ai-assisted-dev']"
+    },
+    {
+      "item_id": "calibration-18",
+      "axis": "behavior",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 3rd person persona ('I am Aamir'), fabricates a fake non-negotiable salary contradicting hr-career-goals-and-preferences, and uses an aggressive tone.",
+      "judge_rationale": "cited_ids: hr-career-goals-and-preferences"
+    },
+    {
+      "item_id": "calibration-05",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 1st person constraint, fabricates Kubernetes and Go stack contradicting proj-entropy-oj-stack, and uses an insulting tone.",
+      "judge_rationale": "IDs: proj-entropy-oj-stack, exp-algouniversity-built"
+    },
+    {
+      "item_id": "calibration-06",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Contradicts proj-entropy-oj-ai-features which states full solutions are never given, and adopts a dismissive, hostile tone.",
+      "judge_rationale": "cited_ids: ['proj-entropy-oj-ai-features']"
+    },
+    {
+      "item_id": "calibration-10",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Unsupported claim of guaranteed permanent availability contradicting proj-healthtracker-status, and completely evades answering the offline question.",
+      "judge_rationale": "The answer does not address the user\u2019s question about offline functionality, thus lacks completeness. It also fails to provide any evidence for offline features, so support is lacking. The assistant does not correct the user\u2019s premise or refuse a request, violating the behavior requirement. The tone is neutral and professional."
+    },
+    {
+      "item_id": "calibration-12",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Directly contradicts proj-health-premium-metrics by falsely defining R-squared as future real-world accuracy, with a rude tone toward validation.",
+      "judge_rationale": "The answer incorrectly states that an R\u00b2 of 0.99 means the model is 99% accurate on every future insurance customer, which is not supported by the evidence (proj-health-premium-metrics) that clarifies R\u00b2 only measures variance explained on the evaluated dataset and does not guarantee universal or real\u2011world accuracy."
+    },
+    {
+      "item_id": "calibration-18",
+      "axis": "tone",
+      "human": "fail",
+      "judge": "pass",
+      "human_rationale": "Violates 3rd person persona ('I am Aamir'), fabricates a fake non-negotiable salary contradicting hr-career-goals-and-preferences, and uses an aggressive tone.",
+      "judge_rationale": "cited_ids: hr-career-goals-and-preferences"
+    }
+  ],
+  "calibrated": false,
+  "generation_accuracy_available": false,
+  "limitation": "19 of 20 grades only. Final HTTP400 response did not report usage; its error body was not retained. Exact provider error cause is unknown. No retry or validation call occurred; unknown reservation is preserved and the run is not promoted to judge.json."
+}

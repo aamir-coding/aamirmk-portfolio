@@ -12,6 +12,8 @@ Prepared 4 November 2026 against `main` at `88fae8c`; approved by Aamir later th
 
 ## Remaining audit disposition
 
+**Same-day override/outcome, 5 November:** Aamir authorized actual-usage reconciliation of earlier four calls and zero visitor reserves, then a distinct schema-v3 twenty-call run at `be132d5`. It collected nineteen grades/14,341 reported tokens, then final HTTP 400 with unknown consumption; its full 7,512 reservation and stopped-run hold remain. No retry. Partial agreement is 17/19 support, 19/19 completeness, 13/19 behavior, 14/19 tone. Even a matching final grade cannot bring behavior/tone to 80% on this calibration slice. All disagreements/records are preserved; human labels unchanged. Calibration needs review, validation is unexecuted, and further live calls need separate approval. See `docs/audits/2026-11-05-judge-calibration.md`.
+
 **Recovery outcome, 2026-11-05:** Aamir approved low effort/1,024 output and immediate start. The distinct recovery stopped after one HTTP 200 response, 756 tokens, finish reason `stop`, zero accepted grades. The saved generic task error does not identify the exact exception/output; it was not an output cutoff. Both runs are archived, totaling four calls/4,098 actual tokens. Offline follow-up adds explicit JSON shape and safe diagnostics; another live attempt requires a new exact-plan/budget approval. Calibration and validation remain incomplete. All human grades and fact draft flags remain unchanged.
 
 ### 1. Offline implementation

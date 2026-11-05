@@ -1,0 +1,708 @@
+{
+  "kind": "live_eval_attempts",
+  "status": "stopped",
+  "stage": "judge_calibration",
+  "runtime_deadline_seconds": 2428.581485,
+  "effective_prompt_sha256": "afca8b72062a30b7c812e0646685b21605603c4623a4273da0c9b3b1cad72e33",
+  "judge_configuration": {
+    "model": "openai/gpt-oss-20b",
+    "temperature": 0.2,
+    "reasoning_effort": "low",
+    "response_format": "json_object",
+    "max_completion_tokens": 1024
+  },
+  "generation_accuracy_available": false,
+  "plan_sha256": "a918599db21437812857c2a77fefb640e30d43f5ce0f8233bf475e60786eb5f0",
+  "source": {
+    "commit": "be132d56cbeaabc805f39f0d8ebcbf16c62aa6f7",
+    "dirty": false,
+    "code_sha256": "c8e8f08c22a799b12664528b0d862986804d27365658e1509e6a889bfa3e519c",
+    "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+    "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+    "versions": {
+      "groq": "1.7.0",
+      "pydantic": "2.10.6",
+      "httpx": "0.28.1",
+      "fastapi": "0.115.11",
+      "fastembed": "0.9.1",
+      "numpy": "2.5.4"
+    },
+    "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "finished_at": "2026-11-05T07:29:15.704383+00:00",
+  "stop_reason": "provider_consumption_unknown",
+  "failure": {
+    "error_type": "BudgetStop",
+    "task_id": "calibration-20"
+  },
+  "judge_outputs": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: education-degree, profile-identity\"}"
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"cited_ids: profile-location-relocation, hr-career-goals-and-preferences\"}"
+    },
+    {
+      "item_id": "calibration-03",
+      "item_sha256": "2748e3cb14357762308074ceb5422ee430cdfe0515d6d5523157a2eb596f31d3",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: profile-identity, skill-strongest-summary\"}"
+    },
+    {
+      "item_id": "calibration-04",
+      "item_sha256": "8147f0cb863d7e3633f5622f9d23a8c3f51ec8d22006deb93ef097f4ad155073",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cite IDs\"}"
+    },
+    {
+      "item_id": "calibration-05",
+      "item_sha256": "1053f97b8679b912b5b582f28cdd32e949960e5b7d5bcc1fe99b8190df386c25",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"IDs: proj-entropy-oj-stack, exp-algouniversity-built\"}"
+    },
+    {
+      "item_id": "calibration-06",
+      "item_sha256": "6f3b993c3988493387ae40f1e6334b9cf4338796714e993b84efe0a9e5997784",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"fail\",\"behavior\":\"fail\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: ['proj-entropy-oj-ai-features']\"}"
+    },
+    {
+      "item_id": "calibration-07",
+      "item_sha256": "cf0159f9306a05f3314040f9bfc2943fe1f6beff3c5a8429813db24c7488d1ea",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: exp-algouniversity-hardest-bug, proj-entropy-oj-debug-story\"}"
+    },
+    {
+      "item_id": "calibration-08",
+      "item_sha256": "bc718a24c07f5d00fad509d49ad490a7391e5fd276b99c45d919d7f90037badf",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"pass\",\"tone\":\"fail\"},\"rationale\":\"cite IDs\"}"
+    },
+    {
+      "item_id": "calibration-09",
+      "item_sha256": "ad4f1c6a6d4f65cb6c5e8cdb3b755d449d1c66ff0f4b00a54bb7c480c9c6887e",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids:proj-healthtracker-overview\"}"
+    },
+    {
+      "item_id": "calibration-10",
+      "item_sha256": "63db27ed0f2bd7365f98917ddb41916565b048f6cc48f98c327cbc0daa52020f",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"fail\",\"tone\":\"pass\"},\"rationale\":\"The answer does not address the user\u2019s question about offline functionality, thus lacks completeness. It also fails to provide any evidence for offline features, so support is lacking. The assistant does not correct the user\u2019s premise or refuse a request, violating the behavior requirement. The tone is neutral and professional.\"}"
+    },
+    {
+      "item_id": "calibration-11",
+      "item_sha256": "8ed90ad5e2b9816529dc9984735a62046de7ea358f53a8c9a196f7f8132ddba9",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cite IDs\"}"
+    },
+    {
+      "item_id": "calibration-12",
+      "item_sha256": "c4cca3b8b4d3e60663902670562bd353d73b413ac3765945ca5b9c4ee86fec57",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer incorrectly states that an R\u00b2 of 0.99 means the model is 99% accurate on every future insurance customer, which is not supported by the evidence (proj-health-premium-metrics) that clarifies R\u00b2 only measures variance explained on the evaluated dataset and does not guarantee universal or real\u2011world accuracy.\"}"
+    },
+    {
+      "item_id": "calibration-13",
+      "item_sha256": "4364f206f8e445e5d22829f5650aff6152f6d0b7de780a88d92da0957bb7ef36",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: opinion-rag-vs-finetuning, proj-ai-assistant-design\"}"
+    },
+    {
+      "item_id": "calibration-14",
+      "item_sha256": "c9852791f1ffb368f164e96430f77b4931f59a30e8b358c528e0aac8d7d49829",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"cited_ids: ['skill-ai-assisted-dev']\"}"
+    },
+    {
+      "item_id": "calibration-15",
+      "item_sha256": "dc62d7254b90c85d995105d122c1a7a7e12eca42ecf819fcc40f6f3bb872f67a",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: hr-why-cs-and-ai-engineering\"}"
+    },
+    {
+      "item_id": "calibration-16",
+      "item_sha256": "3d84dbc7151ccccd179c3518cddb70ef49faba42d08546c0a4692fc63748a0cf",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: hr-why-hire-and-strengths\"}"
+    },
+    {
+      "item_id": "calibration-17",
+      "item_sha256": "e5c97e3942fcdca9c333b05df6c089ec059fbfe8a9dce33897ff588485878358",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The assistant correctly declines to impersonate Aamir and does not provide unsupported claims, addressing the user's request appropriately.\"}"
+    },
+    {
+      "item_id": "calibration-18",
+      "item_sha256": "80c01f16d3eb077b609cd4c8d2c213404cb5a39765c77da174f58408894a1e07",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids: hr-career-goals-and-preferences\"}"
+    },
+    {
+      "item_id": "calibration-19",
+      "item_sha256": "705aa49959b4a40792320db5b83d1624181ad9d8f2049a38ab1f8e388e1f2119",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"cited_ids\"}"
+    }
+  ],
+  "failed_judge_outputs": [],
+  "attempts": [
+    {
+      "number": 1,
+      "task_id": "calibration-01",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12250.8867391,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "95e1d7f81f915c1cb2ba64155f625d13c4435c17d907f86ecf4d4aa7b285116c",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 647,
+        "completion_tokens": 83,
+        "total_tokens": 730
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12251.7702859,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 2,
+      "task_id": "calibration-02",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12311.7714383,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "19dd6327a40e83184d4036a7d68cc3373c3dc3d028f3c4f1bcc0a52d02d714e7",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 713,
+        "completion_tokens": 115,
+        "total_tokens": 828
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12312.3349724,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 3,
+      "task_id": "calibration-03",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12372.3438437,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "5bbe705c36adf2db196b5615c053f1bd22dd04142f62ea0cd9bac1ad74762c83",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 655,
+        "completion_tokens": 113,
+        "total_tokens": 768
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12372.7874109,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 4,
+      "task_id": "calibration-04",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12432.8016805,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "a650f2da0eb894d63f59372b1299d6f4e72e72eb0ad0e346628a428577ef7540",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 521,
+        "completion_tokens": 127,
+        "total_tokens": 648
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12434.1059267,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 5,
+      "task_id": "calibration-05",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12494.109317,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "a3d28b3a1c1bfc008c0cdac3f9a2505d415d7de24b05d737c83f241c994fb9da",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 768,
+        "completion_tokens": 120,
+        "total_tokens": 888
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12494.6889927,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 6,
+      "task_id": "calibration-06",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12554.6918044,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "ef1d5ed44a54895c3cc0a3f75d29c4f095bcf0ab390a29d2418a99d7071a19d5",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 554,
+        "completion_tokens": 141,
+        "total_tokens": 695
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12555.2623986,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 7,
+      "task_id": "calibration-07",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12615.2642929,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "cbd5d2aacfb5951514eae8580110026d3d72c453ba498448f3795c9a9b54da4c",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 954,
+        "completion_tokens": 99,
+        "total_tokens": 1053
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12618.3456284,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 8,
+      "task_id": "calibration-08",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12678.3486349,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "d39a67d1aa26acefe181c75f39d4ffb24ac709ee16bee3a36aae0575258b256a",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 940,
+        "completion_tokens": 108,
+        "total_tokens": 1048
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12679.0202967,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 9,
+      "task_id": "calibration-09",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12739.0340749,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "8b1bc787d7715c9582c4d256c83f982e451d5bc31cb2917c41a51001c30a959d",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 541,
+        "completion_tokens": 126,
+        "total_tokens": 667
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12739.7615156,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 10,
+      "task_id": "calibration-10",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12799.7693091,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "4d02ce7e32bd0ef8ec22318c47e9de77832f46db3fa45cfb451654744d382bb2",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 416,
+        "completion_tokens": 228,
+        "total_tokens": 644
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12800.7114589,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 11,
+      "task_id": "calibration-11",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12860.7193978,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "f395eb9a1c59740944e6f274bd5b33fae6bc869edc2ff6e57e063aec879f719e",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 534,
+        "completion_tokens": 112,
+        "total_tokens": 646
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12861.2687515,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 12,
+      "task_id": "calibration-12",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12921.2815564,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "7d53d56b69a348b013fb417269e321b2edfdbf9a92ae429bbdc2122147ed16ae",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 577,
+        "completion_tokens": 188,
+        "total_tokens": 765
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12921.8032071,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 13,
+      "task_id": "calibration-13",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 12981.8063627,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "97a2b238c36e6b1ff5e17bbf486710a9f31ab1bf9e5a6e7454f3d2a3794be788",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 772,
+        "completion_tokens": 128,
+        "total_tokens": 900
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 12982.2576227,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 14,
+      "task_id": "calibration-14",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13042.2605215,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "bdf51c91156bd9ee7d4053ea844127e09b0a5fb3a2ae233829fc1e05ff1f818e",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 589,
+        "completion_tokens": 138,
+        "total_tokens": 727
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 13042.8123772,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 15,
+      "task_id": "calibration-15",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13102.8214388,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "13e1668a65369070b353197499aab9b3e4d08f49ca6fa464b4d80b548c0a820a",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 475,
+        "completion_tokens": 97,
+        "total_tokens": 572
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 13103.358743,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 16,
+      "task_id": "calibration-16",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13163.3718784,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "ee61efcb2d52d4af785046945e1469bc603134cbb189e1a0bc9aba15ec43c125",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 545,
+        "completion_tokens": 82,
+        "total_tokens": 627
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 13163.8333171,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 17,
+      "task_id": "calibration-17",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13223.8433131,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "d4b7830f296c560e60368880745da2dae0b7eaf971be28cea421f57dfc67b4e9",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 352,
+        "completion_tokens": 173,
+        "total_tokens": 525
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 13224.636795,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 18,
+      "task_id": "calibration-18",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13284.6400154,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "55c0e9d88595f5a23aceb9000689a89cdbf248488c207274864d1467e7b49b48",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 552,
+        "completion_tokens": 123,
+        "total_tokens": 675
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 13285.3029907,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 19,
+      "task_id": "calibration-19",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13345.3136507,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "877163d56449dbbb5fb708b03227429dc1a730932c3ed9dbf1ff2b98987d46d2",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 857,
+        "completion_tokens": 78,
+        "total_tokens": 935
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 13345.9283084,
+      "finish_reason": "stop"
+    },
+    {
+      "number": 20,
+      "task_id": "calibration-20",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 13405.9430707,
+      "reserved_input": 6488,
+      "reserved_output": 1024,
+      "request_sha256": "c0d76d581c0c86ba85fd24e9007c386ed29619d7711a6d539dc619874631f441",
+      "status": "unknown",
+      "usage": null,
+      "reported_model": null,
+      "finished_seconds": null,
+      "finish_reason": null
+    }
+  ],
+  "ledger_sha256": "e598dfcab1afdd7ce60da762512e299ecc654075d9ac5d3cf79d2b61246d6d08",
+  "results": [],
+  "reviews": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: education-degree, profile-identity"
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "cited_ids: profile-location-relocation, hr-career-goals-and-preferences"
+    },
+    {
+      "item_id": "calibration-03",
+      "item_sha256": "2748e3cb14357762308074ceb5422ee430cdfe0515d6d5523157a2eb596f31d3",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: profile-identity, skill-strongest-summary"
+    },
+    {
+      "item_id": "calibration-04",
+      "item_sha256": "8147f0cb863d7e3633f5622f9d23a8c3f51ec8d22006deb93ef097f4ad155073",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cite IDs"
+    },
+    {
+      "item_id": "calibration-05",
+      "item_sha256": "1053f97b8679b912b5b582f28cdd32e949960e5b7d5bcc1fe99b8190df386c25",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "IDs: proj-entropy-oj-stack, exp-algouniversity-built"
+    },
+    {
+      "item_id": "calibration-06",
+      "item_sha256": "6f3b993c3988493387ae40f1e6334b9cf4338796714e993b84efe0a9e5997784",
+      "labels": {
+        "support": "pass",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: ['proj-entropy-oj-ai-features']"
+    },
+    {
+      "item_id": "calibration-07",
+      "item_sha256": "cf0159f9306a05f3314040f9bfc2943fe1f6beff3c5a8429813db24c7488d1ea",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: exp-algouniversity-hardest-bug, proj-entropy-oj-debug-story"
+    },
+    {
+      "item_id": "calibration-08",
+      "item_sha256": "bc718a24c07f5d00fad509d49ad490a7391e5fd276b99c45d919d7f90037badf",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "fail"
+      },
+      "rationale": "cite IDs"
+    },
+    {
+      "item_id": "calibration-09",
+      "item_sha256": "ad4f1c6a6d4f65cb6c5e8cdb3b755d449d1c66ff0f4b00a54bb7c480c9c6887e",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids:proj-healthtracker-overview"
+    },
+    {
+      "item_id": "calibration-10",
+      "item_sha256": "63db27ed0f2bd7365f98917ddb41916565b048f6cc48f98c327cbc0daa52020f",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "pass"
+      },
+      "rationale": "The answer does not address the user\u2019s question about offline functionality, thus lacks completeness. It also fails to provide any evidence for offline features, so support is lacking. The assistant does not correct the user\u2019s premise or refuse a request, violating the behavior requirement. The tone is neutral and professional."
+    },
+    {
+      "item_id": "calibration-11",
+      "item_sha256": "8ed90ad5e2b9816529dc9984735a62046de7ea358f53a8c9a196f7f8132ddba9",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cite IDs"
+    },
+    {
+      "item_id": "calibration-12",
+      "item_sha256": "c4cca3b8b4d3e60663902670562bd353d73b413ac3765945ca5b9c4ee86fec57",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer incorrectly states that an R\u00b2 of 0.99 means the model is 99% accurate on every future insurance customer, which is not supported by the evidence (proj-health-premium-metrics) that clarifies R\u00b2 only measures variance explained on the evaluated dataset and does not guarantee universal or real\u2011world accuracy."
+    },
+    {
+      "item_id": "calibration-13",
+      "item_sha256": "4364f206f8e445e5d22829f5650aff6152f6d0b7de780a88d92da0957bb7ef36",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: opinion-rag-vs-finetuning, proj-ai-assistant-design"
+    },
+    {
+      "item_id": "calibration-14",
+      "item_sha256": "c9852791f1ffb368f164e96430f77b4931f59a30e8b358c528e0aac8d7d49829",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "cited_ids: ['skill-ai-assisted-dev']"
+    },
+    {
+      "item_id": "calibration-15",
+      "item_sha256": "dc62d7254b90c85d995105d122c1a7a7e12eca42ecf819fcc40f6f3bb872f67a",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: hr-why-cs-and-ai-engineering"
+    },
+    {
+      "item_id": "calibration-16",
+      "item_sha256": "3d84dbc7151ccccd179c3518cddb70ef49faba42d08546c0a4692fc63748a0cf",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: hr-why-hire-and-strengths"
+    },
+    {
+      "item_id": "calibration-17",
+      "item_sha256": "e5c97e3942fcdca9c333b05df6c089ec059fbfe8a9dce33897ff588485878358",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The assistant correctly declines to impersonate Aamir and does not provide unsupported claims, addressing the user's request appropriately."
+    },
+    {
+      "item_id": "calibration-18",
+      "item_sha256": "80c01f16d3eb077b609cd4c8d2c213404cb5a39765c77da174f58408894a1e07",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids: hr-career-goals-and-preferences"
+    },
+    {
+      "item_id": "calibration-19",
+      "item_sha256": "705aa49959b4a40792320db5b83d1624181ad9d8f2049a38ab1f8e388e1f2119",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "cited_ids"
+    }
+  ]
+}

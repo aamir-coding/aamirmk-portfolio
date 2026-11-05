@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. Human grades are validated. The authorized low-effort/1,024-output recovery stopped after one HTTP 200 response: 625 input + 131 completion = **756 tokens**, finish reason `stop`, zero accepted grades. The saved generic task error lacks the original exception/output, so its exact cause is unknown. Both runs are archived; combined actual usage is **four calls / 4,098 tokens**. Offline follow-up adds explicit JSON shape and safe failure diagnostics. Calibration remains incomplete; Increment 5 has not started. No further live call is authorized by either stopped run.
+**Phase 8: Evals, under-the-hood panel and eval badge** — on `phase-8-evals`. Human grades are validated. The authorized same-day schema-v3 run collected **19 grades in 20 attempts**, then stopped on HTTP 400 with unknown consumption for request 20. It reported **14,341 known tokens**; that failed request's full 7,512-token reservation and the stopped run's conservative hold remain intact. Partial agreement: support 17/19, completeness 19/19, behavior 13/19, tone 14/19. Today's three runs total **24 requests / 18,439 reported tokens plus one unknown-usage request**. Calibration remains incomplete; validation/Increment 5 have not started. See [calibration review](audits/2026-11-05-judge-calibration.md).
 
 **Handoff Remediation Sprint** — complete. Implementation and historical local verification/review are recorded. The user authorized integration/push on 2026-11-03, then waived teach-back answers on 2026-11-04 once the study guide was verified. No answers were assessed. Local `handoff-remediation-done` tag targets integration commit `88fae8c`; the tag has not been pushed. Source branch: `codex/handoff-remediation`.
 
@@ -9,7 +9,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Execute Aamir's explicitly approved same-day schema-v3 calibration after clean-source checks. He authorized actual-usage reconciliation and zero visitor reserves, confirmed more than 195,000 tokens/990 requests available, and a quiet window expiring **13:20:28 IST on 5 November**. Human grades remain unchanged. Validation still needs its own later compatible budget; partial configurations are not combined.
+Next: Review the recorded calibration disagreements and a calibration-only prompt revision before further spending. The twenty-attempt approval is consumed; any further live call needs a separately reviewed budget/approval. Even a matching twentieth grade cannot bring behavior/tone to 80% on this calibration slice. Human grades and the unexecuted validation/held-out sets remain unchanged; partial configurations are not combined.
 
 ## Live Deployments
 - **Backend (Render)**: `https://aamirmk-portfolio-mlr4.onrender.com/api/health`
@@ -34,7 +34,7 @@ Next: Execute Aamir's explicitly approved same-day schema-v3 calibration after c
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟡 Human grades verified; both live attempts stopped; calibration incomplete | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P8: Evals | 🟡 Latest run 19/20 grades; stopped on HTTP 400; calibration incomplete | `phase-8-evals` | — | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | ⬜ Not Started | — | — | — |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
@@ -191,7 +191,7 @@ Next: Execute Aamir's explicitly approved same-day schema-v3 calibration after c
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. All 28 human grades are validated. Both authorized live attempts stopped: first two accepted grades/three calls, then zero grades/one call. Combined actual usage: four calls/4,098 tokens. Another run needs a distinct plan, fresh capacity and separate approval. Genuine calibration/validation remains incomplete.
+1. All 28 human grades are validated. Latest schema-v3 calibration collected 19 grades/20 attempts, then HTTP 400 with unknown consumption. Partial behavior/tone agreement is below the required level even with a matching final item. Today's known usage: 18,439 tokens/24 requests, one request's usage unknown. A further run needs a reviewed calibration revision and new approval. Validation remains unexecuted.
 2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
 3. Human calibration grading is a later user input at Increment 4. Fact approval/provenance and a concrete live budget require separate review; no blanket approval of draft facts or live model calls is implied.
 
@@ -315,6 +315,14 @@ Next: Execute Aamir's explicitly approved same-day schema-v3 calibration after c
 - Proposed local ceiling: **4,098 prior + 150,240 new = 154,338 tokens**, four prior + twenty new = **24 requests**. Fresh capacity is user-confirmed, not independent provider telemetry. Per-call reservation stays 7,512 <= 8,000 TPM. Human grades, full evidence, schema-v3, low effort, output cap and stop conditions are unchanged.
 - Test-first actual-use/zero-visitor cases failed, then passed; **34 reconciliation tests passed in 7.97s**. Fresh full offline suite: **452 passed, 1 warning in 57.74s**; configured Ruff/format/diff checks passed (84 files formatted). Scoped read-only review found no blocker and independently ran **28 pure tests in 6.68s**; no reviewer edits/provider calls. Frontend checks were not rerun because frontend source is unchanged. DRN-044 and study guide capture the explicitly superseded policy. Preparing a distinct exact clean-source plan; no new provider call at this preparation point.
 
+## Same-day schema-v3 live outcome — 2026-11-05
+- Executed plan SHA `a918599db21437812857c2a77fefb640e30d43f5ce0f8233bf475e60786eb5f0` at clean `be132d5`, prior four calls/4,098 tokens, zero visitors, low effort/1,024 output. No tracked source/input changes during execution. Twenty attempts collected nineteen schema-valid grades, then final HTTP 400 at **12:59:15 IST**, before the 13:20:28 expiry. No retry/validation/held-out call occurred.
+- Known usage: **11,962 input + 2,379 completion = 14,341 tokens**. Final usage is unknown; its **7,512-token reservation and full stopped-run hold remain**. Earlier reconciliations are intact. Today's total: **24 requests / 18,439 reported tokens plus one unknown-usage request**, not an independent account balance.
+- Exact receipt/result/last HTTP progress/summary: `evals/annotations/runs/calibration-2026-11-05-schema-v3/`. Result SHA `265b44cd08c710465fafef08751b15a25e091ffafd1546ce71e6057fcd2cdfa4`; ledger SHA `e598dfcab1afdd7ce60da762512e299ecc654075d9ac5d3cf79d2b61246d6d08`. No `judge.json`. HTTP status is established; exact provider body/cause was not retained and must not be invented.
+- Partial diagnostics: support **17/19**, completeness **19/19**, behavior **13/19**, tone **14/19**, one missing on every axis. All thirteen item/axis disagreements remain visible. Several model rationales repeat only IDs/template text. Even a matching final grade leaves behavior at most 14/20 and tone 15/20. The [calibration review](audits/2026-11-05-judge-calibration.md) recommends reviewing instructions/axis separation/rationale quality before more calls; human labels and validation outcomes are untouched.
+- Offline test-first follow-up retains safe provider class/status/allowlisted code, excluding messages/body/failed generation/hidden reasoning. Fake HTTP 400 regression failed for missing metadata, then passed. Final full offline suite: **453 passed, 1 warning in 58.63s**; configured Ruff/format/diff checks passed. Read-only review found no blocker and verified hashes, usage/reservation and metric counts without edits/provider calls. One sandboxed async diagnostic hit the known deadlock and was terminated; successful tests used the outside-sandbox workaround. No frontend changes/checks.
+- DRN-045, READMEs and study guide record limitations. No new prompt, human/fact approval, badge, dependency, push, deployment or tag. Further live calls need a new reviewed budget/explicit authorization. Calibration/validation remain incomplete; Increment 5 has not started.
+
 ## Resolved
 - [x] Python 3.13.17 installed and on PATH ✅
 - [x] Groq limits confirmed (see below) ✅
@@ -337,4 +345,4 @@ Both models share the same limits. The 20b model is cheaper for utility calls.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-Human grading is validated; calibration and validation remain incomplete after two stopped live runs. The second run's exact task error remains unknown. Both stopped approvals are consumed. Aamir has separately authorized immediate schema-v3 recovery, actual-use reconciliation and zero visitor reserves (DRN-044), with fresh capacity and a quiet window expiring 13:20:28 IST on 5 November. Execute only the distinct clean-source plan within that window. All 76 fact chunks remain draft; validation/publication gates and Phase 8 completion remain future work.
+Human grading is validated; judge calibration remains incomplete after the schema-v3 run stopped at 19 grades/20 attempts on HTTP 400. Exact provider cause and final-request consumption were not retained; never treat that unknown usage as zero or reconcile it away. The twenty-attempt approval is consumed, and calibration behavior/tone need review before another live budget. Validation/publication gates remain pending; all 76 chunks remain draft and Phase 8 is not complete.

@@ -1,5 +1,14 @@
 # Human calibration — grading received, judging pending
 
+**Latest outcome, 5 November:** The explicitly approved same-day schema-v3 run
+collected 19 grades in 20 attempts, then HTTP 400 with unknown final-request usage.
+It reported 14,341 tokens and retained the failed request's 7,512 reservation.
+See `runs/calibration-2026-11-05-schema-v3/` for exact records and all disagreements.
+Partial development agreement: support 17/19, completeness 19/19, behavior 13/19,
+tone 14/19. One item remains missing; no completed judge artifact, validation,
+retry or calibrated status. Human labels remain unchanged. Earlier updates below
+are historical; no stopped authorization is reusable.
+
 **Update, 5 November 2026:** Aamir supplied all 28 attested grades. Offline schema,
 hash and coverage validation passed; the unchanged submission is archived as
 `human-v1-aamir-2026-11-05.json`. Validation labels have four passes/four failures

@@ -89,6 +89,43 @@ def budget(**changes: object) -> Budget:
 
 
 @pytest.mark.asyncio
+async def test_provider_http_failure_retains_safe_diagnostics_only() -> None:
+    import httpx
+    from groq import BadRequestError
+
+    class Rejected(Provider):
+        async def complete(self, request: ProviderRequest) -> ProviderReply:
+            self.calls += 1
+            raise BadRequestError(
+                "secret-bearing message",
+                response=httpx.Response(
+                    400, request=httpx.Request("POST", "https://example.invalid")
+                ),
+                body={
+                    "error": {
+                        "code": "json_validate_failed",
+                        "message": "secret-bearing message",
+                        "failed_generation": "secret-bearing hidden output",
+                    }
+                },
+            )
+
+    clock, provider = Clock(), Rejected()
+    llm = MeteredLLM(provider, budget(), clock=clock, sleep=clock.sleep)
+    with pytest.raises(BudgetStop, match="provider_consumption_unknown"):
+        await llm.complete([Message(role="user", content="public eval")])
+    row = llm.attempts[0].model_dump(mode="json")
+    assert row["provider_error"] == {
+        "exception_type": "BadRequestError",
+        "status_code": 400,
+        "code": "json_validate_failed",
+    }
+    assert row["usage"] is None and row["status"] == "unknown"
+    assert provider.calls == 1
+    assert "secret-bearing" not in json.dumps(row)
+
+
+@pytest.mark.asyncio
 async def test_every_attempt_reserves_caps_and_reports_actual_usage() -> None:
     provider, clock = Provider(), Clock()
     llm = MeteredLLM(provider, budget(), clock=clock, sleep=clock.sleep)

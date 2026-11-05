@@ -111,6 +111,17 @@ class CompletionProvider(Protocol):
     async def complete(self, request: ProviderRequest) -> ProviderReply: ...
 
 
+class ProviderFailure(ReplayModel):
+    exception_type: str
+    status_code: int | None = Field(default=None, ge=100, le=599, strict=True)
+    code: (
+        Literal[
+            "json_validate_failed", "context_length_exceeded", "rate_limit_exceeded"
+        ]
+        | None
+    ) = None
+
+
 class Attempt(ReplayModel):
     number: int
     task_id: str
@@ -124,6 +135,7 @@ class Attempt(ReplayModel):
     reported_model: str | None = None
     finished_seconds: float | None = None
     finish_reason: str | None = None
+    provider_error: ProviderFailure | None = None
 
 
 class BudgetStop(RuntimeError):
@@ -298,7 +310,29 @@ class MeteredLLM:
                 async with asyncio.timeout(request.timeout_seconds):
                     reply = await self.provider.complete(request)
             except BaseException as exc:
-                self.attempts[-1] = attempt.model_copy(update={"status": "unknown"})
+                # Preserve status and selected safe codes, never provider messages,
+                # request headers/body or failed-generation/hidden-reasoning text.
+                status = getattr(exc, "status_code", None)
+                body = getattr(exc, "body", None)
+                error = body.get("error", body) if isinstance(body, dict) else {}
+                code = error.get("code") if isinstance(error, dict) else None
+                diagnostic = ProviderFailure(
+                    exception_type=type(exc).__name__,
+                    status_code=status
+                    if type(status) is int and 100 <= status <= 599
+                    else None,
+                    code=code
+                    if code
+                    in (
+                        "json_validate_failed",
+                        "context_length_exceeded",
+                        "rate_limit_exceeded",
+                    )
+                    else None,
+                )
+                self.attempts[-1] = attempt.model_copy(
+                    update={"status": "unknown", "provider_error": diagnostic}
+                )
                 self.stop_reason = "provider_consumption_unknown"
                 if isinstance(
                     exc, KeyboardInterrupt | SystemExit | asyncio.CancelledError

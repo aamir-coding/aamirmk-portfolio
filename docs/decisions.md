@@ -3,6 +3,15 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-045: Preserve partial calibration and safe provider-error diagnostics
+
+**Date:** 2026-11-05
+**Evidence:** The approved schema-v3 run at clean `be132d5` made twenty attempts. Nineteen returned schema-valid grades and 14,341 reported tokens; request 20 returned HTTP 400 with no reported usage. The adapter discarded exception details, so the exact cause is unknown. No retry occurred. Partial development agreement is 17/19 support, 19/19 completeness, 13/19 behavior and 14/19 tone. Even a matching final grade leaves behavior/tone below 80% on this calibration slice. This is not validation or generator accuracy.
+**Choice:** Preserve exact receipt/result/progress and a hash-bound summary with every disagreement. Do not produce a complete `judge.json`, edit human grades, assign a missing grade or mix configurations. Keep the unknown request's full 7,512 reservation and the stopped run's conservative hold; fully-reported reconciliation cannot apply. The twenty-attempt approval is consumed. Review instructions, axis separation and rationale quality before more spending.
+**Offline follow-up:** Typed per-attempt metadata retains exception class, validated HTTP status and three allowlisted codes. Exclude arbitrary exception text, response body, headers, failed generation and hidden reasoning. Unknown usage and retry/stop behavior remain unchanged. A fake SDK `BadRequestError` regression verifies retention. This fix does not reconstruct the historical HTTP 400 body or establish its cause.
+
+---
+
 ### DRN-044: User-authorized actual-usage reconciliation and zero visitor reserves
 
 **Date:** 2026-11-05

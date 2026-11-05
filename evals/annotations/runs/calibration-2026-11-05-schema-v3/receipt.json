@@ -1,0 +1,72 @@
+{
+  "plan": {
+    "version": 2,
+    "run_id": "calibration-2026-11-05-schema-v3",
+    "stage": "judge_calibration",
+    "case_ids": [],
+    "budget": {
+      "models": {
+        "openai/gpt-oss-20b": {
+          "max_attempts": 20,
+          "input_tokens": 129760,
+          "output_tokens": 20480,
+          "per_call_input": 6488,
+          "per_call_output": 1024
+        }
+      },
+      "shared_rpm": 30,
+      "shared_tpm": 8000,
+      "shared_rpd": 1000,
+      "shared_tpd": 200000,
+      "prior_requests_today": 4,
+      "prior_tokens_today": 4098,
+      "visitor_rpm": 0,
+      "visitor_tpm": 0,
+      "visitor_rpd": 0,
+      "visitor_tpd": 0,
+      "min_interval_seconds": 3.0,
+      "deadline_seconds": 2700.0,
+      "request_timeout_seconds": 60.0
+    },
+    "source": {
+      "commit": "be132d56cbeaabc805f39f0d8ebcbf16c62aa6f7",
+      "dirty": false,
+      "code_sha256": "c8e8f08c22a799b12664528b0d862986804d27365658e1509e6a889bfa3e519c",
+      "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+      "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "versions": {
+        "groq": "1.7.0",
+        "pydantic": "2.10.6",
+        "httpx": "0.28.1",
+        "fastapi": "0.115.11",
+        "fastembed": "0.9.1",
+        "numpy": "2.5.4"
+      },
+      "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+    },
+    "inputs_sha256": "a0abc9fbd125b39e5dbae8cc8e88aaf3084ffef0c6e856aa6323cc75ea062e8f",
+    "judge_configuration": {
+      "model": "openai/gpt-oss-20b",
+      "temperature": 0.2,
+      "reasoning_effort": "low",
+      "response_format": "json_object",
+      "max_completion_tokens": 1024
+    }
+  },
+  "approval": {
+    "purpose": "live_groq_authorization",
+    "approved_by": "Aamir Mohammed Khan",
+    "reference": "Aamir explicit same-day schema-v3 approval: reconcile both fully reported stops to actual usage, zero all visitor reserves, low effort/1024 output, >195000 tokens/>990 requests available, quiet45min.",
+    "plan_sha256": "a918599db21437812857c2a77fefb640e30d43f5ce0f8233bf475e60786eb5f0",
+    "approved_at": "2026-11-05T07:05:28Z",
+    "expires_at": "2026-11-05T07:50:28Z",
+    "limits_verified_at": "2026-11-05T07:05:28Z",
+    "limits_reference": "User confirmed current 30 RPM/1000 RPD/8000 TPM/200000 TPD with >195000 tokens and >990 requests remaining, all visitors explicitly zero.",
+    "visitor_allowance_acknowledged": true,
+    "draft_corpus_acknowledged": true,
+    "input_reservation_policy_acknowledged": true
+  },
+  "state": "started_consumption_unknown_until_result",
+  "started_at": "2026-11-05T07:09:59.247522+00:00"
+}

@@ -622,6 +622,37 @@ account-wide availability still comes from the user's fresh statement. Zero
 visitor headroom is an explicit priority choice during the confirmed quiet window,
 not proof that the standalone runner controls production traffic.
 
+## Partial grades and unknown provider consumption are separate evidence
+
+The same-day schema-v3 run attempted twenty calls and accepted nineteen grades
+before final HTTP 400. Reported usage was 14,341 tokens; the failed call reported
+no usage and keeps its 7,512 reservation. Fully-reported reconciliation therefore
+cannot apply. HTTP 400 is known from status-only progress; the original error body
+was discarded, so do not infer a JSON error or zero cost. The exact record remains
+unchanged. Today's three runs total 24 requests/18,439 reported tokens plus one
+unknown request; no account-wide balance is independently measured.
+
+`ProviderFailure` in `evals/budget.py` now keeps future exception class, validated
+status and three allowlisted codes. The fake SDK HTTP 400 test verifies that
+messages/body/failed-generation/hidden output are excluded, usage stays unknown,
+and no retry occurs. This is a tested diagnostics fix, not a retrospective cause.
+
+The partial diagnostic ratios are 17/19 support, 19/19 completeness, 13/19 behavior
+and 14/19 tone. The intended denominator remains twenty, with one missing item;
+the eight validation answers remain unexecuted. Even a matching final grade leaves
+behavior/tone at most 14/20 and 15/20. Schema acceptance is also weaker than a
+meaningful rationale: several outputs merely repeat IDs/template wording. Preserve
+them and the human disagreements, then review calibration instructions/axis
+separation before further spending. Do not edit human labels or report generator
+accuracy. The [calibration review](../audits/2026-11-05-judge-calibration.md) records
+these findings. There is no complete `judge.json` or calibrated claim.
+
+Interview Q&A: **Why not retry once?** The twenty-attempt authorization is consumed,
+and one extra matching item would not fix the observed behavior/tone disagreement.
+**Why retain the partial output?** It exposes judging weaknesses reproducibly,
+without promoting incomplete results. **Can the HTTP error be counted as a fail?**
+No: an unknown/unparsed model result is missing, not an independently graded label.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

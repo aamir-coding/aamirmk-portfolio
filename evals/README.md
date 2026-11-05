@@ -455,3 +455,23 @@ fresh account statement (>195,000 tokens/>990 requests available), not independe
 account telemetry. The quiet window expires at **13:20:28 IST on 5 November**,
 anchored to confirmation. No old approval is reused, retry added, or failure gate
 removed. Separate validation authorization remains necessary.
+
+### Same-day result: 19 grades, final HTTP 400
+
+Run `calibration-2026-11-05-schema-v3` at clean `be132d5` consumed twenty attempts:
+nineteen schema-valid grades, 14,341 reported tokens, then HTTP 400 with unknown
+usage. Its 7,512-token reservation and full stopped-run hold remain. Earlier actual
+reconciliations are intact; this run is ineligible because some usage is unknown.
+No retry occurred. Exact records: `annotations/runs/calibration-2026-11-05-schema-v3/`.
+No complete `judge.json` exists. Daily observed total: 24 requests/18,439 reported
+tokens plus the unknown request, not a verified account balance.
+
+Partial development agreement: support 17/19, completeness 19/19, behavior 13/19,
+tone 14/19, one missing item. Validation and generator accuracy remain unavailable.
+Every disagreement is recorded; human labels remain unchanged. See
+`docs/audits/2026-11-05-judge-calibration.md`. Even a matching final grade leaves
+behavior/tone below 80% on this slice; review instructions before more spending.
+
+Future attempts retain typed provider class/status/allowlisted codes, excluding
+arbitrary messages/body/failed-generation/hidden-reasoning text. This does not
+recover the historical HTTP 400 cause. Unknown consumption still stops, no retry.
