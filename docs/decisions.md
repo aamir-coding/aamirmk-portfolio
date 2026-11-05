@@ -654,3 +654,16 @@ B. Adopt the battle-tested `react-markdown` + `remark-gfm` ecosystem with custom
 - Zero domain truncation or relative path resolution regressions.
 - Bundle size remains 162.94 kB gzipped (<200 kB budget).
 - All 125 frontend Vitest tests and 239 backend Pytest tests pass cleanly.
+
+## DRN-051: Offline artifact and regression gates (Phase 8 Increment 5)
+
+Aamir accepted the failed independent validation as the authentic baseline and formally
+closed Increment 4; this does not change its gate, human grades or draft facts. Remaining
+Phase 8 increments are authorized without additional briefs. `python -m evals.run --full`
+combines actual local retrieval with eight recorded fake/curated contract checks. Typed
+artifacts preserve individual outcomes, exclusions, split IDs, runtime and input hashes.
+No generator executes; no generator accuracy is inferred. The initial compatible baseline
+preserves all critical replay checks and existing retrieval thresholds; a drop exceeding
+two percentage points fails. Changed fingerprint sets require explicit reviewed baseline
+replacement, never automatic approval. CI runs root tests and the offline command, archives
+its result, and enforces an initial-JS 200,000-byte gzip budget. Live scheduling stays off.

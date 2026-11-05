@@ -1,0 +1,2444 @@
+{
+  "schema_version": 1,
+  "kind": "offline_engineering_checks",
+  "generated_at": "2026-11-05T12:49:34.968894Z",
+  "generation_accuracy_available": false,
+  "configured_models": {
+    "generator": "openai/gpt-oss-120b",
+    "judge": "openai/gpt-oss-20b"
+  },
+  "generation_settings": "not_executed",
+  "reported_models": [],
+  "provider_calls": 0,
+  "provider_tokens": 0,
+  "runtime": {
+    "python": "3.13.17",
+    "pydantic": "2.10.6",
+    "fastembed": "0.9.1",
+    "numpy": "2.5.4",
+    "groq": "1.7.0"
+  },
+  "fingerprints": {
+    "prompts": "ca6ceac970f64a4044826b3272c80e80b625bfe9531c3c896e51839a27403178",
+    "checker": "ac9f18968a8d81cc1cb54fc059d0a136ef3644f55570f30fbd1bbf819827dfa0",
+    "rubric": "135a8bfe0638e48d191bb75f1d05fca2b84b176e3bc5b6089875d79819beb4bb",
+    "recordings": "cce24c1407ba9569cb3f4878b4cf8e3b4ac47561afb38fc6aafa4a9e75d69fbe",
+    "cases": "132aa0aa5f602dbaf149fdb605125aa7cc688f7be3da46ce2b48a9ce97f0e51a",
+    "corpus": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+    "index": "809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e",
+    "dataset": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "retrieval": "8a8fa9eab98b6ae588f095f52f4396bfdf7361d196fa5e4cdfc343e5eea3ca95"
+  },
+  "split_ids": {
+    "development": [
+      "eval-01-degree-grad",
+      "eval-02-cgpa",
+      "eval-03-location",
+      "eval-05-reputation",
+      "eval-06-algouniversity-role",
+      "eval-07-entropy-oj-pitch",
+      "eval-08-entropy-oj-tech",
+      "eval-09-entropy-oj-execution",
+      "eval-10-entropy-oj-ai-features",
+      "eval-11-socratic-copilot-leakage",
+      "eval-12-hardest-bug",
+      "eval-13-adversarial-latency-metric",
+      "eval-14-concurrency-limits",
+      "eval-15-test-suite-status",
+      "eval-16-why-redis-bullmq",
+      "eval-17-healthtracker-demo",
+      "eval-18-healthtracker-offline",
+      "eval-19-health-premium-predictor",
+      "eval-20-r2-score-meaning",
+      "eval-21-adversarial-accuracy",
+      "eval-22-portfolio-assistant-purpose",
+      "eval-23-why-rag",
+      "eval-24-retrieval-method",
+      "eval-25-coding-tools",
+      "eval-26-ibm-cert-status",
+      "eval-27-career-direction",
+      "eval-28-ml-project",
+      "eval-29-hackathon-result",
+      "eval-30-contest-result",
+      "eval-31-why-fullstack-ai",
+      "eval-32-top-strengths",
+      "eval-33-weakness",
+      "scope-cooking",
+      "persona-override",
+      "salary-demand",
+      "false-google-employer",
+      "followup-entropy-stack",
+      "fit-cloud-negative",
+      "fit-firmware-negative",
+      "protocol-premature-eof"
+    ],
+    "held_out": [
+      "reserved-01",
+      "reserved-02",
+      "reserved-03",
+      "reserved-04",
+      "reserved-05",
+      "reserved-06",
+      "reserved-07",
+      "reserved-08",
+      "reserved-09",
+      "reserved-10"
+    ]
+  },
+  "retrieval": {
+    "schema_version": 1,
+    "kind": "offline_retrieval_diagnostic",
+    "retriever": "local_hybrid_rrf",
+    "label_status": "provisional",
+    "held_out_executed": false,
+    "groq_calls": 0,
+    "provenance": {
+      "created_at": "2026-11-05T12:49:29.895866Z",
+      "commit": "a286a16ff9ffe93ad04ebe31688a48a3df606522",
+      "dirty": true,
+      "retrieval_source_sha256": "8a8fa9eab98b6ae588f095f52f4396bfdf7361d196fa5e4cdfc343e5eea3ca95",
+      "dataset_manifest_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "index_artifact_sha256": "809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e",
+      "embedding_model": "BAAI/bge-small-en-v1.5",
+      "draft_chunks": 76,
+      "rrf_k": 60,
+      "candidates_multiplier": 4,
+      "python_version": "3.13.17",
+      "library_versions": {
+        "pydantic": "2.10.6",
+        "numpy": "2.5.4",
+        "fastembed": "0.9.1",
+        "PyYAML": "6.0.3"
+      }
+    },
+    "suites": {
+      "legacy_development": {
+        "total_cases": 45,
+        "evaluated_cases": 45,
+        "excluded_cases": 0,
+        "metrics": {
+          "hit_at_3": {
+            "numerator": 41.0,
+            "denominator": 45,
+            "value": 0.9111111111111111
+          },
+          "hit_at_5": {
+            "numerator": 45.0,
+            "denominator": 45,
+            "value": 1.0
+          },
+          "mrr_at_5": {
+            "numerator": 40.0,
+            "denominator": 45,
+            "value": 0.8888888888888888
+          },
+          "recall_at_3": {
+            "numerator": 0.0,
+            "denominator": 0,
+            "value": null
+          },
+          "recall_at_5": {
+            "numerator": 0.0,
+            "denominator": 0,
+            "value": null
+          }
+        },
+        "by_category": {
+          "adversarial": {
+            "hit_at_3": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "hit_at_5": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 3,
+            "excluded_cases": 0
+          },
+          "factual": {
+            "hit_at_3": {
+              "numerator": 19.0,
+              "denominator": 21,
+              "value": 0.9047619047619048
+            },
+            "hit_at_5": {
+              "numerator": 21.0,
+              "denominator": 21,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 18.5,
+              "denominator": 21,
+              "value": 0.8809523809523809
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 21,
+            "excluded_cases": 0
+          },
+          "follow_up": {
+            "hit_at_3": {
+              "numerator": 2.0,
+              "denominator": 3,
+              "value": 0.6666666666666666
+            },
+            "hit_at_5": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 2.25,
+              "denominator": 3,
+              "value": 0.75
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 3,
+            "excluded_cases": 0
+          },
+          "hr": {
+            "hit_at_3": {
+              "numerator": 4.0,
+              "denominator": 4,
+              "value": 1.0
+            },
+            "hit_at_5": {
+              "numerator": 4.0,
+              "denominator": 4,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 3.5,
+              "denominator": 4,
+              "value": 0.875
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 4,
+            "excluded_cases": 0
+          },
+          "technical": {
+            "hit_at_3": {
+              "numerator": 13.0,
+              "denominator": 14,
+              "value": 0.9285714285714286
+            },
+            "hit_at_5": {
+              "numerator": 14.0,
+              "denominator": 14,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 12.75,
+              "denominator": 14,
+              "value": 0.9107142857142857
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 14,
+            "excluded_cases": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "eval-01-degree-grad",
+            "category": "factual",
+            "retrieved_ids": [
+              "education-degree",
+              "personal-background",
+              "hr-tell-me-about-yourself",
+              "hr-career-goals-and-preferences",
+              "profile-location-relocation"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 23.273899998457637,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-02-cgpa",
+            "category": "factual",
+            "retrieved_ids": [
+              "education-degree",
+              "achieve-academic-excellence",
+              "hr-tell-me-about-yourself",
+              "skill-ai-assisted-dev",
+              "hr-why-hire-and-strengths"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.960199998517055,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-03-location",
+            "category": "factual",
+            "retrieved_ids": [
+              "profile-location-relocation",
+              "hr-career-goals-and-preferences",
+              "profile-work-availability",
+              "profile-identity",
+              "hr-tell-me-about-yourself"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 21.728399999119574,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-04-contact-links",
+            "category": "factual",
+            "retrieved_ids": [
+              "profile-contact",
+              "proj-ai-assistant-links",
+              "profile-identity",
+              "skill-strongest-summary",
+              "profile-links"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.957399999024346,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-05-reputation",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-strongest-summary",
+              "proj-ai-assistant-overview",
+              "personal-values-and-teamwork",
+              "skill-not-claimed",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.755399999761721,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-06-algouniversity-role",
+            "category": "factual",
+            "retrieved_ids": [
+              "exp-algouniversity-role",
+              "exp-algouniversity-built",
+              "exp-algouniversity-mentor-feedback",
+              "hr-tell-me-about-yourself",
+              "exp-algouniversity-improvements"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.438100000319537,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-07-entropy-oj-pitch",
+            "category": "technical",
+            "retrieved_ids": [
+              "exp-algouniversity-built",
+              "opinion-system-design",
+              "proj-entropy-oj-links",
+              "proj-entropy-oj-pitch",
+              "proj-entropy-oj-ai-features"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 13.855500001227483,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-08-entropy-oj-tech",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-stack",
+              "proj-entropy-oj-security",
+              "proj-entropy-oj-ai-features",
+              "opinion-system-design",
+              "proj-entropy-oj-debug-story"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.222599999106023,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-09-entropy-oj-execution",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-security",
+              "proj-entropy-oj-interview-qa",
+              "skill-cloud-devops-tools",
+              "proj-entropy-oj-pitch",
+              "proj-entropy-oj-ai-features"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.567599999485537,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-10-entropy-oj-ai-features",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-ai-features",
+              "proj-entropy-oj-pitch",
+              "exp-algouniversity-built",
+              "skill-ai-llm-engineering",
+              "hr-tell-me-about-yourself"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.36030000069877,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-11-socratic-copilot-leakage",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-ai-features",
+              "skill-strongest-summary",
+              "proj-entropy-oj-design",
+              "skill-ai-assisted-dev",
+              "proj-entropy-oj-interview-qa"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.624900000257185,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-12-hardest-bug",
+            "category": "technical",
+            "retrieved_ids": [
+              "exp-algouniversity-hardest-bug",
+              "proj-entropy-oj-debug-story",
+              "skill-ai-assisted-dev",
+              "exp-algouniversity-built",
+              "exp-algouniversity-improvements"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.776799998799106,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-13-adversarial-latency-metric",
+            "category": "adversarial",
+            "retrieved_ids": [
+              "exp-algouniversity-hardest-bug",
+              "proj-entropy-oj-interview-qa",
+              "proj-entropy-oj-debug-story",
+              "exp-algouniversity-improvements",
+              "opinion-production-debugging"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.863799999962794,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-14-concurrency-limits",
+            "category": "technical",
+            "retrieved_ids": [
+              "exp-algouniversity-concurrency",
+              "proj-entropy-oj-pitch",
+              "opinion-system-design",
+              "proj-entropy-oj-interview-qa",
+              "proj-entropy-oj-design"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 22.790200000599725,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-15-test-suite-status",
+            "category": "factual",
+            "retrieved_ids": [
+              "exp-algouniversity-improvements",
+              "proj-entropy-oj-ai-features",
+              "exp-algouniversity-concurrency",
+              "proj-entropy-oj-links",
+              "opinion-production-debugging"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.289100000605686,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-16-why-redis-bullmq",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-stack",
+              "exp-algouniversity-concurrency",
+              "skill-databases",
+              "hr-why-hire-and-strengths",
+              "proj-entropy-oj-interview-qa"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.18249999935506,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-17-healthtracker-demo",
+            "category": "factual",
+            "retrieved_ids": [
+              "proj-healthtracker-status",
+              "proj-healthtracker-overview",
+              "proj-healthtracker-links",
+              "profile-links",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.353800001117634,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-18-healthtracker-offline",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-healthtracker-status",
+              "proj-healthtracker-overview",
+              "proj-healthtracker-links",
+              "proj-browser-games-status",
+              "profile-links"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.13379999960307,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-19-health-premium-predictor",
+            "category": "factual",
+            "retrieved_ids": [
+              "proj-health-premium-overview",
+              "proj-health-premium-links",
+              "proj-health-premium-metrics",
+              "profile-links",
+              "proj-healthtracker-overview"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.050399997358909,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-20-r2-score-meaning",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-health-premium-metrics",
+              "achieve-academic-excellence",
+              "exp-algouniversity-hardest-bug",
+              "exp-algouniversity-improvements",
+              "education-school-background"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 17.961199999263044,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-21-adversarial-accuracy",
+            "category": "adversarial",
+            "retrieved_ids": [
+              "proj-health-premium-metrics",
+              "proj-health-premium-links",
+              "proj-health-premium-overview",
+              "profile-links",
+              "opinion-ai-engineering-misconception"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.87810000011814,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-22-portfolio-assistant-purpose",
+            "category": "factual",
+            "retrieved_ids": [
+              "proj-ai-assistant-overview",
+              "skill-ai-assisted-dev",
+              "proj-ai-assistant-design",
+              "proj-ai-assistant-links",
+              "proj-ai-assistant-status"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 16.920099998969818,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-23-why-rag",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-ai-assistant-overview",
+              "proj-ai-assistant-design",
+              "proj-ai-assistant-status",
+              "skill-ai-llm-engineering",
+              "opinion-rag-vs-finetuning"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 16.10909999726573,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-24-retrieval-method",
+            "category": "technical",
+            "retrieved_ids": [
+              "opinion-rag-vs-finetuning",
+              "proj-ai-assistant-design",
+              "skill-currently-learning",
+              "proj-ai-assistant-architecture",
+              "skill-ai-llm-engineering"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.686400001868606,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-25-coding-tools",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-ai-assisted-dev",
+              "skill-currently-learning",
+              "proj-ai-assistant-overview",
+              "skill-ai-llm-engineering",
+              "hr-tell-me-about-yourself"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 16.60789999732515,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-26-ibm-cert-status",
+            "category": "factual",
+            "retrieved_ids": [
+              "hr-tell-me-about-yourself",
+              "skill-currently-learning",
+              "education-certifications",
+              "education-no-backlogs",
+              "education-coursework"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 22.67809999830206,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-27-career-direction",
+            "category": "factual",
+            "retrieved_ids": [
+              "hr-career-goals-and-preferences",
+              "profile-location-relocation",
+              "profile-identity",
+              "profile-work-availability",
+              "hr-weakness-and-mitigation"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.074899999191985,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-28-ml-project",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-ai-assisted-dev",
+              "skill-ai-llm-engineering",
+              "exp-algouniversity-built",
+              "proj-health-premium-overview",
+              "skill-ramp-up-narratives"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.626400000357535,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-29-hackathon-result",
+            "category": "factual",
+            "retrieved_ids": [
+              "achieve-google-cloud-hackathon",
+              "education-clubs",
+              "proj-vayusetu-overview",
+              "achieve-graph-contest",
+              "achieve-academic-excellence"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.481999999494292,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-30-contest-result",
+            "category": "factual",
+            "retrieved_ids": [
+              "achieve-graph-contest",
+              "hr-tell-me-about-yourself",
+              "achieve-academic-excellence",
+              "achieve-google-cloud-hackathon",
+              "education-no-backlogs"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.966300001105992,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-31-why-fullstack-ai",
+            "category": "hr",
+            "retrieved_ids": [
+              "hr-why-cs-and-ai-engineering",
+              "skill-strongest-summary",
+              "skill-ai-llm-engineering",
+              "hr-why-hire-and-strengths",
+              "opinion-ai-engineering-misconception"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 13.665800001035677,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-32-top-strengths",
+            "category": "hr",
+            "retrieved_ids": [
+              "hr-why-hire-and-strengths",
+              "skill-strongest-summary",
+              "hr-tell-me-about-yourself",
+              "skill-not-claimed",
+              "skill-ai-llm-engineering"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.04209999984596,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-33-weakness",
+            "category": "hr",
+            "retrieved_ids": [
+              "hr-weakness-and-mitigation",
+              "skill-ai-assisted-dev",
+              "skill-not-claimed",
+              "skill-ai-llm-engineering",
+              "hr-outside-coding-and-curiosity"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.953800000512274,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-34-debugging-approach",
+            "category": "hr",
+            "retrieved_ids": [
+              "skill-strongest-summary",
+              "opinion-production-debugging",
+              "hr-weakness-and-mitigation",
+              "proj-entropy-oj-interview-qa",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.44250000087777,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-35-work-location-stance",
+            "category": "factual",
+            "retrieved_ids": [
+              "profile-location-relocation",
+              "hr-career-goals-and-preferences",
+              "profile-work-availability",
+              "skill-ai-assisted-dev",
+              "proj-ai-assistant-overview"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.114399997401051,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-36-outside-coding",
+            "category": "factual",
+            "retrieved_ids": [
+              "hr-outside-coding-and-curiosity",
+              "skill-ai-assisted-dev",
+              "personal-hobbies-and-curiosity",
+              "proj-ai-assistant-overview",
+              "education-clubs"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.455000000452856,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-37-rag-vs-finetuning",
+            "category": "technical",
+            "retrieved_ids": [
+              "opinion-rag-vs-finetuning",
+              "skill-ai-llm-engineering",
+              "proj-ai-assistant-design",
+              "skill-currently-learning",
+              "exp-algouniversity-improvements"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.242700000177138,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-38-responsible-ai-use",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-ai-assisted-dev",
+              "hr-weakness-and-mitigation",
+              "proj-ai-assistant-overview",
+              "hr-tell-me-about-yourself",
+              "personal-hobbies-and-curiosity"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.264099999621976,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-39-phone-number-recruiter",
+            "category": "factual",
+            "retrieved_ids": [
+              "profile-contact",
+              "profile-identity",
+              "skill-ai-assisted-dev",
+              "proj-ai-assistant-overview",
+              "exp-algouniversity-hardest-bug"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.7987000028661,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-40-adversarial-google-employment",
+            "category": "adversarial",
+            "retrieved_ids": [
+              "skill-not-claimed",
+              "achieve-google-cloud-hackathon",
+              "hr-tell-me-about-yourself",
+              "profile-identity",
+              "education-clubs"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.96190000034403,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-41-delay-diagnosis",
+            "category": "follow_up",
+            "retrieved_ids": [
+              "exp-algouniversity-hardest-bug",
+              "hr-tell-me-about-yourself",
+              "proj-entropy-oj-debug-story",
+              "hr-handling-pressure-and-deadlines",
+              "exp-algouniversity-improvements"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.175100002030376,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-42-future-improvements",
+            "category": "follow_up",
+            "retrieved_ids": [
+              "exp-algouniversity-improvements",
+              "exp-algouniversity-built",
+              "hr-tell-me-about-yourself",
+              "proj-entropy-oj-links",
+              "proj-entropy-oj-design"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.146400001773145,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-43-why-postgres-over-mongodb",
+            "category": "technical",
+            "retrieved_ids": [
+              "opinion-fastapi-react-db",
+              "skill-databases",
+              "proj-secure-auction-overview",
+              "proj-entropy-oj-interview-qa",
+              "proj-entropy-oj-stack"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 22.088899997470435,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-44-aws-experience",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-not-claimed",
+              "skill-ramp-up-narratives",
+              "hr-why-hire-and-strengths",
+              "proj-ai-assistant-overview",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.521800000598887,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-45-pre-launch-checks",
+            "category": "follow_up",
+            "retrieved_ids": [
+              "proj-ai-assistant-status",
+              "exp-algouniversity-improvements",
+              "skill-ai-llm-engineering",
+              "proj-ai-assistant-design",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.183999999862863,
+            "skip_reason": null
+          }
+        ],
+        "latency": {
+          "count": 45,
+          "mean_ms": 17.560719999811326,
+          "p50_ms": 16.920099998969818,
+          "p95_ms": 22.67809999830206,
+          "p99_ms": 23.273899998457637,
+          "percentile_method": "nearest_rank"
+        },
+        "quality_passed": true,
+        "failed_quality_checks": [],
+        "thresholds": {
+          "hit_at_3": 0.9,
+          "mrr_at_5": 0.8,
+          "hit_at_5": 1.0
+        },
+        "query_mode": "raw_query_top5"
+      },
+      "versioned_development": {
+        "total_cases": 40,
+        "evaluated_cases": 34,
+        "excluded_cases": 6,
+        "metrics": {
+          "hit_at_3": {
+            "numerator": 31.0,
+            "denominator": 34,
+            "value": 0.9117647058823529
+          },
+          "hit_at_5": {
+            "numerator": 34.0,
+            "denominator": 34,
+            "value": 1.0
+          },
+          "mrr_at_5": {
+            "numerator": 30.25,
+            "denominator": 34,
+            "value": 0.8897058823529411
+          },
+          "recall_at_3": {
+            "numerator": 2.0,
+            "denominator": 2,
+            "value": 1.0
+          },
+          "recall_at_5": {
+            "numerator": 2.0,
+            "denominator": 2,
+            "value": 1.0
+          }
+        },
+        "by_category": {
+          "adversarial": {
+            "hit_at_3": {
+              "numerator": 2.0,
+              "denominator": 2,
+              "value": 1.0
+            },
+            "hit_at_5": {
+              "numerator": 2.0,
+              "denominator": 2,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 2.0,
+              "denominator": 2,
+              "value": 1.0
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 3,
+            "excluded_cases": 1
+          },
+          "factual": {
+            "hit_at_3": {
+              "numerator": 13.0,
+              "denominator": 15,
+              "value": 0.8666666666666667
+            },
+            "hit_at_5": {
+              "numerator": 15.0,
+              "denominator": 15,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 12.5,
+              "denominator": 15,
+              "value": 0.8333333333333334
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 15,
+            "excluded_cases": 0
+          },
+          "false_premise": {
+            "hit_at_3": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "hit_at_5": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "recall_at_3": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "recall_at_5": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "total_cases": 1,
+            "excluded_cases": 0
+          },
+          "fit": {
+            "hit_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "hit_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "mrr_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 2,
+            "excluded_cases": 2
+          },
+          "follow_up": {
+            "hit_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "hit_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "mrr_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 1,
+            "excluded_cases": 1
+          },
+          "hr": {
+            "hit_at_3": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "hit_at_5": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 3.0,
+              "denominator": 3,
+              "value": 1.0
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 3,
+            "excluded_cases": 0
+          },
+          "off_topic": {
+            "hit_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "hit_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "mrr_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 1,
+            "excluded_cases": 1
+          },
+          "protocol": {
+            "hit_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "hit_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "mrr_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 1,
+            "excluded_cases": 1
+          },
+          "refusal": {
+            "hit_at_3": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "hit_at_5": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "recall_at_3": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "recall_at_5": {
+              "numerator": 1.0,
+              "denominator": 1,
+              "value": 1.0
+            },
+            "total_cases": 1,
+            "excluded_cases": 0
+          },
+          "technical": {
+            "hit_at_3": {
+              "numerator": 11.0,
+              "denominator": 12,
+              "value": 0.9166666666666666
+            },
+            "hit_at_5": {
+              "numerator": 12.0,
+              "denominator": 12,
+              "value": 1.0
+            },
+            "mrr_at_5": {
+              "numerator": 10.75,
+              "denominator": 12,
+              "value": 0.8958333333333334
+            },
+            "recall_at_3": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "recall_at_5": {
+              "numerator": 0.0,
+              "denominator": 0,
+              "value": null
+            },
+            "total_cases": 12,
+            "excluded_cases": 0
+          }
+        },
+        "cases": [
+          {
+            "id": "eval-01-degree-grad",
+            "category": "factual",
+            "retrieved_ids": [
+              "education-degree",
+              "personal-background",
+              "hr-tell-me-about-yourself",
+              "hr-career-goals-and-preferences",
+              "profile-location-relocation"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 21.984599999996135,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-02-cgpa",
+            "category": "factual",
+            "retrieved_ids": [
+              "education-degree",
+              "achieve-academic-excellence",
+              "hr-tell-me-about-yourself",
+              "skill-ai-assisted-dev",
+              "hr-why-hire-and-strengths"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.169800000876421,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-03-location",
+            "category": "factual",
+            "retrieved_ids": [
+              "profile-location-relocation",
+              "hr-career-goals-and-preferences",
+              "profile-work-availability",
+              "profile-identity",
+              "hr-tell-me-about-yourself"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.78609999807668,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-05-reputation",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-strongest-summary",
+              "proj-ai-assistant-overview",
+              "personal-values-and-teamwork",
+              "skill-not-claimed",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 16.15959999980987,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-06-algouniversity-role",
+            "category": "factual",
+            "retrieved_ids": [
+              "exp-algouniversity-role",
+              "exp-algouniversity-built",
+              "exp-algouniversity-mentor-feedback",
+              "hr-tell-me-about-yourself",
+              "exp-algouniversity-improvements"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 21.575999999186024,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-07-entropy-oj-pitch",
+            "category": "technical",
+            "retrieved_ids": [
+              "exp-algouniversity-built",
+              "opinion-system-design",
+              "proj-entropy-oj-links",
+              "proj-entropy-oj-pitch",
+              "proj-entropy-oj-ai-features"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.30880000043544,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-08-entropy-oj-tech",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-stack",
+              "proj-entropy-oj-security",
+              "proj-entropy-oj-ai-features",
+              "opinion-system-design",
+              "proj-entropy-oj-debug-story"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.684699999837903,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-09-entropy-oj-execution",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-security",
+              "proj-entropy-oj-interview-qa",
+              "skill-cloud-devops-tools",
+              "proj-entropy-oj-pitch",
+              "proj-entropy-oj-ai-features"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 16.451399998913985,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-10-entropy-oj-ai-features",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-ai-features",
+              "proj-entropy-oj-pitch",
+              "exp-algouniversity-built",
+              "skill-ai-llm-engineering",
+              "hr-tell-me-about-yourself"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.526399999449495,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-11-socratic-copilot-leakage",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-ai-features",
+              "skill-strongest-summary",
+              "proj-entropy-oj-design",
+              "skill-ai-assisted-dev",
+              "proj-entropy-oj-interview-qa"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 21.00859999700333,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-12-hardest-bug",
+            "category": "technical",
+            "retrieved_ids": [
+              "exp-algouniversity-hardest-bug",
+              "proj-entropy-oj-debug-story",
+              "skill-ai-assisted-dev",
+              "exp-algouniversity-built",
+              "exp-algouniversity-improvements"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.439300001162337,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-13-adversarial-latency-metric",
+            "category": "adversarial",
+            "retrieved_ids": [
+              "exp-algouniversity-hardest-bug",
+              "proj-entropy-oj-interview-qa",
+              "proj-entropy-oj-debug-story",
+              "exp-algouniversity-improvements",
+              "opinion-production-debugging"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.62559999790392,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-14-concurrency-limits",
+            "category": "technical",
+            "retrieved_ids": [
+              "exp-algouniversity-concurrency",
+              "proj-entropy-oj-pitch",
+              "opinion-system-design",
+              "proj-entropy-oj-interview-qa",
+              "proj-entropy-oj-design"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.174999997834675,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-15-test-suite-status",
+            "category": "factual",
+            "retrieved_ids": [
+              "exp-algouniversity-improvements",
+              "proj-entropy-oj-ai-features",
+              "exp-algouniversity-concurrency",
+              "proj-entropy-oj-links",
+              "opinion-production-debugging"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 19.355200001882622,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-16-why-redis-bullmq",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-entropy-oj-stack",
+              "exp-algouniversity-concurrency",
+              "skill-databases",
+              "hr-why-hire-and-strengths",
+              "proj-entropy-oj-interview-qa"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.048100001877174,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-17-healthtracker-demo",
+            "category": "factual",
+            "retrieved_ids": [
+              "proj-healthtracker-status",
+              "proj-healthtracker-overview",
+              "proj-healthtracker-links",
+              "profile-links",
+              "skill-ai-assisted-dev"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 13.94340000115335,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-18-healthtracker-offline",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-healthtracker-status",
+              "proj-healthtracker-overview",
+              "proj-healthtracker-links",
+              "proj-browser-games-status",
+              "profile-links"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.227100000629434,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-19-health-premium-predictor",
+            "category": "factual",
+            "retrieved_ids": [
+              "proj-health-premium-overview",
+              "proj-health-premium-links",
+              "proj-health-premium-metrics",
+              "profile-links",
+              "proj-healthtracker-overview"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.087700001255143,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-20-r2-score-meaning",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-health-premium-metrics",
+              "achieve-academic-excellence",
+              "exp-algouniversity-hardest-bug",
+              "exp-algouniversity-improvements",
+              "education-school-background"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 17.987899998843204,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-21-adversarial-accuracy",
+            "category": "adversarial",
+            "retrieved_ids": [
+              "proj-health-premium-metrics",
+              "proj-health-premium-links",
+              "proj-health-premium-overview",
+              "profile-links",
+              "opinion-ai-engineering-misconception"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 20.01159999781521,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-22-portfolio-assistant-purpose",
+            "category": "factual",
+            "retrieved_ids": [
+              "proj-ai-assistant-overview",
+              "skill-ai-assisted-dev",
+              "proj-ai-assistant-design",
+              "proj-ai-assistant-links",
+              "proj-ai-assistant-status"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 16.98000000033062,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-23-why-rag",
+            "category": "technical",
+            "retrieved_ids": [
+              "proj-ai-assistant-overview",
+              "proj-ai-assistant-design",
+              "proj-ai-assistant-status",
+              "skill-ai-llm-engineering",
+              "opinion-rag-vs-finetuning"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.762500002689194,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-24-retrieval-method",
+            "category": "technical",
+            "retrieved_ids": [
+              "opinion-rag-vs-finetuning",
+              "proj-ai-assistant-design",
+              "skill-currently-learning",
+              "proj-ai-assistant-architecture",
+              "skill-ai-llm-engineering"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.245599999412661,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-25-coding-tools",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-ai-assisted-dev",
+              "skill-currently-learning",
+              "proj-ai-assistant-overview",
+              "skill-ai-llm-engineering",
+              "hr-tell-me-about-yourself"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.94420000037644,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-26-ibm-cert-status",
+            "category": "factual",
+            "retrieved_ids": [
+              "hr-tell-me-about-yourself",
+              "skill-currently-learning",
+              "education-certifications",
+              "education-no-backlogs",
+              "education-coursework"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.5,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.425999997911276,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-27-career-direction",
+            "category": "factual",
+            "retrieved_ids": [
+              "hr-career-goals-and-preferences",
+              "profile-location-relocation",
+              "profile-identity",
+              "profile-work-availability",
+              "hr-weakness-and-mitigation"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.24350000161212,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-28-ml-project",
+            "category": "factual",
+            "retrieved_ids": [
+              "skill-ai-assisted-dev",
+              "skill-ai-llm-engineering",
+              "exp-algouniversity-built",
+              "proj-health-premium-overview",
+              "skill-ramp-up-narratives"
+            ],
+            "scores": {
+              "hit_at_3": 0,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 0.25,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 15.967800001817523,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-29-hackathon-result",
+            "category": "factual",
+            "retrieved_ids": [
+              "achieve-google-cloud-hackathon",
+              "education-clubs",
+              "proj-vayusetu-overview",
+              "achieve-graph-contest",
+              "achieve-academic-excellence"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 18.522499998653075,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-30-contest-result",
+            "category": "factual",
+            "retrieved_ids": [
+              "achieve-graph-contest",
+              "hr-tell-me-about-yourself",
+              "achieve-academic-excellence",
+              "achieve-google-cloud-hackathon",
+              "education-no-backlogs"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.53150000088499,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-31-why-fullstack-ai",
+            "category": "hr",
+            "retrieved_ids": [
+              "hr-why-cs-and-ai-engineering",
+              "skill-strongest-summary",
+              "skill-ai-llm-engineering",
+              "hr-why-hire-and-strengths",
+              "opinion-ai-engineering-misconception"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 13.456399999995483,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-32-top-strengths",
+            "category": "hr",
+            "retrieved_ids": [
+              "hr-why-hire-and-strengths",
+              "skill-strongest-summary",
+              "hr-tell-me-about-yourself",
+              "skill-not-claimed",
+              "skill-ai-llm-engineering"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.83360000202083,
+            "skip_reason": null
+          },
+          {
+            "id": "eval-33-weakness",
+            "category": "hr",
+            "retrieved_ids": [
+              "hr-weakness-and-mitigation",
+              "skill-ai-assisted-dev",
+              "skill-not-claimed",
+              "skill-ai-llm-engineering",
+              "hr-outside-coding-and-curiosity"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": null,
+              "recall_at_5": null
+            },
+            "latency_ms": 14.609600002586376,
+            "skip_reason": null
+          },
+          {
+            "id": "scope-cooking",
+            "category": "off_topic",
+            "retrieved_ids": [],
+            "scores": null,
+            "latency_ms": null,
+            "skip_reason": "no_source_expectation"
+          },
+          {
+            "id": "persona-override",
+            "category": "adversarial",
+            "retrieved_ids": [],
+            "scores": null,
+            "latency_ms": null,
+            "skip_reason": "no_source_expectation"
+          },
+          {
+            "id": "salary-demand",
+            "category": "refusal",
+            "retrieved_ids": [
+              "hr-career-goals-and-preferences",
+              "profile-identity",
+              "skill-ai-llm-engineering",
+              "personal-values-and-teamwork",
+              "achieve-graph-contest"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": 1.0,
+              "recall_at_5": 1.0
+            },
+            "latency_ms": 28.955299996596295,
+            "skip_reason": null
+          },
+          {
+            "id": "false-google-employer",
+            "category": "false_premise",
+            "retrieved_ids": [
+              "achieve-google-cloud-hackathon",
+              "education-clubs",
+              "skill-not-claimed",
+              "proj-vayusetu-overview",
+              "exp-algouniversity-role"
+            ],
+            "scores": {
+              "hit_at_3": 1,
+              "hit_at_5": 1,
+              "reciprocal_rank_at_5": 1.0,
+              "recall_at_3": 1.0,
+              "recall_at_5": 1.0
+            },
+            "latency_ms": 28.211700002430007,
+            "skip_reason": null
+          },
+          {
+            "id": "followup-entropy-stack",
+            "category": "follow_up",
+            "retrieved_ids": [],
+            "scores": null,
+            "latency_ms": null,
+            "skip_reason": "requires_recorded_rewrite"
+          },
+          {
+            "id": "fit-cloud-negative",
+            "category": "fit",
+            "retrieved_ids": [],
+            "scores": null,
+            "latency_ms": null,
+            "skip_reason": "requires_requirement_extraction"
+          },
+          {
+            "id": "fit-firmware-negative",
+            "category": "fit",
+            "retrieved_ids": [],
+            "scores": null,
+            "latency_ms": null,
+            "skip_reason": "requires_requirement_extraction"
+          },
+          {
+            "id": "protocol-premature-eof",
+            "category": "protocol",
+            "retrieved_ids": [],
+            "scores": null,
+            "latency_ms": null,
+            "skip_reason": "protocol_case"
+          }
+        ],
+        "latency": {
+          "count": 34,
+          "mean_ms": 17.419032352978213,
+          "p50_ms": 15.94420000037644,
+          "p95_ms": 28.211700002430007,
+          "p99_ms": 28.955299996596295,
+          "percentile_method": "nearest_rank"
+        },
+        "quality_passed": true,
+        "failed_quality_checks": [],
+        "thresholds": {
+          "hit_at_3": 0.9,
+          "mrr_at_5": 0.8
+        },
+        "query_mode": "raw_query_top5"
+      }
+    },
+    "latency_gate": null
+  },
+  "replay": {
+    "kind": "recorded_checker_diagnostic",
+    "generation_accuracy_available": false,
+    "replayed_at": "2026-11-05T12:49:34.726404Z",
+    "replay_commit": "a286a16ff9ffe93ad04ebe31688a48a3df606522",
+    "replay_dirty": true,
+    "checker_sha256": "18848307748c461d77883f9032d94a89e1c7187be34923a6a6bd1563e27426ff",
+    "recording_file_sha256": "5a3025fcede5778ce95eb48e77b7f55e77b83c25ac8e3870b0ec0c42e947a545",
+    "capture_commit": "b63529cbc4409a2c26e5d3d18b5f9e568293d3c4",
+    "captured_at": "2026-11-04T13:57:26.928094Z",
+    "prompt_matches_current": true,
+    "groq_calls": 0,
+    "held_out_executed": false,
+    "origins": {
+      "fake": 7,
+      "curated": 1
+    },
+    "deliveries": {
+      "fresh": 6,
+      "cached": 1,
+      "preset": 1
+    },
+    "recordings_checked": 8,
+    "checks_passed": 8,
+    "development_cases_without_recordings": [
+      "eval-01-degree-grad",
+      "eval-02-cgpa",
+      "eval-03-location",
+      "eval-05-reputation",
+      "eval-06-algouniversity-role",
+      "eval-08-entropy-oj-tech",
+      "eval-09-entropy-oj-execution",
+      "eval-10-entropy-oj-ai-features",
+      "eval-11-socratic-copilot-leakage",
+      "eval-12-hardest-bug",
+      "eval-13-adversarial-latency-metric",
+      "eval-14-concurrency-limits",
+      "eval-15-test-suite-status",
+      "eval-16-why-redis-bullmq",
+      "eval-17-healthtracker-demo",
+      "eval-18-healthtracker-offline",
+      "eval-19-health-premium-predictor",
+      "eval-20-r2-score-meaning",
+      "eval-21-adversarial-accuracy",
+      "eval-22-portfolio-assistant-purpose",
+      "eval-23-why-rag",
+      "eval-24-retrieval-method",
+      "eval-25-coding-tools",
+      "eval-26-ibm-cert-status",
+      "eval-27-career-direction",
+      "eval-28-ml-project",
+      "eval-29-hackathon-result",
+      "eval-30-contest-result",
+      "eval-31-why-fullstack-ai",
+      "eval-32-top-strengths",
+      "eval-33-weakness",
+      "false-google-employer",
+      "fit-firmware-negative",
+      "protocol-premature-eof",
+      "salary-demand",
+      "scope-cooking"
+    ],
+    "semantic_review": "pending",
+    "baseline_comparison": {
+      "status": "unavailable",
+      "reason": "No comparable authorized live stuffed/RAG answer and usage recordings exist."
+    },
+    "results": [
+      {
+        "id": "chat-project",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [],
+        "warnings": [],
+        "observed_error": null,
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "chat-followup",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [],
+        "warnings": [],
+        "observed_error": null,
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "chat-refusal",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [],
+        "warnings": [],
+        "observed_error": null,
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "chat-error",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [
+          "answer_completion"
+        ],
+        "warnings": [],
+        "observed_error": "chat_error",
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "fit-fresh",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [],
+        "warnings": [],
+        "observed_error": null,
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "fit-cached",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [],
+        "warnings": [
+          "server_cached_flag_unreliable"
+        ],
+        "observed_error": null,
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "fit-preset",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [
+          "requirement_local_evidence"
+        ],
+        "warnings": [],
+        "observed_error": null,
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      },
+      {
+        "id": "fit-extraction-error",
+        "passed": true,
+        "failed_checks": [],
+        "unavailable_checks": [
+          "answer_completion",
+          "requirement_local_evidence"
+        ],
+        "warnings": [],
+        "observed_error": "extraction_error",
+        "semantic_review": "pending",
+        "generation_accuracy_available": false
+      }
+    ]
+  }
+}

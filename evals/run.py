@@ -357,6 +357,10 @@ async def build_report(selection: str) -> OfflineRetrievalReport:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--full", action="store_true", help="Retrieval + replay + CI gate"
+    )
+    parser.add_argument("--baseline", type=Path, default=DEFAULT_ROOT / "baseline.json")
+    parser.add_argument(
         "--suite", choices=("all", "legacy", "development"), default="all"
     )
     parser.add_argument(
@@ -370,6 +374,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Optional machine-specific latency ceiling; never a default quality gate",
     )
     args = parser.parse_args(argv)
+    if args.full:
+        from evals.results import run_full
+
+        try:
+            return asyncio.run(
+                run_full(args.output or DEFAULT_ROOT / "results.json", args.baseline)
+            )
+        except (ValueError, OSError, subprocess.SubprocessError) as exc:
+            print(f"Offline suite unavailable: {exc}", file=sys.stderr)
+            return 2
     if args.max_mean_ms is not None and (
         not math.isfinite(args.max_mean_ms) or args.max_mean_ms <= 0
     ):

@@ -402,3 +402,12 @@ Preserve human grades and the failed result; do not resample/retune this exposed
 validation set to claim a pass. Further calibration needs a reviewed fresh
 validation version with human grading. All76facts remain draft; no calibrated
 accuracy badge or Phase 8 completion. Increment 5 has not started.
+
+### Phase 8 Increment 5 — implementation
+
+User closed Increment 4 after accepting the authentic failed validation baseline and
+authorized Increments 5–7. Implemented combined schema-validated offline artifact,
+compatible baseline regression gate, root CI evaluation/tests and gzip gate. Fresh focused
+artifact tests: 5 passed. Single-command offline gate passed. Local retrieval: legacy Hit@3
+41/45, MRR@5 .8889; development Hit@3 31/34, MRR@5 .8897; replay 8/8. Held-out unexecuted.
+No new Groq calls, factual approval, deployment or remote push.

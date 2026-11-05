@@ -31,10 +31,10 @@ jobs:
           pip install -r backend/requirements-dev.txt
 
       - name: Run Ruff linter
-        run: ruff check backend
+        run: ruff check --config backend/pyproject.toml backend evals
 
       - name: Run Ruff formatter check
-        run: ruff format --check backend
+        run: ruff format --check --config backend/pyproject.toml backend evals
 
       - name: Provision embedding assets before offline runtime tests
         run: >-
@@ -43,8 +43,18 @@ jobs:
 
       - name: Run pytest test suite
         run: |
-          cd backend
-          pytest -v
+          python -m pytest -c backend/pyproject.toml backend/tests evals -v
+
+      - name: Offline retrieval, replay and compatible baseline gate
+        run: python -m evals.run --full --output build/evals/results.json
+
+      - name: Preserve actual offline results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: offline-eval-results
+          path: build/evals/results.json
+          if-no-files-found: warn
 
   frontend:
     name: Frontend Lint, Typecheck & Tests
@@ -79,3 +89,6 @@ jobs:
         run: |
           cd frontend
           npm test
+
+      - name: Enforce initial JavaScript gzip budget
+        run: node frontend/scripts/check-bundle.mjs
