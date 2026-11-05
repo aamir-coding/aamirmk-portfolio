@@ -397,8 +397,14 @@ Reserve **6,488 input + 1,024 output = 7,512 per call**, with twenty calls total
 remains 170,240. No quota guard, input-estimation margin or receipt hold was relaxed.
 The larger cap still cannot guarantee complete output.
 
-The prior same-day hold remains active on 5 November UTC and clears with the next
-local UTC budget day, 05:30 IST on 6 November. A start-window preference was asked
-asynchronously; no answer or scheduling action has yet occurred. Budget approval
-is recorded, but no new live approval window/provider attempt is created while
-timing remains unresolved. This amendment does not authorize validation calls.
+The user subsequently explicitly requested immediate start after the hold was
+explained and reaffirmed remaining capacity. An optional operator reconciliation
+now permits only fully reported incomplete-output stops with original approved
+plan/receipt/result/ledger bindings, valid chronology, verified process exit and
+known usage on every attempt. It keeps all attempted-call reservations; missing
+proof, unknown usage, stale hashes or lifecycle uncertainty retain the full hold
+or fail closed. The separate record for the first run retains three requests and
+22,536 reserved tokens without changing its original receipt/result. A new run ID,
+exact approval, cooldown, daily/visitor caps and confirmation-anchored quiet-window
+expiry still apply. This is not an automatic refund, and no scheduled task is used.
+The amendment does not authorize validation calls.

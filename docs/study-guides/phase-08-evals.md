@@ -561,11 +561,16 @@ are unchanged; this is input compaction, not quota-accounting relaxation. Fake
 tests verify full evidence preservation and construct all twenty 1,024-token
 requests; they do not prove that the real model will finish within that cap.
 
-The previous daily hold still applies until the next local UTC budget day,
-05:30 IST on 6 November. A numerical budget that fits is distinct from a valid
-execution window. The user's start-time choice is pending; no scheduling or new
-provider call has occurred. Human grading remains valid and unchanged, and the
-eight validation calls still require their own compatible budget.
+The first conservative hold initially required waiting for the next UTC budget
+day. Aamir then explicitly requested starting now and confirmed capacity. A new,
+optional operator reconciliation accepts only fully reported incomplete-output
+stops with exact original plan/approval/receipt/result/ledger bindings, valid
+chronology and verified process exit. All three attempted reservations remain
+charged (22,536); only unattempted potential calls are released. Unknown usage or
+missing/stale proof cannot use this path. Original evidence is not edited or
+deleted, cooldown/one-shot/day/visitor checks remain, and the quiet-window expiry
+is anchored to the user's confirmation. No scheduled task is created. Human
+grading remains unchanged; validation still needs its own compatible budget.
 
 ## Official references
 
