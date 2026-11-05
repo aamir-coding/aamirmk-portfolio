@@ -1,4 +1,10 @@
-# Human calibration input — pending
+# Human calibration — grading received, judging pending
+
+**Update, 5 November 2026:** Aamir supplied all 28 attested grades. Offline schema,
+hash and coverage validation passed; the unchanged submission is archived as
+`human-v1-aamir-2026-11-05.json`. Validation labels have four passes/four failures
+on each axis and no abstentions. Genuine judge outputs/agreement and separate live
+budget approval remain pending. The original template below stays blank.
 
 The committed template contains **no human grades**. Aamir chose to fill a copied
 JSON file on 4 November 2026. `build/human-v1.json` is an ignored working copy;
