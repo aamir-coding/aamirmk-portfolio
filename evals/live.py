@@ -40,6 +40,7 @@ from evals.budget import (  # noqa: E402
 from evals.calibration import (  # noqa: E402
     AnnotationSet,
     GradingPacket,
+    JudgeConfiguration,
     JudgeSet,
     Labels,
     Review,
@@ -92,16 +93,22 @@ def source_state() -> dict[str, Any]:
 
 
 class LivePlan(ReplayModel):
-    version: Literal[1] = 1
+    version: Literal[2] = 2
     run_id: Identifier
     stage: Literal["generation", "judge_calibration", "judge_validation"]
     case_ids: list[Identifier] = Field(default_factory=list)
     budget: Budget
     source: dict[str, Any]
     inputs_sha256: str
+    judge_configuration: JudgeConfiguration | None = None
 
     @model_validator(mode="after")
     def stage_inputs(self) -> Self:
+        if self.stage.startswith("judge") != (self.judge_configuration is not None):
+            raise ValueError(
+                "Judge stages require explicit settings; "
+                "generation retains application settings"
+            )
         if len(set(self.case_ids)) != len(self.case_ids) or (
             self.stage == "generation"
         ) != bool(self.case_ids):
@@ -196,6 +203,13 @@ def preflight(
         wanted = "validation" if plan.stage == "judge_validation" else "calibration"
         items = [x for x in packet.items if x.slice == wanted]
         cap = plan.budget.models[UTILITY]
+        expected = JudgeConfiguration(max_completion_tokens=cap.per_call_output)
+        if plan.judge_configuration != expected:
+            raise ValueError("Judge settings differ from the request/output budget")
+        if prior is not None and prior.configuration != expected:
+            raise ValueError(
+                "Validation must use the same judge settings as calibration"
+            )
         if (
             cap.max_attempts < len(items)
             or cap.input_tokens < len(items) * cap.per_call_input
@@ -250,6 +264,8 @@ class GroqProvider:
             kwargs.update(tools=request.tools, tool_choice="auto")
         if request.response_format:
             kwargs["response_format"] = request.response_format
+        if request.reasoning_effort is not None:
+            kwargs["reasoning_effort"] = request.reasoning_effort
         response = await self.client.chat.completions.create(**kwargs)
         choice = response.choices[0]
         usage = response.usage
@@ -423,6 +439,9 @@ async def run_jobs(
         provider,
         runtime_budget,
         default_model=UTILITY if plan.stage.startswith("judge") else MAIN,
+        reasoning_effort=plan.judge_configuration.reasoning_effort
+        if plan.judge_configuration
+        else None,
     )
     results: list[dict[str, Any]] = []
     reviews: list[Review] = list(prior.reviews) if prior else []
@@ -480,6 +499,9 @@ async def run_jobs(
         "runtime_deadline_seconds": runtime_budget.deadline_seconds,
         "effective_prompt_sha256": canonical_sha256(system_prompt)
         if system_prompt is not None
+        else None,
+        "judge_configuration": plan.judge_configuration.model_dump(mode="json")
+        if plan.judge_configuration
         else None,
         "generation_accuracy_available": False,
         "plan_sha256": canonical_sha256(plan.model_dump(mode="json")),
@@ -613,6 +635,7 @@ async def execute(
                 rubric_sha256=packet.rubric_sha256,
                 prompt_sha256=packet.judge_prompt_sha256,
                 effective_prompt_sha256=result["effective_prompt_sha256"],
+                configuration=plan.judge_configuration,
                 origin="live",
                 model=UTILITY,
                 authorization_reference=approval.reference,
@@ -669,13 +692,21 @@ def main() -> int:
                     "Draft planning needs run-id/budget and cannot execute"
                 )
             verify_dataset()
+            budget = Budget.model_validate_json(args.budget.read_text(encoding="utf-8"))
+            if args.stage.startswith("judge") and set(budget.models) != {UTILITY}:
+                raise ValueError(
+                    "Evaluation judge must budget only the fixed utility model"
+                )
             plan = LivePlan(
                 run_id=args.run_id,
                 stage=args.stage,
                 case_ids=args.cases,
-                budget=Budget.model_validate_json(
-                    args.budget.read_text(encoding="utf-8")
-                ),
+                budget=budget,
+                judge_configuration=JudgeConfiguration(
+                    max_completion_tokens=budget.models[UTILITY].per_call_output
+                )
+                if args.stage.startswith("judge")
+                else None,
                 source=source_state(),
                 inputs_sha256=canonical_sha256(
                     inputs_state(args.stage, args.cases, human, prior)

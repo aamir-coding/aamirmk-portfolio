@@ -201,11 +201,20 @@ class AnnotationSet(ReplayModel):
         return self
 
 
+class JudgeConfiguration(ReplayModel):
+    model: Literal["openai/gpt-oss-20b"] = "openai/gpt-oss-20b"
+    temperature: Literal[0.2] = 0.2
+    reasoning_effort: Literal["low"] = "low"
+    response_format: Literal["json_object"] = "json_object"
+    max_completion_tokens: int = Field(gt=0, le=1024, strict=True)
+
+
 class JudgeSet(ReplayModel):
     packet_sha256: Sha256
     rubric_sha256: Sha256
     prompt_sha256: Sha256
     effective_prompt_sha256: Sha256
+    configuration: JudgeConfiguration
     origin: Literal["fake", "live"]
     model: Text
     authorization_reference: Text | None = None

@@ -6,6 +6,7 @@ import pytest
 
 from evals.calibration import (
     AnnotationSet,
+    JudgeConfiguration,
     JudgeSet,
     Labels,
     Review,
@@ -78,6 +79,7 @@ def reviews(*, judge: bool = False, wrong: bool = False) -> AnnotationSet | Judg
             model="fake",
             prompt_sha256=packet.judge_prompt_sha256,
             effective_prompt_sha256=effective_judge_prompt_sha256(),
+            configuration=JudgeConfiguration(max_completion_tokens=512),
         )
     return AnnotationSet(
         **fields, reviewer="test-only reviewer", attestation="test-only"
@@ -92,6 +94,13 @@ def test_fake_agreement_never_calibrates_a_live_judge() -> None:
     assert not report.live_judge_calibrated
     assert not report.generation_accuracy_available
     assert all(x.numerator == x.denominator == 8 for x in report.per_label.values())
+
+
+def test_legacy_judge_result_cannot_guess_unrecorded_settings() -> None:
+    data = reviews(judge=True).model_dump(mode="json")
+    del data["configuration"]
+    with pytest.raises(ValueError):
+        JudgeSet.model_validate(data)
 
 
 def test_uncertain_judge_counts_as_disagreement_and_humans_override() -> None:

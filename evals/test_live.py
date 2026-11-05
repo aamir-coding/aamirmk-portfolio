@@ -117,6 +117,8 @@ async def test_uncertain_or_invalid_consumption_stops_all_further_calls(
     assert provider.calls == 1
     assert llm.stop_reason
     assert "secret-bearing" not in str(llm.attempts)
+    if failure == "length":
+        assert llm.attempts[0].finish_reason == "length"
 
 
 @pytest.mark.asyncio
@@ -164,6 +166,13 @@ def plan() -> LivePlan:
             inputs_state("generation", ["eval-01-degree-grad"])
         ),
     )
+
+
+def test_judge_plan_requires_explicit_generation_settings() -> None:
+    data = plan().model_dump(mode="json")
+    data.update(stage="judge_calibration", case_ids=[])
+    with pytest.raises(ValueError):
+        LivePlan.model_validate(data)
 
 
 def approval(proposal: LivePlan) -> LiveApproval:
@@ -490,14 +499,136 @@ def inject_clock(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         live,
         "MeteredLLM",
-        lambda provider, limits, default_model: MeteredLLM(
+        lambda provider, limits, default_model, reasoning_effort=None: MeteredLLM(
             provider,
             limits,
             default_model=default_model,
+            reasoning_effort=reasoning_effort,
             clock=clock,
             sleep=clock.sleep,
         ),
     )
+
+
+@pytest.mark.asyncio
+async def test_judge_run_uses_explicit_settings_without_human_labels(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import evals.live as live
+    from evals.calibration import JudgeConfiguration
+
+    inject_clock(monkeypatch)
+    reply = json.dumps(
+        {
+            "labels": {
+                k: "pass" for k in ("support", "completeness", "behavior", "tone")
+            },
+            "rationale": "TEST ONLY synthetic judge output.",
+        }
+    )
+    provider = ScriptProvider([reply] * 20)
+    limits = {
+        "max_attempts": 20,
+        "input_tokens": 140000,
+        "output_tokens": 10240,
+        "per_call_input": 7000,
+        "per_call_output": 512,
+    }
+    proposal = LivePlan(
+        run_id="test-judge",
+        stage="judge_calibration",
+        case_ids=[],
+        budget=budget(
+            models={"openai/gpt-oss-20b": limits},
+            deadline_seconds=2700,
+            visitor_tpm=400,
+        ),
+        source={"dirty": False},
+        inputs_sha256="test-only",
+        judge_configuration=JudgeConfiguration(max_completion_tokens=512),
+    )
+    report = await live.run_jobs(proposal, provider)
+    assert report["status"] == "complete"
+    assert len(report["reviews"]) == provider.calls == 20
+    assert report["judge_configuration"]["reasoning_effort"] == "low"
+    assert all(
+        r.reasoning_effort == "low" and r.max_completion_tokens == 512
+        for r in provider.requests
+    )
+    assert all(a["finish_reason"] == "stop" for a in report["attempts"])
+
+
+def test_validation_cannot_mix_judge_output_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import evals.live as live
+    from evals.calibration import (
+        AnnotationSet,
+        JudgeConfiguration,
+        JudgeSet,
+        Labels,
+        Review,
+        effective_judge_prompt_sha256,
+        load_packet,
+        packet_fingerprint,
+    )
+
+    packet = load_packet()
+    rows = [
+        Review(
+            item_id=x.id,
+            item_sha256=x.sha256,
+            labels=Labels(
+                support="pass", completeness="pass", behavior="pass", tone="pass"
+            ),
+            rationale="TEST ONLY",
+        )
+        for x in packet.items
+    ]
+    human = AnnotationSet(
+        packet_sha256=packet_fingerprint(packet),
+        rubric_sha256=packet.rubric_sha256,
+        reviewer="TEST ONLY",
+        attestation="TEST ONLY",
+        reviews=rows,
+    )
+    cal_ids = {x.id for x in packet.items if x.slice == "calibration"}
+    prior = JudgeSet(
+        packet_sha256=packet_fingerprint(packet),
+        rubric_sha256=packet.rubric_sha256,
+        prompt_sha256=packet.judge_prompt_sha256,
+        effective_prompt_sha256=effective_judge_prompt_sha256(),
+        configuration=JudgeConfiguration(max_completion_tokens=512),
+        origin="live",
+        model="openai/gpt-oss-20b",
+        authorization_reference="TEST ONLY",
+        ledger_sha256="0" * 64,
+        reviews=[r for r in rows if r.item_id in cal_ids],
+    )
+    limits = {
+        "max_attempts": 8,
+        "input_tokens": 56000,
+        "output_tokens": 2048,
+        "per_call_input": 7000,
+        "per_call_output": 256,
+    }
+    proposal = LivePlan(
+        run_id="test-validation",
+        stage="judge_validation",
+        budget=budget(
+            models={"openai/gpt-oss-20b": limits},
+            deadline_seconds=2700,
+            visitor_tpm=400,
+        ),
+        source={"dirty": False},
+        inputs_sha256=canonical_sha256(
+            inputs_state("judge_validation", [], human, prior)
+        ),
+        judge_configuration=JudgeConfiguration(max_completion_tokens=256),
+    )
+    monkeypatch.setattr(live, "source_state", lambda: proposal.source)
+    with pytest.raises(ValueError, match="same judge settings"):
+        live.preflight(proposal, human=human, prior=prior)
 
 
 @pytest.mark.asyncio
@@ -735,6 +866,7 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
         body = json.loads(request.content)
         assert body["max_completion_tokens"] == 100
         assert body["stream"] is False
+        assert body["reasoning_effort"] == "low"
         if status == 429:
             return httpx.Response(429, json={"error": {"message": "synthetic"}})
         return httpx.Response(
@@ -765,7 +897,13 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
         max_retries=0,
         http_client=httpx.AsyncClient(transport=httpx.MockTransport(respond)),
     ) as client:
-        llm = MeteredLLM(GroqProvider(client), budget(), clock=clock, sleep=clock.sleep)
+        llm = MeteredLLM(
+            GroqProvider(client),
+            budget(),
+            clock=clock,
+            sleep=clock.sleep,
+            reasoning_effort="low",
+        )
         if status == 429:
             with pytest.raises(BudgetStop):
                 await llm.complete([])

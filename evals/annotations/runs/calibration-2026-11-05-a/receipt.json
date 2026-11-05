@@ -1,0 +1,65 @@
+{
+  "plan": {
+    "version": 1,
+    "run_id": "calibration-2026-11-05-a",
+    "stage": "judge_calibration",
+    "case_ids": [],
+    "budget": {
+      "models": {
+        "openai/gpt-oss-20b": {
+          "max_attempts": 20,
+          "input_tokens": 140000,
+          "output_tokens": 10240,
+          "per_call_input": 7000,
+          "per_call_output": 512
+        }
+      },
+      "shared_rpm": 30,
+      "shared_tpm": 8000,
+      "shared_rpd": 1000,
+      "shared_tpd": 200000,
+      "prior_requests_today": 880,
+      "prior_tokens_today": 29760,
+      "visitor_rpm": 10,
+      "visitor_tpm": 400,
+      "visitor_rpd": 100,
+      "visitor_tpd": 20000,
+      "min_interval_seconds": 3.0,
+      "deadline_seconds": 2700.0,
+      "request_timeout_seconds": 60.0
+    },
+    "source": {
+      "commit": "1927818b5a2f20eaf2729854ac88e8ce67dc9bd9",
+      "dirty": false,
+      "code_sha256": "c833fedcbbf300382be07818cc87ac30300a1eb0fa421024883e4c5476519024",
+      "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+      "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "versions": {
+        "groq": "1.7.0",
+        "pydantic": "2.10.6",
+        "httpx": "0.28.1",
+        "fastapi": "0.115.11",
+        "fastembed": "0.9.1",
+        "numpy": "2.5.4"
+      },
+      "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+    },
+    "inputs_sha256": "ab6114064f04c428e24f5acfece48d0e2c3388513083fe8bb2313dd46bff55fe"
+  },
+  "approval": {
+    "purpose": "live_groq_authorization",
+    "approved_by": "Aamir Mohammed Khan",
+    "reference": "User confirmed the concrete 20-answer proposal, listed account limits, remaining daily capacity and quiet45-minute window in this chat on2026-11-05; earlier request directs proceeding with judge calibration.",
+    "plan_sha256": "37887f8c9acf858da2dca52f76c98bac5f11b78491d4f5219b755742de00c320",
+    "approved_at": "2026-11-05T05:31:13.920330Z",
+    "expires_at": "2026-11-05T06:16:13.920330Z",
+    "limits_verified_at": "2026-11-05T05:31:13.920330Z",
+    "limits_reference": "User confirmation in this chat:30RPM,1000RPD,8000TPM,200000TPD; at least170240 tokens and120 requests remaining, including visitor reserves.",
+    "visitor_allowance_acknowledged": true,
+    "draft_corpus_acknowledged": true,
+    "input_reservation_policy_acknowledged": true
+  },
+  "state": "started_consumption_unknown_until_result",
+  "started_at": "2026-11-05T05:31:49.214576+00:00"
+}

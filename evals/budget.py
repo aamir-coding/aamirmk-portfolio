@@ -96,6 +96,7 @@ class ProviderRequest(ReplayModel):
     response_format: dict[str, Any] | None
     max_completion_tokens: int
     timeout_seconds: float
+    reasoning_effort: Literal["low"] | None = None
 
 
 class ProviderReply(ReplayModel):
@@ -122,6 +123,7 @@ class Attempt(ReplayModel):
     usage: Usage | None = None
     reported_model: str | None = None
     finished_seconds: float | None = None
+    finish_reason: str | None = None
 
 
 class BudgetStop(RuntimeError):
@@ -173,12 +175,14 @@ class MeteredLLM:
         budget: Budget,
         *,
         default_model: str = MAIN,
+        reasoning_effort: Literal["low"] | None = None,
         clock: Callable[[], float] = time.monotonic,
         sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
     ) -> None:
         self.provider = provider
         self.budget = budget
         self.default_model = default_model
+        self.reasoning_effort = reasoning_effort
         self.clock = clock
         self.sleep = sleep
         self.started = clock()
@@ -275,6 +279,7 @@ class MeteredLLM:
                 tools=tools,
                 response_format=response_format,
                 max_completion_tokens=cap.per_call_output,
+                reasoning_effort=self.reasoning_effort,
                 timeout_seconds=min(
                     self.budget.request_timeout_seconds, self.remaining()
                 ),
@@ -306,6 +311,7 @@ class MeteredLLM:
                     "usage": reply.usage,
                     "reported_model": reply.model,
                     "finished_seconds": self.clock(),
+                    "finish_reason": reply.finish_reason,
                 }
             )
             if reply.usage is None:

@@ -1,0 +1,107 @@
+{
+  "kind": "live_eval_attempts",
+  "status": "stopped",
+  "stage": "judge_calibration",
+  "runtime_deadline_seconds": 2664.182863,
+  "effective_prompt_sha256": "dbb34ff31c5806b68eec995e215e3b3ca885d1877871e1bb20a51e622cbb4be5",
+  "generation_accuracy_available": false,
+  "plan_sha256": "37887f8c9acf858da2dca52f76c98bac5f11b78491d4f5219b755742de00c320",
+  "source": {
+    "commit": "1927818b5a2f20eaf2729854ac88e8ce67dc9bd9",
+    "dirty": false,
+    "code_sha256": "c833fedcbbf300382be07818cc87ac30300a1eb0fa421024883e4c5476519024",
+    "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+    "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+    "versions": {
+      "groq": "1.7.0",
+      "pydantic": "2.10.6",
+      "httpx": "0.28.1",
+      "fastapi": "0.115.11",
+      "fastembed": "0.9.1",
+      "numpy": "2.5.4"
+    },
+    "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "finished_at": "2026-11-05T05:33:55.422490+00:00",
+  "stop_reason": "incomplete_provider_output",
+  "attempts": [
+    {
+      "number": 1,
+      "task_id": "calibration-01",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 6361.1932468,
+      "reserved_input": 7000,
+      "reserved_output": 512,
+      "request_sha256": "671b97d8eb976df66e5c20b02f8587cccd4322619da71108202e427869b472e5",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 744,
+        "completion_tokens": 275,
+        "total_tokens": 1019
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 6364.0592796
+    },
+    {
+      "number": 2,
+      "task_id": "calibration-02",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 6424.0739863,
+      "reserved_input": 7000,
+      "reserved_output": 512,
+      "request_sha256": "b0a261e311dbb8965d33876a7b5ccefe646a8b03b64a96d279af89d0eb0a72f0",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 810,
+        "completion_tokens": 249,
+        "total_tokens": 1059
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 6425.4550696
+    },
+    {
+      "number": 3,
+      "task_id": "calibration-03",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 6485.4609376,
+      "reserved_input": 7000,
+      "reserved_output": 512,
+      "request_sha256": "f94b6f4b74e98c06c47c4aaffc5e3368a76b2e83b8dabc2ec5c5cea1242bd68a",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 752,
+        "completion_tokens": 512,
+        "total_tokens": 1264
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 6486.319917
+    }
+  ],
+  "ledger_sha256": "b7a486200710a610a71c23d291fc707ba01ab32eede19e244b4ecfaecc0178cf",
+  "results": [],
+  "reviews": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer states that Aamir is pursuing a B.Tech in Computer Science and Engineering at MSRUAS in Bengaluru and expects to graduate in June 2027. Both evidence items (education-degree and profile-identity) explicitly contain this information, satisfying the support requirement. The answer directly addresses the question, providing the degree and graduation date, meeting completeness. The assistant maintains third-person identity, does not deviate from the question, and shows no disallowed behavior. The tone is clear, professional, and respectful, appropriate for a recruiter context."
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer does not provide the requested information about Aamir\u2019s location or preferred work location, contradicting the evidence that states he is based in Bengaluru and prefers to work there. The response also refuses to answer, which is not a correct or helpful behavior. The tone is dismissive and unprofessional."
+    }
+  ]
+}

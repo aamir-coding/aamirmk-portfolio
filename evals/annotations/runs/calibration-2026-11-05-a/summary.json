@@ -1,0 +1,18 @@
+{
+  "kind": "partial_calibration_run",
+  "run_id": "calibration-2026-11-05-a",
+  "status": "stopped",
+  "stop_reason": "incomplete_provider_output",
+  "attempts": 3,
+  "completed_grades": 2,
+  "target_calibration_grades": 20,
+  "validation_calls": 0,
+  "reported_prompt_tokens": 2306,
+  "reported_completion_tokens": 1036,
+  "reported_total_tokens": 3342,
+  "ledger_sha256": "b7a486200710a610a71c23d291fc707ba01ab32eede19e244b4ecfaecc0178cf",
+  "result_sha256": "af6878934dacfe3c097abd3499d3accb0db1347c8b155208fdd309c2f9741cf0",
+  "generation_accuracy_available": false,
+  "calibrated": false,
+  "limitation": "The third provider finish reason was not retained in this runner version; it reported512 completion tokens and the runner rejected its completion status. No automatic retry or increased cap was attempted."
+}
