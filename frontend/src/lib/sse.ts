@@ -1,6 +1,8 @@
 import { getApiBaseUrl } from "./api";
+import type { RequestTelemetry } from "./contracts";
 import type {
   ChatHistoryMessage,
+  BrowserTiming,
   FitProgressData,
   FitReport,
   ProjectCardData,
@@ -23,8 +25,10 @@ export interface StreamChatCallbacks {
     conversation_id: string;
     sources?: SourceCitation[];
     cards?: ProjectCardData[];
+    telemetry?: RequestTelemetry;
+    browserTiming?: BrowserTiming;
   }) => void;
-  onError: (error: string) => void;
+  onError: (error: string, telemetry?: RequestTelemetry) => void;
   onSources?: (sources: SourceCitation[]) => void;
   onCard?: (card: ProjectCardData) => void;
 }
@@ -121,6 +125,8 @@ export async function streamChat({
 }: StreamChatOptions): Promise<void> {
   const base = baseUrl ?? getApiBaseUrl();
   const url = `${base}/api/chat/stream`;
+  const started = performance.now();
+  let firstText: number | null = null;
 
   try {
     const response = await fetch(url, {
@@ -163,6 +169,7 @@ export async function streamChat({
         if (event === "token") {
           const res = TokenEventPayloadSchema.safeParse(parsed);
           if (res.success) {
+            if (res.data.token && firstText === null) firstText = performance.now() - started;
             callbacks.onToken(res.data.token);
           }
         } else if (event === "sources") {
@@ -182,14 +189,15 @@ export async function streamChat({
               conversation_id: res.data.conversation_id,
               sources: res.data.sources,
               cards: res.data.cards,
+              telemetry: res.data.telemetry,
+              browserTiming: { total_ms: performance.now() - started, first_text_ms: firstText },
             });
             return true;
           }
         } else if (event === "error") {
           const res = ErrorEventPayloadSchema.safeParse(parsed);
-          callbacks.onError(
-            res.success ? res.data.detail : "An error occurred during streaming"
-          );
+          if (res.success && res.data.telemetry) callbacks.onError(res.data.detail, res.data.telemetry);
+          else callbacks.onError(res.success ? res.data.detail : "An error occurred during streaming");
           return true;
         }
       } catch {
@@ -238,6 +246,7 @@ export async function streamFitReport({
 }: StreamFitOptions): Promise<void> {
   const base = baseUrl ?? getApiBaseUrl();
   const url = `${base}/api/fit`;
+  const started = performance.now();
 
   try {
     const response = await fetch(url, {
@@ -287,7 +296,7 @@ export async function streamFitReport({
         } else if (event === "complete") {
           const res = FitReportSchema.safeParse(parsed);
           if (res.success) {
-            callbacks.onComplete(res.data as FitReport);
+            callbacks.onComplete({ ...res.data, browserTiming: { total_ms: performance.now() - started, first_text_ms: performance.now() - started } });
             return true;
           } else {
             callbacks.onError("Received invalid report schema from server");

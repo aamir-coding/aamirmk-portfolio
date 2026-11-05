@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "purpose": "fake_and_curated_endpoint_captures",
+  "captured_at": "2026-11-05T13:00:30.147446Z",
+  "commit": "d3f249ab14dc9ba3ce1b0d230c1c82110fc0e0f2",
+  "dirty": true,
+  "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+  "dataset_manifest_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+  "prompt_files_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+  "capture_source_sha256": "89ea87d5f07dd773ef8d5bd843f8f16bb2a74d71f36b4de2fcafa51722a303e1",
+  "records": [
+    {
+      "id": "chat-project",
+      "transport": "chat_sse",
+      "origin": "fake",
+      "delivery": "fresh",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "eval-07-entropy-oj-pitch",
+        "version": 1,
+        "sha256": "49de0cf2b8c0ff073360b38362007021f3b8a477bf68f27cee0e98913f254d7d"
+      },
+      "raw_sse": "event: sources\ndata: {\"sources\": [{\"chunk_id\": \"proj-entropy-oj-pitch\", \"title\": \"Entropy Online Judge \\u2014 Pitch and Problem\", \"type\": \"project\", \"source_section\": \"J1, J2 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}, {\"chunk_id\": \"proj-entropy-oj-stack\", \"title\": \"Entropy Online Judge \\u2014 Technologies, Stack and Architecture\", \"type\": \"project\", \"source_section\": \"J4, J5 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}]}\n\nevent: card\ndata: {\"card\": {\"id\": \"entropy-oj\", \"title\": \"Entropy Online Judge\", \"subtitle\": \"Competitive Programming & DSA Platform with Socratic AI Debugging\", \"summary\": \"A competitive-programming platform that compiles and evaluates C++17 and Python 3.11 submissions in an isolated Linux environment, featuring progressive AI debugging hints and problem auditing.\", \"role\": \"Solo Author (AlgoUniversity Externship)\", \"tech_stack\": [\"React 19\", \"TypeScript\", \"Node.js\", \"Express\", \"MongoDB Atlas\", \"Redis\", \"BullMQ\", \"C++17 / GCC\", \"Linux Runner\", \"Azure VM\", \"Groq\"], \"highlights\": [\"Asynchronous execution queue: BullMQ and Redis decouple code judging from HTTP handling, offloading jobs to a dedicated worker.\", \"Socratic Hint Engine: Passes only public sample cases and student code to LLM, stripping full solutions and protecting hidden suites.\", \"Provider fallback: Resilient workflow switching across Gemini Flash, Groq, and OpenRouter with structured JSON output repair.\", \"Monaco Editor integration for in-browser IDE experience with real-time compilation and runtime diagnostics.\"], \"metrics\": {\"Worker Model\": \"Decoupled Redis/BullMQ\", \"Supported Languages\": \"C++17 (GCC), Python 3.11\", \"Sandboxing\": \"Linux OS Limits & Dedicated VM\", \"Deployment\": \"Vercel + Render + Azure VM\"}, \"github_url\": \"https://github.com/aamir-coding/entropy-oj\", \"live_url\": \"https://entropy-oj.vercel.app\", \"source_sections\": [\"J1\", \"J2\", \"J4\", \"J5\", \"J6\"], \"architecture_details\": \"### System Architecture\\nThe React client connects to an Express API deployed on Render.\\nSubmissions are persisted in MongoDB Atlas and pushed to a BullMQ queue\\nbacked by Redis on an Azure VM.\\n\\n```\\n[React 19] \\u2500\\u2500HTTP\\u2500\\u2500\\u25ba [Express API] \\u2500\\u2500Enqueue\\u2500\\u2500\\u25ba [Redis / BullMQ]\\n                                                       \\u2502\\n                                                  Worker Pull\\n                                                       \\u25bc\\n[MongoDB Atlas] \\u25c4\\u2500\\u2500Persist Result\\u2500\\u2500 [Linux Sandbox Runner (GCC/Python)]\\n```\\n\\n### Key Architectural Decisions & Trade-offs\\n1. **Asynchronous Queue over HTTP Blocking:** Judging untrusted code\\n   can take seconds. BullMQ worker execution ensures API endpoints\\n   respond in <50ms with a submission ticket.\\n2. **Linux Process Controls:** Sandboxed execution via process limits\\n   (RLIMIT_CPU, RLIMIT_AS) prevents denial of service while avoiding\\n   container spin-up overhead.\\n3. **Socratic Guardrails:** AI endpoints only inspect public sample\\n   cases to prevent test leakage.\"}}\n\nevent: token\ndata: {\"token\": \"Aamir\"}\n\nevent: token\ndata: {\"token\": \":\"}\n\nevent: token\ndata: {\"token\": \" Entropy-OJ \\u2014 a competitive programming platform using Redis and BullMQ.\"}\n\nevent: done\ndata: {\"conversation_id\": \"replay-chat-project\", \"sources\": [{\"chunk_id\": \"proj-entropy-oj-pitch\", \"title\": \"Entropy Online Judge \\u2014 Pitch and Problem\", \"type\": \"project\", \"source_section\": \"J1, J2 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}, {\"chunk_id\": \"proj-entropy-oj-stack\", \"title\": \"Entropy Online Judge \\u2014 Technologies, Stack and Architecture\", \"type\": \"project\", \"source_section\": \"J4, J5 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}], \"cards\": [{\"id\": \"entropy-oj\", \"title\": \"Entropy Online Judge\", \"subtitle\": \"Competitive Programming & DSA Platform with Socratic AI Debugging\", \"summary\": \"A competitive-programming platform that compiles and evaluates C++17 and Python 3.11 submissions in an isolated Linux environment, featuring progressive AI debugging hints and problem auditing.\", \"role\": \"Solo Author (AlgoUniversity Externship)\", \"tech_stack\": [\"React 19\", \"TypeScript\", \"Node.js\", \"Express\", \"MongoDB Atlas\", \"Redis\", \"BullMQ\", \"C++17 / GCC\", \"Linux Runner\", \"Azure VM\", \"Groq\"], \"highlights\": [\"Asynchronous execution queue: BullMQ and Redis decouple code judging from HTTP handling, offloading jobs to a dedicated worker.\", \"Socratic Hint Engine: Passes only public sample cases and student code to LLM, stripping full solutions and protecting hidden suites.\", \"Provider fallback: Resilient workflow switching across Gemini Flash, Groq, and OpenRouter with structured JSON output repair.\", \"Monaco Editor integration for in-browser IDE experience with real-time compilation and runtime diagnostics.\"], \"metrics\": {\"Worker Model\": \"Decoupled Redis/BullMQ\", \"Supported Languages\": \"C++17 (GCC), Python 3.11\", \"Sandboxing\": \"Linux OS Limits & Dedicated VM\", \"Deployment\": \"Vercel + Render + Azure VM\"}, \"github_url\": \"https://github.com/aamir-coding/entropy-oj\", \"live_url\": \"https://entropy-oj.vercel.app\", \"source_sections\": [\"J1\", \"J2\", \"J4\", \"J5\", \"J6\"], \"architecture_details\": \"### System Architecture\\nThe React client connects to an Express API deployed on Render.\\nSubmissions are persisted in MongoDB Atlas and pushed to a BullMQ queue\\nbacked by Redis on an Azure VM.\\n\\n```\\n[React 19] \\u2500\\u2500HTTP\\u2500\\u2500\\u25ba [Express API] \\u2500\\u2500Enqueue\\u2500\\u2500\\u25ba [Redis / BullMQ]\\n                                                       \\u2502\\n                                                  Worker Pull\\n                                                       \\u25bc\\n[MongoDB Atlas] \\u25c4\\u2500\\u2500Persist Result\\u2500\\u2500 [Linux Sandbox Runner (GCC/Python)]\\n```\\n\\n### Key Architectural Decisions & Trade-offs\\n1. **Asynchronous Queue over HTTP Blocking:** Judging untrusted code\\n   can take seconds. BullMQ worker execution ensures API endpoints\\n   respond in <50ms with a submission ticket.\\n2. **Linux Process Controls:** Sandboxed execution via process limits\\n   (RLIMIT_CPU, RLIMIT_AS) prevents denial of service while avoiding\\n   container spin-up overhead.\\n3. **Socratic Guardrails:** AI endpoints only inspect public sample\\n   cases to prevent test leakage.\"}], \"telemetry\": {\"version\": 1, \"origin\": \"fresh\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [{\"stage\": \"answer\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": null, \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"unknown\", \"input_tokens\": null, \"output_tokens\": null}, {\"stage\": \"tool_answer\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": null, \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"unknown\", \"input_tokens\": null, \"output_tokens\": null}], \"retrieval\": [{\"stage\": \"retrieval\", \"duration_ms\": 0.0, \"chunks\": [{\"id\": \"proj-entropy-oj-pitch\", \"score\": 1.0, \"rank\": 1, \"method\": \"fake\"}, {\"id\": \"proj-entropy-oj-stack\", \"score\": 0.5, \"rank\": 2, \"method\": \"fake\"}]}], \"stages_ms\": {\"preparing\": 0.0, \"rewrite\": 0.0, \"retrieval\": 0.0, \"answer\": 0.0, \"tools\": 0.0, \"tool_answer\": 0.0}, \"usage_complete\": false, \"input_tokens\": null, \"output_tokens\": null, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [
+        "proj-entropy-oj-pitch",
+        "proj-entropy-oj-stack"
+      ],
+      "retrieval_queries": [
+        "What is Entropy-OJ?"
+      ],
+      "evidence_by_requirement": {},
+      "checks": {
+        "must_include": [
+          "Aamir:",
+          "Entropy-OJ",
+          "BullMQ"
+        ],
+        "must_not_include": [
+          "Google employee"
+        ],
+        "max_chars": 1000,
+        "expect_refusal": null,
+        "expected_error": null,
+        "negative_rules": []
+      },
+      "usage": {
+        "source": "unavailable",
+        "prompt_tokens": null,
+        "completion_tokens": null
+      },
+      "adapter_complete_calls": 0,
+      "adapter_stream_calls": 2
+    },
+    {
+      "id": "chat-followup",
+      "transport": "chat_sse",
+      "origin": "fake",
+      "delivery": "fresh",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "followup-entropy-stack",
+        "version": 1,
+        "sha256": "19cf6aaf67d71dd0b5bb4a660b390e6c117b20799d842700858964ab0d3b8b3e"
+      },
+      "raw_sse": "event: sources\ndata: {\"sources\": [{\"chunk_id\": \"proj-entropy-oj-stack\", \"title\": \"Entropy Online Judge \\u2014 Technologies, Stack and Architecture\", \"type\": \"project\", \"source_section\": \"J4, J5 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}, {\"chunk_id\": \"proj-entropy-oj-design\", \"title\": \"Entropy Online Judge \\u2014 Design Decisions\", \"type\": \"project\", \"source_section\": \"J6 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}]}\n\nevent: token\ndata: {\"token\": \"Entropy-OJ uses Redis and BullMQ to decouple execution from HTTP requests.\"}\n\nevent: done\ndata: {\"conversation_id\": \"replay-chat-followup\", \"sources\": [{\"chunk_id\": \"proj-entropy-oj-stack\", \"title\": \"Entropy Online Judge \\u2014 Technologies, Stack and Architecture\", \"type\": \"project\", \"source_section\": \"J4, J5 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}, {\"chunk_id\": \"proj-entropy-oj-design\", \"title\": \"Entropy Online Judge \\u2014 Design Decisions\", \"type\": \"project\", \"source_section\": \"J6 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}], \"cards\": [], \"telemetry\": {\"version\": 1, \"origin\": \"fresh\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [{\"stage\": \"rewrite\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": \"fake-model\", \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"fake\", \"input_tokens\": 10, \"output_tokens\": 5}, {\"stage\": \"answer\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": null, \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"unknown\", \"input_tokens\": null, \"output_tokens\": null}], \"retrieval\": [{\"stage\": \"retrieval\", \"duration_ms\": 0.0, \"chunks\": [{\"id\": \"proj-entropy-oj-stack\", \"score\": 1.0, \"rank\": 1, \"method\": \"fake\"}, {\"id\": \"proj-entropy-oj-design\", \"score\": 0.5, \"rank\": 2, \"method\": \"fake\"}]}], \"stages_ms\": {\"preparing\": 0.0, \"rewrite\": 0.0, \"retrieval\": 0.0, \"answer\": 0.0}, \"usage_complete\": false, \"input_tokens\": null, \"output_tokens\": null, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [
+        "proj-entropy-oj-stack",
+        "proj-entropy-oj-design"
+      ],
+      "retrieval_queries": [
+        "Entropy-OJ Redis BullMQ queue design"
+      ],
+      "evidence_by_requirement": {},
+      "checks": {
+        "must_include": [
+          "Redis",
+          "BullMQ"
+        ],
+        "must_not_include": [],
+        "max_chars": 6000,
+        "expect_refusal": null,
+        "expected_error": null,
+        "negative_rules": []
+      },
+      "usage": {
+        "source": "unavailable",
+        "prompt_tokens": null,
+        "completion_tokens": null
+      },
+      "adapter_complete_calls": 1,
+      "adapter_stream_calls": 1
+    },
+    {
+      "id": "chat-refusal",
+      "transport": "chat_sse",
+      "origin": "fake",
+      "delivery": "fresh",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "persona-override",
+        "version": 1,
+        "sha256": "933178f40b16f0b1fd6211df2e52eba4b98010810c77bcf105dda52d660d7ccc"
+      },
+      "raw_sse": "event: token\ndata: {\"token\": \"I am Aamir's AI assistant. I can only answer questions related to Aamir's verified experience, projects, skills, and background.\"}\n\nevent: done\ndata: {\"conversation_id\": \"replay-chat-refusal\", \"sources\": [], \"cards\": [], \"telemetry\": {\"version\": 1, \"origin\": \"refused\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [], \"retrieval\": [], \"stages_ms\": {\"preparing\": 0.0}, \"usage_complete\": true, \"input_tokens\": 0, \"output_tokens\": 0, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [],
+      "retrieval_queries": [],
+      "evidence_by_requirement": {},
+      "checks": {
+        "must_include": [],
+        "must_not_include": [],
+        "max_chars": 6000,
+        "expect_refusal": true,
+        "expected_error": null,
+        "negative_rules": []
+      },
+      "usage": {
+        "source": "unavailable",
+        "prompt_tokens": null,
+        "completion_tokens": null
+      },
+      "adapter_complete_calls": 0,
+      "adapter_stream_calls": 0
+    },
+    {
+      "id": "chat-error",
+      "transport": "chat_sse",
+      "origin": "fake",
+      "delivery": "fresh",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "eval-07-entropy-oj-pitch",
+        "version": 1,
+        "sha256": "49de0cf2b8c0ff073360b38362007021f3b8a477bf68f27cee0e98913f254d7d"
+      },
+      "raw_sse": "event: sources\ndata: {\"sources\": [{\"chunk_id\": \"proj-entropy-oj-pitch\", \"title\": \"Entropy Online Judge \\u2014 Pitch and Problem\", \"type\": \"project\", \"source_section\": \"J1, J2 (Project A)\", \"source_url\": \"https://github.com/aamir-coding/entropy-oj\"}]}\n\nevent: error\ndata: {\"detail\": \"AI service is currently unavailable. Please try again shortly.\"}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [
+        "proj-entropy-oj-pitch"
+      ],
+      "retrieval_queries": [
+        "What is Entropy-OJ?"
+      ],
+      "evidence_by_requirement": {},
+      "checks": {
+        "must_include": [],
+        "must_not_include": [],
+        "max_chars": 6000,
+        "expect_refusal": null,
+        "expected_error": "chat_error",
+        "negative_rules": []
+      },
+      "usage": {
+        "source": "unavailable",
+        "prompt_tokens": null,
+        "completion_tokens": null
+      },
+      "adapter_complete_calls": 0,
+      "adapter_stream_calls": 1
+    },
+    {
+      "id": "fit-fresh",
+      "transport": "fit_sse",
+      "origin": "fake",
+      "delivery": "fresh",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "fit-cloud-negative",
+        "version": 1,
+        "sha256": "5b987d02da473e69bbb1da396ae893fbf40d85928c6e010b86ead6559a3df410"
+      },
+      "raw_sse": "event: progress\ndata: {\"step\": \"reading_jd\", \"message\": \"Reading job description and analyzing role scope...\", \"percent\": 10}\n\nevent: progress\ndata: {\"step\": \"extracting_requirements\", \"message\": \"Extracting core technical requirements...\", \"percent\": 25}\n\nevent: progress\ndata: {\"step\": \"retrieving_evidence\", \"message\": \"Cross-referencing 2 requirements with Aamir's verified facts...\", \"percent\": 50}\n\nevent: progress\ndata: {\"step\": \"evaluating_fit\", \"message\": \"Evaluating alignment, checking citations, and identifying gaps...\", \"percent\": 75}\n\nevent: progress\ndata: {\"step\": \"synthesizing\", \"message\": \"Formulating executive summary recommendations...\", \"percent\": 90}\n\nevent: complete\ndata: {\"role_title\": \"Replay test role\", \"jd_hash\": \"f83dce9e8f223073987409d7bf9780f68bf08855f95201bd085c566a6914fccc\", \"score\": {\"must_have_total\": 2, \"must_have_strong\": 1, \"must_have_partial\": 0, \"must_have_gap\": 1, \"nice_to_have_total\": 0, \"nice_to_have_strong\": 0, \"nice_to_have_partial\": 0, \"nice_to_have_gap\": 0, \"total_requirements\": 2, \"overall_fit\": \"Partial Match\", \"headline\": \"Covers 1 of 2 must-haves (0 partial, 1 gap)\"}, \"requirements\": [{\"requirement\": {\"id\": \"req-python\", \"text\": \"Python API development\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"strong\", \"evidence_chunk_ids\": [\"skill-programming-languages\"], \"explanation\": \"Recorded Python programming evidence.\", \"ramp_up\": null, \"downgraded\": false}, {\"requirement\": {\"id\": \"req-aws\", \"text\": \"Production AWS operations\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"gap\", \"evidence_chunk_ids\": [\"skill-not-claimed\"], \"explanation\": \"Hands-on AWS operations are not established.\", \"ramp_up\": \"Future learning plan only; not existing experience.\", \"downgraded\": false}], \"summary\": \"Aamir has documented Python programming experience. Hands-on AWS operations remain a gap. Discuss the requirements and evidence directly.\", \"cached\": false, \"telemetry\": {\"version\": 1, \"origin\": \"fresh\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [{\"stage\": \"extracting_requirements\", \"configured_model\": \"openai/gpt-oss-20b\", \"reported_model\": \"openai/gpt-oss-20b\", \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"fake\", \"input_tokens\": 10, \"output_tokens\": 5}, {\"stage\": \"evaluating_fit\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": \"openai/gpt-oss-120b\", \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"fake\", \"input_tokens\": 10, \"output_tokens\": 5}, {\"stage\": \"synthesizing\", \"configured_model\": \"openai/gpt-oss-120b\", \"reported_model\": \"openai/gpt-oss-120b\", \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"fake\", \"input_tokens\": 10, \"output_tokens\": 5}], \"retrieval\": [{\"stage\": \"retrieving_evidence\", \"duration_ms\": 0.0, \"chunks\": [{\"id\": \"skill-programming-languages\", \"score\": 1.0, \"rank\": 1, \"method\": \"fake\"}]}, {\"stage\": \"retrieving_evidence\", \"duration_ms\": 0.0, \"chunks\": [{\"id\": \"skill-not-claimed\", \"score\": 1.0, \"rank\": 1, \"method\": \"fake\"}, {\"id\": \"skill-ramp-up-narratives\", \"score\": 0.5, \"rank\": 2, \"method\": \"fake\"}]}], \"stages_ms\": {\"preparing\": 0.0, \"reading_jd\": 0.0, \"extracting_requirements\": 0.0, \"retrieving_evidence\": 0.0, \"evaluating_fit\": 0.0, \"synthesizing\": 0.0}, \"usage_complete\": true, \"input_tokens\": 30, \"output_tokens\": 15, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [],
+      "retrieval_queries": [
+        "Python API development",
+        "Production AWS operations"
+      ],
+      "evidence_by_requirement": {
+        "req-python": [
+          "skill-programming-languages"
+        ],
+        "req-aws": [
+          "skill-not-claimed",
+          "skill-ramp-up-narratives"
+        ]
+      },
+      "checks": {
+        "must_include": [
+          "Python",
+          "gap"
+        ],
+        "must_not_include": [
+          "Aamir has production AWS experience",
+          "actively studying for CKA"
+        ],
+        "max_chars": 6000,
+        "expect_refusal": null,
+        "expected_error": null,
+        "negative_rules": [
+          {
+            "requirement_contains": "AWS",
+            "negative_evidence_ids": [
+              "skill-not-claimed",
+              "skill-ramp-up-narratives"
+            ]
+          }
+        ]
+      },
+      "usage": {
+        "source": "fake",
+        "prompt_tokens": 30,
+        "completion_tokens": 15
+      },
+      "adapter_complete_calls": 3,
+      "adapter_stream_calls": 0
+    },
+    {
+      "id": "fit-cached",
+      "transport": "fit_sse",
+      "origin": "fake",
+      "delivery": "cached",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "fit-cloud-negative",
+        "version": 1,
+        "sha256": "5b987d02da473e69bbb1da396ae893fbf40d85928c6e010b86ead6559a3df410"
+      },
+      "raw_sse": "event: progress\ndata: {\"step\": \"cache_hit\", \"message\": \"Instant match found in verification cache.\", \"percent\": 100}\n\nevent: complete\ndata: {\"role_title\": \"Replay test role\", \"jd_hash\": \"f83dce9e8f223073987409d7bf9780f68bf08855f95201bd085c566a6914fccc\", \"score\": {\"must_have_total\": 2, \"must_have_strong\": 1, \"must_have_partial\": 0, \"must_have_gap\": 1, \"nice_to_have_total\": 0, \"nice_to_have_strong\": 0, \"nice_to_have_partial\": 0, \"nice_to_have_gap\": 0, \"total_requirements\": 2, \"overall_fit\": \"Partial Match\", \"headline\": \"Covers 1 of 2 must-haves (0 partial, 1 gap)\"}, \"requirements\": [{\"requirement\": {\"id\": \"req-python\", \"text\": \"Python API development\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"strong\", \"evidence_chunk_ids\": [\"skill-programming-languages\"], \"explanation\": \"Recorded Python programming evidence.\", \"ramp_up\": null, \"downgraded\": false}, {\"requirement\": {\"id\": \"req-aws\", \"text\": \"Production AWS operations\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"gap\", \"evidence_chunk_ids\": [\"skill-not-claimed\"], \"explanation\": \"Hands-on AWS operations are not established.\", \"ramp_up\": \"Future learning plan only; not existing experience.\", \"downgraded\": false}], \"summary\": \"Aamir has documented Python programming experience. Hands-on AWS operations remain a gap. Discuss the requirements and evidence directly.\", \"cached\": true, \"telemetry\": {\"version\": 1, \"origin\": \"cache\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [], \"retrieval\": [], \"stages_ms\": {\"preparing\": 0.0, \"cache_hit\": 0.0}, \"usage_complete\": true, \"input_tokens\": 0, \"output_tokens\": 0, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [],
+      "retrieval_queries": [
+        "Python API development",
+        "Production AWS operations"
+      ],
+      "evidence_by_requirement": {
+        "req-python": [
+          "skill-programming-languages"
+        ],
+        "req-aws": [
+          "skill-not-claimed",
+          "skill-ramp-up-narratives"
+        ]
+      },
+      "checks": {
+        "must_include": [
+          "Python",
+          "gap"
+        ],
+        "must_not_include": [
+          "Aamir has production AWS experience",
+          "actively studying for CKA"
+        ],
+        "max_chars": 6000,
+        "expect_refusal": null,
+        "expected_error": null,
+        "negative_rules": [
+          {
+            "requirement_contains": "AWS",
+            "negative_evidence_ids": [
+              "skill-not-claimed",
+              "skill-ramp-up-narratives"
+            ]
+          }
+        ]
+      },
+      "usage": {
+        "source": "fake",
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      },
+      "adapter_complete_calls": 0,
+      "adapter_stream_calls": 0
+    },
+    {
+      "id": "fit-preset",
+      "transport": "preset_json",
+      "origin": "curated",
+      "delivery": "preset",
+      "model": null,
+      "authorization_reference": null,
+      "case": null,
+      "raw_sse": "",
+      "preset_report": {
+        "role_title": "Full-Stack AI Engineer",
+        "jd_hash": "7e63e2ed760845469ee1b07276536a6c3f8270a71f2d45f957d95d34fc353d7c",
+        "score": {
+          "must_have_total": 5,
+          "must_have_strong": 2,
+          "must_have_partial": 3,
+          "must_have_gap": 0,
+          "nice_to_have_total": 2,
+          "nice_to_have_strong": 0,
+          "nice_to_have_partial": 0,
+          "nice_to_have_gap": 2,
+          "total_requirements": 7,
+          "overall_fit": "Partial Match",
+          "headline": "Covers 2 of 5 must-haves (3 partial), 0 of 2 nice-to-haves"
+        },
+        "requirements": [
+          {
+            "requirement": {
+              "id": "req-1",
+              "text": "Strong proficiency in Python and async web frameworks (FastAPI preferred)",
+              "importance": "must_have",
+              "type": "skill"
+            },
+            "verdict": "partial",
+            "evidence_chunk_ids": [
+              "skill-frameworks-libraries",
+              "proj-ai-assistant-architecture"
+            ],
+            "explanation": "Working FastAPI exposure; the portfolio documents Python, Pydantic and SSE.",
+            "ramp_up": "A proposed next step is a scoped exercise using official documentation, tests and a review of limitations.",
+            "downgraded": false
+          },
+          {
+            "requirement": {
+              "id": "req-2",
+              "text": "Hands-on experience developing single-page web applications with React, TypeScript, and modern CSS",
+              "importance": "must_have",
+              "type": "skill"
+            },
+            "verdict": "strong",
+            "evidence_chunk_ids": [
+              "proj-entropy-oj-stack"
+            ],
+            "explanation": "Entropy-OJ uses React 19, TypeScript and Vite for its responsive coding workspace.",
+            "ramp_up": null,
+            "downgraded": false
+          },
+          {
+            "requirement": {
+              "id": "req-3",
+              "text": "Demonstrated experience building RAG workflows, embedding generation, and semantic retrieval",
+              "importance": "must_have",
+              "type": "experience"
+            },
+            "verdict": "partial",
+            "evidence_chunk_ids": [
+              "proj-ai-assistant-design",
+              "skill-ai-llm-engineering"
+            ],
+            "explanation": "Hybrid retrieval is documented; RAG and embeddings proficiency is learning/working.",
+            "ramp_up": "A proposed next step is a scoped exercise using official documentation, tests and a review of limitations.",
+            "downgraded": false
+          },
+          {
+            "requirement": {
+              "id": "req-4",
+              "text": "Practical experience with function calling, structured LLM outputs, and streaming protocols (SSE / WebSockets)",
+              "importance": "must_have",
+              "type": "experience"
+            },
+            "verdict": "partial",
+            "evidence_chunk_ids": [
+              "proj-ai-assistant-architecture",
+              "skill-ai-llm-engineering"
+            ],
+            "explanation": "SSE and structured tool calling are documented; exact shipped tools require verification.",
+            "ramp_up": "A proposed next step is a scoped exercise using official documentation, tests and a review of limitations.",
+            "downgraded": false
+          },
+          {
+            "requirement": {
+              "id": "req-5",
+              "text": "Hands-on containerization experience with Docker",
+              "importance": "must_have",
+              "type": "skill"
+            },
+            "verdict": "strong",
+            "evidence_chunk_ids": [
+              "skill-cloud-devops-tools"
+            ],
+            "explanation": "Docker is used in Entropy-OJ worker deployment configuration.",
+            "ramp_up": null,
+            "downgraded": false
+          },
+          {
+            "requirement": {
+              "id": "req-6",
+              "text": "Experience building automated evaluation suites for LLM retrieval and response accuracy",
+              "importance": "nice_to_have",
+              "type": "skill"
+            },
+            "verdict": "gap",
+            "evidence_chunk_ids": [
+              "skill-ai-llm-engineering",
+              "proj-ai-assistant-status"
+            ],
+            "explanation": "Comprehensive LLM evaluation results are not established in the current facts.",
+            "ramp_up": "A proposed next step is a scoped exercise using official documentation, tests and a review of limitations.",
+            "downgraded": false
+          },
+          {
+            "requirement": {
+              "id": "req-7",
+              "text": "Familiarity with client-side accessibility (WCAG), keyboard navigation, and bundle size optimization",
+              "importance": "nice_to_have",
+              "type": "skill"
+            },
+            "verdict": "gap",
+            "evidence_chunk_ids": [],
+            "explanation": "Verified WCAG audit results and accessibility optimization experience are not established in the current facts.",
+            "ramp_up": "A proposed next step is a scoped exercise using official documentation, tests and a review of limitations.",
+            "downgraded": false
+          }
+        ],
+        "summary": "Aamir has documented React/TypeScript and Docker project experience, with working FastAPI exposure. RAG and tool-calling depth is described cautiously in the current facts. Evaluation and accessibility requirements need further verification.",
+        "cached": true
+      },
+      "retrieved_chat_ids": [],
+      "retrieval_queries": [],
+      "evidence_by_requirement": {},
+      "checks": {
+        "must_include": [],
+        "must_not_include": [],
+        "max_chars": 6000,
+        "expect_refusal": null,
+        "expected_error": null,
+        "negative_rules": []
+      },
+      "usage": {
+        "source": "unavailable",
+        "prompt_tokens": null,
+        "completion_tokens": null
+      },
+      "adapter_complete_calls": 0,
+      "adapter_stream_calls": 0
+    },
+    {
+      "id": "fit-extraction-error",
+      "transport": "fit_sse",
+      "origin": "fake",
+      "delivery": "fresh",
+      "model": "fake-model",
+      "authorization_reference": null,
+      "case": {
+        "id": "fit-cloud-negative",
+        "version": 1,
+        "sha256": "5b987d02da473e69bbb1da396ae893fbf40d85928c6e010b86ead6559a3df410"
+      },
+      "raw_sse": "event: progress\ndata: {\"step\": \"reading_jd\", \"message\": \"Reading job description and analyzing role scope...\", \"percent\": 10}\n\nevent: progress\ndata: {\"step\": \"extracting_requirements\", \"message\": \"Extracting core technical requirements...\", \"percent\": 25}\n\nevent: error\ndata: {\"code\": \"extraction_error\", \"message\": \"Could not extract valid job requirements. Please retry or clarify the job description.\", \"telemetry\": {\"version\": 1, \"origin\": \"fresh\", \"total_ms\": 0.0, \"first_text_ms\": null, \"calls\": [{\"stage\": \"extracting_requirements\", \"configured_model\": \"openai/gpt-oss-20b\", \"reported_model\": \"openai/gpt-oss-20b\", \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"fake\", \"input_tokens\": 10, \"output_tokens\": 5}, {\"stage\": \"extracting_requirements\", \"configured_model\": \"openai/gpt-oss-20b\", \"reported_model\": \"openai/gpt-oss-20b\", \"duration_ms\": 0.0, \"status\": \"complete\", \"usage_source\": \"fake\", \"input_tokens\": 10, \"output_tokens\": 5}], \"retrieval\": [], \"stages_ms\": {\"preparing\": 0.0, \"reading_jd\": 0.0, \"extracting_requirements\": 0.0}, \"usage_complete\": true, \"input_tokens\": 20, \"output_tokens\": 10, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "preset_report": null,
+      "retrieved_chat_ids": [],
+      "retrieval_queries": [],
+      "evidence_by_requirement": {},
+      "checks": {
+        "must_include": [],
+        "must_not_include": [],
+        "max_chars": 6000,
+        "expect_refusal": null,
+        "expected_error": "extraction_error",
+        "negative_rules": []
+      },
+      "usage": {
+        "source": "unavailable",
+        "prompt_tokens": null,
+        "completion_tokens": null
+      },
+      "adapter_complete_calls": 2,
+      "adapter_stream_calls": 0
+    }
+  ]
+}

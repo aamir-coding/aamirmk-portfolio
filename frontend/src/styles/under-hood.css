@@ -1,0 +1,9 @@
+.under-hood { margin-block: 1rem; border-top: 1px solid var(--border-strong); padding-top: .6rem; font-size: .8rem; }
+.under-hood summary { cursor: pointer; font-family: var(--font-mono, monospace); width: fit-content; }
+.under-hood summary:focus-visible { outline: 2px solid var(--accent-cobalt); outline-offset: 4px; }
+.under-hood p { max-width: 72ch; line-height: 1.6; }
+.under-hood dl { font-family: var(--font-mono, monospace); }
+.under-hood dt { font-weight: 600; margin-top: .6rem; }
+.under-hood dd { margin-left: 0; overflow-wrap: anywhere; }
+.under-hood ol { padding-left: 1.4rem; overflow-wrap: anywhere; }
+.under-hood li { margin-block: .4rem; }

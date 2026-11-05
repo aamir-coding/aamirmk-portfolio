@@ -6,6 +6,7 @@ anti-overclaiming enforcement, and summary generation with streaming progress up
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 from collections.abc import AsyncIterator
@@ -29,6 +30,13 @@ from app.llm import LLMClient, LLMError, Message
 from app.retrieval.models import RetrievedChunk
 from app.retrieval.retriever import Retriever
 from app.settings import Settings, get_settings
+from app.telemetry import (
+    ObservedLLM,
+    ObservedRetriever,
+    Trace,
+    active_trace,
+    provenance,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +55,10 @@ class FitPipeline:
         settings: Settings | None = None,
         cache: dict[str, FitReport] | None = None,
     ) -> None:
-        self._llm = llm
-        self._retriever = retriever
         self._settings = settings or get_settings()
+        self._llm = ObservedLLM(llm, main_model=self._settings.LLM_MODEL_MAIN)
+        self._retriever = ObservedRetriever(retriever)
+        self._curated_keys: set[str] = set()
         if cache is not None:
             self._cache = cache
         else:
@@ -58,8 +67,47 @@ class FitPipeline:
             self._cache = {
                 rep.jd_hash: rep for rep in GOLDEN_BENCHMARK_REPORTS.values()
             }
+            self._curated_keys = set(self._cache)
 
     async def run(self, request: FitRequest) -> AsyncIterator[dict[str, Any]]:
+        trace = Trace()
+        versions = await asyncio.to_thread(provenance)
+        iterator = self._run(request)
+        try:
+            while True:
+                # Heartbeat transport resumes each __anext__ in a separate task.
+                # Install/reset within that task, never across a yielded frame.
+                token = active_trace.set(trace)
+                try:
+                    frame = await anext(iterator)
+                except StopAsyncIteration:
+                    return
+                finally:
+                    active_trace.reset(token)
+                if frame["event"] == "progress":
+                    stage = frame["data"]["step"]
+                    if stage == "cache_hit":
+                        trace.origin = (
+                            "curated"
+                            if request.compute_hash() in self._curated_keys
+                            else "cache"
+                        )
+                    trace.set_stage(stage)
+                elif frame["event"] in {"complete", "error"}:
+                    if frame["event"] == "complete":
+                        trace.text()
+                    frame = {
+                        **frame,
+                        "data": {
+                            **frame["data"],
+                            "telemetry": {**trace.snapshot().model_dump(), **versions},
+                        },
+                    }
+                yield frame
+        finally:
+            await iterator.aclose()
+
+    async def _run(self, request: FitRequest) -> AsyncIterator[dict[str, Any]]:
         """Execute the 5-stage pipeline and yield SSE progress & completion frames."""
         jd_hash = request.compute_hash()
 
@@ -77,7 +125,7 @@ class FitPipeline:
             }
             yield {
                 "event": "complete",
-                "data": cached_report.model_dump(),
+                "data": cached_report.model_copy(update={"cached": True}).model_dump(),
             }
             return
 

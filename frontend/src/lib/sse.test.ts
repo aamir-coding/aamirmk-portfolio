@@ -264,6 +264,6 @@ describe("streamChat", () => {
       })
     );
     expect(onToken).toHaveBeenCalledWith("Overview");
-    expect(onDone).toHaveBeenCalledWith({ conversation_id: "conv-1" });
+    expect(onDone).toHaveBeenCalledWith(expect.objectContaining({ conversation_id: "conv-1", browserTiming: { total_ms: expect.any(Number), first_text_ms: expect.any(Number) } }));
   });
 });

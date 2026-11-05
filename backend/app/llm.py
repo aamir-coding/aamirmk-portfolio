@@ -56,6 +56,14 @@ class AssistantMessage:
     completion_tokens: int
     total_tokens: int
     tool_calls: list[ToolCall] = field(default_factory=list)
+    usage_reported: bool = True
+
+
+@dataclass(frozen=True, slots=True)
+class StreamUsage:
+    model: str
+    input_tokens: int
+    output_tokens: int
 
 
 # ── LLM errors ─────────────────────────────────────────────────────────
@@ -114,7 +122,7 @@ class LLMClient(Protocol):
         self,
         messages: list[Message],
         tools: list[dict[str, Any]] | None = None,
-    ) -> AsyncIterator[str | ToolCall]: ...
+    ) -> AsyncIterator[str | ToolCall | StreamUsage]: ...
 
 
 # ── Real adapter ───────────────────────────────────────────────────────
@@ -208,13 +216,14 @@ class GroqLLM:
             completion_tokens=usage.completion_tokens if usage else 0,
             total_tokens=usage.total_tokens if usage else 0,
             tool_calls=tool_calls,
+            usage_reported=usage is not None,
         )
 
     async def stream(
         self,
         messages: list[Message],
         tools: list[dict[str, Any]] | None = None,
-    ) -> AsyncIterator[str | ToolCall]:
+    ) -> AsyncIterator[str | ToolCall | StreamUsage]:
         """Stream assistant response tokens and tool calls from Groq."""
         kwargs: dict[str, Any] = {
             "model": self._model,
@@ -222,6 +231,8 @@ class GroqLLM:
             "temperature": 0.4,
             "max_completion_tokens": 1024,
             "stream": True,
+            # groq 1.7.0 exposes this API option through extra_body.
+            "extra_body": {"stream_options": {"include_usage": True}},
         }
         if tools:
             kwargs["tools"] = tools
@@ -236,6 +247,13 @@ class GroqLLM:
 
         try:
             async for chunk in response_stream:
+                usage = chunk.usage or (chunk.x_groq.usage if chunk.x_groq else None)
+                if usage is not None:
+                    yield StreamUsage(
+                        model=chunk.model,
+                        input_tokens=usage.prompt_tokens,
+                        output_tokens=usage.completion_tokens,
+                    )
                 if not chunk.choices:
                     continue
                 delta = chunk.choices[0].delta
@@ -276,6 +294,9 @@ class GroqLLM:
                     )
         except Exception as exc:
             self._map_error(exc)
+
+        finally:
+            await response_stream.close()
 
     def _map_error(self, exc: Exception) -> None:
         """Translate Groq SDK exceptions into our domain errors."""

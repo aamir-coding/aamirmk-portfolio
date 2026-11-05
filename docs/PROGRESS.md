@@ -411,3 +411,12 @@ compatible baseline regression gate, root CI evaluation/tests and gzip gate. Fre
 artifact tests: 5 passed. Single-command offline gate passed. Local retrieval: legacy Hit@3
 41/45, MRR@5 .8889; development Hit@3 31/34, MRR@5 .8897; replay 8/8. Held-out unexecuted.
 No new Groq calls, factual approval, deployment or remote push.
+
+### Phase 8 Increment 6 — implementation
+
+Request telemetry and collapsed Under the hood drawers implemented for chat and fit.
+Fresh focused checks: 7 telemetry tests passed (including mocked real SDK transport,
+cancellation, privacy and shared-pipeline concurrency); 58 existing chat/fit/LLM tests
+passed; 24 focused frontend receipt/SSE/contract tests passed. Missing stream usage stays
+unknown. New v2 endpoint fixtures preserve original replay and human calibration inputs.
+Full review/checks follow Increment 7; no live provider calls or publication occurred.

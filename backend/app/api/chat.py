@@ -43,6 +43,8 @@ from app.safety.rate_limiter import (
     RateLimitResult,
     check_rate_limit,
 )
+from app.settings import get_settings
+from app.telemetry import ObservedLLM, ObservedRetriever, Trace, provenance
 from app.tools.projects import ProjectCardData
 from app.tools.registry import ToolRegistry, get_tool_registry
 
@@ -125,6 +127,10 @@ async def chat(
 ) -> ChatResponse:
     """Process user message using LLM grounded with retrieved context chunks."""
     conv_id = request.conversation_id or uuid.uuid4().hex
+    trace = Trace()
+    llm = ObservedLLM(llm, trace, main_model=get_settings().LLM_MODEL_MAIN)
+    retriever = ObservedRetriever(retriever, trace)
+    versions = await asyncio.to_thread(provenance)
 
     # Attach rate limit visibility headers to successful response
     response.headers["X-RateLimit-Limit"] = str(rate_limit.limit)
@@ -134,7 +140,10 @@ async def chat(
     # 1. Guard against adversarial prompt injections (0 LLM token cost)
     injection_check = check_prompt_injection(request.message)
     if not injection_check.is_safe:
+        trace.origin = "refused"
+        trace.text()
         return ChatResponse(
+            telemetry=trace.snapshot().model_copy(update=versions),
             reply=SAFE_REFUSAL_MESSAGE,
             conversation_id=conv_id,
             model="guardrails",
@@ -148,6 +157,7 @@ async def chat(
         )
 
     # 2. Rewrite follow-up query if conversation history is present
+    trace.set_stage("rewrite")
     search_query = await rewrite_follow_up_query(
         request.message,
         request.history,
@@ -155,6 +165,7 @@ async def chat(
     )
 
     # 3. Retrieve relevant factual context chunks & generate receipts
+    trace.set_stage("retrieval")
     retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(retrieved_chunks)
@@ -182,6 +193,7 @@ async def chat(
     summoned_cards: list[ProjectCardData] = []
 
     try:
+        trace.set_stage("answer")
         completion = await llm.complete(messages, tools=tool_schemas)
 
         # If LLM requested tool calls, execute them and run turn 2 for text reply
@@ -213,6 +225,7 @@ async def chat(
                 )
 
             # Turn 2: verbal explanation grounded in tool output
+            trace.set_stage("tool_answer")
             second_completion = await llm.complete(messages)
             reply_text = second_completion.content
             total_tokens = completion.total_tokens + second_completion.total_tokens
@@ -254,7 +267,9 @@ async def chat(
     # 4. Track actual consumed tokens against daily quota
     await quota_guard.record_usage(tokens=total_tokens)
 
+    trace.text()
     return ChatResponse(
+        telemetry=trace.snapshot().model_copy(update=versions),
         reply=reply_text,
         conversation_id=conv_id,
         model=completion.model,
@@ -284,6 +299,10 @@ async def chat_stream(
 ) -> StreamingResponse:
     """Stream user message using LLM via Server-Sent Events (SSE)."""
     conv_id = request.conversation_id or uuid.uuid4().hex
+    trace = Trace()
+    llm = ObservedLLM(llm, trace, main_model=get_settings().LLM_MODEL_MAIN)
+    retriever = ObservedRetriever(retriever, trace)
+    versions = await asyncio.to_thread(provenance)
 
     headers = {
         "Cache-Control": "no-cache, no-transform",
@@ -299,10 +318,17 @@ async def chat_stream(
     if not injection_check.is_safe:
 
         async def refusal_generator() -> AsyncIterator[str]:
+            trace.origin = "refused"
+            trace.text()
             payload = json.dumps({"token": SAFE_REFUSAL_MESSAGE})
             yield f"event: token\ndata: {payload}\n\n"
             done_payload = json.dumps(
-                {"conversation_id": conv_id, "sources": [], "cards": []}
+                {
+                    "conversation_id": conv_id,
+                    "sources": [],
+                    "cards": [],
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
+                }
             )
             yield f"event: done\ndata: {done_payload}\n\n"
 
@@ -313,6 +339,7 @@ async def chat_stream(
         )
 
     # 2. Rewrite follow-up query if conversation history is present
+    trace.set_stage("rewrite")
     search_query = await rewrite_follow_up_query(
         request.message,
         request.history,
@@ -320,6 +347,7 @@ async def chat_stream(
     )
 
     # 3. Retrieve relevant factual context chunks & generate receipts
+    trace.set_stage("retrieval")
     retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(retrieved_chunks)
@@ -349,6 +377,7 @@ async def chat_stream(
         tokens_emitted = 0
         summoned_cards: list[ProjectCardData] = []
         try:
+            trace.set_stage("answer")
             # Emit verified source receipts before stream begins
             if citations:
                 sources_payload = json.dumps(
@@ -367,12 +396,14 @@ async def chat_stream(
                 if isinstance(item, ToolCall):
                     detected_tool_calls.append(item)
                 else:
+                    trace.text()
                     tokens_emitted += 1
                     payload = json.dumps({"token": item})
                     yield f"event: token\ndata: {payload}\n\n"
 
             # If tool calls were made, resolve them and stream Turn 2 explanation
             if detected_tool_calls:
+                trace.set_stage("tools")
                 messages.append(
                     Message(
                         role="assistant",
@@ -401,12 +432,14 @@ async def chat_stream(
                         )
                     )
 
+                trace.set_stage("tool_answer")
                 # Turn 2: stream verbal explanation
                 async for token in stream_with_heartbeat(llm.stream(messages)):
                     if token is StreamHeartbeat.PING:
                         yield ": heartbeat\n\n"
                         continue
                     if isinstance(token, str):
+                        trace.text()
                         tokens_emitted += 1
                         payload = json.dumps({"token": token})
                         yield f"event: token\ndata: {payload}\n\n"
@@ -416,6 +449,7 @@ async def chat_stream(
                     "conversation_id": conv_id,
                     "sources": [c.model_dump() for c in citations],
                     "cards": [c.model_dump() for c in summoned_cards],
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
                 }
             )
             yield f"event: done\ndata: {done_payload}\n\n"
@@ -430,6 +464,12 @@ async def chat_stream(
             err_payload = json.dumps(
                 {"detail": "Rate limit reached. Please try again in a few moments."}
             )
+            err_payload = json.dumps(
+                {
+                    **json.loads(err_payload),
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
+                }
+            )
             yield f"event: error\ndata: {err_payload}\n\n"
         except LLMAuthError as exc:
             logger.error("[%s] Groq auth error during stream: %s", conv_id, exc)
@@ -439,6 +479,12 @@ async def chat_stream(
                     "Please check server configuration."
                 }
             )
+            err_payload = json.dumps(
+                {
+                    **json.loads(err_payload),
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
+                }
+            )
             yield f"event: error\ndata: {err_payload}\n\n"
         except (LLMUnavailableError, LLMError) as exc:
             logger.error("[%s] LLM error during stream: %s", conv_id, exc)
@@ -446,6 +492,12 @@ async def chat_stream(
                 {
                     "detail": "AI service is currently unavailable. "
                     "Please try again shortly."
+                }
+            )
+            err_payload = json.dumps(
+                {
+                    **json.loads(err_payload),
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
                 }
             )
             yield f"event: error\ndata: {err_payload}\n\n"

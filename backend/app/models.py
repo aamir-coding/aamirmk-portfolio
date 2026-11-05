@@ -6,6 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.telemetry import RequestTelemetry
 from app.tools.projects import ProjectCardData
 
 
@@ -86,6 +87,8 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     """Outbound chat response payload returned to client."""
+
+    telemetry: RequestTelemetry | None = None
 
     reply: str = Field(..., description="Assistant response text")
     conversation_id: str = Field(..., description="Conversation identifier")

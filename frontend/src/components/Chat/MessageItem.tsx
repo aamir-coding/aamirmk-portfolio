@@ -1,3 +1,4 @@
+import { UnderHood } from "./UnderHood";
 import React, { useState, useCallback } from "react";
 import type { ChatMessage, ProjectCardData } from "../../lib/types";
 import { SourceChips } from "./SourceChips";
@@ -118,6 +119,7 @@ export const MessageItem = React.memo(function MessageItem({
         {!isUser && message.sources && message.sources.length > 0 && (
           <SourceChips sources={message.sources} />
         )}
+        {!isUser && message.status !== "streaming" ? <UnderHood telemetry={message.telemetry} browserTiming={message.browserTiming} delivery={message.delivery} /> : null}
       </div>
 
       {!isUser && (

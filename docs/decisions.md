@@ -667,3 +667,20 @@ preserves all critical replay checks and existing retrieval thresholds; a drop e
 two percentage points fails. Changed fingerprint sets require explicit reviewed baseline
 replacement, never automatic approval. CI runs root tests and the offline command, archives
 its result, and enforces an initial-JS 200,000-byte gzip budget. Live scheduling stays off.
+
+## DRN-052: Request-local observation without production quota claims
+
+Phase 8 receipts measure server timings with a monotonic clock and separately report
+browser timings. The LLM observer collects completion usage and consumes typed terminal
+stream usage from the pinned Groq SDK (`extra_body.stream_options.include_usage`). Missing
+counts, cancellations and provider failures remain unknown; partial individual calls stay
+visible. Shared fit pipelines use a ContextVar installed/reset within each `__anext__`
+invocation so heartbeat tasks and concurrent requests cannot share traces. Chat observers
+receive their trace explicitly. Receipts contain no prompts, arguments, recruiter text or
+private/unindexed source details. Fresh, cached, curated, refused and browser instant paths
+are distinguished. Historical cached FitReports are copied with cached=True on delivery;
+telemetry is added only to the event and is never stored in the report cache. This does
+not fix production-wide quota reservations, SDK HTTP-attempt accounting or durable logs.
+Original endpoint-v1/human packets are untouched; separate v2 fake-backed captures exercise
+new telemetry through real frontend Zod/SSE contracts. Native details/summary provides the
+collapsed keyboard disclosure in the existing dossier style.

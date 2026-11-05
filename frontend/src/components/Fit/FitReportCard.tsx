@@ -1,3 +1,4 @@
+import { UnderHood } from "../Chat/UnderHood";
 import type { FitReport, JudgedRequirement, SampleJobDescription } from "../../lib/types";
 
 export interface FitReportCardProps {
@@ -201,6 +202,7 @@ export function FitReportCard({
         )}
       </section>
 
+      <UnderHood telemetry={report.telemetry} browserTiming={report.browserTiming} delivery={activePreset?.report ? "curated" : undefined} />
       <footer className="fit-report-footer">
         {onReset && (
           <button type="button" className="btn btn-secondary" onClick={onReset}>

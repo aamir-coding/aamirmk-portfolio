@@ -1,6 +1,12 @@
 /**
  * Core TypeScript domain models for the AI Digital Assistant Portfolio.
  */
+import type { RequestTelemetry } from "./contracts";
+
+export interface BrowserTiming {
+  total_ms: number;
+  first_text_ms: number | null;
+}
 
 export interface SourceCitation {
   chunk_id: string;
@@ -39,6 +45,9 @@ export interface ChatMessage {
   timestamp: string;
   sources?: SourceCitation[];
   cards?: ProjectCardData[];
+  telemetry?: RequestTelemetry;
+  browserTiming?: BrowserTiming;
+  delivery?: "instant" | "cancelled";
 }
 
 export interface ChatHistoryMessage {
@@ -85,6 +94,8 @@ export interface FitReport {
   requirements: JudgedRequirement[];
   summary: string;
   cached?: boolean;
+  telemetry?: RequestTelemetry;
+  browserTiming?: BrowserTiming;
 }
 
 export interface FitProgressData {

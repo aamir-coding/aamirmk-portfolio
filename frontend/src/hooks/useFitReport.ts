@@ -88,7 +88,7 @@ export function useFitReport(): UseFitReportReturn {
       setActivePreset(preset);
 
       if (preset.report) {
-        setReport(preset.report);
+        setReport({ ...preset.report, telemetry: undefined });
         setStatus("completed");
       }
     },
@@ -126,14 +126,17 @@ export function useFitReport(): UseFitReportReturn {
           signal: controller.signal,
           callbacks: {
             onProgress: (p) => {
+              if (controller.signal.aborted) return;
               setProgress(p);
             },
             onComplete: (rep) => {
+              if (controller.signal.aborted) return;
               setReport(rep);
               setStatus("completed");
               setProgress(null);
             },
             onError: (err) => {
+              if (controller.signal.aborted) return;
               setError(err || "An error occurred during fit evaluation.");
               setStatus("error");
               setProgress(null);
@@ -150,7 +153,7 @@ export function useFitReport(): UseFitReportReturn {
         setStatus("error");
         setProgress(null);
       } finally {
-        abortControllerRef.current = null;
+        if (abortControllerRef.current === controller) abortControllerRef.current = null;
       }
     },
     []

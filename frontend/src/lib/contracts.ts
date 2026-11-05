@@ -7,6 +7,34 @@
 
 import { z } from "zod";
 
+const Milliseconds = z.number().nonnegative().finite();
+const Tokens = z.number().int().nonnegative().nullable();
+export const RequestTelemetrySchema = z.object({
+  version: z.literal(1),
+  origin: z.enum(["fresh", "cache", "curated", "refused", "instant"]),
+  total_ms: Milliseconds,
+  first_text_ms: Milliseconds.nullable(),
+  calls: z.array(z.object({
+    stage: z.string(), configured_model: z.string().nullable(),
+    reported_model: z.string().nullable(), duration_ms: Milliseconds,
+    status: z.enum(["running", "complete", "failed", "cancelled"]),
+    usage_source: z.enum(["reported", "fake", "unknown"]),
+    input_tokens: Tokens, output_tokens: Tokens,
+  })),
+  retrieval: z.array(z.object({
+    stage: z.string(), duration_ms: Milliseconds,
+    chunks: z.array(z.object({
+      id: z.string(), score: z.number().finite(), rank: z.number().int().positive(),
+      method: z.string(),
+    })),
+  })),
+  stages_ms: z.record(z.string(), Milliseconds),
+  usage_complete: z.boolean(), input_tokens: Tokens, output_tokens: Tokens,
+  prompt_sha256: z.string().nullable(), index_sha256: z.string().nullable(),
+  index_built_at: z.string().nullable(),
+});
+export type RequestTelemetry = z.infer<typeof RequestTelemetrySchema>;
+
 export const SourceCitationSchema = z.object({
   chunk_id: z.string().min(1),
   title: z.string().min(1),
@@ -57,10 +85,12 @@ export const DoneEventPayloadSchema = z.object({
   conversation_id: z.string().min(1),
   sources: z.array(SourceCitationSchema).optional(),
   cards: z.array(ProjectCardDataSchema).optional(),
+  telemetry: RequestTelemetrySchema.optional(),
 });
 
 export const ErrorEventPayloadSchema = z.object({
   detail: z.string().min(1),
+  telemetry: RequestTelemetrySchema.optional(),
 });
 
 // ── Phase 6 Fit Report Schemas ──────────────────────────────────────────
@@ -102,6 +132,7 @@ export const FitReportSchema = z.object({
   requirements: z.array(JudgedRequirementSchema),
   summary: z.string().min(1),
   cached: z.boolean().optional(),
+  telemetry: RequestTelemetrySchema.optional(),
 });
 
 export const FitProgressDataSchema = z.object({

@@ -1,3 +1,4 @@
+import type { RequestTelemetry } from "../lib/contracts";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { streamChat } from "../lib/sse";
 import type {
@@ -114,7 +115,7 @@ export function useChat(): UseChatReturn {
     setIsStreaming(false);
     setMessages((prev) => {
       const updated = prev.map((msg) =>
-        msg.status === "streaming" ? { ...msg, status: "done" as const } : msg
+        msg.status === "streaming" ? { ...msg, status: "done" as const, delivery: "cancelled" as const } : msg
       );
       savePersistedChat(updated, conversationId);
       return updated;
@@ -143,6 +144,7 @@ export function useChat(): UseChatReturn {
         id: assistantMessageId,
         role: "assistant",
         content: answer.reply,
+        delivery: "instant",
         status: "done",
         timestamp,
         sources: answer.sources || [],
@@ -208,6 +210,7 @@ export function useChat(): UseChatReturn {
         signal: controller.signal,
         callbacks: {
           onSources: (sources: SourceCitation[]) => {
+            if (controller.signal.aborted) return;
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId ? { ...msg, sources } : msg
@@ -215,6 +218,7 @@ export function useChat(): UseChatReturn {
             );
           },
           onCard: (card: ProjectCardData) => {
+            if (controller.signal.aborted) return;
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -224,6 +228,7 @@ export function useChat(): UseChatReturn {
             );
           },
           onToken: (token: string) => {
+            if (controller.signal.aborted) return;
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
@@ -233,6 +238,7 @@ export function useChat(): UseChatReturn {
             );
           },
           onDone: (data) => {
+            if (controller.signal.aborted) return;
             let activeConvId = conversationId;
             if (data.conversation_id) {
               setConversationId(data.conversation_id);
@@ -244,6 +250,8 @@ export function useChat(): UseChatReturn {
                   ? {
                       ...msg,
                       status: "done" as const,
+                      telemetry: data.telemetry,
+                      browserTiming: data.browserTiming,
                       sources:
                         msg.sources && msg.sources.length > 0
                           ? msg.sources
@@ -261,7 +269,8 @@ export function useChat(): UseChatReturn {
             setIsStreaming(false);
             abortControllerRef.current = null;
           },
-          onError: (errMsg: string) => {
+          onError: (errMsg: string, telemetry?: RequestTelemetry) => {
+            if (controller.signal.aborted) return;
             setError(errMsg);
             setMessages((prev) => {
               const updated = prev.map((msg) =>
@@ -269,6 +278,7 @@ export function useChat(): UseChatReturn {
                   ? {
                       ...msg,
                       status: "error" as const,
+                      telemetry,
                       content:
                         msg.content ||
                         errMsg ||
