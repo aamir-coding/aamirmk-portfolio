@@ -893,6 +893,82 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
         for r in provider.requests
     )
     assert all(a["finish_reason"] == "stop" for a in report["attempts"])
+    from evals.calibration import effective_judge_prompt_sha256
+
+    assert report["effective_prompt_sha256"] == effective_judge_prompt_sha256()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("failure_kind", ["contract", "transient", "auth"])
+async def test_explicit_judge_recovery_preserves_budget_and_attempts(
+    monkeypatch: pytest.MonkeyPatch, failure_kind: str
+) -> None:
+    import httpx
+    from groq import APIStatusError
+
+    import evals.live as live
+    from evals.calibration import JudgeConfiguration
+
+    inject_clock(monkeypatch)
+    good = json.dumps(
+        {
+            "labels": {
+                k: "pass" for k in ("support", "completeness", "behavior", "tone")
+            },
+            "rationale": "TEST ONLY fake reasons.",
+        }
+    )
+
+    class Recovering(ScriptProvider):
+        async def complete(self, request: ProviderRequest) -> ProviderReply:
+            if failure_kind != "contract" and self.calls < 2:
+                await Provider.complete(self, request)
+                raise APIStatusError(
+                    "secret-bearing message",
+                    response=httpx.Response(
+                        401 if failure_kind == "auth" else 400,
+                        request=httpx.Request("POST", "https://example.invalid"),
+                    ),
+                    body={"error": {"code": "json_validate_failed"}},
+                )
+            return await super().complete(request)
+
+    provider = Recovering(["bad JSON"] * 2 + [good] * 20)
+    limits = {
+        "max_attempts": 24,
+        "input_tokens": 135424,
+        "output_tokens": 24576,
+        "per_call_input": 6976,
+        "per_call_output": 1024,
+    }
+    proposal = LivePlan(
+        run_id="test-recovery",
+        stage="judge_calibration",
+        budget=budget(
+            models={"openai/gpt-oss-20b": limits},
+            input_reservation="request_bound",
+            visitor_tpm=0,
+            deadline_seconds=2700,
+        ),
+        source={"dirty": False},
+        inputs_sha256="TEST ONLY",
+        judge_configuration=JudgeConfiguration(max_completion_tokens=1024),
+        judge_recovery_attempts=4,
+    )
+    result = await live.run_jobs(proposal, provider)
+    assert result["status"] == ("stopped" if failure_kind == "auth" else "complete")
+    assert provider.calls == (1 if failure_kind == "auth" else 22)
+    assert len(result["reviews"]) == (0 if failure_kind == "auth" else 20)
+    assert len(result["recoveries"]) == (0 if failure_kind == "auth" else 2)
+    assert sum(x["reserved_input"] for x in result["attempts"]) <= 135424
+    assert sum(x["reserved_output"] for x in result["attempts"]) <= 24576
+    assert "secret-bearing" not in json.dumps(result)
+    if failure_kind == "transient":
+        assert all(
+            x["usage"] is None and x["status"] == "unknown"
+            for x in result["attempts"][:2]
+        )
+        assert all(x["reserved_input"] > 0 for x in result["attempts"][:2])
 
 
 @pytest.mark.asyncio
@@ -1245,7 +1321,7 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
     from groq import AsyncGroq
 
     from evals.calibration import load_packet
-    from evals.live import GroqProvider, judge_messages
+    from evals.live import GroqProvider, judge_messages, judge_response_format
 
     messages = judge_messages(load_packet(), "calibration-20") if item20 else []
 
@@ -1259,7 +1335,11 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
         assert body["stream"] is False
         assert body["reasoning_effort"] == "low"
         if item20:
-            assert body["response_format"] == {"type": "json_object"}
+            assert body["response_format"] == judge_response_format()
+            schema = body["response_format"]["json_schema"]
+            assert schema["strict"] is True
+            assert schema["schema"]["required"] == ["labels", "rationale"]
+            assert schema["schema"]["additionalProperties"] is False
             assert body["model"] == "openai/gpt-oss-20b"
             assert "reasoning_format" not in body and "tools" not in body
             item = next(i for i in load_packet().items if i.id == "calibration-20")
@@ -1322,7 +1402,7 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
                 await llm.complete(
                     messages,
                     model="openai/gpt-oss-20b" if item20 else None,
-                    response_format={"type": "json_object"} if item20 else None,
+                    response_format=judge_response_format() if item20 else None,
                 )
             assert llm.attempts[0].usage is None
         else:
@@ -1330,7 +1410,7 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
                 await llm.complete(
                     messages,
                     model="openai/gpt-oss-20b" if item20 else None,
-                    response_format={"type": "json_object"} if item20 else None,
+                    response_format=judge_response_format() if item20 else None,
                 )
             ).content == "ok"
     assert calls == 1

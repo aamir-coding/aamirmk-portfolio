@@ -1,0 +1,65 @@
+{
+  "kind": "partial_calibration_run",
+  "run_id": "calibration-2026-11-05-v4",
+  "status": "stopped",
+  "stop_reason": "provider_consumption_unknown",
+  "attempts": 5,
+  "accepted_grades": 4,
+  "reported_input_tokens": 2972,
+  "reported_completion_tokens": 885,
+  "reported_total_tokens": 3857,
+  "unknown_reserved_tokens": 8000,
+  "provider_error": {
+    "exception_type": "BadRequestError",
+    "status_code": 400,
+    "code": "json_validate_failed"
+  },
+  "result_sha256": "78b8c0aee1503bcb03989d16ddb9ab5384ba526a9ff0870d3a2f927c25a802ec",
+  "ledger_sha256": "917d5ddc10e44e5dfdf6ed1b35200dc786f1850692fa4f3fad8fdd9872d99ee7",
+  "source_commit": "1e470bbca018cb0ff3f389b25dbc1ae4c89b8130",
+  "calibration_diagnostic_only": {
+    "support": {
+      "matches": 4,
+      "observed_denominator": 4,
+      "intended_denominator": 20,
+      "missing": 16,
+      "confusion": {
+        "pass/pass": 3,
+        "fail/fail": 1
+      }
+    },
+    "completeness": {
+      "matches": 4,
+      "observed_denominator": 4,
+      "intended_denominator": 20,
+      "missing": 16,
+      "confusion": {
+        "pass/pass": 3,
+        "fail/fail": 1
+      }
+    },
+    "behavior": {
+      "matches": 4,
+      "observed_denominator": 4,
+      "intended_denominator": 20,
+      "missing": 16,
+      "confusion": {
+        "pass/pass": 3,
+        "fail/fail": 1
+      }
+    },
+    "tone": {
+      "matches": 4,
+      "observed_denominator": 4,
+      "intended_denominator": 20,
+      "missing": 16,
+      "confusion": {
+        "pass/pass": 3,
+        "fail/fail": 1
+      }
+    }
+  },
+  "calibrated": false,
+  "generation_accuracy_available": false,
+  "limitation": "Stopped after4grades/5attempts on HTTP400 json_validate_failed. Output validation failed; the failed-generation body was deliberately not captured, and the precise malformed output is unknown. No retry/validation/held-out call. Unknown consumption retainsfull8000reservation; partial grades are not a completed judge result."
+}

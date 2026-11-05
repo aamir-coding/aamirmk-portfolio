@@ -1,0 +1,15 @@
+{
+  "purpose": "explicit_reported_with_unknown_reservations",
+  "run_id": "calibration-2026-11-05-v4",
+  "receipt_sha256": "e4afd02e9042fbbe5714fd8cbd2bc117dbf55b0ab32260ad3b0c1614826ec267",
+  "result_sha256": "78b8c0aee1503bcb03989d16ddb9ab5384ba526a9ff0870d3a2f927c25a802ec",
+  "ledger_sha256": "917d5ddc10e44e5dfdf6ed1b35200dc786f1850692fa4f3fad8fdd9872d99ee7",
+  "actor": "Aamir authorization; Codex verified accounting",
+  "reference": "Explicit v4 actual-use reconciliation; reported actual plus full unknown reservation, no new live approval",
+  "created_at": "2026-11-05T08:39:43.233610Z",
+  "process_exit_verified": true,
+  "charged_requests": 5,
+  "charged_reserved_tokens": 40000,
+  "reported_tokens": 3857,
+  "unreported_reserved_tokens": 8000
+}

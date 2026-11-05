@@ -3,6 +3,27 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-048: User-authorized bounded recovery to collect all twenty answers
+
+**Date:** 2026-11-05
+**Authorization:** Aamir explicitly directed continuing through failures without returning after each one, until all twenty calibration answers are collected. This supersedes the earlier stop-and-request-approval recovery workflow, not the daily quota ceiling, output cap or evidence/provenance rules.
+**Choice:** Use strict response schema and versioned v4-strict criteria. Add opt-in `judge_recovery_attempts` (default zero, maximum four) and `request_bound` input reservations (default remains full cap). Reserve the unchanged conservative byte-plus-overhead bound for each exact request, enforce its 6,976 maximum, and compare actual usage with that reservation. No reservation is refunded. Retain the same attempt ledger, deadline and quota counters on recovery; journal each failed attempt, preserve unknown usage/full request reservation and require a rolling minute after client completion. Retry only JSON validation, typed contract failure, 429, 5xx or network/timeout errors. Authentication, missing usage, reservation overruns and exhausted budgets do not auto-retry. Production paths are unchanged.
+**Bound:** Complete twenty-item base input bound totals 91,243. Four worst-case recoveries add 27,904; required input 119,147. Approved continuation plan reserves 135,424 input + 24,576 output = **160,000** across maximum 24 attempts to obtain twenty grades. Prior daily charge remains 37,808 including both unknown calls' full 15,512. Total conservative daily ceiling remains **197,808 / 53 attempts**, zero visitors. Preflight reserves the complete slice plus all recovery slots; SDK retries remain disabled. This is bounded execution under the continuation instruction, not unbounded spending or permission for validation calls. New hard window is anchored to the continuation at 15:52:18 IST, expires 16:37:18 IST.
+
+---
+
+### DRN-047: Strict schema after a recorded JSON-mode validation failure
+
+**Date:** 2026-11-05
+**Outcome:** V4/JSON-object run `calibration-2026-11-05-v4` at clean `1e470bb` stopped on attempt five with `BadRequestError`, HTTP 400, `json_validate_failed`. Four valid grades match all human axes; sixteen answers are missing. Known usage: 2,972 input + 885 completion = 3,857. Final usage unknown; full 8,000 reservation retained. No retry, continuation, validation or complete judge artifact. The code identifies output validation failure, not the exact malformed output or the older lost 400's cause.
+**Choice:** Preserve used v4 prompt/receipt/result/progress unchanged. Prepare separate `judge-v4-strict.txt` with the same user criteria and explicit support/completeness. Use documented `json_schema`/`strict:true`, derived from typed `JudgePayload`/`Labels`, not JSON-object mode. Remove schema titles/string constraints outside the provider subset; local validation retains nonblank rationale. Full inputs/maps and human grades stay unchanged. This is offline preparation, not a new live approval.
+**Provenance:** Effective judging fingerprint binds instructions **and actual response schema**. Runner snapshots/sends/hashes the same pair. Prior reuse rejects schema changes even if prefix/settings stay unchanged. Regression tests reproduced both missing schema invalidation and mismatched emitted fingerprints, then verified fixes. Earlier configurations are not mixed into strict results.
+**Budget:** V4 reconciliation charges 3,857 known + full 8,000 unknown = 11,857. Across all four runs: 29 attempts, 22,296 known and two unknown requests retaining 15,512. Prior daily charge 37,808; separately approved twenty-call strict run could reserve 160,000 for **197,808 daily tokens / 49 attempts**, zero visitors. Strict full input bound 6,953 <= 6,976 includes schema; per-call reservation remains 8,000. Another run requires new exact-plan/budget approval/window and confirmed capacity; the stopped approval is not reused. Strict structure does not certify semantic agreement or guarantee provider success.
+
+Official basis: [Groq strict structured outputs](https://console.groq.com/docs/structured-outputs), installed SDK 1.7.0 and offline MockTransport checks.
+
+---
+
 ### DRN-046: Explicit v4 judging and actual-known accounting with unknown reservations
 
 **Date:** 2026-11-05

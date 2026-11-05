@@ -6,7 +6,7 @@ import argparse
 import sys
 from collections import Counter
 from pathlib import Path
-from typing import Literal, Self
+from typing import Any, Literal, Self
 
 backend_dir = str(Path(__file__).resolve().parents[1] / "backend")
 if backend_dir not in sys.path:
@@ -33,7 +33,7 @@ AXES = ("support", "completeness", "behavior", "tone")
 DEFAULT_PACKET = DEFAULT_ROOT / "annotations/packet-v1.json"
 RUBRIC = DEFAULT_ROOT / "rubrics/support-v1.md"
 JUDGE_PROMPT = DEFAULT_ROOT / "rubrics/judge-v1.txt"
-JUDGE_RUNTIME_PROMPT = DEFAULT_ROOT / "rubrics/judge-v4.txt"
+JUDGE_RUNTIME_PROMPT = DEFAULT_ROOT / "rubrics/judge-v4-strict.txt"
 
 
 def text_sha(path: Path) -> str:
@@ -41,22 +41,20 @@ def text_sha(path: Path) -> str:
 
 
 def judge_system_prompt() -> str:
-    rubric = RUBRIC.read_text(encoding="utf-8")
-    definitions = []
-    # Runtime v4 defines behavior/tone explicitly; keep the other frozen rubric
-    # definitions verbatim without duplicating those runtime instructions.
-    for axis in ("support", "completeness"):
-        paragraph = rubric.split(f"- **{axis}**:", 1)[1].split("\n- **", 1)[0]
-        sentence = " ".join(paragraph.split()).split(". ", 1)[0]
-        definitions.append(f"{axis}: {sentence}.")
-    # Keep the frozen authoring template intact. This independently versioned
-    # runtime prefix retains its constraints and an explicit output shape.
-    prefix = " ".join(JUDGE_RUNTIME_PROMPT.read_text(encoding="utf-8").split())
-    return prefix + "\n\n" + "\n".join(definitions)
+    # The separately versioned strict prefix defines every axis; output shape is
+    # supplied by the actual response schema rather than a copied JSON example.
+    return " ".join(JUDGE_RUNTIME_PROMPT.read_text(encoding="utf-8").split())
 
 
 def effective_judge_prompt_sha256() -> str:
-    return canonical_sha256(judge_system_prompt())
+    # The schema is part of the judging instructions and must match between
+    # calibration and validation, even if the prefix text is unchanged.
+    return canonical_sha256(
+        {
+            "instructions": judge_system_prompt(),
+            "response_format": judge_response_format(),
+        }
+    )
 
 
 class Labels(ReplayModel):
@@ -64,6 +62,35 @@ class Labels(ReplayModel):
     completeness: Literal["pass", "fail", "uncertain"]
     behavior: Literal["pass", "fail", "uncertain"]
     tone: Literal["pass", "fail", "uncertain"]
+
+
+class JudgePayload(ReplayModel):
+    labels: Labels
+    rationale: Text
+
+
+def judge_response_format() -> dict[str, Any]:
+    schema = JudgePayload.model_json_schema()
+    schema["properties"]["labels"] = schema.pop("$defs")["Labels"]
+
+    def compact(node: Any) -> None:
+        if isinstance(node, dict):
+            # Preserve the typed shape/enums; minLength stays enforced locally
+            # because the provider's strict JSON-schema subset is narrower.
+            node.pop("title", None)
+            node.pop("minLength", None)
+            node.pop("pattern", None)
+            for value in node.values():
+                compact(value)
+        elif isinstance(node, list):
+            for value in node:
+                compact(value)
+
+    compact(schema)
+    return {
+        "type": "json_schema",
+        "json_schema": {"name": "judge", "strict": True, "schema": schema},
+    }
 
 
 class Evidence(ReplayModel):
@@ -211,7 +238,7 @@ class JudgeConfiguration(ReplayModel):
     model: Literal["openai/gpt-oss-20b"] = "openai/gpt-oss-20b"
     temperature: Literal[0.2] = 0.2
     reasoning_effort: Literal["low"] = "low"
-    response_format: Literal["json_object"] = "json_object"
+    response_format: Literal["json_object", "json_schema"] = "json_schema"
     max_completion_tokens: int = Field(gt=0, le=1024, strict=True)
 
 

@@ -1,0 +1,72 @@
+{
+  "plan": {
+    "version": 2,
+    "run_id": "calibration-2026-11-05-v4",
+    "stage": "judge_calibration",
+    "case_ids": [],
+    "budget": {
+      "models": {
+        "openai/gpt-oss-20b": {
+          "max_attempts": 20,
+          "input_tokens": 139520,
+          "output_tokens": 20480,
+          "per_call_input": 6976,
+          "per_call_output": 1024
+        }
+      },
+      "shared_rpm": 30,
+      "shared_tpm": 8000,
+      "shared_rpd": 1000,
+      "shared_tpd": 200000,
+      "prior_requests_today": 24,
+      "prior_tokens_today": 25951,
+      "visitor_rpm": 0,
+      "visitor_tpm": 0,
+      "visitor_rpd": 0,
+      "visitor_tpd": 0,
+      "min_interval_seconds": 3.0,
+      "deadline_seconds": 2700.0,
+      "request_timeout_seconds": 60.0
+    },
+    "source": {
+      "commit": "1e470bbca018cb0ff3f389b25dbc1ae4c89b8130",
+      "dirty": false,
+      "code_sha256": "b93c69a8b6ed2aaa26d38974a1608d3c04bf6bdfaa03971266e391eae9914140",
+      "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+      "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+      "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+      "versions": {
+        "groq": "1.7.0",
+        "pydantic": "2.10.6",
+        "httpx": "0.28.1",
+        "fastapi": "0.115.11",
+        "fastembed": "0.9.1",
+        "numpy": "2.5.4"
+      },
+      "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+    },
+    "inputs_sha256": "98c82c578feff212c53cad7bb758aaa960074d5bc660f3ead4ef5804051c90ad",
+    "judge_configuration": {
+      "model": "openai/gpt-oss-20b",
+      "temperature": 0.2,
+      "reasoning_effort": "low",
+      "response_format": "json_object",
+      "max_completion_tokens": 1024
+    }
+  },
+  "approval": {
+    "purpose": "live_groq_authorization",
+    "approved_by": "Aamir Mohammed Khan",
+    "reference": "Aamir explicitly approves20 fresh judge-v4 calls,20b/low/1024, actual-usage reconciliation, zero visitors, >180000 tokens remaining. Hard45minute execution window from this authorization; unknown prior call retainsfull7512reservation.",
+    "plan_sha256": "3bd7d5a7302299ce5e155b761771f15db91d4bdd31f2ce0d31ff2e82e7e5837a",
+    "approved_at": "2026-11-05T08:21:03Z",
+    "expires_at": "2026-11-05T09:06:03Z",
+    "limits_verified_at": "2026-11-05T08:21:03Z",
+    "limits_reference": "User confirmed >180000 tokens remaining; existing30RPM/1000RPD/8000TPM/200000TPD; actual-known reconciliation retains unknown cap and zero visitors explicitly approved.",
+    "visitor_allowance_acknowledged": true,
+    "draft_corpus_acknowledged": true,
+    "input_reservation_policy_acknowledged": true
+  },
+  "state": "started_consumption_unknown_until_result",
+  "started_at": "2026-11-05T08:31:42.311353+00:00"
+}

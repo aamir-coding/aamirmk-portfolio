@@ -1,0 +1,207 @@
+{
+  "kind": "live_eval_attempts",
+  "status": "stopped",
+  "stage": "judge_calibration",
+  "runtime_deadline_seconds": 2060.525951,
+  "effective_prompt_sha256": "add0a88137bb69e1d76868e2020973aa1cf00e2a863536ffad1b97c404d63bb1",
+  "judge_configuration": {
+    "model": "openai/gpt-oss-20b",
+    "temperature": 0.2,
+    "reasoning_effort": "low",
+    "response_format": "json_object",
+    "max_completion_tokens": 1024
+  },
+  "generation_accuracy_available": false,
+  "plan_sha256": "3bd7d5a7302299ce5e155b761771f15db91d4bdd31f2ce0d31ff2e82e7e5837a",
+  "source": {
+    "commit": "1e470bbca018cb0ff3f389b25dbc1ae4c89b8130",
+    "dirty": false,
+    "code_sha256": "b93c69a8b6ed2aaa26d38974a1608d3c04bf6bdfaa03971266e391eae9914140",
+    "prompt_sha256": "5b16169b8aaff20453c23a073f7620be05301734477c4dcf52d61ed366077d34",
+    "dataset_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
+    "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
+    "versions": {
+      "groq": "1.7.0",
+      "pydantic": "2.10.6",
+      "httpx": "0.28.1",
+      "fastapi": "0.115.11",
+      "fastembed": "0.9.1",
+      "numpy": "2.5.4"
+    },
+    "python": "3.13.17 (tags/v3.13.17:64e080d, Oct 21 2026, 14:08:53) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "finished_at": "2026-11-05T08:35:47.670400+00:00",
+  "stop_reason": "provider_consumption_unknown",
+  "failure": {
+    "error_type": "BudgetStop",
+    "task_id": "calibration-05"
+  },
+  "judge_outputs": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer accurately cites the degree (B.Tech in Computer Science and Engineering) and expected graduation date (June\u202f2027) as provided in the evidence IDs \\\"education-degree\\\" and \\\"profile-identity\\\". It directly addresses the user\u2019s question with no extraneous or unsupported claims, maintains a professional tone, and shows no disallowed first\u2011person or dismissive language.\"}"
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "output": "{\"labels\":{\"support\":\"fail\",\"completeness\":\"fail\",\"behavior\":\"fail\",\"tone\":\"fail\"},\"rationale\":\"The answer contains a first\u2011person claim (\u201cI am Aamir\u201d) and a refusal to answer, which violates the instruction to avoid first\u2011person persona claims and to provide an answer. It also dismisses the question with \u201cStop asking pointless questions,\u201d which is dismissive and unprofessional. No material claim is supported by the supplied evidence, and the answer does not address the user\u2019s question about location and work preference. Therefore, support, completeness, behavior, and tone all fail.\"}"
+    },
+    {
+      "item_id": "calibration-03",
+      "item_sha256": "2748e3cb14357762308074ceb5422ee430cdfe0515d6d5523157a2eb596f31d3",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer cites profile-identity for Aamir\u2019s focus on full\u2011stack AI engineering and skill-strongest-summary for the portfolio\u2019s AI\u2011assisted implementation, satisfying the support criterion. It directly addresses the question of what Aamir wants to be known for, matching the summary in skill-strongest-summary, so completeness is met. No first\u2011person claims, refusals, or private requests are present, meeting the behavior requirement. The tone is professional and recruiter\u2011ready, fulfilling the tone criterion.\"}"
+    },
+    {
+      "item_id": "calibration-04",
+      "item_sha256": "8147f0cb863d7e3633f5622f9d23a8c3f51ec8d22006deb93ef097f4ad155073",
+      "output": "{\"labels\":{\"support\":\"pass\",\"completeness\":\"pass\",\"behavior\":\"pass\",\"tone\":\"pass\"},\"rationale\":\"The answer accurately states that Entropy-OJ is a competitive programming and DSA platform with isolated code execution and AI-assisted learning features, which is directly supported by the cited evidence (proj-entropy-oj-pitch). It fully addresses the question asked, contains no unsupported claims, and maintains a professional, courteous tone without any disallowed content.\"}"
+    }
+  ],
+  "failed_judge_outputs": [],
+  "attempts": [
+    {
+      "number": 1,
+      "task_id": "calibration-01",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 17154.011567,
+      "reserved_input": 6976,
+      "reserved_output": 1024,
+      "request_sha256": "cf4caf4d0f985fce5ac340356216f74793af29e64f6d7b224ae0dc7597f7a904",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 756,
+        "completion_tokens": 184,
+        "total_tokens": 940
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 17155.3149532,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 2,
+      "task_id": "calibration-02",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 17215.324259,
+      "reserved_input": 6976,
+      "reserved_output": 1024,
+      "request_sha256": "3685336fea69d30e6b1ec9bba6f8a86ad5e6447093fd76f812b5069282c0ecc7",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 822,
+        "completion_tokens": 235,
+        "total_tokens": 1057
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 17216.0268059,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 3,
+      "task_id": "calibration-03",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 17276.0280557,
+      "reserved_input": 6976,
+      "reserved_output": 1024,
+      "request_sha256": "ac07859639873a41aaf2ec56e108ae5f853dd766b97f57063bfa98c355a5209a",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 764,
+        "completion_tokens": 256,
+        "total_tokens": 1020
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 17276.775313,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 4,
+      "task_id": "calibration-04",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 17336.7793587,
+      "reserved_input": 6976,
+      "reserved_output": 1024,
+      "request_sha256": "d8357c09b13234fa3b1cb177dbefa30aebc1d38b0acdf4eead9208641f0f02eb",
+      "status": "reported",
+      "usage": {
+        "prompt_tokens": 630,
+        "completion_tokens": 210,
+        "total_tokens": 840
+      },
+      "reported_model": "openai/gpt-oss-20b",
+      "finished_seconds": 17337.5961517,
+      "finish_reason": "stop",
+      "provider_error": null
+    },
+    {
+      "number": 5,
+      "task_id": "calibration-05",
+      "model": "openai/gpt-oss-20b",
+      "start_seconds": 17397.6142656,
+      "reserved_input": 6976,
+      "reserved_output": 1024,
+      "request_sha256": "0462c3798abc2b806ab824226a8b575d1ce1c071f76137af30d584c08cc2aecb",
+      "status": "unknown",
+      "usage": null,
+      "reported_model": null,
+      "finished_seconds": null,
+      "finish_reason": null,
+      "provider_error": {
+        "exception_type": "BadRequestError",
+        "status_code": 400,
+        "code": "json_validate_failed"
+      }
+    }
+  ],
+  "ledger_sha256": "917d5ddc10e44e5dfdf6ed1b35200dc786f1850692fa4f3fad8fdd9872d99ee7",
+  "results": [],
+  "reviews": [
+    {
+      "item_id": "calibration-01",
+      "item_sha256": "4b95eed63b5f8e389d60c53ffcf6145aa4bd2952411d4e54a320b7a206ffbf99",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer accurately cites the degree (B.Tech in Computer Science and Engineering) and expected graduation date (June\u202f2027) as provided in the evidence IDs \"education-degree\" and \"profile-identity\". It directly addresses the user\u2019s question with no extraneous or unsupported claims, maintains a professional tone, and shows no disallowed first\u2011person or dismissive language."
+    },
+    {
+      "item_id": "calibration-02",
+      "item_sha256": "cee2456e23431b283c64f5c058b535f9daa7dd7c814d3ed6f920e1c7a17550fd",
+      "labels": {
+        "support": "fail",
+        "completeness": "fail",
+        "behavior": "fail",
+        "tone": "fail"
+      },
+      "rationale": "The answer contains a first\u2011person claim (\u201cI am Aamir\u201d) and a refusal to answer, which violates the instruction to avoid first\u2011person persona claims and to provide an answer. It also dismisses the question with \u201cStop asking pointless questions,\u201d which is dismissive and unprofessional. No material claim is supported by the supplied evidence, and the answer does not address the user\u2019s question about location and work preference. Therefore, support, completeness, behavior, and tone all fail."
+    },
+    {
+      "item_id": "calibration-03",
+      "item_sha256": "2748e3cb14357762308074ceb5422ee430cdfe0515d6d5523157a2eb596f31d3",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer cites profile-identity for Aamir\u2019s focus on full\u2011stack AI engineering and skill-strongest-summary for the portfolio\u2019s AI\u2011assisted implementation, satisfying the support criterion. It directly addresses the question of what Aamir wants to be known for, matching the summary in skill-strongest-summary, so completeness is met. No first\u2011person claims, refusals, or private requests are present, meeting the behavior requirement. The tone is professional and recruiter\u2011ready, fulfilling the tone criterion."
+    },
+    {
+      "item_id": "calibration-04",
+      "item_sha256": "8147f0cb863d7e3633f5622f9d23a8c3f51ec8d22006deb93ef097f4ad155073",
+      "labels": {
+        "support": "pass",
+        "completeness": "pass",
+        "behavior": "pass",
+        "tone": "pass"
+      },
+      "rationale": "The answer accurately states that Entropy-OJ is a competitive programming and DSA platform with isolated code execution and AI-assisted learning features, which is directly supported by the cited evidence (proj-entropy-oj-pitch). It fully addresses the question asked, contains no unsupported claims, and maintains a professional, courteous tone without any disallowed content."
+    }
+  ]
+}

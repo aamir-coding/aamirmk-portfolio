@@ -40,6 +40,7 @@ from evals.budget import (  # noqa: E402
     UTILITY,
     Attempt,
     Budget,
+    BudgetStop,
     CompletionProvider,
     MeteredLLM,
     ProviderReply,
@@ -52,10 +53,11 @@ from evals.calibration import (  # noqa: E402
     AnnotationSet,
     GradingPacket,
     JudgeConfiguration,
+    JudgePayload,
     JudgeSet,
-    Labels,
     Review,
     effective_judge_prompt_sha256,
+    judge_response_format,
     judge_system_prompt,
     load_packet,
     packet_fingerprint,
@@ -113,9 +115,12 @@ class LivePlan(ReplayModel):
     source: dict[str, Any]
     inputs_sha256: str
     judge_configuration: JudgeConfiguration | None = None
+    judge_recovery_attempts: int = Field(default=0, ge=0, le=4, strict=True)
 
     @model_validator(mode="after")
     def stage_inputs(self) -> Self:
+        if self.stage == "generation" and self.judge_recovery_attempts:
+            raise ValueError("Recovery is limited to explicitly planned judging")
         if self.stage.startswith("judge") != (self.judge_configuration is not None):
             raise ValueError(
                 "Judge stages require explicit settings; "
@@ -223,22 +228,28 @@ def preflight(
             raise ValueError(
                 "Validation must use the same judge settings as calibration"
             )
-        if (
-            cap.max_attempts < len(items)
-            or cap.input_tokens < len(items) * cap.per_call_input
-            or cap.output_tokens < len(items) * cap.per_call_output
-        ):
-            raise ValueError("Budget cannot reserve the full requested judge slice")
-        if any(
+        bounds = [
             input_reservation_bound(
                 request_payload(
                     judge_messages(packet, x.id),
-                    response_format={"type": "json_object"},
+                    response_format=judge_response_format(),
                 )
             )
-            > cap.per_call_input
             for x in items
+        ]
+        required_input = (
+            sum(bounds)
+            if plan.budget.input_reservation == "request_bound"
+            else len(items) * cap.per_call_input
+        ) + plan.judge_recovery_attempts * cap.per_call_input
+        if (
+            cap.max_attempts < len(items) + plan.judge_recovery_attempts
+            or cap.input_tokens < required_input
+            or cap.output_tokens
+            < (len(items) + plan.judge_recovery_attempts) * cap.per_call_output
         ):
+            raise ValueError("Budget cannot reserve the full requested judge slice")
+        if any(bound > cap.per_call_input for bound in bounds):
             raise ValueError(
                 "A judge prompt exceeds the byte reservation policy; do not execute"
             )
@@ -425,11 +436,6 @@ def judge_messages(
     ]
 
 
-class JudgePayload(ReplayModel):
-    labels: Labels
-    rationale: Text
-
-
 async def run_jobs(
     plan: LivePlan,
     provider: CompletionProvider,
@@ -460,9 +466,11 @@ async def run_jobs(
     reviews: list[Review] = list(prior.reviews) if prior else []
     status = "complete"
     system_prompt = None
+    response_format = None
     judge_outputs: list[dict[str, Any]] = []
     failed_judge_outputs: list[dict[str, Any]] = []
     failure: dict[str, Any] | None = None
+    recoveries: list[dict[str, Any]] = []
     try:
         async with asyncio.timeout(runtime_budget.deadline_seconds):
             if plan.stage == "generation":
@@ -483,6 +491,7 @@ async def run_jobs(
             else:
                 packet = load_packet()
                 system_prompt = judge_system_prompt()
+                response_format = judge_response_format()
                 wanted = (
                     "validation" if plan.stage == "judge_validation" else "calibration"
                 )
@@ -490,40 +499,92 @@ async def run_jobs(
                     if item.slice != wanted:
                         continue
                     llm.task_id = item.id
-                    response = await llm.complete(
-                        judge_messages(packet, item.id, system_prompt=system_prompt),
-                        model=UTILITY,
-                        response_format={"type": "json_object"},
-                    )
-                    raw_output = {
-                        "item_id": item.id,
-                        "item_sha256": item.sha256,
-                        "output": response.content,
-                    }
-                    judge_outputs.append(raw_output)
-                    try:
-                        grade = JudgePayload.model_validate_json(response.content)
-                    except ValidationError as exc:
-                        failed_judge_outputs.append(raw_output)
-                        failure = {
-                            "error_type": type(exc).__name__,
-                            "task_id": item.id,
-                            "issues": exc.errors(
-                                include_url=False,
-                                include_input=False,
-                                include_context=False,
-                            ),
-                        }
-                        llm.stop_reason = "judge_contract_error"
-                        raise
-                    reviews.append(
-                        Review(
-                            item_id=item.id,
-                            item_sha256=item.sha256,
-                            labels=grade.labels,
-                            rationale=grade.rationale,
-                        )
-                    )
+                    while True:
+                        try:
+                            response = await llm.complete(
+                                judge_messages(
+                                    packet, item.id, system_prompt=system_prompt
+                                ),
+                                model=UTILITY,
+                                response_format=response_format,
+                            )
+                            raw_output = {
+                                "item_id": item.id,
+                                "item_sha256": item.sha256,
+                                "output": response.content,
+                            }
+                            judge_outputs.append(raw_output)
+                            try:
+                                grade = JudgePayload.model_validate_json(
+                                    response.content
+                                )
+                            except ValidationError as exc:
+                                failed_judge_outputs.append(raw_output)
+                                failure = {
+                                    "error_type": type(exc).__name__,
+                                    "task_id": item.id,
+                                    "issues": exc.errors(
+                                        include_url=False,
+                                        include_input=False,
+                                        include_context=False,
+                                    ),
+                                }
+                                llm.stop_reason = "judge_contract_error"
+                                raise
+                            reviews.append(
+                                Review(
+                                    item_id=item.id,
+                                    item_sha256=item.sha256,
+                                    labels=grade.labels,
+                                    rationale=grade.rationale,
+                                )
+                            )
+                            break
+                        except (BudgetStop, ValidationError):
+                            last = llm.attempts[-1] if llm.attempts else None
+                            error = last.provider_error if last else None
+                            allowed = llm.stop_reason == "judge_contract_error" or (
+                                llm.stop_reason == "provider_consumption_unknown"
+                                and error is not None
+                                and (
+                                    (
+                                        error.status_code == 400
+                                        and error.code == "json_validate_failed"
+                                    )
+                                    or error.status_code == 429
+                                    or (
+                                        error.status_code is not None
+                                        and error.status_code >= 500
+                                    )
+                                    or error.exception_type
+                                    in {
+                                        "APIConnectionError",
+                                        "APITimeoutError",
+                                        "TimeoutError",
+                                    }
+                                )
+                            )
+                            if (
+                                not allowed
+                                or len(recoveries) >= plan.judge_recovery_attempts
+                            ):
+                                raise
+                            recoveries.append(
+                                {
+                                    "attempt_number": last.number,
+                                    "task_id": item.id,
+                                    "reason": llm.stop_reason,
+                                    "failure": failure,
+                                }
+                            )
+                            if last.finished_seconds is None:
+                                llm.attempts[-1] = last.model_copy(
+                                    update={"finished_seconds": llm.clock()}
+                                )
+                            # Same ledger, reservations and deadline; only the
+                            # explicitly allowed recoverable stop is cleared.
+                            llm.stop_reason = None
+                            failure = None
     except (Exception, asyncio.CancelledError) as exc:
         status = "stopped"
         llm.stop_reason = llm.stop_reason or "task_error_or_deadline"
@@ -534,7 +595,9 @@ async def run_jobs(
         "status": status,
         "stage": plan.stage,
         "runtime_deadline_seconds": runtime_budget.deadline_seconds,
-        "effective_prompt_sha256": canonical_sha256(system_prompt)
+        "effective_prompt_sha256": canonical_sha256(
+            {"instructions": system_prompt, "response_format": response_format}
+        )
         if system_prompt is not None
         else None,
         "judge_configuration": plan.judge_configuration.model_dump(mode="json")
@@ -546,6 +609,7 @@ async def run_jobs(
         "finished_at": datetime.now(UTC).isoformat(),
         "stop_reason": llm.stop_reason,
         "failure": failure,
+        "recoveries": recoveries,
         "judge_outputs": judge_outputs,
         "failed_judge_outputs": failed_judge_outputs,
         "attempts": ledger,
@@ -638,7 +702,11 @@ def _known_stop_charge(
                 a.finished_seconds is not None and not math.isfinite(a.finished_seconds)
             )
             or counts[a.model] > cap.max_attempts
-            or a.reserved_input != cap.per_call_input
+            or (
+                a.reserved_input != cap.per_call_input
+                if budget.input_reservation == "full_cap"
+                else not 0 < a.reserved_input <= cap.per_call_input
+            )
             or a.reserved_output != cap.per_call_output
         ):
             raise ValueError("Unknown or inconsistent usage cannot release a hold")
@@ -759,7 +827,7 @@ def check_local_prior_usage(plan: LivePlan, directory: Path, now: datetime) -> N
                 token_charge = sum(
                     max(
                         a["reserved_input"] + a["reserved_output"],
-                        a["usage"]["total_tokens"],
+                        (a["usage"] or {}).get("total_tokens", 0),
                     )
                     for a in result["attempts"]
                 )
@@ -928,6 +996,7 @@ def main() -> int:
     parser.add_argument("--annotations", type=Path)
     parser.add_argument("--prior-judge", type=Path)
     parser.add_argument("--execute", action="store_true")
+    parser.add_argument("--judge-recovery-attempts", type=int, default=0)
     parser.add_argument("--approval", type=Path)
     args = parser.parse_args()
     if not args.plan and not args.draft_plan and not args.execute:
@@ -965,6 +1034,7 @@ def main() -> int:
                 stage=args.stage,
                 case_ids=args.cases,
                 budget=budget,
+                judge_recovery_attempts=args.judge_recovery_attempts,
                 judge_configuration=JudgeConfiguration(
                     max_completion_tokens=budget.models[UTILITY].per_call_output
                 )

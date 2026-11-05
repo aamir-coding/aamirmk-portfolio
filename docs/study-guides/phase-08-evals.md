@@ -683,6 +683,35 @@ lifecycle records fail closed. Prior daily charge is therefore 18,439 known +
 the user's account statement supplies remaining capacity. New attempts remain
 fully reserved, with no automatic retry or validation authorization.
 
+## Strict output and recovery preserve different contracts
+
+The actual v4/JSON-object run stopped after four grades/five attempts with HTTP
+400 `json_validate_failed`. Known usage was 3,857; the unknown request retains
+8,000. Four matching grades do not stand for the sixteen missing answers. The
+separate v4-strict prefix keeps the user criteria and full evidence while the
+provider schema constrains output structure. `JudgePayload` and `Labels` own the
+typed shape; `judge_response_format()` derives the provider subset and local
+validation retains nonblank rationale checks. Strict JSON does not prove semantic
+support or agreement. Earlier prompt/configuration records remain unchanged.
+
+The effective recipe fingerprint binds normalized instructions **and actual
+response schema**. The runner snapshots both, sends them, and hashes the same
+snapshots. Tests first caught a changed schema being reused, then caught the runner
+emitting the old text-only hash; both now reject incompatible reuse. This is why
+testing the real emission seam matters alongside a helper test.
+
+Aamir subsequently authorized continuing until twenty answers without pausing on
+each failure. Recovery is opt-in, up to four extra attempts under the same ledger,
+deadline and token budget. `request_bound` reserves the full conservative byte
+bound of each request, capped at 6,976; it never refunds a failed reservation.
+The default full-cap policy remains unchanged for other plans. Preflight covers
+the twenty base bounds (91,243) plus four worst-case extras (27,904), and 24 output
+caps. A 160,000 total budget covers them; prior known/unknown charges yield a
+197,808 daily maximum. Authentication, exhausted quota, missing usage and overruns
+stay hard stops. Recoverable JSON/contract/429/5xx/network failures are journaled;
+unknown usage remains unknown and its reservation remains charged. Recovery does
+not imply approval for validation or change the human labels.
+
 ## Official references
 
 - [Pydantic validators](https://docs.pydantic.dev/2.10/concepts/validators/): field and model validation contracts.

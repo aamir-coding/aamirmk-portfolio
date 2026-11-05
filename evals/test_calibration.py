@@ -214,7 +214,7 @@ def test_compact_judge_prompt_keeps_all_evidence_and_fits_recorded_limit_policy(
     import json
 
     from evals.budget import input_reservation_bound, request_payload
-    from evals.live import judge_messages
+    from evals.live import judge_messages, judge_response_format
 
     packet = load_packet()
     bounds = []
@@ -226,7 +226,7 @@ def test_compact_judge_prompt_keeps_all_evidence_and_fits_recorded_limit_policy(
         assert "labels" not in data
         bounds.append(
             input_reservation_bound(
-                request_payload(messages, response_format={"type": "json_object"})
+                request_payload(messages, response_format=judge_response_format())
             )
         )
     assert max(bounds) <= 6976
@@ -246,6 +246,20 @@ def test_changed_effective_prompt_invalidates_prior(
     monkeypatch.setattr(
         calibration, "judge_system_prompt", lambda: original + "changed recipe"
     )
+    with pytest.raises(ValueError, match="Judge prompt changed"):
+        validate_reviews(packet, judged)
+
+
+def test_changed_wire_schema_invalidates_prior(monkeypatch: pytest.MonkeyPatch) -> None:
+    import evals.calibration as calibration
+
+    packet, judged = load_packet(), reviews(judge=True)
+    original = calibration.judge_response_format()
+    changed = {
+        **original,
+        "json_schema": {**original["json_schema"], "name": "changed"},
+    }
+    monkeypatch.setattr(calibration, "judge_response_format", lambda: changed)
     with pytest.raises(ValueError, match="Judge prompt changed"):
         validate_reviews(packet, judged)
 

@@ -28,6 +28,7 @@ class ModelBudget(ReplayModel):
 
 
 class Budget(ReplayModel):
+    input_reservation: Literal["full_cap", "request_bound"] = "full_cap"
     models: dict[Model, ModelBudget] = Field(min_length=1)
     shared_rpm: int = Field(gt=0, strict=True)
     shared_tpm: int = Field(gt=0, strict=True)
@@ -232,16 +233,21 @@ class MeteredLLM:
             byte_bound = input_reservation_bound(payload)
             if byte_bound > cap.per_call_input:
                 self.stop("prompt_reservation_exceeded")
+            reserved_input = (
+                byte_bound
+                if self.budget.input_reservation == "request_bound"
+                else cap.per_call_input
+            )
             previous = [a for a in self.attempts if a.model == target]
             if (
                 len(previous) >= cap.max_attempts
-                or sum(a.reserved_input for a in previous) + cap.per_call_input
+                or sum(a.reserved_input for a in previous) + reserved_input
                 > cap.input_tokens
                 or sum(a.reserved_output for a in previous) + cap.per_call_output
                 > cap.output_tokens
             ):
                 self.stop("run_budget_exhausted")
-            reservation = cap.per_call_input + cap.per_call_output
+            reservation = reserved_input + cap.per_call_output
             while True:
                 now = self.clock()
                 if self.remaining() <= 0:
@@ -301,7 +307,7 @@ class MeteredLLM:
                 task_id=self.task_id,
                 model=target,
                 start_seconds=self.clock(),
-                reserved_input=cap.per_call_input,
+                reserved_input=reserved_input,
                 reserved_output=cap.per_call_output,
                 request_sha256=canonical_sha256(request.model_dump(mode="json")),
             )
@@ -351,7 +357,7 @@ class MeteredLLM:
             if reply.usage is None:
                 self.stop("provider_usage_missing")
             if (
-                reply.usage.prompt_tokens > cap.per_call_input
+                reply.usage.prompt_tokens > reserved_input
                 or reply.usage.completion_tokens > cap.per_call_output
             ):
                 self.stop("provider_reservation_exceeded")
