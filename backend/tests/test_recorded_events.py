@@ -48,6 +48,17 @@ def test_repeat_capture_isolated_from_seeded_and_previous_fit_caches() -> None:
     assert decode_recording(cached).cache_hit
 
 
+def test_current_safety_capture_passes_every_strict_replay_check() -> None:
+    from evals.replay import replay_report
+
+    report = replay_report(CURRENT_CAPTURES)
+    assert report.prompt_matches_current
+    assert report.recordings_checked == 8
+    assert report.checks_passed == 8, [
+        (row.id, row.failed_checks) for row in report.results if not row.passed
+    ]
+
+
 def test_saved_captures_pass_limited_checks_and_expose_unavailable_guarantees() -> None:
     from app.retrieval.loader import FactLoader
     from evals.dataset import load_cases

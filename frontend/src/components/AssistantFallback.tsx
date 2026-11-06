@@ -1,7 +1,7 @@
 export function AssistantFallback() {
-  return <nav aria-label="Alternatives to live answers">
-    <a href="https://github.com/aamir-coding/aamirmk-portfolio/blob/main/resume.tex"
-      target="_blank" rel="noopener noreferrer">Read résumé source</a>
+  return <div className="assistant-fallback" role="group" aria-label="Alternatives to live answers">
+    <a href="https://www.linkedin.com/in/aamir-mk/"
+      target="_blank" rel="noopener noreferrer">View professional profile</a>
     {" · "}<a href="mailto:aamirmkh25@gmail.com">Contact Aamir</a>
-  </nav>;
+  </div>;
 }

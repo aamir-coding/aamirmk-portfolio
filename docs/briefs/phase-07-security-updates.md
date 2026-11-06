@@ -1,6 +1,9 @@
 # Audit findings and proposed compatibility updates
 
-Prepared 6 November 2026. Proposal only; application dependencies are unchanged.
+Prepared 6 November 2026. **Exact updates explicitly approved by Aamir and applied.**
+Compatibility checks and repeat audits ran locally. The approved Vitest 4.1.11 removes
+the critical findings but still has moderate development-tool advisories; the repeat
+audit recommends 4.1.12. No automatic audit fixes or further version changes were made.
 
 The approved scans actually ran. Python reported 16 advisory rows in two packages
 (eight distinct advisory IDs after duplicate rows): pytest 8.3.5 and Starlette 0.46.2.

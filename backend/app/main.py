@@ -1,5 +1,8 @@
+import hashlib
+import hmac
 import logging
 import re
+import secrets
 import time
 import uuid
 from collections.abc import AsyncGenerator
@@ -19,6 +22,7 @@ from app.api.fit import router as fit_router
 from app.api.health import router as health_router
 from app.fit.cache import ReportCache, cache_identity
 from app.llm import GroqLLM
+from app.logging_config import JsonLogFormatter
 from app.safety.ip import get_client_ip
 from app.safety.middleware import RequestBoundsMiddleware
 from app.safety.rate_limiter import SlidingWindowRateLimiter
@@ -46,10 +50,14 @@ class NormalizePathMiddleware:
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     """Application lifespan management for startup and shutdown tasks."""
     settings = getattr(app.state, "settings", get_settings())
+    handler = logging.StreamHandler()
+    handler.setFormatter(JsonLogFormatter())
     logging.basicConfig(
         level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
-        format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
+        handlers=[handler],
     )
+    for name in ("groq", "httpx", "httpcore"):
+        logging.getLogger(name).setLevel(logging.WARNING)
     logger.info("Starting up application in %s environment", settings.ENVIRONMENT)
     try:
         from app.retrieval.retriever import get_retriever
@@ -57,7 +65,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         get_retriever()
         logger.info("Hybrid retrieval index initialized and ready")
     except Exception as exc:
-        logger.warning("Could not pre-warm retriever at startup: %s", exc)
+        logger.warning("Retriever startup unavailable: %s", type(exc).__name__)
     try:
         yield
     finally:
@@ -77,6 +85,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.log_ip_salt = secrets.token_bytes(32)
     app.state.llm = GroqLLM(app_settings)
     app.state.tool_registry = ToolRegistry()
     app.state.fit_cache = ReportCache(
@@ -103,7 +112,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Request ID, security headers, and access logging middleware
     @app.middleware("http")
     async def request_id_and_logging_middleware(request: Request, call_next):
-        request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex
+        candidate_id = request.headers.get("X-Request-ID", "")
+        request_id = (
+            candidate_id
+            if re.fullmatch(r"[a-fA-F0-9]{32}", candidate_id)
+            else uuid.uuid4().hex
+        )
         request.state.request_id = request_id
         start_time = time.perf_counter()
 
@@ -116,15 +130,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
         client_ip = get_client_ip(request)
+        ip_hash = hmac.new(
+            app.state.log_ip_salt, client_ip.encode(), hashlib.sha256
+        ).hexdigest()[:24]
+        route = getattr(request.scope.get("route"), "path", "<unmatched>")
+        method = (
+            request.method if request.method in {"GET", "POST", "OPTIONS"} else "OTHER"
+        )
 
         logger.info(
-            "[%s] %s %s status=%d duration=%.2fms ip=%s",
+            "[%s] %s %s status=%d duration=%.2fms ip_hash=%s",
             request_id,
-            request.method,
-            request.url.path,
+            method,
+            route,
             response.status_code,
             duration_ms,
-            client_ip,
+            ip_hash,
         )
         return response
 
@@ -173,7 +194,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     ):
         request_id = getattr(request.state, "request_id", None)
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content={
                 "error": {
                     "code": 422,
@@ -195,7 +216,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.exception_handler(Exception)
     async def unhandled_exception_handler(request: Request, exc: Exception):
         request_id = getattr(request.state, "request_id", None)
-        logger.exception("[%s] Unhandled exception: %s", request_id, str(exc))
+        logger.error("[%s] Unhandled exception: %s", request_id, type(exc).__name__)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={

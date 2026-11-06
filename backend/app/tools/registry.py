@@ -108,7 +108,7 @@ class ToolRegistry:
         """Safely execute a tool by name, handling string or dict arguments."""
         tool = self._tools.get(name)
         if not tool:
-            logger.warning("Tool not found in registry: %s", name)
+            logger.warning("Unknown tool rejected")
             return None
 
         # Parse string arguments if model passed serialized JSON string
@@ -121,8 +121,8 @@ class ToolRegistry:
                 return None
             try:
                 parsed_args = json.loads(arguments)
-            except Exception as exc:
-                logger.warning("Malformed JSON tool arguments for %s: %s", name, exc)
+            except Exception:
+                logger.warning("Malformed tool arguments rejected")
                 return None
         elif isinstance(arguments, dict):
             parsed_args = arguments
@@ -135,7 +135,7 @@ class ToolRegistry:
         try:
             return tool.execute(parsed_args)
         except Exception as exc:
-            logger.error("Error executing tool %s: %s", name, exc)
+            logger.error("Tool execution failed: %s", type(exc).__name__)
             return None
 
 

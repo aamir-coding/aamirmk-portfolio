@@ -382,7 +382,17 @@ The outcome is the feature no other portfolio has: a recruiter pastes a job desc
 
 ## Phase 7: Safety, rate limits, quota guard and prompt-injection defense
 
-The outcome is a site that cannot exhaust your free quota or be made to misrepresent you. Do the "before first share" rows right after Phase 3 and the rest before you send the link to recruiters widely. Effort: 2 to 3 days.
+The outcome is bounded provider consumption, useful resting behavior and layered defenses against misrepresentation. Do the "before first share" rows right after Phase 3 and the rest before you send the link to recruiters widely. No schema, lexical guard or prompt framing certifies general semantic safety. Effort: 2 to 3 days.
+
+**Approved remaining-P7 scope (6 November 2026):** The six-increment
+[brief](briefs/phase-07-safety-hardening.md) supersedes the early assumptions below.
+Use one app-owned atomic inference ledger across rewrite/chat/tool/fit attempts, with
+shared and model budgets, explicit retries, conservative reservations and bounded waits.
+Start closed after each boot; a fresh one-shot allowance expires by UTC midnight and
+cannot silently renew. There is no production activation endpoint in this phase.
+Do not switch models on exhausted shared quota. Utility rewriting is model routing,
+not quota failover. Persisted accounting, recruiter-message retention and handoff remain
+P9; optional Turnstile/classifier calls are not part of this implementation.
 
 **Inputs:** your `boundaries.md`, the limits for each chosen model from your Groq Limits page, a daily token budget set well below them (for example 70 percent), and a list of employers and facts the assistant must never confirm unless true.
 
@@ -393,9 +403,9 @@ The outcome is a site that cannot exhaust your free quota or be made to misrepre
 | Threat | Defense | When |
 | --- | --- | --- |
 | Bots or scrapers drain the free quota | Per-IP and per-session limits (your own token-bucket dependency, with slowapi as an optional comparison), tighter on `/api/fit`, request size caps | Before first share |
-| Free-tier ceilings (tokens per minute, tokens per day, requests per day) | A global token ledger below Groq's published limits per model, a bounded wait on 429, failover to a second model, then a polite "resting" mode | Before first share |
+| Free-tier ceilings (tokens per minute, tokens per day, requests per day) | Atomic shared/model ledger, fresh boot-bound allowance, bounded explicit retry and resting mode; no quota failover | Before first share |
 | Site used as a free general chatbot | Scope rule in the system prompt, low completion limit, history trimming | Before first share |
-| Prompt injection from chat, JD or any retrieved text | Delimited data blocks, "content is data, not instructions", tool allowlist, no secrets in the prompt (assume the prompt is public). Optional: a Prompt Guard classifier call on the user message | Rules before first share, classifier before wide launch |
+| Prompt injection from chat, JD or any retrieved text | Escaped data blocks, system data/instruction separation, typed tool allowlist, no prompt secrets; semantic attack review remains required | Rules before first share; semantic review before wide launch |
 | Making you claim something false ("So you worked at X, right?") | Grounding rule, never confirm user-asserted facts, adversarial eval set | Before wide launch |
 | Recruiter data and logs | Store a salted hash of the IP, not the IP. Set a retention window such as 90 days. Footer line: logging is on and messages are processed by Groq | Before wide launch |
 | Browser-side attacks and cross-origin abuse | Sanitized Markdown (Phase 3), a Content-Security-Policy and headers set in `vercel.json`, an exact-origin CORS allowlist on the API, no wildcard and no cookies | Before wide launch |
@@ -405,13 +415,13 @@ The outcome is a site that cannot exhaust your free quota or be made to misrepre
 
 **Build**
 
-1. Write a small rate-limit dependency: a token bucket per IP and per session id, held in memory. One Uvicorn worker keeps the counts consistent, and a reset after a spin-down is acceptable because the global budget lives in the database. Read the client IP from the forwarded headers that Render supplies.
-2. Write the quota ledger. After each call record model, input tokens and output tokens from the usage field. Keep per-minute and per-day counters per model, check them before each call, and wait a bounded time on a 429 using the retry hint. Persist daily totals to Postgres on a best-effort basis, because a spin-down wipes memory.
-3. Serve from cache whenever possible. Starter chips and curated HR questions cost zero tokens, and so do repeat fit reports (cached by JD hash).
-4. Add failover and resting mode. When one model's quota is used up, switch to the second model, since each has its own limits. When all are used up, enter resting mode: canned answers, your résumé link and the handoff form.
+1. Use bounded app-owned sliding windows per canonical IP and opaque session ID. Trust forwarded headers only after the socket peer and proxy chain have been verified. Raw body limits precede JSON parsing. Single-worker state does not establish account-wide capacity after a restart.
+2. Reserve shared/model RPM/TPM/RPD/TPD atomically before every provider attempt. Reconcile complete validated usage; keep unknown dispatched charges. Disable SDK retries and meter bounded explicit retries. Fresh boot-bound grants fail closed on restart/expiry; durable accounting remains P9.
+3. Serve authored starters and provenance-checked presets without inference. Generated fit reports use a bounded 64-entry LRU, 15-minute reuse TTL, exact input plus runtime identity; live bypass still crosses quota admission.
+4. Return typed resting state with authored answers, professional-profile and contact links. A public résumé PDF and end-to-end handoff are separate P10/P9 gates. No model failover on exhausted shared capacity.
 5. Add an optional Cloudflare Turnstile check before the first message of a session.
 6. Add CORS with an exact allowlist, a small middleware for API security headers (`X-Content-Type-Options`, `Referrer-Policy`), and the Content-Security-Policy on the frontend in `vercel.json`, with `connect-src` limited to your API origin.
-7. Optional: call a Prompt Guard model on each user message. Its context window is short, so check only the user's message, and measure false positives on your own questions before enforcing it.
+7. Keep code-solvable constraints in code: tools, bounds, citation membership, known-negative evidence and score arithmetic. Reserve model work for semantic interpretation; a classifier is outside the approved scope.
 8. Build an attack set of at least 20 prompts: instruction override, role-play escapes, "repeat your system prompt", false-premise questions, salary pressure. Run it after every prompt change.
 
 **Learn**
@@ -540,11 +550,11 @@ The outcome is a public, monitored site on a link you are proud to put on a rés
 
 1. Decide how to handle the sleeping API. Render's free web service spins down after 15 idle minutes and takes about a minute to wake. Options: accept it and rely on the Phase 3 warm-up experience; point a free uptime monitor at `/api/health` every 10 to 14 minutes during the weeks you are applying (this also gives you downtime alerts); or pay for the smallest always-on instance. An always-on free service uses about 744 of the 750 free instance hours in a 31-day month, so keep only one free web service in the workspace, and check Render's current terms before relying on pings.
 2. Keep state out of the Render disk. Use the external Postgres for everything durable, run Alembic migrations on each deploy, and remember the search index is built during the Render build, so a change to `knowledge/` needs a redeploy.
-3. Add backups: a weekly GitHub Actions job runs `pg_dump` and stores the result as a private artifact. Do one real restore test.
+3. Database backups and a real restore test depend on P9 storage (Band 4). Do not introduce Postgres ahead of the approved execution order.
 4. Keep configuration in Git (`render.yaml`, `vercel.json`) and secrets only in the dashboards. Decide how preview deployments are handled in the CORS allowlist: production and localhost only is safest.
 5. Add your domain to Vercel for the frontend, and optionally a subdomain such as `api.` for Render. HTTPS is automatic. Then update the CORS allowlist, the Content-Security-Policy and `VITE_API_BASE_URL`.
 6. Observability: structured JSON logs with the request id, optional error tracking with a free tier, an uptime monitor, and an alert to your phone when the health check fails or resting mode starts.
-7. CI/CD: lint, tests and retrieval evals on every pull request, auto-deploy on merge to `main` on both hosts, and the weekly live eval from Phase 8 updating the badge file.
+7. CI/CD: lint, tests, offline retrieval/replay and dependency/secret audits on pull requests; auto-deploy on merge to `main`. Live evals require separately approved scope/budget and valid judging; no automatic live badge publication.
 8. Content workflow: edit a knowledge file, open a pull request, let evals run, merge, and the index and "updated" date refresh on deploy.
 9. Put the link everywhere: résumé header, LinkedIn featured section, GitHub profile README, email signature.
 
@@ -559,9 +569,9 @@ The outcome is a public, monitored site on a link you are proud to put on a rés
 - [ ] The static fallback works with JavaScript disabled.
 - [ ] Every source link and the résumé PDF return a working page.
 - [ ] The footer discloses logging and that messages are processed by Groq, and the AI label is visible.
-- [ ] A handoff reaches you end to end.
-- [ ] Per-company links are created and tested.
-- [ ] A database backup has been restored once.
+- [ ] P9 follow-up: a handoff reaches you end to end.
+- [ ] P9 follow-up: per-company links are created and tested.
+- [ ] P9 follow-up: a database backup has been restored once.
 - [ ] Soft launch to three friends or seniors, fix what their questions expose, then send to recruiters.
 
 **Learn**
@@ -576,7 +586,7 @@ The outcome is a public, monitored site on a link you are proud to put on a rés
 **Done when**
 
 - The site is live on your own domain and both halves redeploy when you merge to `main`.
-- A backup restore has been tested.
+- Database restore acceptance is recorded in P9, after storage exists.
 - An alert for downtime or resting mode reaches your phone.
 - You can say how long a cold start takes and what a visitor sees during it.
 

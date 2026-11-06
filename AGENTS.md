@@ -22,7 +22,7 @@ Identity: "I'm an AI assistant trained on Aamir's verified résumé, projects, a
 - Retrieval: Markdown/YAML facts, BM25 + fastembed ONNX embeddings, numpy
 - Storage: External Supabase Postgres (Phase 9+), SQLAlchemy 2, Alembic
 - Frontend: React, Vite, TypeScript, plain CSS with design tokens
-- Streaming: SSE over POST via FastAPI native EventSourceResponse
+- Streaming: SSE over POST via Starlette StreamingResponse with hand-framed events (DRN-010)
 - Hosting: API on Render free, frontend on Vercel Hobby
 - Quality: pytest, Ruff, Vitest, Playwright, GitHub Actions
 - NO: Next.js, LangChain, LlamaIndex

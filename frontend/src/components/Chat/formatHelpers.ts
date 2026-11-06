@@ -10,6 +10,8 @@ export function formatSafeHref(rawHref?: string): string | undefined {
   if (!rawHref) return undefined;
   const trimmed = rawHref.trim();
   if (!trimmed) return undefined;
+  if ([...trimmed].some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127)) return undefined;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed) && !/^(https?:|mailto:|tel:)/i.test(trimmed)) return undefined;
 
   // 1. Pass valid absolute web, mail, or tel protocols directly
   if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) {

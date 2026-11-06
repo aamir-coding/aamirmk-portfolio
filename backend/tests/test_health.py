@@ -45,7 +45,7 @@ def test_request_id_generated_when_missing(client: TestClient) -> None:
 
 def test_request_id_preserved_when_supplied(client: TestClient) -> None:
     """An incoming X-Request-ID header is propagated into the response."""
-    custom_id = "recruiter-session-12345"
+    custom_id = "0123456789abcdef0123456789abcdef"
     response = client.get(
         "/api/health",
         headers={"X-Request-ID": custom_id},

@@ -1074,6 +1074,12 @@ body {
 }
 
 /* Banner Notices */
+.assistant-fallback a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .banner-notice {
   padding: var(--space-3) var(--space-4);
   margin-bottom: var(--space-3);

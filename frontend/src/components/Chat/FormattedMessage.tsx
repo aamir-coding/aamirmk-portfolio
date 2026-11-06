@@ -29,6 +29,7 @@ function processChildren(children: React.ReactNode): React.ReactNode {
 }
 
 const markdownComponents: Components = {
+  img: () => null,
   p: ({ children }) => (
     <p className="prose-paragraph">{processChildren(children)}</p>
   ),

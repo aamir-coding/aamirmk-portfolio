@@ -237,6 +237,13 @@ function Portfolio() {
         </div>
       </main>
 
+      <footer className="fit-form-notice">
+        <p>AI assistant about Aamir. Live questions and job descriptions are processed by Groq.
+          Chat stays in this browser tab. Reports are reused for up to 15 minutes and
+          held in bounded server memory until eviction or restart.
+          Service logs use request IDs and temporary salted IP hashes, without message text.</p>
+      </footer>
+
       {isFitModalOpen && (
         <FitReportModal
           isOpen={isFitModalOpen}

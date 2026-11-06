@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — approved; Increments 1–5 implemented**
+**Phase 7 (remaining): Safety hardening — six increments implemented locally; final verification/acceptance in progress**
 on `phase-7-safety-hardening`, based on `main` at `440e81d`.
 [Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -28,7 +28,8 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: privacy/CI, approved security dependency updates and final review (Increment 6).
+Next: finish source-bound offline artifact refresh and final checks; review outstanding
+operational/semantic gates and teach-back. No push/deploy or next phase is authorized.
 Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
@@ -59,7 +60,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Approved; Increments 1–5 implemented; privacy/CI/review next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
+| P7: Safety (rest) | 🟡 Six increments local; final verification and acceptance pending | `phase-7-safety-hardening` | — | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -610,8 +611,9 @@ the following kickoff supersedes its remote-status statements.
 
 - Typed resting responses for chat/fit and capacity state in health. Service readiness
   stays distinct from inference capacity. Existing dossier UI offers authored starter
-  answers, curated role examples, contact and a working tracked résumé-source link.
-  There is no exported résumé PDF yet; PDF/source-link acceptance remains P10 work.
+  answers, curated role examples and contact. Final verification found the old résumé
+  repository source returned 404 unauthenticated; fallback now uses the existing LinkedIn
+  profile. There is no exported résumé PDF; PDF/source-link acceptance remains P10 work.
 - App-owned generated fit cache: 64-entry LRU, 15-minute TTL, exact JD/title plus
   source/fact/index/model identity. Explicit `force_live` bypasses generated and authored
   entries but never provider admission. Fit pipeline has a 90-second total deadline.
@@ -665,4 +667,58 @@ the following kickoff supersedes its remote-status statements.
   compatibility update proposal. Isolated pip-audit 2.10.1 installed under ignored build/.
   Initial Python audit: 16 rows/eight distinct advisory IDs in pytest/Starlette. Initial
   npm audit: two critical and eight moderate affected package entries. No auto-fix run.
-  Approved version changes remain to be applied/verified in Increment 6.
+  Approved version changes were subsequently applied/verified in Increment 6 below.
+
+### Remaining Phase 7 Increment 6 — 6 November 2026
+
+- Added structured metadata logging, temporary per-app salted IP hashes, validated
+  request IDs and exception-type-only diagnostics across request/rewrite/fit/tool paths.
+  No recruiter text/headers/raw IPs/provider messages in application-managed logs.
+  Read-only review found independent Uvicorn access/exception/WebSocket logging could
+  bypass this: explicit JSON logging config, no access logs and no WebSockets now apply
+  in Render. Real loopback sentinel fault/query regression passed: **3 privacy tests**.
+- Tightened production CSP, moved synchronous theme bootstrap to self-hosted JS,
+  suppressed model Markdown images and checked source URL schemes. Footer discloses
+  Groq processing and actual bounded-memory cache retention. Corrected an inaccessible
+  résumé fallback to existing professional profile; résumé PDF/source link remains P10.
+- Exact approved dependency/tool proposals applied. Repeat isolated pip-audit reports
+  **No known vulnerabilities found**, exit 0. Gitleaks 8.30.1 scanned **155 commits**,
+  3.48MB: **no leaks found**. npm: **9 moderate, 0 high, 0 critical**, all development
+  tooling. Remaining advisories include Vitest mocker (audit recommends 4.1.12) and
+  minimatch through TypeScript ESLint. No automatic fixes/ignores or unapproved pin swaps.
+  CI audit workflows and Dependabot added; cloud jobs have not run on this branch.
+- Full backend/eval run: **607 passed, 3 failed, 2 warnings in 112.29s**. Two stale
+  test expectations (utility rewrite routing and deterministic gap summary) corrected
+  and **2 passed**; the third is expected stale public artifact pending final refresh.
+  Current/historical replay subset: **32 passed**. Current strict replay is **8/8**;
+  original v1/v2, human labels, judge archives and facts remain unchanged.
+- Actual offline candidate reproduced **all seven baseline scores exactly**, with only
+  `incompatible_baseline`. Explicit fingerprints-only compatibility review is DRN-061;
+  final source-bound regeneration and full green suite remain to be recorded below.
+- Full frontend: **176 passed / 23 files**; ESLint and TypeScript/Vite build passed;
+  initial JS **166,965 gzip bytes < 200,000** before final small accessibility fixes.
+  Final repeat verification is running. Existing Rollup annotation/chunk warnings remain.
+- Fake-backed local browser exercised authored starter, custom resting chat, curated
+  fit and explicit live bypass returning terminal resting fallback; Escape dismissal
+  and 390×844 mobile layout checked. Fixed observed contrast/landmark issues; mobile
+  axe: **0 violations, 1 incomplete manual-review item**. Screenshot inspected locally.
+  No deployed CSP/proxy/mobile-device assertion; Vite dev does not apply Vercel headers.
+- Read-only architecture review found no remaining blocker across six increments after
+  fixes. Existing P7 study guide rewritten for current architecture, roadmap deferrals
+  reconciled, and three-question interactive teach-back sent. Answers not yet assessed.
+
+### Remaining Phase 7 acceptance gates
+
+- **Pending:** real-output semantic review of at least 20 attacks, with separately
+  authorized bounded provider spend. Development fixture/code enforcement is not this
+  acceptance. P8 judge validation remains failed; all 76 facts remain draft.
+- **Pending:** current account limits/remaining use from other processes, production
+  activation design and fresh boot-bound allowance, and verified Render proxy chain.
+  Default inference stays closed; no account-wide/restart durability claimed before P9.
+- **Pending:** separate approval to push/deploy this concrete branch, cloud checks and
+  deployed CSP/proxy/runtime verification. No new completion tag or next phase started.
+  Existing first-share `phase-7-done` will not be moved or force-pushed.
+- **Tracked P10/P9:** public résumé PDF/source links; real-device/cold-start/no-JS checks;
+  hosted log retention and monitoring; P9 database, durable quota, handoff and backups.
+- **Tracked audit follow-up:** reviewed Vitest/lint-tool updates for nine moderate npm
+  development findings. The configured high-severity gate is not a zero-finding claim.

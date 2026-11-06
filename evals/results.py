@@ -102,6 +102,11 @@ def input_fingerprints() -> dict[str, str]:
         ],
         "application": sorted((REPO_ROOT / "backend/app").rglob("*.py")),
         "cases": sorted((DEFAULT_ROOT / "cases").glob("*.yaml")),
+        "safety_assets": [
+            *sorted((DEFAULT_ROOT / "attacks").glob("*.json")),
+            REPO_ROOT / "backend/app/fit/curated-provenance.json",
+            REPO_ROOT / "backend/logging.json",
+        ],
     }
     fingerprints = {
         name: canonical_sha256(
@@ -117,7 +122,18 @@ def input_fingerprints() -> dict[str, str]:
         index=file_sha256(DEFAULT_EMBEDDINGS_PATH),
         dataset=canonical_sha256(load_manifest().model_dump(mode="json")),
         dependencies=canonical_sha256(
-            {name: version(name) for name in ("fastembed", "numpy", "pydantic", "groq")}
+            {
+                name: version(name)
+                for name in (
+                    "fastembed",
+                    "numpy",
+                    "pydantic",
+                    "groq",
+                    "fastapi",
+                    "starlette",
+                    "httpx",
+                )
+            }
         ),
     )
     return fingerprints
@@ -125,7 +141,8 @@ def input_fingerprints() -> dict[str, str]:
 
 async def offline_result() -> OfflineResult:
     retrieval = await build_report("all")
-    replay = replay_report()
+    # Keep historical v1/v2 replay inputs frozen; the current safety contract is v3.
+    replay = replay_report(DEFAULT_ROOT / "recordings/endpoints-v3-safety.json")
     manifest = load_manifest()
     fingerprints = input_fingerprints()
     fingerprints.update(

@@ -84,7 +84,7 @@ async def generate_fit_report(
     pipeline: FitPipeline = Depends(get_fit_pipeline),
 ) -> StreamingResponse:
     """Analyze a pasted job description and stream progress and fit report via SSE."""
-    logger.info("Initiating fit report generation (hash: %s)", body.compute_hash())
+    logger.info("Initiating fit report generation")
 
     async def sse_event_generator() -> AsyncIterator[str]:
         async with aclosing(pipeline.run(body)) as frames:

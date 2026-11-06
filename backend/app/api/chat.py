@@ -260,25 +260,25 @@ async def chat(
             headers={"X-Assistant-State": "resting"},
         ) from exc
     except LLMRateLimitError as exc:
-        logger.warning("[%s] Groq rate limit: %s", conv_id, exc)
+        logger.warning("Groq rate limit: %s", type(exc).__name__)
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Rate limit reached. Please try again in a few moments.",
         ) from exc
     except LLMAuthError as exc:
-        logger.error("[%s] Groq auth error: %s", conv_id, exc)
+        logger.error("Groq auth error: %s", type(exc).__name__)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="LLM authentication failure. Please check server configuration.",
         ) from exc
     except LLMUnavailableError as exc:
-        logger.error("[%s] Groq unavailable: %s", conv_id, exc)
+        logger.error("Groq unavailable: %s", type(exc).__name__)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="AI service is currently unavailable. Please try again shortly.",
         ) from exc
     except LLMError as exc:
-        logger.error("[%s] LLM unexpected error: %s", conv_id, exc)
+        logger.error("LLM unexpected error: %s", type(exc).__name__)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while communicating with the AI service.",
@@ -506,7 +506,7 @@ async def chat_stream(
             )
             yield f"event: error\ndata: {err_payload}\n\n"
         except LLMRateLimitError as exc:
-            logger.warning("[%s] Groq rate limit during stream: %s", conv_id, exc)
+            logger.warning("Groq rate limit during stream: %s", type(exc).__name__)
             err_payload = json.dumps(
                 {"detail": "Rate limit reached. Please try again in a few moments."}
             )
@@ -518,7 +518,7 @@ async def chat_stream(
             )
             yield f"event: error\ndata: {err_payload}\n\n"
         except LLMAuthError as exc:
-            logger.error("[%s] Groq auth error during stream: %s", conv_id, exc)
+            logger.error("Groq auth error during stream: %s", type(exc).__name__)
             err_payload = json.dumps(
                 {
                     "detail": "LLM authentication failure. "
@@ -533,7 +533,7 @@ async def chat_stream(
             )
             yield f"event: error\ndata: {err_payload}\n\n"
         except (LLMUnavailableError, LLMError) as exc:
-            logger.error("[%s] LLM error during stream: %s", conv_id, exc)
+            logger.error("LLM error during stream: %s", type(exc).__name__)
             err_payload = json.dumps(
                 {
                     "detail": "AI service is currently unavailable. "

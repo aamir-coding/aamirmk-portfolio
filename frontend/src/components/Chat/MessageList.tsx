@@ -39,6 +39,7 @@ export function MessageList({
   return (
     <div
       className="chat-message-list"
+      role="log"
       aria-label="Conversation history"
       aria-live="polite"
     >

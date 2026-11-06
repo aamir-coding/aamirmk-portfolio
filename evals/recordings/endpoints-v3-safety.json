@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "purpose": "fake_and_curated_endpoint_captures",
-  "captured_at": "2026-11-06T06:18:20.439753Z",
-  "commit": "0d043f21955cbd26be189ae5c6a883cde984e6c4",
+  "captured_at": "2026-11-06T15:24:00.345239Z",
+  "commit": "df24c61749b22edad442692dabacbd1331d35a39",
   "dirty": true,
   "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
   "dataset_manifest_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
-  "prompt_files_sha256": "e863f3cad20f14da6ffaa631870b259c58a259951a0f4355198ea05f42281a6a",
-  "capture_source_sha256": "36bb506a91fe7b03d454607eea1c03c28369824753401536b646e90819856a9b",
+  "prompt_files_sha256": "b80833eb20f1f2e6ad40032fb221323c4b1cc4460d0d9c67864238bb7403c815",
+  "capture_source_sha256": "d905c2aa5ea92bc330e02509bbcf6279c582ac9a01d6dc9325a551d265262f28",
   "records": [
     {
       "id": "chat-project",

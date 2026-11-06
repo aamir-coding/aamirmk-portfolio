@@ -1187,7 +1187,11 @@ async def test_real_chat_rewrite_and_both_tool_turns_share_one_ledger(
     )
     assert report["status"] == "complete"
     assert provider.calls == len(report["attempts"]) == 3
-    assert all(a["model"] == "openai/gpt-oss-120b" for a in report["attempts"])
+    assert [a["model"] for a in report["attempts"]] == [
+        "openai/gpt-oss-20b",  # Coreference rewrite uses the utility model.
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-120b",
+    ]
     assert report["results"][0]["output"]["cards"]
     assert (
         report["results"][0]["retrieval"][0]["query"]
@@ -1218,7 +1222,7 @@ async def test_fit_retries_count_and_uncertainty_stops_fallback(
 
 
 @pytest.mark.asyncio
-async def test_fit_extraction_alignment_and_summary_use_isolated_real_pipeline(
+async def test_fit_extraction_alignment_and_deterministic_gap_summary_are_isolated(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import evals.live as live
@@ -1253,7 +1257,6 @@ async def test_fit_extraction_alignment_and_summary_use_isolated_real_pipeline(
                     ]
                 }
             ),
-            "Hands-on AWS operations remain a gap.",
         ]
     )
     proposal = plan().model_copy(
@@ -1267,15 +1270,16 @@ async def test_fit_extraction_alignment_and_summary_use_isolated_real_pipeline(
     assert [a["model"] for a in first["attempts"]] == [
         "openai/gpt-oss-20b",
         "openai/gpt-oss-120b",
-        "openai/gpt-oss-120b",
     ]
+    assert provider.calls == 2  # A gap summary requires no semantic generation.
+    assert first["results"][0]["output"]["requirements"][0]["verdict"] == "gap"
     assert not first["results"][0]["output"]["cached"]
     second_provider = ScriptProvider(provider.replies)
     second = await live.run_jobs(
         proposal, second_provider, retriever=FakeRetriever(default_facts=facts)
     )
     assert second["status"] == "complete"
-    assert second_provider.calls == 3
+    assert second_provider.calls == 2
 
 
 @pytest.mark.asyncio

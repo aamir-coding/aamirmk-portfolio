@@ -113,7 +113,7 @@ export function FitReportModal({
         aria-modal="true"
         aria-labelledby="fit-modal-title"
       >
-        <header className="fit-modal-header">
+        <div className="fit-modal-header">
           <div className="fit-modal-title-group">
             <span className="fit-tag">Curated evidence review</span>
             <h2 id="fit-modal-title">Job Description Fit Report</h2>
@@ -129,7 +129,7 @@ export function FitReportModal({
           >
             ✕
           </button>
-        </header>
+        </div>
 
         <div className="fit-modal-body">
           {status === "completed" && report ? (
@@ -145,7 +145,7 @@ export function FitReportModal({
           ) : (
             <form onSubmit={handleSubmit} className="fit-form">
               {presets.length > 0 && (
-                <div className="fit-presets-container" aria-label="Sample Job Description Presets">
+                <div className="fit-presets-container" role="group" aria-label="Sample Job Description Presets">
                   <div className="fit-presets-header">
                     <span className="fit-presets-label">Curated examples (instant):</span>
                     <span className="fit-presets-subtext">Authored development examples; not calibrated ground truth</span>
@@ -228,7 +228,9 @@ export function FitReportModal({
                 <p>
                   Your pasted job description is analyzed against curated portfolio facts.
                   Uncited requirement verdicts are downgraded; citation membership alone does not
-                  prove semantic support. No personal recruiter details are stored.
+                  prove semantic support. Live text is processed by Groq. Reports are reused
+                  for up to 15 minutes and held in bounded server memory until eviction or
+                  restart. No message history is saved to a database.
                 </p>
               </div>
 

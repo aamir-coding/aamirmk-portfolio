@@ -40,16 +40,7 @@
     <meta name="twitter:image" content="/og-image.svg" />
 
     <!-- Synchronous Theme Pre-hydration Script (Prevents FOUC) -->
-    <script>
-      (function () {
-        try {
-          var t = localStorage.getItem("amk_portfolio_theme");
-          if (t === "dark" || t === "light") {
-            document.documentElement.setAttribute("data-theme", t);
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <noscript>

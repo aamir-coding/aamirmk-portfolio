@@ -1,4 +1,5 @@
 import React from "react";
+import { formatSafeHref } from "./formatHelpers";
 import type { SourceCitation } from "../../lib/types";
 
 export interface SourceChipsProps {
@@ -15,19 +16,21 @@ export const SourceChips = React.memo(function SourceChips({
   return (
     <div
       className="source-chips-container"
+      role="group"
       aria-label="Verified Source Receipts"
     >
       <span className="source-chips-label">RECEIPTS:</span>
       <ul className="source-chips-list">
         {sources.map((src) => {
           const sectionBadge = src.source_section ? `[${src.source_section}]` : "";
-          const hasUrl = Boolean(src.source_url);
+          const safeUrl = formatSafeHref(src.source_url ?? undefined);
+          const hasUrl = Boolean(safeUrl);
 
           return (
             <li key={src.chunk_id} className="source-chip-item">
               {hasUrl ? (
                 <a
-                  href={src.source_url!}
+                  href={safeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="source-chip source-chip-link"
@@ -45,6 +48,7 @@ export const SourceChips = React.memo(function SourceChips({
               ) : (
                 <span
                   className="source-chip"
+                  role="group"
                   title={`Grounded in questionnaire receipt: ${src.title}`}
                   aria-label={`${src.title} ${sectionBadge}`}
                 >

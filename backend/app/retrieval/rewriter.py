@@ -95,9 +95,9 @@ async def rewrite_follow_up_query(
         )
         rewritten = completion.content.strip().strip('"').strip("'")
         if rewritten and 2 < len(rewritten) <= 1000:
-            logger.info("Rewrote follow-up query '%s' -> '%s'", query, rewritten)
+            logger.info("Follow-up query rewritten")
             return rewritten
     except Exception as exc:
-        logger.warning("Query rewriting failed: %s; using original query", exc)
+        logger.warning("Query rewriting failed: %s", type(exc).__name__)
 
     return query

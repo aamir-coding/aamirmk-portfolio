@@ -396,6 +396,8 @@ Top 5 Skills - Aamir Mohammed Khan & Where He Applied Them
   });
 
   it("normalizes formatSafeHref to prevent relative browser resolution", () => {
+    expect(formatSafeHref("javascript:alert(1)")).toBeUndefined();
+    expect(formatSafeHref("data:text/html,bad")).toBeUndefined();
     expect(formatSafeHref("https://entropy-oj.vercel.app")).toBe(
       "https://entropy-oj.vercel.app"
     );

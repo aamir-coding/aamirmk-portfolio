@@ -92,3 +92,7 @@ jobs:
 
       - name: Enforce initial JavaScript gzip budget
         run: node frontend/scripts/check-bundle.mjs
+
+      - name: Audit frontend dependencies without automatic fixes
+        working-directory: frontend
+        run: npm audit --audit-level=high

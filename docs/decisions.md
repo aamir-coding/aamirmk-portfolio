@@ -841,3 +841,68 @@ templates and computed counts, removing unnecessary inference and invented timel
 Positive semantic alignment/entailment still requires semantic evidence; source membership
 alone cannot certify it. Draft facts and authored presets were not promoted or rewritten.
 Development attack code checks and pending semantic cases are recorded separately.
+
+### DRN-059: Privacy includes the server's independent log handlers
+
+**Date:** 2026-11-06. **Scope:** Remaining P7 Increment 6.
+
+Use temporary per-app HMAC IP hashes and validated 32-hex request IDs, route templates
+and exception class names. Never log message/JD/history text or raw provider exceptions.
+The JSON formatter omits traceback payloads. Root application configuration alone does
+not govern Uvicorn's independent handlers: Render disables access logging, uses the
+explicit `backend/logging.json`, and disables WebSockets for this SSE-only application.
+SDK/HTTP client loggers use WARNING. A real isolated loopback Uvicorn regression checks
+both an exception sentinel and a query sentinel. Platform/provider retention remains an
+operational matter; no recruiter-message database or 90-day cleanup is added before P9.
+
+Footer copy distinguishes the cache's 15-minute reuse TTL from data deletion: bounded
+memory can retain an expired report until eviction/restart. Resting links point to the
+existing professional profile/contact; the prior unauthenticated résumé repository
+link returned 404. Public résumé PDF/source-link acceptance remains P10.
+
+Move theme bootstrap to a same-origin external script and remove inline script permission
+from production CSP. Connections permit only self plus the exact Render API; images
+permit self/data and model Markdown images are suppressed. Keep inline style permission
+for existing React styles. Source links reject unsupported schemes and control characters.
+Browser-observed fallback contrast/ARIA landmark issues were fixed within the existing
+design tokens; mobile axe reports zero violations, not a full accessibility certification.
+
+### DRN-060: Adopt only the explicitly reviewed audit additions and update set
+
+**Date:** 2026-11-06. **Scope:** Remaining P7 Increment 6; explicit user approvals.
+
+Approved pip-audit 2.10.1 runs in an isolated environment against the complete installed
+graph. The Gitleaks action is pinned to ff98106e4c7b2bc287b24eaf42907196329070c7,
+scanner 8.30.1, with read-only permissions and comments/summary/report uploads disabled.
+The owner is a personal GitHub User according to the checked API; no organization
+license was invented. npm audit uses a high-severity CI threshold; Dependabot proposes
+updates. No global installation, automatic audit fix or blanket advisory suppression.
+
+The separate exact compatibility proposal was approved: FastAPI 0.135.0, Starlette
+1.3.1, typing-inspection 0.4.2, annotated-doc 0.0.5, pytest 9.0.3,
+pytest-asyncio 1.4.1.post1 and Vitest 4.1.11. Runtime pyproject dependencies now match
+the pinned requirements. Preserve the existing HTTPX stack despite its TestClient
+deprecation warning. Repeat Python audit found no known vulnerabilities; npm retained
+nine moderate development-tool entries, zero high/critical. Current audit recommends
+Vitest 4.1.12 and lint dependency updates; those further changes were not silently
+substituted for the exact approved pins. Track findings rather than call npm clean.
+
+### DRN-061: Review current safety replay and compatibility identity without lowering floors
+
+**Date:** 2026-11-06. **Scope:** Phase-final offline artifact regeneration.
+
+Current full evaluation explicitly selects the v3 safety capture. Historical v1/v2
+records and the diagnostic replay default remain preserved. Strict event schemas now
+accept optional typed RequestTelemetry on done/error frames, instead of rejecting the
+P8 telemetry as an extra field. This is contract compatibility, not a permissive extra
+field policy. A regression requires all eight current records to pass.
+
+Fingerprint application/evaluator/prompt/recording changes, safety fixtures/curated
+provenance/logging configuration and relevant FastAPI/Starlette/HTTPX versions alongside
+the previous dependencies. Actual local retrieval plus eight-record replay reproduced
+all seven original baseline scores exactly. The candidate gate reported only
+`incompatible_baseline`; no critical check or numeric regression remained. The read-only
+review checks the same comparison. Update identity and review reference only, preserving
+numeric floors and the two-percentage-point tolerance. Commit source before generating
+the final result/public projection. Held-out cases are reserved, model calls remain
+zero, all 76 facts remain draft, and the five failed human/judge disagreements remain.

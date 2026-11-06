@@ -10,14 +10,14 @@ export function StatusIndicator({
   errorMessage,
 }: StatusIndicatorProps) {
   if (state === "resting") return (
-    <div className="status-pill" aria-label="Server status: live answers resting">
+    <div className="status-pill" role="status" aria-label="Server status: live answers resting">
       <span className="status-dot warming" aria-hidden="true" />
       <span>Live answers resting</span>
     </div>
   );
   if (state === "ready") {
     return (
-      <div className="status-pill" aria-label="Server status: ready">
+      <div className="status-pill" role="status" aria-label="Server status: ready">
         <span className="status-dot ready" aria-hidden="true" />
         <span>Ready</span>
       </div>
@@ -27,7 +27,7 @@ export function StatusIndicator({
   if (state === "warming" || state === "checking") {
     return (
       <div
-        className="status-pill"
+        className="status-pill" role="status"
         aria-label="Server status: waking up on Render free tier"
       >
         <span className="status-dot warming" aria-hidden="true" />
@@ -40,7 +40,7 @@ export function StatusIndicator({
 
   return (
     <div
-      className="status-pill"
+      className="status-pill" role="status"
       aria-label={`Server status error: ${errorMessage || "Connection failed"}`}
     >
       <span className="status-dot error" aria-hidden="true" />

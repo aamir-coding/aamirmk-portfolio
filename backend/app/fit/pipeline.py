@@ -142,7 +142,7 @@ class FitPipeline:
         # Step 0: Check content-hash cache
         cached = self._cache.get(request)
         if cached is not None:
-            logger.info("Fit cache hit for JD hash: %s", jd_hash)
+            logger.info("Fit cache hit")
             cached_report, origin = cached
             yield {
                 "event": "progress",
@@ -286,7 +286,7 @@ class FitPipeline:
                 },
             }
         except LLMError as err:
-            logger.error("LLM failure during fit report generation: %s", err)
+            logger.error("LLM fit failure: %s", type(err).__name__)
             yield {
                 "event": "error",
                 "data": {
@@ -297,7 +297,7 @@ class FitPipeline:
                 },
             }
         except Exception as err:
-            logger.exception("Unexpected error in fit pipeline: %s", err)
+            logger.error("Fit pipeline failure: %s", type(err).__name__)
             yield {
                 "event": "error",
                 "data": {
@@ -354,7 +354,9 @@ class FitPipeline:
             except LLMError:
                 raise
             except Exception as exc:
-                logger.warning("Extraction attempt %d failed: %s", attempt + 1, exc)
+                logger.warning(
+                    "Extraction attempt %d failed: %s", attempt + 1, type(exc).__name__
+                )
                 if attempt == 0:
                     messages.append(
                         Message(
@@ -452,7 +454,9 @@ class FitPipeline:
             except LLMError:
                 raise
             except Exception as exc:
-                logger.warning("Judging batch failed: %s; assigning safe gaps", exc)
+                logger.warning(
+                    "Judging batch failed: %s; assigning safe gaps", type(exc).__name__
+                )
                 for req in batch:
                     judged_list.append(
                         JudgedRequirement(
@@ -486,7 +490,8 @@ class FitPipeline:
             raise
         except Exception as exc:
             logger.warning(
-                "Summary generation failed: %s; using deterministic fallback", exc
+                "Summary generation failed: %s; using deterministic fallback",
+                type(exc).__name__,
             )
 
         return (

@@ -13,6 +13,7 @@ from app.fit.models import FitReport
 from app.fit.scorer import compute_fit_summary
 from app.models import SourceCitation
 from app.retrieval.artifacts import Sha256
+from app.telemetry import RequestTelemetry
 from app.tools.projects import ProjectCardData
 from evals.schemas import EvalCase, Text
 
@@ -166,15 +167,18 @@ class DonePayload(ReplayModel):
     conversation_id: Text
     sources: list[SourceCitation] = Field(default_factory=list)
     cards: list[ProjectCardData] = Field(default_factory=list)
+    telemetry: RequestTelemetry | None = None
 
 
 class ChatErrorPayload(ReplayModel):
     detail: Text
+    telemetry: RequestTelemetry | None = None
 
 
 class FitErrorPayload(ReplayModel):
     code: Text
     message: Text
+    telemetry: RequestTelemetry | None = None
 
 
 class ProgressPayload(ReplayModel):

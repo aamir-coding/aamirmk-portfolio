@@ -198,7 +198,7 @@ def test_chat_propagates_request_id(
     chat_client: tuple[TestClient, FakeLLM, FakeRetriever],
 ) -> None:
     client, _, _ = chat_client
-    headers = {"X-Request-ID": "test-req-trace-001"}
+    headers = {"X-Request-ID": "0123456789abcdef0123456789abcdef"}
     response = client.post(
         "/api/chat",
         json={"message": "Hello"},
@@ -206,7 +206,7 @@ def test_chat_propagates_request_id(
     )
 
     assert response.status_code == 200
-    assert response.headers.get("X-Request-ID") == "test-req-trace-001"
+    assert response.headers.get("X-Request-ID") == headers["X-Request-ID"]
 
 
 def test_chat_handles_rate_limit(
@@ -335,11 +335,11 @@ def test_chat_stream_propagates_request_id(
     response = client.post(
         "/api/chat/stream",
         json={"message": "Stream trace test"},
-        headers={"X-Request-ID": "stream-trace-123"},
+        headers={"X-Request-ID": "abcdef0123456789abcdef0123456789"},
     )
 
     assert response.status_code == 200
-    assert response.headers.get("X-Request-ID") == "stream-trace-123"
+    assert response.headers.get("X-Request-ID") == "abcdef0123456789abcdef0123456789"
 
 
 def test_chat_stream_handles_rate_limit(

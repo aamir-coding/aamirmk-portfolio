@@ -1,7 +1,9 @@
 # Phase 7 audit tools: version and workflow proposal
 
-Prepared 6 November 2026. **Not installed or enabled.** Aamir requested preparation
-and retained approval until exact versions and workflow were available for review.
+Prepared 6 November 2026. **Exact additions explicitly approved by Aamir and applied.**
+The isolated local audit ran; the workflow is enabled in `.github/workflows/security.yml`.
+Cloud execution awaits a separately authorized push. The inert proposal below is retained
+as the reviewed specification.
 
 Proposed additions:
 

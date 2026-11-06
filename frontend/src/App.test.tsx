@@ -52,7 +52,7 @@ describe("<App />", () => {
     const stream = vi.spyOn(sse, "streamChat");
     render(<App />);
     expect(await screen.findByText("Live answers resting")).toBeInTheDocument();
-    expect(screen.getByRole("link", {name: "Read résumé source"})).toBeInTheDocument();
+    expect(screen.getByRole("link", {name: "View professional profile"})).toBeInTheDocument();
     const starter = screen.getByRole("button", {name: /What is Aamir's experience with FastAPI and LLM systems/i});
     fireEvent.click(starter);
     expect(stream).not.toHaveBeenCalled();

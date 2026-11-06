@@ -48,11 +48,7 @@ def validate_and_downgrade_verdicts(
         if item.verdict in ("strong", "partial"):
             if not verified_chunk_ids:
                 logger.warning(
-                    "Anti-overclaiming trigger: requirement '%s' claimed verdict '%s' "
-                    "with invalid/missing chunk IDs %s. Downgrading to 'gap'.",
-                    item.requirement.id,
-                    item.verdict,
-                    item.evidence_chunk_ids,
+                    "Positive verdict downgraded: no valid positive evidence"
                 )
                 downgraded_explanation = (
                     "[Downgraded to gap: No verified portfolio evidence cited.]"
