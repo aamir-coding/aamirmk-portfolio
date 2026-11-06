@@ -47,6 +47,7 @@ export function UnderHood({ telemetry, browserTiming, delivery }: Props) {
             ? `reported ${call.reported_model}`
             : `configured ${call.configured_model ?? "unavailable"} (reported model unavailable)`}
           {` · ${ms(call.duration_ms)} · ${call.status} · usage ${call.usage_source}`}
+          {(call.attempts ?? 1) > 1 ? ` · ${call.attempts} attempts (${call.unknown_attempts ?? 0} with unknown usage)` : ""}
           {call.usage_source !== "unknown" ? ` · ${call.input_tokens} in / ${call.output_tokens} out` : ""}
         </li>)}</ol>
       </> : null}

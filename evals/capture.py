@@ -66,7 +66,7 @@ from evals.dataset import (  # noqa: E402
     verify_dataset,
 )
 
-DEFAULT_RECORDINGS = DEFAULT_ROOT / "recordings" / "endpoints-v2-telemetry.json"
+DEFAULT_RECORDINGS = DEFAULT_ROOT / "recordings" / "endpoints-v3-safety.json"
 
 
 class TraceFakeLLM(FakeLLM):

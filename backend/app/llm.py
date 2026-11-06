@@ -9,16 +9,27 @@ satisfies the same protocol — no real Groq calls in CI.
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import math
 import re
+import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from fastapi import Depends
+from fastapi import Request
 from groq import AsyncGroq
+from pydantic import ValidationError
 
-from app.settings import Settings, get_settings
+from app.safety.admission import (
+    AttemptCost,
+    InferenceLedger,
+    ProviderUsage,
+    QuotaDenied,
+    reserve_input_tokens,
+)
+from app.settings import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +68,8 @@ class AssistantMessage:
     total_tokens: int
     tool_calls: list[ToolCall] = field(default_factory=list)
     usage_reported: bool = True
+    attempts: int = 1
+    unknown_attempts: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -75,6 +88,14 @@ class LLMError(Exception):
 
 class LLMRateLimitError(LLMError):
     """Groq rate limit (429) hit."""
+
+
+class LLMCapacityError(LLMRateLimitError):
+    """Local capacity is unavailable; reason contains no recruiter/provider text."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
 
 
 class LLMAuthError(LLMError):
@@ -134,9 +155,64 @@ class GroqLLM:
     Accepts dependencies via __init__ — never reads globals or env directly.
     """
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        ledger: InferenceLedger | None = None,
+        client: AsyncGroq | None = None,
+    ) -> None:
         self._model = settings.LLM_MODEL_MAIN
-        self._client = AsyncGroq(api_key=settings.GROQ_API_KEY)
+        self._settings = settings
+        self.ledger = ledger or InferenceLedger(
+            shared=settings.INFERENCE_SHARED_LIMITS,
+            models=settings.INFERENCE_MODEL_LIMITS,
+            max_active=settings.INFERENCE_MAX_ACTIVE,
+            max_waiters=settings.INFERENCE_MAX_WAITERS,
+        )
+        if client is not None and client.max_retries != 0:
+            raise ValueError("Injected SDK client must disable implicit retries")
+        self._client = client
+        self.timeout_seconds = 30.0
+        self._closed = False
+
+    def _sdk(self) -> AsyncGroq:
+        if self._closed:
+            raise LLMUnavailableError("Inference client is closed")
+        if self._client is None:
+            if not self._settings.GROQ_API_KEY:
+                raise LLMAuthError("Inference credentials unavailable")
+            self._client = AsyncGroq(
+                api_key=self._settings.GROQ_API_KEY,
+                base_url="https://api.groq.com",
+                max_retries=0,
+                timeout=self.timeout_seconds,
+            )
+        return self._client
+
+    async def aclose(self) -> None:
+        self._closed = True
+        if self._client is not None:
+            await self._client.close()
+
+    def _cost(self, kwargs: dict[str, Any]) -> AttemptCost:
+        return AttemptCost(
+            model=kwargs["model"],
+            input_tokens=reserve_input_tokens(kwargs),
+            output_tokens=kwargs["max_completion_tokens"],
+        )
+
+    @staticmethod
+    def _retry_delay(exc: Exception) -> float | None:
+        from groq import RateLimitError
+
+        if not isinstance(exc, RateLimitError):
+            return None
+        try:
+            delay = float(exc.response.headers.get("retry-after", "1"))
+        except ValueError:
+            return None
+        return delay if math.isfinite(delay) and 0 <= delay <= 5 else None
 
     def _format_messages_for_groq(
         self, messages: list[Message]
@@ -186,8 +262,41 @@ class GroqLLM:
             kwargs["tools"] = tools
             kwargs["tool_choice"] = "auto"
 
+        deadline = time.monotonic() + self.timeout_seconds
         try:
-            response = await self._client.chat.completions.create(**kwargs)
+            for attempt in range(2):
+                try:
+                    async with self.ledger.attempt(
+                        self._cost(kwargs),
+                        wait_seconds=max(0, min(5, deadline - time.monotonic())),
+                    ) as p:
+                        sdk = self._sdk()
+                        if time.monotonic() >= deadline:
+                            raise TimeoutError
+                        p.dispatch()
+                        response = await asyncio.wait_for(
+                            sdk.chat.completions.create(**kwargs),
+                            timeout=max(0, deadline - time.monotonic()),
+                        )
+                        if response.model != target_model:
+                            self.ledger.stop("model_mismatch")
+                            raise LLMUnavailableError("Inference model mismatch")
+                        if response.usage is not None:
+                            p.settle(
+                                ProviderUsage(
+                                    input_tokens=response.usage.prompt_tokens,
+                                    output_tokens=response.usage.completion_tokens,
+                                    total_tokens=response.usage.total_tokens,
+                                )
+                            )
+                    break
+                except Exception as exc:
+                    delay = self._retry_delay(exc)
+                    if attempt or delay is None or time.monotonic() + delay >= deadline:
+                        raise
+                    await asyncio.sleep(delay)
+        except QuotaDenied as exc:
+            raise LLMCapacityError(exc.reason) from None
         except Exception as exc:
             self._map_error(exc)
 
@@ -216,7 +325,9 @@ class GroqLLM:
             completion_tokens=usage.completion_tokens if usage else 0,
             total_tokens=usage.total_tokens if usage else 0,
             tool_calls=tool_calls,
-            usage_reported=usage is not None,
+            usage_reported=usage is not None and attempt == 0,
+            attempts=attempt + 1,
+            unknown_attempts=attempt + (usage is None),
         )
 
     async def stream(
@@ -238,75 +349,105 @@ class GroqLLM:
             kwargs["tools"] = tools
             kwargs["tool_choice"] = "auto"
 
-        try:
-            response_stream = await self._client.chat.completions.create(**kwargs)
-        except Exception as exc:
-            self._map_error(exc)
-
         tool_call_buffers: dict[int, dict[str, str]] = {}
-
+        final_usage: ProviderUsage | None = None
+        deadline = time.monotonic() + self.timeout_seconds
         try:
-            async for chunk in response_stream:
-                usage = chunk.usage or (chunk.x_groq.usage if chunk.x_groq else None)
-                if usage is not None:
-                    yield StreamUsage(
-                        model=chunk.model,
-                        input_tokens=usage.prompt_tokens,
-                        output_tokens=usage.completion_tokens,
-                    )
-                if not chunk.choices:
-                    continue
-                delta = chunk.choices[0].delta
-
-                if delta.content:
-                    yield normalize_llm_text(delta.content)
-
-                if delta.tool_calls:
-                    for tc_delta in delta.tool_calls:
-                        idx = tc_delta.index if tc_delta.index is not None else 0
-                        if idx not in tool_call_buffers:
-                            tool_call_buffers[idx] = {
-                                "id": tc_delta.id or "",
-                                "name": (
-                                    tc_delta.function.name
-                                    if tc_delta.function and tc_delta.function.name
-                                    else ""
-                                ),
-                                "arguments": "",
-                            }
-                        else:
-                            if tc_delta.id:
-                                tool_call_buffers[idx]["id"] = tc_delta.id
-                            if tc_delta.function and tc_delta.function.name:
-                                tool_call_buffers[idx]["name"] = tc_delta.function.name
-
-                        if tc_delta.function and tc_delta.function.arguments:
-                            tool_call_buffers[idx]["arguments"] += (
-                                tc_delta.function.arguments
+            async with self.ledger.attempt(
+                self._cost(kwargs),
+                wait_seconds=max(0, min(5, deadline - time.monotonic())),
+            ) as p:
+                sdk = self._sdk()
+                if time.monotonic() >= deadline:
+                    raise TimeoutError
+                p.dispatch()
+                response_stream = await asyncio.wait_for(
+                    sdk.chat.completions.create(**kwargs),
+                    timeout=max(0, deadline - time.monotonic()),
+                )
+                try:
+                    iterator = aiter(response_stream)
+                    while True:
+                        try:
+                            chunk = await asyncio.wait_for(
+                                anext(iterator),
+                                timeout=max(0, deadline - time.monotonic()),
                             )
-
-            for tc_data in tool_call_buffers.values():
-                if tc_data["name"]:
-                    yield ToolCall(
-                        id=tc_data["id"] or "call_unknown",
-                        name=tc_data["name"],
-                        arguments=tc_data["arguments"],
-                    )
+                        except StopAsyncIteration:
+                            break
+                        if chunk.model != self._model:
+                            self.ledger.stop("model_mismatch")
+                            raise LLMUnavailableError("Inference model mismatch")
+                        usage = chunk.usage or (
+                            chunk.x_groq.usage if chunk.x_groq else None
+                        )
+                        if usage is not None:
+                            reported_usage = ProviderUsage(
+                                input_tokens=usage.prompt_tokens,
+                                output_tokens=usage.completion_tokens,
+                                total_tokens=usage.total_tokens,
+                            )
+                            if (
+                                final_usage is not None
+                                and final_usage != reported_usage
+                            ):
+                                self.ledger.stop("provider_contract")
+                                raise LLMUnavailableError(
+                                    "Inconsistent inference usage"
+                                )
+                            final_usage = reported_usage
+                        if not chunk.choices:
+                            continue
+                        delta = chunk.choices[0].delta
+                        if delta.content:
+                            yield normalize_llm_text(delta.content)
+                        if delta.tool_calls:
+                            for tc in delta.tool_calls:
+                                idx = tc.index if tc.index is not None else 0
+                                buffer = tool_call_buffers.setdefault(
+                                    idx, {"id": "", "name": "", "arguments": ""}
+                                )
+                                if tc.id:
+                                    buffer["id"] = tc.id
+                                if tc.function:
+                                    if tc.function.name:
+                                        buffer["name"] = tc.function.name
+                                    buffer["arguments"] += tc.function.arguments or ""
+                    if final_usage is not None:
+                        p.settle(final_usage)
+                        yield StreamUsage(
+                            model=self._model,
+                            input_tokens=final_usage.input_tokens,
+                            output_tokens=final_usage.output_tokens,
+                        )
+                    for buffer in tool_call_buffers.values():
+                        if buffer["name"]:
+                            yield ToolCall(
+                                id=buffer["id"] or "call_unknown",
+                                name=buffer["name"],
+                                arguments=buffer["arguments"],
+                            )
+                finally:
+                    await response_stream.close()
+        except QuotaDenied as exc:
+            raise LLMCapacityError(exc.reason) from None
         except Exception as exc:
             self._map_error(exc)
-
-        finally:
-            await response_stream.close()
 
     def _map_error(self, exc: Exception) -> None:
         """Translate Groq SDK exceptions into our domain errors."""
         from groq import AuthenticationError, RateLimitError
 
+        if isinstance(exc, ValidationError):
+            self.ledger.stop("provider_contract")
+            raise LLMUnavailableError("Invalid inference usage") from None
+        if isinstance(exc, LLMError):
+            raise exc
         if isinstance(exc, RateLimitError):
-            raise LLMRateLimitError(str(exc)) from exc
+            raise LLMRateLimitError("Provider capacity unavailable") from None
         if isinstance(exc, AuthenticationError):
-            raise LLMAuthError(str(exc)) from exc
-        raise LLMUnavailableError(str(exc)) from exc
+            raise LLMAuthError("Inference credentials unavailable") from None
+        raise LLMUnavailableError("Inference service unavailable") from None
 
 
 # ── Fake adapter (for tests) ──────────────────────────────────────────
@@ -403,6 +544,6 @@ class FakeLLM:
                 yield word + (" " if i < len(words) - 1 else "")
 
 
-def get_llm_client(settings: Settings = Depends(get_settings)) -> LLMClient:
-    """Dependency provider returning production LLM client."""
-    return GroqLLM(settings)
+def get_llm_client(request: Request) -> LLMClient:
+    """One lazy provider client and quota ledger owned by the application lifespan."""
+    return request.app.state.llm

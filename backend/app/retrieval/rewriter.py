@@ -5,6 +5,7 @@ Rewrites pronouns and relative queries into standalone search queries.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from typing import TYPE_CHECKING
@@ -87,7 +88,9 @@ async def rewrite_follow_up_query(
     ]
 
     try:
-        completion = await llm.complete(messages, model=model)
+        completion = await asyncio.wait_for(
+            llm.complete(messages, model=model), timeout=2
+        )
         rewritten = completion.content.strip().strip('"').strip("'")
         if rewritten and len(rewritten) > 2:
             logger.info("Rewrote follow-up query '%s' -> '%s'", query, rewritten)

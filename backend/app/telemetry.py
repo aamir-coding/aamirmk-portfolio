@@ -31,6 +31,8 @@ class ModelCall(Observation):
     usage_source: Literal["reported", "fake", "unknown"] = "unknown"
     input_tokens: int | None = Field(default=None, ge=0)
     output_tokens: int | None = Field(default=None, ge=0)
+    attempts: int | None = Field(default=None, ge=0)
+    unknown_attempts: int | None = Field(default=None, ge=0)
 
 
 class RetrievedSource(Observation):
@@ -178,6 +180,8 @@ class ObservedLLM:
                 messages, tools=tools, model=model, response_format=response_format
             )
             call.reported_model = reply.model
+            call.attempts = reply.attempts
+            call.unknown_attempts = reply.unknown_attempts
             if reply.usage_reported:
                 call.usage_source = (
                     "fake" if isinstance(self.client, FakeLLM) else "reported"
@@ -198,31 +202,40 @@ class ObservedLLM:
         self, messages: list[Message], tools: list[dict[str, Any]] | None = None
     ) -> AsyncIterator[str | ToolCall]:
         trace = self.trace or active_trace.get()
-        if trace is None:
-            async for item in self.client.stream(messages, tools=tools):
-                if not isinstance(item, StreamUsage):
-                    yield item
-            return
-        call = ModelCall(stage=trace.stage, configured_model=self.main_model)
-        trace.calls.append(call)
-        start = trace.clock()
+        call = (
+            ModelCall(stage=trace.stage, configured_model=self.main_model)
+            if trace
+            else None
+        )
+        if trace and call:
+            trace.calls.append(call)
+        start = trace.clock() if trace else 0
+        iterator = self.client.stream(messages, tools=tools)
         try:
-            async for item in self.client.stream(messages, tools=tools):
+            async for item in iterator:
                 if isinstance(item, StreamUsage):
-                    call.reported_model = item.model
-                    call.usage_source = "reported"
-                    call.input_tokens, call.output_tokens = (
-                        item.input_tokens,
-                        item.output_tokens,
-                    )
+                    if call:
+                        call.attempts, call.unknown_attempts = 1, 0
+                        call.reported_model = item.model
+                        call.usage_source = "reported"
+                        call.input_tokens, call.output_tokens = (
+                            item.input_tokens,
+                            item.output_tokens,
+                        )
                 else:
                     yield item
-            call.status = "complete"
+            if call:
+                call.status = "complete"
         except BaseException as exc:
-            call.status = "failed" if isinstance(exc, Exception) else "cancelled"
+            if call:
+                call.status = "failed" if isinstance(exc, Exception) else "cancelled"
             raise
         finally:
-            call.duration_ms = (trace.clock() - start) * 1000
+            close = getattr(iterator, "aclose", None)
+            if close is not None:
+                await close()
+            if trace and call:
+                call.duration_ms = (trace.clock() - start) * 1000
 
 
 class ObservedRetriever:

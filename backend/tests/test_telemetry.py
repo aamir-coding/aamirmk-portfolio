@@ -21,6 +21,8 @@ from app.telemetry import (
     active_trace,
     provenance,
 )
+from tests.test_inference_client import make_ledger
+from tests.test_safety_admission import Clock
 
 
 @pytest.mark.asyncio
@@ -66,7 +68,7 @@ async def test_real_sdk_stream_reports_final_usage_and_closes() -> None:
         base = {
             "id": "fake",
             "created": 0,
-            "model": "reported-model",
+            "model": "openai/gpt-oss-120b",
             "object": "chat.completion.chunk",
         }
         frames = [
@@ -88,13 +90,12 @@ async def test_real_sdk_stream_reports_final_usage_and_closes() -> None:
             200, text=data, headers={"content-type": "text/event-stream"}
         )
 
-    adapter = GroqLLM(Settings(GROQ_API_KEY="fake-test-key"))
-    await adapter._client.close()
-    adapter._client = AsyncGroq(
+    sdk = AsyncGroq(
         api_key="fake-test-key",
         max_retries=0,
         http_client=httpx.AsyncClient(transport=httpx.MockTransport(handler)),
     )
+    adapter = GroqLLM(Settings(_env_file=None), ledger=make_ledger(Clock()), client=sdk)
     trace = Trace()
     try:
         observed = ObservedLLM(adapter, trace, main_model="configured-model")
@@ -102,7 +103,7 @@ async def test_real_sdk_stream_reports_final_usage_and_closes() -> None:
         receipt = trace.snapshot()
         assert receipt.usage_complete
         assert (receipt.input_tokens, receipt.output_tokens) == (12, 3)
-        assert receipt.calls[0].reported_model == "reported-model"
+        assert receipt.calls[0].reported_model == "openai/gpt-oss-120b"
         assert receipt.calls[0].configured_model == "configured-model"
     finally:
         await adapter._client.close()

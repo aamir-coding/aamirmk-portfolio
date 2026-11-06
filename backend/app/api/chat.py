@@ -7,7 +7,7 @@ import json
 import logging
 import uuid
 from collections.abc import AsyncIterator
-from contextlib import suppress
+from contextlib import aclosing, suppress
 from enum import Enum
 from typing import Any
 
@@ -33,11 +33,6 @@ from app.safety.guardrails import (
     SAFE_REFUSAL_MESSAGE,
     check_prompt_injection,
     format_safe_user_message,
-)
-from app.safety.quota import (
-    DailyQuotaGuard,
-    check_daily_quota,
-    get_quota_guard,
 )
 from app.safety.rate_limiter import (
     RateLimitResult,
@@ -86,6 +81,9 @@ async def stream_with_heartbeat(
             anext_task.cancel()
             with suppress(asyncio.CancelledError):
                 await anext_task
+        close = getattr(stream_iter, "aclose", None)
+        if close is not None:
+            await close()
 
 
 def extract_citations(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
@@ -122,8 +120,6 @@ async def chat(
     retriever: Retriever = Depends(get_retriever),
     tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
-    _quota: None = Depends(check_daily_quota),
-    quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
 ) -> ChatResponse:
     """Process user message using LLM grounded with retrieved context chunks."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -162,6 +158,7 @@ async def chat(
         request.message,
         request.history,
         llm=llm,
+        model=get_settings().LLM_MODEL_UTILITY,
     )
 
     # 3. Retrieve relevant factual context chunks & generate receipts
@@ -264,9 +261,6 @@ async def chat(
             detail="An error occurred while communicating with the AI service.",
         ) from exc
 
-    # 4. Track actual consumed tokens against daily quota
-    await quota_guard.record_usage(tokens=total_tokens)
-
     trace.text()
     return ChatResponse(
         telemetry=trace.snapshot().model_copy(update=versions),
@@ -294,8 +288,6 @@ async def chat_stream(
     retriever: Retriever = Depends(get_retriever),
     tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
-    _quota: None = Depends(check_daily_quota),
-    quota_guard: DailyQuotaGuard = Depends(get_quota_guard),
 ) -> StreamingResponse:
     """Stream user message using LLM via Server-Sent Events (SSE)."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -344,6 +336,7 @@ async def chat_stream(
         request.message,
         request.history,
         llm=llm,
+        model=get_settings().LLM_MODEL_UTILITY,
     )
 
     # 3. Retrieve relevant factual context chunks & generate receipts
@@ -387,19 +380,20 @@ async def chat_stream(
 
             # Stream Turn 1: checks for tool calls or direct text
             detected_tool_calls: list[ToolCall] = []
-            async for item in stream_with_heartbeat(
-                llm.stream(messages, tools=tool_schemas)
-            ):
-                if item is StreamHeartbeat.PING:
-                    yield ": heartbeat\n\n"
-                    continue
-                if isinstance(item, ToolCall):
-                    detected_tool_calls.append(item)
-                else:
-                    trace.text()
-                    tokens_emitted += 1
-                    payload = json.dumps({"token": item})
-                    yield f"event: token\ndata: {payload}\n\n"
+            async with aclosing(
+                stream_with_heartbeat(llm.stream(messages, tools=tool_schemas))
+            ) as items:
+                async for item in items:
+                    if item is StreamHeartbeat.PING:
+                        yield ": heartbeat\n\n"
+                        continue
+                    if isinstance(item, ToolCall):
+                        detected_tool_calls.append(item)
+                    else:
+                        trace.text()
+                        tokens_emitted += 1
+                        payload = json.dumps({"token": item})
+                        yield f"event: token\ndata: {payload}\n\n"
 
             # If tool calls were made, resolve them and stream Turn 2 explanation
             if detected_tool_calls:
@@ -434,15 +428,18 @@ async def chat_stream(
 
                 trace.set_stage("tool_answer")
                 # Turn 2: stream verbal explanation
-                async for token in stream_with_heartbeat(llm.stream(messages)):
-                    if token is StreamHeartbeat.PING:
-                        yield ": heartbeat\n\n"
-                        continue
-                    if isinstance(token, str):
-                        trace.text()
-                        tokens_emitted += 1
-                        payload = json.dumps({"token": token})
-                        yield f"event: token\ndata: {payload}\n\n"
+                async with aclosing(
+                    stream_with_heartbeat(llm.stream(messages))
+                ) as items:
+                    async for token in items:
+                        if token is StreamHeartbeat.PING:
+                            yield ": heartbeat\n\n"
+                            continue
+                        if isinstance(token, str):
+                            trace.text()
+                            tokens_emitted += 1
+                            payload = json.dumps({"token": token})
+                            yield f"event: token\ndata: {payload}\n\n"
 
             done_payload = json.dumps(
                 {
@@ -454,11 +451,6 @@ async def chat_stream(
             )
             yield f"event: done\ndata: {done_payload}\n\n"
 
-            # 4. Track tokens (estimated prompt + generated tokens)
-            estimated_prompt_tokens = max(len(system_prompt) // 4, 100)
-            await quota_guard.record_usage(
-                tokens=estimated_prompt_tokens + tokens_emitted
-            )
         except LLMRateLimitError as exc:
             logger.warning("[%s] Groq rate limit during stream: %s", conv_id, exc)
             err_payload = json.dumps(

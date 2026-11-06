@@ -11,7 +11,7 @@ import * as api from "./api";
 const captures = z.object({ records: z.array(z.object({
   id: z.string(), raw_sse: z.string(),
 })) }).parse(JSON.parse(readFileSync(resolve(process.cwd(),
-  "../evals/recordings/endpoints-v2-telemetry.json"), "utf8"))).records;
+  "../evals/recordings/endpoints-v3-safety.json"), "utf8"))).records;
 
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 

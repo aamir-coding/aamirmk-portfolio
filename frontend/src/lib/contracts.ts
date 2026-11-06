@@ -20,6 +20,8 @@ export const RequestTelemetrySchema = z.object({
     status: z.enum(["running", "complete", "failed", "cancelled"]),
     usage_source: z.enum(["reported", "fake", "unknown"]),
     input_tokens: Tokens, output_tokens: Tokens,
+    attempts: z.number().int().nonnegative().nullable().optional(),
+    unknown_attempts: z.number().int().nonnegative().nullable().optional(),
   })),
   retrieval: z.array(z.object({
     stage: z.string(), duration_ms: Milliseconds,

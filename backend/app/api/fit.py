@@ -5,9 +5,10 @@ from __future__ import annotations
 import json
 import logging
 from collections.abc import AsyncIterator
+from contextlib import aclosing
 from typing import Any
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import StreamingResponse
 
 from app.api.chat import StreamHeartbeat, stream_with_heartbeat
@@ -16,7 +17,6 @@ from app.fit.pipeline import FitPipeline
 from app.fit.sample_jds import load_sample_jds
 from app.llm import LLMClient, get_llm_client
 from app.retrieval.retriever import Retriever, get_retriever
-from app.safety.quota import check_daily_quota
 from app.safety.rate_limiter import check_fit_rate_limit
 from app.settings import Settings, get_settings
 
@@ -24,29 +24,33 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["fit"])
 
-_fit_pipeline_instance: FitPipeline | None = None
-
 
 def get_fit_pipeline(
+    request: Request,
     llm: LLMClient = Depends(get_llm_client),
     retriever: Retriever = Depends(get_retriever),
     settings: Settings = Depends(get_settings),
 ) -> FitPipeline:
-    """Dependency provider returning singleton FitPipeline instance."""
-    global _fit_pipeline_instance
-    if _fit_pipeline_instance is None:
-        _fit_pipeline_instance = FitPipeline(
-            llm=llm,
-            retriever=retriever,
-            settings=settings,
-        )
-    return _fit_pipeline_instance
+    """Request-local orchestration using an app-owned provider and shared cache."""
+    override = getattr(request.app.state, "fit_pipeline_override", None)
+    if override is not None:
+        return override
+    pipeline = FitPipeline(
+        llm=llm,
+        retriever=retriever,
+        settings=settings,
+        cache=request.app.state.fit_cache,
+    )
+    if request.app.state.fit_cache is None:
+        request.app.state.fit_cache = pipeline._cache
+    return pipeline
 
 
 def set_fit_pipeline(pipeline: FitPipeline | None) -> None:
-    """Set or override active FitPipeline instance (for test isolation)."""
-    global _fit_pipeline_instance
-    _fit_pipeline_instance = pipeline
+    """Legacy test helper; override only the exported default application's state."""
+    from app.main import app
+
+    app.state.fit_pipeline_override = pipeline
 
 
 @router.get(
@@ -80,21 +84,22 @@ async def get_fit_presets() -> list[dict[str, Any]]:
 async def generate_fit_report(
     body: FitRequest,
     _rate: Any = Depends(check_fit_rate_limit),
-    _quota: Any = Depends(check_daily_quota),
     pipeline: FitPipeline = Depends(get_fit_pipeline),
 ) -> StreamingResponse:
     """Analyze a pasted job description and stream progress and fit report via SSE."""
     logger.info("Initiating fit report generation (hash: %s)", body.compute_hash())
 
     async def sse_event_generator() -> AsyncIterator[str]:
-        async for frame in pipeline.run(body):
-            event_name = frame["event"]
-            event_data = json.dumps(frame["data"])
-            yield f"event: {event_name}\ndata: {event_data}\n\n"
+        async with aclosing(pipeline.run(body)) as frames:
+            async for frame in frames:
+                event_name = frame["event"]
+                event_data = json.dumps(frame["data"])
+                yield f"event: {event_name}\ndata: {event_data}\n\n"
 
     async def transport_stream() -> AsyncIterator[str]:
-        async for item in stream_with_heartbeat(sse_event_generator()):
-            yield ": heartbeat\n\n" if item is StreamHeartbeat.PING else item
+        async with aclosing(stream_with_heartbeat(sse_event_generator())) as frames:
+            async for item in frames:
+                yield ": heartbeat\n\n" if item is StreamHeartbeat.PING else item
 
     return StreamingResponse(
         transport_stream(),

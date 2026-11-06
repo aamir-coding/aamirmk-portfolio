@@ -61,6 +61,13 @@ class FitPipeline:
         self._curated_keys: set[str] = set()
         if cache is not None:
             self._cache = cache
+            from app.fit.golden_benchmarks import GOLDEN_BENCHMARK_REPORTS
+
+            self._curated_keys = {
+                report.jd_hash
+                for report in GOLDEN_BENCHMARK_REPORTS.values()
+                if self._cache.get(report.jd_hash) == report
+            }
         else:
             from app.fit.golden_benchmarks import GOLDEN_BENCHMARK_REPORTS
 

@@ -353,7 +353,6 @@ async def generate_case(
     from app.fit.models import FitReport, FitRequest
     from app.fit.pipeline import FitPipeline
     from app.models import ChatRequest
-    from app.safety.quota import DailyQuotaGuard
     from app.safety.rate_limiter import RateLimitResult
     from app.settings import Settings
     from app.tools.registry import ToolRegistry
@@ -372,8 +371,6 @@ async def generate_case(
             retriever=trace,
             tool_registry=ToolRegistry(),
             rate_limit=RateLimitResult(True, 10, 9, 60),
-            _quota=None,
-            quota_guard=DailyQuotaGuard(),
         )
         output = response.model_dump(mode="json")
     else:

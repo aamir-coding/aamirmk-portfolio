@@ -16,7 +16,7 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Mapping
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Self
+from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -314,3 +314,7 @@ class InferenceLedger:
             waiting=self._waiting,
             reason=reason,
         )
+
+    def stop(self, reason: Literal["model_mismatch", "provider_contract"]) -> None:
+        """An invalid provider contract makes further local accounting unsafe."""
+        self._fault = reason

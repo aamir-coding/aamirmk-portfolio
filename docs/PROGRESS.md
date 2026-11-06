@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — approved; Increment 1 implemented**
+**Phase 7 (remaining): Safety hardening — approved; Increments 1–2 implemented**
 on `phase-7-safety-hardening`, based on `main` at `440e81d`.
 [Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -28,7 +28,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: integrate per-attempt admission into the app-owned provider lifecycle (Increment 2).
+Next: trusted identity, bounded IP/session admission and request-size caps (Increment 3).
 Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
@@ -59,7 +59,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Approved; Increment 1 implemented; provider integration next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
+| P7: Safety (rest) | 🟡 Approved; Increments 1–2 implemented; abuse controls next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -215,7 +215,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with per-provider-attempt integration (Increment 2); no Phase 10/9 work starts.
+1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with trusted identity and bounded abuse admission (Increment 3); no Phase 10/9 work starts.
 2. Phase 8 remote main/tag identity is verified at `440e81d`; deployment is user-confirmed. CI results and deployed runtime revision remain independently unverified.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -547,3 +547,36 @@ the following kickoff supersedes its remote-status statements.
 - Sandbox async tests stalled; the same fake-only suite completed outside sandbox.
   Stalled test processes were identified and stopped. Successful runs above are counted;
   no stalled run is treated as a pass.
+
+### Remaining Phase 7 Increment 2 — 6 November 2026
+
+- App owns one lazy Groq adapter/ledger and closes the client on lifespan exit.
+  Fit orchestration is request-local with an app-owned cache; the legacy setter now
+  overrides only the exported default app for existing tests. Removed route-level
+  quota checks/accounting so every actual provider call instead crosses admission,
+  including fit/rewrite/tool turns. Zero-call refusals and presets stay usable.
+- Groq 1.7.0 official client source checked: pinned base URL, `max_retries=0`, bounded
+  30-second total complete/stream deadlines. Nonstreaming 429 allows at most one
+  explicit retry with finite <=5-second Retry-After, independently reserved; unknown
+  first-attempt usage is never refunded or reported as complete. Streaming has no
+  automatic retry. Rewrite uses the utility model and a two-second fallback deadline.
+- Provider model mismatch and malformed/contradictory usage stop subsequent admission.
+  Stream settlement is deferred until complete iteration; early cancellation keeps the
+  full hold. Explicit child-generator closure spans adapter, observer, heartbeat,
+  chat and fit transports. Retained-child tests verify closure after a yielded frame.
+- Read-only review found and prompted fixes for forwarding-generator closure, reported
+  model identity, early stream refunds and invented failure attempt counts. Failed/
+  cancelled attempt counts now remain unavailable; successful retries disclose their
+  count and unknown usage. Latest focused inference/chat/fit/rewrite/recording tests:
+  **97 passed, 1 warning in 9.02s**; after the final nullable failure-count change,
+  **24 focused inference/telemetry/recording tests passed in 7.88s**.
+- Separate `endpoints-v3-safety.json` fake-backed contract capture added and used by
+  frontend tests. Original v1/v2 records, human packet and judge archives preserved.
+  **25 frontend receipt/contract tests passed**; ESLint, TypeScript/Vite build passed;
+  initial JS **166,126 gzip bytes < 200,000**. Existing build warnings remain.
+  Ruff full configured lint/format and diff checks passed before the final tiny change;
+  final phase checks will cover the complete source. No new dependencies/provider calls.
+- Old P8 result/baseline/runtime fingerprints remain stale until reviewed phase-final
+  offline regeneration. No numeric accuracy claim, baseline weakening, push or deploy.
+- User chose to prepare exact audit-tool additions for version/workflow review;
+  adding pip-audit or a secret-scanning action still awaits explicit approval.

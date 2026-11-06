@@ -746,3 +746,29 @@ Pydantic models constrain budgets, costs, usage and allowances. Settings define 
 not spending permission. Legacy route quota behavior stays until Increment 2 wires one
 ledger and provider client into app lifespan; this increment alone changes no outbound
 call path. No database or new dependency. Explicit code rules do not depend on a model.
+
+### DRN-055: App-owned provider lifecycle and terminal stream accounting
+
+**Date:** 2026-11-06. **Scope:** Remaining P7 Increment 2.
+
+One lazy Groq client and ledger belong to each app, with Depends returning that client
+and lifespan closing it. Fresh fit orchestration receives that client and an app-owned
+cache, rather than retaining the first request's dependencies in a module singleton.
+SDK retries are disabled and host pinned. Each complete call has a total 30-second
+deadline including admission and at most one explicit <=5-second-hint 429 retry, each
+with a new hold. Streams have a total deadline and no retry, avoiding duplicate output.
+Utility rewrites get a two-second fallback deadline and explicit utility routing.
+
+Reported models must match the admitted model. Inconsistent usage faults the ledger;
+stream usage is only settled after complete validated iteration. Every forwarding
+generator owns child closure, including explicit close while suspended after yield.
+Unknown attempts stay charged; retry responses cannot make aggregate usage complete.
+Receipts disclose successful attempt/unknown counts; counts on failures/cancellation
+remain null rather than inventing a number. Per-request telemetry is still distinct
+from global reservations. Old route quota estimates no longer control provider calls.
+
+v3 fake-backed endpoint captures track the changed contracts without rewriting v1/v2
+or human calibration evidence. Changed code invalidates the P8 numeric summary until
+fresh compatible offline evidence and baseline identity review; no floors are lowered.
+Default production generation remains resting without a boot-bound allowance. This
+rollout does not supply durable accounting, operational activation or live acceptance.

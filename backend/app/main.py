@@ -17,6 +17,7 @@ from app.api.debug import router as debug_router
 from app.api.evals import router as evals_router
 from app.api.fit import router as fit_router
 from app.api.health import router as health_router
+from app.llm import GroqLLM
 from app.safety.ip import get_client_ip
 from app.settings import Settings, get_settings
 
@@ -53,8 +54,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         logger.info("Hybrid retrieval index initialized and ready")
     except Exception as exc:
         logger.warning("Could not pre-warm retriever at startup: %s", exc)
-    yield
-    logger.info("Shutting down application")
+    try:
+        yield
+    finally:
+        await app.state.llm.aclose()
+        logger.info("Shutting down application")
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -69,6 +73,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.llm = GroqLLM(app_settings)
+    app.state.fit_cache = None
+    app.dependency_overrides[get_settings] = lambda: app_settings
 
     # Pure ASGI path normalization middleware (runs before routing)
     app.add_middleware(NormalizePathMiddleware)

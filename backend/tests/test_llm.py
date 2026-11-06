@@ -17,6 +17,9 @@ from app.llm import (
     ToolCall,
     normalize_llm_text,
 )
+from app.settings import Settings
+from tests.test_inference_client import make_ledger
+from tests.test_safety_admission import Clock
 
 
 @pytest.mark.asyncio
@@ -28,14 +31,13 @@ async def test_json_mode_preserves_raw_structured_response() -> None:
                 SimpleNamespace(message=SimpleNamespace(content=payload, tool_calls=[]))
             ],
             usage=None,
-            model="fake",
+            model="openai/gpt-oss-120b",
         )
     )
-    llm = GroqLLM.__new__(GroqLLM)
-    llm._model = "fake"
-    llm._client = SimpleNamespace(
-        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+    sdk = SimpleNamespace(
+        max_retries=0, chat=SimpleNamespace(completions=SimpleNamespace(create=create))
     )
+    llm = GroqLLM(Settings(_env_file=None), ledger=make_ledger(Clock()), client=sdk)
     reply = await llm.complete([], response_format={"type": "json_object"})
     assert reply.content == payload
 
