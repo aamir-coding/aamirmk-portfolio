@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — six increments implemented locally; final verification/acceptance in progress**
+**Phase 7 (remaining): Safety hardening — six increments implemented and locally verified; semantic/operational acceptance pending**
 on `phase-7-safety-hardening`, based on `main` at `440e81d`.
 [Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -28,8 +28,9 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: finish source-bound offline artifact refresh and final checks; review outstanding
-operational/semantic gates and teach-back. No push/deploy or next phase is authorized.
+Next: review the [local verification/acceptance ledger](audits/2026-11-06-phase-07-safety.md)
+and outstanding operational/semantic gates; teach-back answers remain unassessed.
+No push/deploy or next phase is authorized.
 Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
@@ -60,7 +61,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Six increments local; final verification and acceptance pending | `phase-7-safety-hardening` | — | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
+| P7: Safety (rest) | 🟡 Six increments locally verified; semantic/operational acceptance pending | `phase-7-safety-hardening` | — | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -708,6 +709,17 @@ the following kickoff supersedes its remote-status statements.
   reconciled, and three-question interactive teach-back sent. Answers not yet assessed.
 
 ### Remaining Phase 7 acceptance gates
+
+Final verification supersedes the intermediate counts above: **610 Python tests passed,
+2 existing warnings in 88.90s**; **176 frontend tests passed in 23 files**; Ruff lint
+and formatting, ESLint, TypeScript/Vite build and diff checks passed. Final initial JS
+**166,994 gzip bytes < 200,000**. The exact full offline gate returned **exit 0,
+gate_failures: []**. Reviewed fingerprints-only baseline refresh preserves every score
+and critical rule; public projection still shows failed judge validation/five
+disagreements/76 draft facts/model accuracy unavailable. Source `ddae674`, clean v3
+capture `fd323d9`; final result generated against clean `fd323d9`. No provider calls.
+Exact npm high-severity CI command also returned exit 0; nine moderate findings remain.
+See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
 
 - **Pending:** real-output semantic review of at least 20 attacks, with separately
   authorized bounded provider spend. Development fixture/code enforcement is not this
