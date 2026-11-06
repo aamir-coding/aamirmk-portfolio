@@ -27,7 +27,7 @@ jobs:
           "$RUNNER_TEMP/portfolio-audit/bin/python" -m pip_audit
           --disable-pip --no-deps -r build/python-environment.txt
           --format json --output build/pip-audit.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: python-audit
