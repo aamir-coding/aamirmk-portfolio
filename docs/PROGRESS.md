@@ -1,14 +1,24 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 8: Evals, under-the-hood panel and eval badge — offline engineering milestone complete**
-on `phase-8-evals`. Aamir accepted the authentic failed independent validation baseline,
+**Phase 7 (remaining): Safety hardening — approved; Increment 1 implemented**
+on `phase-7-safety-hardening`, based on `main` at `440e81d`.
+[Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
+Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
+
+**Phase 8: Evals, under-the-hood panel and eval badge — merged and remotely tagged**
+at `440e81d`. On 6 November 2026, read-only `git ls-remote origin` independently
+confirmed both `refs/heads/main` and `refs/tags/phase-8-done` target
+`440e81d6057a493c32f851f962e6cbda9fc19e9f`. Aamir reports the merge/push triggered
+cloud CI and deployments and confirms deployment. Pipeline success and deployed
+runtime revision were not independently checked in this kickoff.
+Aamir accepted the authentic failed independent validation baseline,
 closed Increment 4, and authorized finishing Increments 5–7. Reproducible artifacts/CI,
 real request-local telemetry, accessible drawer, `/api/eval-summary`, `/evals` and an
 actual-result engineering badge are implemented. **Judge validation remains FAILED**:
 Support 8/8 (100%), Completeness 6/8 (75%), Behavior 7/8 (87.5%), Tone 6/8 (75%).
 All five disagreements, unchanged human grades and all 76 draft facts are preserved.
-**Model accuracy remains unavailable.** No new Groq calls, remote push or deployment.
+**Model accuracy remains unavailable.** No new Groq calls in this kickoff.
 [Validation baseline](audits/2026-11-05-judge-validation.md) ·
 [Close-out review](audits/2026-11-05-phase-08-closeout.md).
 
@@ -18,8 +28,8 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: STOP after local Phase 8 close-out; await Aamir's explicit approval before any
-next phase. Remote integration/deployment is not performed. A new factual accuracy claim
+Next: integrate per-attempt admission into the app-owned provider lifecycle (Increment 2).
+Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
 and resampling these exposed eight outcomes. These are experiment/publication gates,
@@ -48,8 +58,8 @@ not unfinished work in the accepted offline engineering milestone.
 | **Quality & Multi-Turn Hardening** | 🟢 Complete | `main` | `quality-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
-| P8: Evals | 🟢 Offline engineering complete; validation failure preserved; model accuracy unavailable | `phase-8-evals` | `phase-8-done` (local) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | ⬜ Not Started | — | — | — |
+| P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
+| P7: Safety (rest) | 🟡 Approved; Increment 1 implemented; provider integration next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -205,9 +215,9 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. All 28 human grades are unchanged. Calibration 20/20 passed its development thresholds; independent validation 8/8 completed but failed Completeness/Tone at 6/8 each. Preserve five disagreements and the failed gate; no new live call or data/prompt change without reviewed scope/budget.
-2. Remediation guide verified and teach-back responses waived by user on 2026-11-04; local completion tag targets `88fae8c`. User-reported live acceptance is below. No remote push of the new tag was performed.
-3. Human grading has been supplied and is unchanged. Fact approval and any further live budget remain separate; no blanket approval of 76 draft facts, validation calls or public accuracy badge is implied.
+1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with per-provider-attempt integration (Increment 2); no Phase 10/9 work starts.
+2. Phase 8 remote main/tag identity is verified at `440e81d`; deployment is user-confirmed. CI results and deployed runtime revision remain independently unverified.
+3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
 ## User-Reported Live Acceptance — 2026-11-04
 - Aamir reports personally verifying that the live website works, including formatting, raw Markdown handling, continued chat context, links, and contact details.
@@ -403,19 +413,25 @@ not unfinished work in the accepted offline engineering milestone.
 | `openai/gpt-oss-120b` | 30 | 1,000 | 8,000 | 200,000 |
 | `openai/gpt-oss-20b` | 30 | 1,000 | 8,000 | 200,000 |
 
-Both models share the same limits. The 20b model is cheaper for utility calls.
+The rows record the same numerical limits, not proof of one shared counter or two
+independently spendable pools. Reconfirm current account-specific limits before use.
 
 ## Open Questions
-1. **Phone number**: resume.tex contains a phone number. Excluded from knowledge base per hard rules unless user approves.
+1. **Contact disclosure**: DRN-029 records prior authorization and the current contact fact. Retrieval rank is not a security boundary; this kickoff grants no new disclosure permission.
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-Independent validation execution is complete, but its quality gate failed:
-Completeness and Tone each 6/8(75%), below 80%. No missing items or transport errors.
-Preserve human grades and the failed result; do not resample/retune this exposed
-validation set to claim a pass. Further calibration needs a reviewed fresh
-validation version with human grading. All76facts remain draft; no calibrated
-accuracy badge or Phase 8 completion. Increment 5 has not started.
+The remaining Phase 7 brief is approved; no blocker to offline implementation.
+Production acceptance needs verified proxy behavior and current account limits/prior
+usage. In-memory accounting cannot establish durable organization-wide protection
+across restarts or independent eval processes; see the brief's fail-closed proposal.
+Postgres persistence stays deferred to P9. P10 database-dependent acceptance also
+stays pending P9 rather than silently bringing storage forward.
+
+Publication gates remain: all 76 public facts are draft; independent judge validation
+failed Completeness/Tone at 6/8 each. Preserve the failed result and five disagreements.
+Further tuning requires a fresh independently graded validation version. These gates
+do not reopen the accepted Phase 8 offline engineering milestone.
 
 ### Phase 8 Increment 5 — implementation
 
@@ -478,4 +494,56 @@ the approved brief. The new receipt does not certify those defects fixed.
 Final result data: clean source `acc35c4f84b3cfb1527181ed6a88dfa24799e6cb` produced the
 committed offline artifact with zero Groq calls and no gate failures. The public
 projection was refreshed from it; 13 focused artifact/endpoint tests passed afterward.
-Initial JS: 166,077 gzip bytes (<200,000). Completion is local only.
+Initial JS: 166,077 gzip bytes (<200,000). Completion was local at that close-out;
+the following kickoff supersedes its remote-status statements.
+
+### Phase 8 remote confirmation / remaining Phase 7 kickoff — 6 November 2026
+
+- Initial `git status --short --branch`: `## main...origin/main`, no worktree changes.
+- Read-only remote query returned `440e81d6057a493c32f851f962e6cbda9fc19e9f` for
+  both `refs/heads/main` and `refs/tags/phase-8-done`. Aamir manually performed the
+  merge/push/tag operations and confirms deployment; no agent push or deploy occurred.
+- Created `phase-7-safety-hardening` from that commit. Prepared the outcome-first
+  pre-mortem and six-increment brief; implementation has not started.
+- Read current quota, IP, rate-limit, guardrail, LLM, chat, fit, rewrite and deployment
+  paths. Verified installed metadata: FastAPI 0.115.11, Starlette 0.46.2, Groq 1.7.0,
+  HTTPX 0.28.1, Pydantic 2.10.6, pydantic-settings 2.8.1, pytest 8.3.5. Local Groq
+  constants show 60-second default timeout (5-second connect) and two default retries.
+- Official Groq rate-limit documentation checked; equal listed model limits do not
+  prove independently spendable pools. Account-specific limits/prior use still need
+  confirmation for production enablement. No live provider calls or dependency changes.
+- Documentation-only kickoff: `git diff --check` passed with no output; structural
+  checks reported `Brief checks: 6 increments; 2 new local document links resolve.`
+  No application test suites rerun; historical Phase 8 checks above remain attributed
+  to their original execution.
+
+### Remaining Phase 7 Increment 1 — 6 November 2026
+
+- Aamir explicitly approved the six-increment phase brief. Added the independent
+  `safety/admission.py` module: atomic shared/model rolling-minute and daily reservations,
+  bounded active/waiting calls, explicit dispatch and idempotent known-use settlement.
+  Cancelled/failed/unknown dispatched attempts retain their holds; undispatched holds
+  are released synchronously. Overruns stop subsequent admission.
+- Startup defaults closed. Allowances are one-shot, fresh, UTC-bounded and tied to a
+  random ledger boot ID; no environment allowance automatically resets spending after
+  restart. Initial unknown minute use gets a 60-second cooldown. Conservative input
+  reservation covers serialized UTF-8 request bytes plus framing headroom, not exact
+  tokenization. Provider wiring and operational allowance activation remain Increment 2.
+- Added validated settings ceilings (shared defaults 24 RPM / 6,400 TPM / 800 RPD /
+  160,000 TPD), model-specific caps, concurrency/queue bounds and `.env.example` comments.
+- Test-first collection failed for missing `app.safety.admission`. Initial focused
+  checks passed; architecture review then found late-wakeup deadline admission and
+  strict environment-integer parsing. Both reproduced as **2 failed** regressions,
+  then fixed. Latest focused admission/legacy quota/settings: **40 passed, 1 existing
+  Starlette deprecation warning in 0.61s**. Ruff checks/format passed before review;
+  final scoped checks follow. No live provider calls or dependencies added.
+- Broader offline run before the two fixes: **527 passed, 1 failed, 1 warning in
+  95.33s**. Sole failure is `test_public_projection_and_endpoint_match_actual_result`:
+  `ValueError: Stale result inputs`. The new application source correctly invalidates
+  the old P8 fingerprints. Do not weaken this gate: fresh compatible results and explicit
+  baseline identity review are required at phase close-out. P8 historical artifacts and
+  frozen grades remain untouched. The old live numeric summary will correctly be stale
+  on a deployment of changed source until a compatible artifact is installed.
+- Sandbox async tests stalled; the same fake-only suite completed outside sandbox.
+  Stalled test processes were identified and stopped. Successful runs above are counted;
+  no stalled run is treated as a pass.

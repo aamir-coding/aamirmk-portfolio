@@ -2,8 +2,10 @@ import json
 from functools import lru_cache
 from typing import Any
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from app.safety.admission import CapacityLimits
 
 
 class Settings(BaseSettings):
@@ -34,12 +36,36 @@ class Settings(BaseSettings):
     QUOTA_DAILY_REQUEST_LIMIT: int = 800
     QUOTA_DAILY_TOKEN_LIMIT: int = 180000
 
+    # A ledger remains closed until a fresh, boot-bound allowance is authorized.
+    INFERENCE_SHARED_LIMITS: CapacityLimits = Field(
+        default_factory=lambda: CapacityLimits(rpm=24, tpm=6400, rpd=800, tpd=160000)
+    )
+    INFERENCE_MODEL_LIMITS: dict[str, CapacityLimits] = Field(
+        default_factory=lambda: {
+            model: CapacityLimits(rpm=24, tpm=6400, rpd=800, tpd=160000)
+            for model in ("openai/gpt-oss-120b", "openai/gpt-oss-20b")
+        },
+        min_length=1,
+        max_length=2,
+    )
+    INFERENCE_MAX_ACTIVE: int = Field(default=2, ge=1, le=16, strict=True)
+    INFERENCE_MAX_WAITERS: int = Field(default=8, ge=0, le=64, strict=True)
+
     model_config = SettingsConfigDict(
         # Try backend/.env first, then repo-root .env (for monorepo layout)
         env_file=(".env", "../.env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @field_validator("INFERENCE_MAX_ACTIVE", "INFERENCE_MAX_WAITERS", mode="before")
+    @classmethod
+    def parse_inference_integer(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped.isascii() and stripped.isdecimal():
+                return int(stripped)
+        return value
 
     @field_validator("CORS_ORIGINS", mode="after")
     @classmethod

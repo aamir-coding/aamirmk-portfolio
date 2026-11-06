@@ -717,3 +717,32 @@ preserve failed/cancelled fit receipts through Zod/SSE/hooks/modal; prefer serve
 over active preset when labeling fresh/generated-cache results; allow corrupt optional
 index metadata to degrade to unknown. No production quota, persistence or broad safety
 scope was silently included. Further Phase 7/9/10 work remains tracked separately.
+
+### DRN-054: Boot-bound per-attempt inference admission
+
+**Date:** 2026-11-06. **Scope:** Approved remaining Phase 7, Increment 1.
+
+**Choice:** Keep a single-event-loop ledger with synchronous accounting transitions
+and yielding only for bounded capacity waits. Reserve full serialized UTF-8 request
+bytes plus framing headroom and capped completion tokens before each attempt. Enforce
+shared and model-specific RPM/TPM/RPD/TPD plus active/queue bounds. A permit explicitly
+marks dispatch; undispatched exits release capacity, while failed/cancelled/unknown
+dispatched attempts retain reservations. Known usage reconciles once, without removing
+request charges or reducing minute reservations. Input/output overruns stop further
+admission and preserve at least the reservation/actual total.
+
+**Restart policy:** DRN-017's fail-open restart behavior does not provide a daily
+protection guarantee. New ledgers start closed. A fresh explicit remaining-capacity
+allowance binds to a random process boot ID, expires by UTC midnight and is one-shot;
+60 seconds drains unknown prior minute use. Wall-clock expiry and a monotonic deadline
+both apply. There is no reusable environment grant or automatic next-day refresh.
+Supabase durability remains P9. The app cannot meter arbitrary independent eval/API
+processes; an allowance must deduct and coordinate their use. This is conservative
+local control, not provider-account telemetry or an exact tokenizer guarantee.
+
+**Interface and rollout:** `InferenceLedger.attempt()` owns admission/wait/cleanup;
+the yielded permit dispatches and settles actual usage. Inject clocks/sleep for tests.
+Pydantic models constrain budgets, costs, usage and allowances. Settings define ceilings,
+not spending permission. Legacy route quota behavior stays until Increment 2 wires one
+ledger and provider client into app lifespan; this increment alone changes no outbound
+call path. No database or new dependency. Explicit code rules do not depend on a model.
