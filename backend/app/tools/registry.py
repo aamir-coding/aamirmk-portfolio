@@ -10,6 +10,9 @@ import json
 import logging
 from typing import Any, Protocol, runtime_checkable
 
+from fastapi import Request
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
 from app.tools.projects import (
     PROJECT_CATALOG,
     ProjectCardData,
@@ -17,6 +20,18 @@ from app.tools.projects import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ProjectCardArguments(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    project_id: str = Field(min_length=1, max_length=80)
+
+    @field_validator("project_id")
+    @classmethod
+    def known_project(cls, value: str) -> str:
+        if value not in PROJECT_CATALOG:
+            raise ValueError("Unknown project")
+        return value
 
 
 @runtime_checkable
@@ -57,15 +72,17 @@ class ShowProjectCardTool:
                         }
                     },
                     "required": ["project_id"],
+                    "additionalProperties": False,
                 },
             },
         }
 
     def execute(self, arguments: dict[str, Any]) -> ProjectCardData | None:
-        project_id = arguments.get("project_id", "")
-        if not isinstance(project_id, str):
+        try:
+            validated = ProjectCardArguments.model_validate(arguments)
+        except ValidationError:
             return None
-        return get_project_card(project_id)
+        return get_project_card(validated.project_id)
 
 
 class ToolRegistry:
@@ -97,6 +114,12 @@ class ToolRegistry:
         # Parse string arguments if model passed serialized JSON string
         if isinstance(arguments, str):
             try:
+                size = len(arguments.encode("utf-8"))
+            except UnicodeError:
+                return None
+            if size > 4096:
+                return None
+            try:
                 parsed_args = json.loads(arguments)
             except Exception as exc:
                 logger.warning("Malformed JSON tool arguments for %s: %s", name, exc)
@@ -106,6 +129,9 @@ class ToolRegistry:
         else:
             return None
 
+        if not isinstance(parsed_args, dict):
+            return None
+
         try:
             return tool.execute(parsed_args)
         except Exception as exc:
@@ -113,9 +139,5 @@ class ToolRegistry:
             return None
 
 
-_default_registry = ToolRegistry()
-
-
-def get_tool_registry() -> ToolRegistry:
-    """FastAPI dependency returning the singleton tool registry."""
-    return _default_registry
+def get_tool_registry(request: Request) -> ToolRegistry:
+    return request.app.state.tool_registry

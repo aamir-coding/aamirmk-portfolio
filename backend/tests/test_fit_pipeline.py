@@ -176,7 +176,8 @@ async def test_fit_pipeline_end_to_end_success(
     assert complete_data["score"]["must_have_gap"] == 1
     assert complete_data["score"]["overall_fit"] == "Partial Match"
     assert len(complete_data["requirements"]) == 3
-    assert complete_data["summary"] == summary_text
+    assert complete_data["summary"].startswith("Current portfolio judgments: 2 strong")
+    assert "1 gap" in complete_data["summary"]
 
 
 @pytest.mark.asyncio

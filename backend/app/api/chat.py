@@ -33,6 +33,7 @@ from app.retrieval.rewriter import rewrite_follow_up_query
 from app.safety.guardrails import (
     SAFE_REFUSAL_MESSAGE,
     check_prompt_injection,
+    data_block,
     format_safe_user_message,
 )
 from app.safety.rate_limiter import (
@@ -97,6 +98,8 @@ def extract_citations(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
     citations: list[SourceCitation] = []
     for rc in chunks:
         chunk = rc.chunk
+        if chunk.private or not chunk.indexed:
+            continue
         if chunk.id in seen_ids:
             continue
         seen_ids.add(chunk.id)
@@ -139,7 +142,9 @@ async def chat(
     response.headers["X-RateLimit-Reset"] = str(rate_limit.reset_seconds)
 
     # 1. Guard against adversarial prompt injections (0 LLM token cost)
-    injection_check = check_prompt_injection(request.message)
+    injection_check = check_prompt_injection(
+        "\n".join([request.message, *(entry.content for entry in request.history)])
+    )
     if not injection_check.is_safe:
         trace.origin = "refused"
         trace.text()
@@ -183,7 +188,12 @@ async def chat(
                     Message(role="user", content=format_safe_user_message(h.content))
                 )
             elif h.role == "assistant":
-                history_messages.append(Message(role="assistant", content=h.content))
+                history_messages.append(
+                    Message(
+                        role="assistant",
+                        content=data_block("assistant_history", h.content),
+                    )
+                )
 
     messages = [
         Message(role="system", content=system_prompt),
@@ -200,6 +210,8 @@ async def chat(
 
         # If LLM requested tool calls, execute them and run turn 2 for text reply
         if completion.tool_calls:
+            if len(completion.tool_calls) > 8:
+                raise LLMError("Too many tool requests")
             messages.append(
                 Message(
                     role="assistant",
@@ -231,7 +243,7 @@ async def chat(
             second_completion = await llm.complete(messages)
             reply_text = second_completion.content
             total_tokens = completion.total_tokens + second_completion.total_tokens
-            prompt_tokens = second_completion.prompt_tokens
+            prompt_tokens = completion.prompt_tokens + second_completion.prompt_tokens
             completion_tokens = (
                 completion.completion_tokens + second_completion.completion_tokens
             )
@@ -272,6 +284,10 @@ async def chat(
             detail="An error occurred while communicating with the AI service.",
         ) from exc
 
+    if len(reply_text) > 6000:
+        raise HTTPException(
+            status_code=503, detail="Generated answer exceeded its size limit."
+        )
     trace.text()
     return ChatResponse(
         telemetry=trace.snapshot().model_copy(update=versions),
@@ -317,7 +333,9 @@ async def chat_stream(
     }
 
     # 1. Guard against adversarial prompt injections (0 LLM token cost)
-    injection_check = check_prompt_injection(request.message)
+    injection_check = check_prompt_injection(
+        "\n".join([request.message, *(entry.content for entry in request.history)])
+    )
     if not injection_check.is_safe:
 
         async def refusal_generator() -> AsyncIterator[str]:
@@ -367,7 +385,12 @@ async def chat_stream(
                     Message(role="user", content=format_safe_user_message(h.content))
                 )
             elif h.role == "assistant":
-                history_messages.append(Message(role="assistant", content=h.content))
+                history_messages.append(
+                    Message(
+                        role="assistant",
+                        content=data_block("assistant_history", h.content),
+                    )
+                )
 
     messages = [
         Message(role="system", content=system_prompt),
@@ -380,6 +403,7 @@ async def chat_stream(
     async def event_generator() -> AsyncIterator[str]:
         tokens_emitted = 0
         summoned_cards: list[ProjectCardData] = []
+        output_chars = 0
         try:
             trace.set_stage("answer")
             # Emit verified source receipts before stream begins
@@ -400,7 +424,12 @@ async def chat_stream(
                         continue
                     if isinstance(item, ToolCall):
                         detected_tool_calls.append(item)
+                        if len(detected_tool_calls) > 8:
+                            raise LLMError("Too many tool requests")
                     else:
+                        output_chars += len(item)
+                        if output_chars > 6000:
+                            raise LLMError("Generated answer exceeded its size limit")
                         trace.text()
                         tokens_emitted += 1
                         payload = json.dumps({"token": item})
@@ -447,6 +476,11 @@ async def chat_stream(
                             yield ": heartbeat\n\n"
                             continue
                         if isinstance(token, str):
+                            output_chars += len(token)
+                            if output_chars > 6000:
+                                raise LLMError(
+                                    "Generated answer exceeded its size limit"
+                                )
                             trace.text()
                             tokens_emitted += 1
                             payload = json.dumps({"token": token})

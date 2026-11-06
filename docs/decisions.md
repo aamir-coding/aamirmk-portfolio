@@ -818,3 +818,26 @@ Fit's total deadline is 90 seconds across stages. A cancellation/timeout cannot 
 a partial report. New v3 fake contracts capture explicit delivery origin; old recorded
 inputs and failed human/judge validation remain untouched. No new framework/storage,
 provider calls, public factual-accuracy claim or deployment is implied.
+
+### DRN-058: Structural data isolation and deterministic gap handling
+
+**Date:** 2026-11-06. **Scope:** Remaining P7 Increment 5.
+
+Escape structural characters and frame all untrusted channels as data, including
+retrieved text inside the system prompt and client-provided assistant history. Explicit
+system rules preserve the instruction/data distinction; this does not make prompt
+injection mathematically impossible. Reject known lexical attacks before inference
+across current/history/JD inputs. Private/unindexed chunks are excluded consistently
+from prompt text, receipts and requirement-local evidence-ID maps.
+
+The default tool uses a strict Pydantic argument model and catalog allowlist; arbitrary
+keys, malformed Unicode, oversized arguments and nonobjects cannot execute. Registry
+ownership is per app. Response/tool/rewrite bounds remain code rules, never model choices.
+
+Existing negative/plans-only fact IDs do not establish positive hands-on evidence.
+Downgrades replace unsupported explanations and ramp-up, rather than retaining a false
+claim followed by a warning. Gap prose and gap-containing report summaries use fixed
+templates and computed counts, removing unnecessary inference and invented timelines.
+Positive semantic alignment/entailment still requires semantic evidence; source membership
+alone cannot certify it. Draft facts and authored presets were not promoted or rewritten.
+Development attack code checks and pending semantic cases are recorded separately.

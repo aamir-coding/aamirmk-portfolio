@@ -6,6 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.safety.guardrails import valid_unicode
 from app.telemetry import RequestTelemetry
 from app.tools.projects import ProjectCardData
 
@@ -54,6 +55,11 @@ class ChatHistoryMessage(BaseModel):
 
     model_config = ConfigDict(frozen=True, str_strip_whitespace=True)
 
+    @field_validator("content")
+    @classmethod
+    def unicode_content(cls, value: str) -> str:
+        return valid_unicode(value)
+
 
 class ChatRequest(BaseModel):
     """Inbound chat payload from client."""
@@ -84,7 +90,7 @@ class ChatRequest(BaseModel):
         trimmed = v.strip()
         if not trimmed:
             raise ValueError("Message cannot be empty or whitespace only")
-        return trimmed
+        return valid_unicode(trimmed)
 
 
 class ChatResponse(BaseModel):

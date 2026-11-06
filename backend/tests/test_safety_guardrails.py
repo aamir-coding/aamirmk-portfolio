@@ -79,7 +79,7 @@ def test_sanitize_user_input():
     sanitized = sanitize_user_input(raw)
     assert "<user_inquiry>" not in sanitized
     assert "</user_inquiry>" not in sanitized
-    assert "[user_inquiry]" in sanitized
+    assert "&lt;user_inquiry&gt;" in sanitized
 
 
 def test_format_safe_user_message():

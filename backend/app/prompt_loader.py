@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from app.safety.guardrails import sanitize_user_input
+
 if TYPE_CHECKING:
     from app.retrieval.models import RetrievedChunk
 
@@ -20,11 +22,14 @@ _SYSTEM_TEMPLATE = _read("system.txt")
 _RESUME_CONTEXT = _read("resume_context.md")
 
 # Static system prompt baseline for backwards compatibility and fallback
-SYSTEM_PROMPT: str = _SYSTEM_TEMPLATE.replace("{resume_context}", _RESUME_CONTEXT)
+SYSTEM_PROMPT: str = _SYSTEM_TEMPLATE.replace(
+    "{resume_context}", sanitize_user_input(_RESUME_CONTEXT)
+)
 
 
 def format_retrieved_context(chunks: list[RetrievedChunk]) -> str:
     """Format retrieved fact chunks into structured markdown source blocks."""
+    chunks = [item for item in chunks if not item.chunk.private and item.chunk.indexed]
     if not chunks:
         return (
             "No specific portfolio facts were retrieved for this inquiry. "
@@ -43,7 +48,9 @@ def format_retrieved_context(chunks: list[RetrievedChunk]) -> str:
         if c.source_url:
             source_label += f" | {c.source_url}"
 
-        sections.append(f"### [{source_label}]\n{c.content.strip()}")
+        sections.append(
+            sanitize_user_input(f"### [{source_label}]\n{c.content.strip()}")
+        )
 
     return "\n\n".join(sections)
 

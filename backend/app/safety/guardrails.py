@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
+from html import escape
 
 logger = logging.getLogger(__name__)
 
@@ -70,30 +71,38 @@ class InjectionCheckResult:
 def check_prompt_injection(text: str) -> InjectionCheckResult:
     """Evaluate whether input text contains adversarial prompt injection directives.
 
-    Uses deterministic regex boundary checks to reject attacks at 0 LLM token cost
-    with zero false-positives on legitimate queries about architecture or engineering.
+    Reject known lexical attacks at zero model cost. This is not a semantic
+    injection detector or a guarantee of zero false positives.
     """
     for pattern in _INJECTION_PATTERNS:
         match = pattern.search(text)
         if match:
             reason = f"Matched injection pattern: {pattern.pattern}"
-            logger.warning(
-                "Prompt injection rejected: %s (matched '%s')", text, match.group(0)
-            )
+            logger.warning("Known injection pattern rejected")
             return InjectionCheckResult(is_safe=False, flagged_reason=reason)
 
     return InjectionCheckResult(is_safe=True)
 
 
 def sanitize_user_input(text: str) -> str:
-    """Strip or neutralize potentially malicious delimiter tags from user input."""
-    # Escape xml tags that might conflict with system prompt delimiter isolation
-    sanitized = re.sub(r"<\s*(/?)user_inquiry\s*>", r"[\1user_inquiry]", text)
-    sanitized = re.sub(r"<\s*(/?)context\s*>", r"[\1context]", sanitized)
-    return sanitized.strip()
+    """Escape structural characters; semantic instructions remain untrusted data."""
+    return escape(text.strip(), quote=False)
+
+
+def valid_unicode(text: str) -> str:
+    try:
+        text.encode("utf-8")
+    except UnicodeError:
+        raise ValueError("Text must contain valid Unicode") from None
+    return text
+
+
+def data_block(tag: str, text: str) -> str:
+    if not re.fullmatch(r"[a-z_]+", tag):
+        raise ValueError("Invalid internal data tag")
+    return f"<{tag}>\n{sanitize_user_input(text)}\n</{tag}>"
 
 
 def format_safe_user_message(user_input: str) -> str:
     """Wrap user query in strict structural XML delimiter boundary fencing."""
-    cleaned = sanitize_user_input(user_input)
-    return f"<user_inquiry>\n{cleaned}\n</user_inquiry>"
+    return data_block("user_inquiry", user_input)

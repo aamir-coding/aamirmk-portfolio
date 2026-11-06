@@ -21,6 +21,9 @@ DEFAULT_GAP_RAMP_UP = (
     "structured ramp-up and codebase onboarding."
 )
 
+# These existing draft facts describe absences/plans, not positive hands-on proof.
+NEGATIVE_ONLY_IDS = frozenset({"skill-not-claimed", "skill-ramp-up-narratives"})
+
 
 def validate_and_downgrade_verdicts(
     judged_requirements: list[JudgedRequirement],
@@ -37,7 +40,9 @@ def validate_and_downgrade_verdicts(
         valid_id_set = set(valid_chunk_ids.get(item.requirement.id, ()))
         # Filter citations to only those that actually exist in the retrieved corpus
         verified_chunk_ids = [
-            cid for cid in item.evidence_chunk_ids if cid in valid_id_set
+            cid
+            for cid in item.evidence_chunk_ids
+            if cid in valid_id_set and cid not in NEGATIVE_ONLY_IDS
         ]
 
         if item.verdict in ("strong", "partial"):
@@ -50,10 +55,9 @@ def validate_and_downgrade_verdicts(
                     item.evidence_chunk_ids,
                 )
                 downgraded_explanation = (
-                    f"{item.explanation.strip()} "
                     "[Downgraded to gap: No verified portfolio evidence cited.]"
                 )
-                ramp_up_plan = item.ramp_up or DEFAULT_GAP_RAMP_UP
+                ramp_up_plan = DEFAULT_GAP_RAMP_UP
 
                 sanitized.append(
                     JudgedRequirement(
@@ -85,8 +89,11 @@ def validate_and_downgrade_verdicts(
                     requirement=item.requirement,
                     verdict="gap",
                     evidence_chunk_ids=verified_chunk_ids,
-                    explanation=item.explanation,
-                    ramp_up=item.ramp_up or DEFAULT_GAP_RAMP_UP,
+                    explanation=(
+                        "The available portfolio evidence "
+                        "does not establish this requirement."
+                    ),
+                    ramp_up=DEFAULT_GAP_RAMP_UP,
                     downgraded=item.downgraded,
                 )
             )

@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — approved; Increments 1–4 implemented**
+**Phase 7 (remaining): Safety hardening — approved; Increments 1–5 implemented**
 on `phase-7-safety-hardening`, based on `main` at `440e81d`.
 [Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -28,7 +28,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: grounding/attack enforcement (Increment 5), then privacy/CI/review (Increment 6).
+Next: privacy/CI, approved security dependency updates and final review (Increment 6).
 Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
@@ -59,7 +59,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Approved; Increments 1–4 implemented; grounding next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
+| P7: Safety (rest) | 🟡 Approved; Increments 1–5 implemented; privacy/CI/review next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -215,7 +215,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with grounding/attack enforcement (Increment 5); no Phase 10/9 work starts.
+1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md): Increment 6 privacy/CI, approved security updates, full verification and review; no Phase 10/9 work starts.
 2. Phase 8 remote main/tag identity is verified at `440e81d`; deployment is user-confirmed. CI results and deployed runtime revision remain independently unverified.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -634,3 +634,35 @@ the following kickoff supersedes its remote-status statements.
   until final explicit compatibility review; no baseline scores/floors lowered.
 - Exact audit-tool proposal prepared in `docs/briefs/phase-07-audit-tools.md` and an
   inert `.yml.proposed` file. Approval question is pending; tools not installed/enabled.
+
+### Remaining Phase 7 Increment 5 — 6 November 2026
+
+- Untrusted chat inquiries/history, retrieved context, JD/title, fit evidence and rewrite
+  inputs receive escaped structural framing. The system template explicitly labels
+  retrieved/history blocks as data. History/JD known lexical attacks refuse without
+  model calls. Private/unindexed facts are excluded from prompts, receipts and both
+  fit evidence maps. Known lexical guards do not certify general semantic resistance.
+- Tool dispatch now uses typed strict arguments, rejects extra keys/nonobjects/unknown
+  project IDs/invalid Unicode/oversized arguments, and belongs to app state. Chat has
+  6,000-character output and eight-tool caps; rewrites are capped at 1,000 characters.
+- Absence/plans-only chunks cannot alone support positive fit verdicts. Downgraded
+  explanations replace fabricated prose instead of appending a disclaimer to it.
+  Gap explanations/ramp-up are deterministic; reports with gaps/downgrades summarize
+  actual computed judgments without another model-generated promise. Other semantic
+  judgments still need semantic review. No facts or authored preset narratives changed.
+- Test-first grounding probes reproduced **5 failures**, then passed. Read-only review
+  identified private evidence-ID admission, malformed-Unicode tool failure and missing
+  chat data framing: all **3 reproduced red**, then fixed. Latest grounding/models/v3
+  recording subset: **56 passed, 1 existing warning in 7.51s**. Earlier broader focused
+  run: **149 passed, 1 warning in 12.35s**. Ruff lint/format pass (100 files).
+- Authored development attacks: 24 lexical/structural examples plus six semantic-review
+  cases in `evals/attacks/phase-7-v1.json`. All explicitly have semantic review pending;
+  no live outcomes or generator-accuracy claims. Original P8 v1/v2, facts, human labels
+  and judge archives remain untouched; v3 fake capture reflects current behavior.
+- Invalid Unicode in API text now returns sanitized JSON 422; validation errors omit
+  input/context rather than echoing recruiter text or failing JSON encoding.
+- User explicitly approved both exact audit-tool additions and the separate security
+  compatibility update proposal. Isolated pip-audit 2.10.1 installed under ignored build/.
+  Initial Python audit: 16 rows/eight distinct advisory IDs in pytest/Starlette. Initial
+  npm audit: two critical and eight moderate affected package entries. No auto-fix run.
+  Approved version changes remain to be applied/verified in Increment 6.

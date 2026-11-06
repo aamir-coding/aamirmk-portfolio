@@ -42,7 +42,7 @@ def test_repeat_capture_isolated_from_seeded_and_previous_fit_caches() -> None:
     assert first.records == second.records
     fresh = next(record for record in first.records if record.id == "fit-fresh")
     cached = next(record for record in first.records if record.id == "fit-cached")
-    assert fresh.adapter_complete_calls == 3
+    assert fresh.adapter_complete_calls == 2
     assert cached.adapter_complete_calls == 0
     assert not decode_recording(fresh).cache_hit
     assert decode_recording(cached).cache_hit

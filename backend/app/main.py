@@ -23,6 +23,7 @@ from app.safety.ip import get_client_ip
 from app.safety.middleware import RequestBoundsMiddleware
 from app.safety.rate_limiter import SlidingWindowRateLimiter
 from app.settings import Settings, get_settings
+from app.tools.registry import ToolRegistry
 
 logger = logging.getLogger("app")
 
@@ -77,6 +78,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = app_settings
     app.state.llm = GroqLLM(app_settings)
+    app.state.tool_registry = ToolRegistry()
     app.state.fit_cache = ReportCache(
         identity=cache_identity(
             (app_settings.LLM_MODEL_MAIN, app_settings.LLM_MODEL_UTILITY)
@@ -177,7 +179,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     "code": 422,
                     "message": "Validation error in request payload",
                     "details": [
-                        {key: value for key, value in error.items() if key != "ctx"}
+                        {
+                            key: value
+                            for key, value in error.items()
+                            if key not in {"ctx", "input"}
+                        }
                         for error in exc.errors()
                     ],
                     "request_id": request_id,

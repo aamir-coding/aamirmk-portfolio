@@ -8,6 +8,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.safety.guardrails import valid_unicode
+
 RequirementImportance = Literal["must_have", "nice_to_have"]
 RequirementType = Literal["skill", "experience", "education", "soft"]
 RequirementVerdictType = Literal["strong", "partial", "gap"]
@@ -37,7 +39,12 @@ class FitRequest(BaseModel):
             raise ValueError(
                 "Job description is too short (minimum 50 characters required)."
             )
-        return cleaned
+        return valid_unicode(cleaned)
+
+    @field_validator("role_title")
+    @classmethod
+    def unicode_title(cls, value: str | None) -> str | None:
+        return valid_unicode(value) if value is not None else None
 
     def compute_hash(self) -> str:
         """Compute deterministic SHA-256 hash of normalized text for caching."""

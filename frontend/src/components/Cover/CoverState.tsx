@@ -90,7 +90,7 @@ export function CoverState({
         <div className="dossier-meta-card">
           <span className="meta-label">GROUNDING POLICY</span>
           <span className="meta-value">
-            Authoritative facts from resume.tex, zero hallucinations
+            Curated résumé and project facts, with source receipts
           </span>
         </div>
       </div>

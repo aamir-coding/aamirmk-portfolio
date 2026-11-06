@@ -104,7 +104,13 @@ def test_tool_registry_execute_edge_cases() -> None:
 
 
 def test_get_tool_registry_singleton() -> None:
-    r1 = get_tool_registry()
-    r2 = get_tool_registry()
+    from starlette.requests import Request
+
+    from app.main import create_app
+
+    app = create_app()
+    request = Request({"type": "http", "app": app})
+    r1 = get_tool_registry(request)
+    r2 = get_tool_registry(request)
     assert r1 is r2
     assert isinstance(r1._tools["show_project_card"], ShowProjectCardTool)

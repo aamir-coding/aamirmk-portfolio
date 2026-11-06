@@ -31,6 +31,7 @@ from app.fit.scorer import compute_fit_summary, validate_and_downgrade_verdicts
 from app.llm import LLMCapacityError, LLMClient, LLMError, Message
 from app.retrieval.models import RetrievedChunk
 from app.retrieval.retriever import Retriever
+from app.safety.guardrails import check_prompt_injection
 from app.settings import Settings, get_settings
 from app.telemetry import (
     ObservedLLM,
@@ -123,6 +124,20 @@ class FitPipeline:
     async def _run(self, request: FitRequest) -> AsyncIterator[dict[str, Any]]:
         """Execute the 5-stage pipeline and yield SSE progress & completion frames."""
         jd_hash = request.compute_hash()
+        if not check_prompt_injection(
+            request.jd_text + "\n" + (request.role_title or "")
+        ).is_safe:
+            yield {
+                "event": "error",
+                "data": {
+                    "code": "unsafe_input",
+                    "message": (
+                        "Please provide job requirements "
+                        "without assistant instructions."
+                    ),
+                },
+            }
+            return
 
         # Step 0: Check content-hash cache
         cached = self._cache.get(request)
@@ -214,9 +229,21 @@ class FitPipeline:
                     "percent": 90,
                 },
             }
-            summary_text = await self._generate_summary(
-                extraction.role_title, sanitized_judged, score_summary
-            )
+            if any(
+                item.verdict == "gap" or item.downgraded for item in sanitized_judged
+            ):
+                strong = sum(item.verdict == "strong" for item in sanitized_judged)
+                partial = sum(item.verdict == "partial" for item in sanitized_judged)
+                gaps = len(sanitized_judged) - strong - partial
+                summary_text = (
+                    f"Current portfolio judgments: {strong} strong, {partial} partial "
+                    f"and {gaps} gap requirements. These judgments are limited to the "
+                    "cited material. Review the evidence and any gaps with Aamir."
+                )
+            else:
+                summary_text = await self._generate_summary(
+                    extraction.role_title, sanitized_judged, score_summary
+                )
 
             # Final Report Assembly
             report = FitReport(
@@ -350,6 +377,7 @@ class FitPipeline:
 
         for req in requirements:
             chunks = await self._retriever.retrieve(req.text, top_k=2)
+            chunks = [rc for rc in chunks if not rc.chunk.private and rc.chunk.indexed]
             retrieved_by_req[req.id] = chunks
             chunk_ids_by_req[req.id] = {rc.chunk.id for rc in chunks}
 
