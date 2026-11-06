@@ -184,8 +184,10 @@ describe("useChat hook", () => {
 
   it("stops streaming when stopStreaming is called", async () => {
     let capturedSignal: AbortSignal | undefined;
+    let lateState: (() => void) | undefined;
     vi.spyOn(sseModule, "streamChat").mockImplementation(async (opts) => {
       capturedSignal = opts.signal;
+      lateState = () => opts.callbacks.onState?.("resting");
       opts.callbacks.onToken("Partial...");
       return new Promise((resolve) => setTimeout(resolve, 500));
     });
@@ -205,5 +207,7 @@ describe("useChat hook", () => {
     expect(capturedSignal?.aborted).toBe(true);
     expect(result.current.isStreaming).toBe(false);
     expect(result.current.messages[1]?.status).toBe("done");
+    act(() => lateState?.());
+    expect(result.current.isResting).toBe(false);
   });
 });

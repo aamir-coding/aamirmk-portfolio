@@ -4,6 +4,7 @@ import json
 
 import pytest
 
+from app.fit.cache import ReportCache
 from app.fit.models import FitRequest
 from app.fit.pipeline import FitPipeline
 from app.llm import FakeLLM, LLMRateLimitError
@@ -25,14 +26,14 @@ from app.retrieval.retriever import FakeRetriever
 async def test_invalid_extraction_stops_without_report_or_cache(payload: str) -> None:
     llm = FakeLLM(canned_replies=[payload, payload])
     retriever = FakeRetriever(canned_chunks=[])
-    cache = {}
+    cache = ReportCache(identity="isolated-test", include_curated=False)
     pipeline = FitPipeline(llm, retriever, cache=cache)
     events = [event async for event in pipeline.run(FitRequest(jd_text="A" * 60))]
     assert events[-1]["event"] == "error"
     assert events[-1]["data"]["code"] == "extraction_error"
     assert not any(event["event"] == "complete" for event in events)
     assert retriever.recorded_queries == []
-    assert cache == {}
+    assert len(cache) == 0
 
 
 @pytest.mark.asyncio
@@ -46,7 +47,11 @@ async def test_extraction_can_recover_on_its_single_retry() -> None:
             "A bounded summary for this test.",
         ]
     )
-    pipeline = FitPipeline(llm, FakeRetriever(canned_chunks=[]), cache={})
+    pipeline = FitPipeline(
+        llm,
+        FakeRetriever(canned_chunks=[]),
+        cache=ReportCache(identity="isolated-test", include_curated=False),
+    )
     events = [event async for event in pipeline.run(FitRequest(jd_text="A" * 60))]
     assert events[-1]["event"] == "complete"
     assert events[-1]["data"]["requirements"][0]["requirement"]["text"] == "Python APIs"

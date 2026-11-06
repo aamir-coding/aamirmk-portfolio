@@ -1,4 +1,5 @@
 import { UnderHood } from "../Chat/UnderHood";
+import { AssistantFallback } from "../AssistantFallback";
 import { useEffect, useRef, useState } from "react";
 import { useFitReport } from "../../hooks/useFitReport";
 import type { SampleJobDescription } from "../../lib/types";
@@ -69,9 +70,9 @@ export function FitReportModal({
 
   const handleRerunLive = () => {
     if (activePreset) {
-      void submit(activePreset.text, activePreset.title);
+      void submit(activePreset.text, activePreset.title, true);
     } else if (jdText) {
-      void submit(jdText, roleTitle);
+      void submit(jdText, roleTitle, true);
     }
   };
 
@@ -218,7 +219,7 @@ export function FitReportModal({
 
               {error && (
                 <div className="banner-notice warning" role="alert">
-                  <span>{error}</span>
+                  <div><p>{error}</p><AssistantFallback /></div>
                 </div>
               )}
 

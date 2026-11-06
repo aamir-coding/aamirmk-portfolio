@@ -794,3 +794,27 @@ before JSON parsing, enforce a total read deadline and validate declared lengths
 session IDs. Body-read disconnect returns without a response; placing this inside
 BaseHTTPMiddleware incorrectly produced `No response returned` server errors. No new
 dependency, storage, authentication scheme or deployment trust assertion is introduced.
+
+### DRN-057: Capacity-aware fallbacks and complete fit cache identity
+
+**Date:** 2026-11-06. **Scope:** Remaining P7 Increment 4.
+
+Expose typed resting state separately from HTTP service readiness. Authored starter
+answers/presets and contact/résumé-source links remain useful without inference. A
+forced live rerun bypasses caches and still crosses quota admission; no synthetic
+generation or cache result is returned as live. Clear active preset identity on a
+submission and ignore state callbacks after abort.
+
+Generated reports use a bounded 64-entry/15-minute LRU and a hash of exact JD/title
+plus source/fact/index/model identity. Do not use the legacy lowercased JD hash alone
+as a cache key. Cached values are copied; transport receipts stay outside report state.
+Authored examples are separate and need exact sample text/report-JD hash plus a
+reviewed manifest binding current draft facts and report source. A sample/fact/report
+edit invalidates the authored report in both preset projection and cache delivery.
+The manifest preserves existing narratives and flags; it does not calibrate them or
+promote facts. Runtime assets are immutable within an app instance; updates redeploy.
+
+Fit's total deadline is 90 seconds across stages. A cancellation/timeout cannot insert
+a partial report. New v3 fake contracts capture explicit delivery origin; old recorded
+inputs and failed human/judge validation remain untouched. No new framework/storage,
+provider calls, public factual-accuracy claim or deployment is implied.

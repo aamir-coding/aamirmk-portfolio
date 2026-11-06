@@ -7,7 +7,7 @@ def test_health_returns_ok(client: TestClient) -> None:
 
     assert response.status_code == 200
     data = response.json()
-    assert data == {"status": "ok", "ready": True}
+    assert data == {"status": "ok", "ready": True, "assistant_state": "resting"}
 
 
 def test_cors_allows_listed_origin(client: TestClient) -> None:
@@ -76,7 +76,11 @@ def test_double_slash_path_normalized(client: TestClient) -> None:
     response = client.get("http://testserver//api/health")
 
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "ready": True}
+    assert response.json() == {
+        "status": "ok",
+        "ready": True,
+        "assistant_state": "resting",
+    }
 
 
 def test_404_returns_consistent_json_error(client: TestClient) -> None:

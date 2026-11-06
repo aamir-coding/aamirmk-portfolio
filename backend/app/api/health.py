@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Literal
+
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, ConfigDict
 
 
@@ -7,6 +9,7 @@ class HealthResponse(BaseModel):
 
     status: str
     ready: bool
+    assistant_state: Literal["ready", "resting"]
 
     model_config = ConfigDict(extra="forbid")
 
@@ -15,6 +18,11 @@ router = APIRouter(tags=["health"])
 
 
 @router.get("/health", response_model=HealthResponse)
-async def get_health() -> HealthResponse:
+async def get_health(request: Request) -> HealthResponse:
     """Return service health and readiness status."""
-    return HealthResponse(status="ok", ready=True)
+    snapshot = request.app.state.llm.ledger.snapshot()
+    return HealthResponse(
+        status="ok",
+        ready=True,
+        assistant_state="resting" if snapshot.reason else "ready",
+    )

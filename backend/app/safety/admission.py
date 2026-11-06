@@ -305,6 +305,15 @@ class InferenceLedger:
         reason: str | None = None
         try:
             self._check_allowance()
+            if self.monotonic() < self._ready:
+                raise QuotaDenied("minute_capacity")
+            grant = self._allowance
+            assert grant is not None
+            if len(self._records) >= min(grant.requests, self._shared.rpd) or (
+                sum(r.charged for r in self._records)
+                >= min(grant.tokens, self._shared.tpd)
+            ):
+                raise QuotaDenied("daily_capacity")
         except QuotaDenied as denial:
             reason = denial.reason
         return LedgerSnapshot(

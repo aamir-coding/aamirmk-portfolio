@@ -5,7 +5,13 @@ import { z } from "zod";
 export interface HealthStatus {
   status: string;
   ready: boolean;
+  assistant_state?: "ready" | "resting";
 }
+
+const HealthStatusSchema = z.object({
+  status: z.string(), ready: z.boolean(),
+  assistant_state: z.enum(["ready", "resting"]).optional(),
+});
 
 export const getApiBaseUrl = (): string => {
   const url = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
@@ -27,16 +33,8 @@ export async function fetchHealth(signal?: AbortSignal): Promise<HealthStatus> {
   }
 
   const data = (await response.json()) as unknown;
-  if (
-    typeof data === "object" &&
-    data !== null &&
-    "status" in data &&
-    "ready" in data &&
-    typeof (data as { status: unknown }).status === "string" &&
-    typeof (data as { ready: unknown }).ready === "boolean"
-  ) {
-    return data as HealthStatus;
-  }
+  const parsed = HealthStatusSchema.safeParse(data);
+  if (parsed.success) return parsed.data;
 
   throw new Error("Invalid response schema from health endpoint");
 }

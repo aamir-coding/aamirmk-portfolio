@@ -45,6 +45,19 @@ describe("<App />", () => {
     });
   });
 
+  it("keeps authored starter answers available while live answers rest", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({
+      status: "ok", ready: true, assistant_state: "resting",
+    });
+    const stream = vi.spyOn(sse, "streamChat");
+    render(<App />);
+    expect(await screen.findByText("Live answers resting")).toBeInTheDocument();
+    expect(screen.getByRole("link", {name: "Read résumé source"})).toBeInTheDocument();
+    const starter = screen.getByRole("button", {name: /What is Aamir's experience with FastAPI and LLM systems/i});
+    fireEvent.click(starter);
+    expect(stream).not.toHaveBeenCalled();
+  });
+
   it("transitions status pill to 'Offline' when health check fails", async () => {
     vi.spyOn(api, "fetchHealth").mockRejectedValue(new Error("Connection refused"));
     render(<App />);

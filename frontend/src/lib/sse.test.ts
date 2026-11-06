@@ -1,6 +1,32 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { parseSSEBuffer, streamChat, streamFitReport } from "./sse";
 
+it("delivers typed resting state before a terminal error", async () => {
+  const body = 'event: error\ndata: {"detail":"Live answers are resting","state":"resting"}\n\n';
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(body)));
+  const onState = vi.fn();
+  const onError = vi.fn();
+  try {
+    await streamChat({message: "hello", callbacks: {
+      onState, onError, onDone: vi.fn(), onToken: vi.fn(),
+    }});
+    expect(onState).toHaveBeenCalledWith("resting");
+    expect(onError).toHaveBeenCalledOnce();
+  } finally { vi.unstubAllGlobals(); }
+});
+
+it("sends explicit live bypass to the backend", async () => {
+  const fetch = vi.fn().mockResolvedValue(new Response('event: error\ndata: {"code":"resting","message":"resting","state":"resting"}\n\n'));
+  vi.stubGlobal("fetch", fetch);
+  try {
+    await streamFitReport({jdText: "x".repeat(60), forceLive: true, callbacks: {
+      onProgress: vi.fn(), onComplete: vi.fn(), onError: vi.fn(),
+    }});
+    const options = fetch.mock.calls[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(options.body)) as {force_live:boolean}).toMatchObject({force_live:true});
+  } finally { vi.unstubAllGlobals(); }
+});
+
 describe("stream terminal lifecycle", () => {
   afterEach(() => vi.unstubAllGlobals());
 

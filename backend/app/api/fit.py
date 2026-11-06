@@ -14,7 +14,6 @@ from fastapi.responses import StreamingResponse
 from app.api.chat import StreamHeartbeat, stream_with_heartbeat
 from app.fit.models import FitRequest
 from app.fit.pipeline import FitPipeline
-from app.fit.sample_jds import load_sample_jds
 from app.llm import LLMClient, get_llm_client
 from app.retrieval.retriever import Retriever, get_retriever
 from app.safety.rate_limiter import check_fit_rate_limit
@@ -41,8 +40,6 @@ def get_fit_pipeline(
         settings=settings,
         cache=request.app.state.fit_cache,
     )
-    if request.app.state.fit_cache is None:
-        request.app.state.fit_cache = pipeline._cache
     return pipeline
 
 
@@ -57,12 +54,12 @@ def set_fit_pipeline(pipeline: FitPipeline | None) -> None:
     "/fit/presets",
     summary="Get curated sample job descriptions for quick evaluation",
 )
-async def get_fit_presets() -> list[dict[str, Any]]:
+async def get_fit_presets(request: Request) -> list[dict[str, Any]]:
     """Return curated sample JDs with pre-evaluated golden reports.
 
     Enables 1-click exploration without burning Groq tokens.
     """
-    samples = load_sample_jds()
+    samples = request.app.state.fit_cache.presets()
     return [
         {
             "id": s.id,

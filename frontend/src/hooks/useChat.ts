@@ -17,6 +17,7 @@ export interface UseChatReturn {
   isStreaming: boolean;
   conversationId: string | null;
   error: string | null;
+  isResting?: boolean;
   sendMessage: (text: string) => Promise<void>;
   sendInstantAnswer: (question: string, answer: InstantAnswer) => void;
   stopStreaming: () => void;
@@ -72,6 +73,7 @@ export function useChat(): UseChatReturn {
     initial.conversationId
   );
   const [error, setError] = useState<string | null>(null);
+  const [isResting, setIsResting] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesRef = useRef(messages);
@@ -209,6 +211,7 @@ export function useChat(): UseChatReturn {
         history: historyPayload,
         signal: controller.signal,
         callbacks: {
+          onState: () => { if (!controller.signal.aborted) setIsResting(true); },
           onSources: (sources: SourceCitation[]) => {
             if (controller.signal.aborted) return;
             setMessages((prev) =>
@@ -239,6 +242,7 @@ export function useChat(): UseChatReturn {
           },
           onDone: (data) => {
             if (controller.signal.aborted) return;
+            setIsResting(false);
             let activeConvId = conversationId;
             if (data.conversation_id) {
               setConversationId(data.conversation_id);
@@ -299,6 +303,7 @@ export function useChat(): UseChatReturn {
   );
 
   return {
+    isResting,
     messages,
     isStreaming,
     conversationId,

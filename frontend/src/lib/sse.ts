@@ -18,9 +18,11 @@ import {
   FitProgressDataSchema,
   FitReportSchema,
   FitErrorPayloadSchema,
+  ApiErrorPayloadSchema,
 } from "./contracts";
 
 export interface StreamChatCallbacks {
+  onState?: (state: "resting") => void;
   onToken: (token: string) => void;
   onDone: (data: {
     conversation_id: string;
@@ -147,11 +149,10 @@ export async function streamChat({
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
       try {
-        const errJson = await response.json();
-        if (errJson?.error?.message) {
-          errorMessage = errJson.error.message;
-        } else if (errJson?.detail) {
-          errorMessage = typeof errJson.detail === "string" ? errJson.detail : JSON.stringify(errJson.detail);
+        const parsed = ApiErrorPayloadSchema.safeParse(await response.json() as unknown);
+        if (parsed.success) {
+          errorMessage = parsed.data.error?.message ?? parsed.data.detail ?? errorMessage;
+          if (parsed.data.error?.state) callbacks.onState?.(parsed.data.error.state);
         }
       } catch {
         // Fallback to generic status text
@@ -198,6 +199,7 @@ export async function streamChat({
           }
         } else if (event === "error") {
           const res = ErrorEventPayloadSchema.safeParse(parsed);
+          if (res.success && res.data.state) callbacks.onState?.(res.data.state);
           if (res.success && res.data.telemetry) callbacks.onError(res.data.detail, res.data.telemetry);
           else callbacks.onError(res.success ? res.data.detail : "An error occurred during streaming");
           return true;
@@ -231,6 +233,7 @@ export interface StreamFitCallbacks {
 export interface StreamFitOptions {
   jdText: string;
   roleTitle?: string;
+  forceLive?: boolean;
   signal?: AbortSignal;
   callbacks: StreamFitCallbacks;
   baseUrl?: string;
@@ -242,6 +245,7 @@ export interface StreamFitOptions {
 export async function streamFitReport({
   jdText,
   roleTitle,
+  forceLive,
   signal,
   callbacks,
   baseUrl,
@@ -260,6 +264,7 @@ export async function streamFitReport({
       body: JSON.stringify({
         jd_text: jdText,
         role_title: roleTitle || undefined,
+        force_live: forceLive || undefined,
       }),
       signal,
     });

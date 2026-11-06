@@ -27,6 +27,7 @@ class FitRequest(BaseModel):
         max_length=150,
         description="Optional title of the role (e.g. 'Senior AI Engineer')",
     )
+    force_live: bool = Field(default=False, strict=True)
 
     @field_validator("jd_text", mode="after")
     @classmethod

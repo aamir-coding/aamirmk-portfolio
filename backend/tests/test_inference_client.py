@@ -273,6 +273,31 @@ async def test_refusals_and_fit_presets_work_without_provider_allowance() -> Non
 
 
 @pytest.mark.asyncio
+async def test_forced_live_preset_bypass_respects_closed_capacity() -> None:
+    from app.fit.sample_jds import load_sample_jds
+    from app.main import create_app
+    from app.retrieval.retriever import FakeRetriever, get_retriever
+
+    app = create_app(Settings(_env_file=None))
+    app.dependency_overrides[get_retriever] = lambda: FakeRetriever()
+    sample = load_sample_jds()[0]
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        cached = await client.post("/api/fit", json={"jd_text": sample.text})
+        assert "event: complete" in cached.text
+        fresh = await client.post(
+            "/api/fit", json={"jd_text": sample.text, "force_live": True}
+        )
+        assert '"state": "resting"' in fresh.text
+        assert "event: complete" not in fresh.text
+        chat = await client.post("/api/chat", json={"message": "Who is Aamir?"})
+        assert chat.status_code == 429
+        assert chat.json()["error"]["state"] == "resting"
+    assert app.state.llm.ledger.snapshot().attempts == 0
+
+
+@pytest.mark.asyncio
 async def test_mismatched_provider_model_stops_subsequent_admission() -> None:
     clock = Clock()
     ledger = make_ledger(clock)

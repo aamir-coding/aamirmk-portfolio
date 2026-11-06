@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "purpose": "fake_and_curated_endpoint_captures",
-  "captured_at": "2026-11-06T05:26:47.877618Z",
-  "commit": "c5cc4cbe8f79c8ae5d4cf4639396e3d2c58e36b2",
+  "captured_at": "2026-11-06T05:50:20.160191Z",
+  "commit": "d7b5819cd4ec4063cb9ad578e53ae44a76e130b3",
   "dirty": true,
   "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
   "dataset_manifest_sha256": "1611b6bfd8267e66dc3998a01b73c3423aeaaea616696c172f9746cf32aeba9c",
   "prompt_files_sha256": "fc94be5b1fcf9c683e44f6ce35658811244cf346ffce9bbd641ddf701e018723",
-  "capture_source_sha256": "ae5b66cf8d0bfc05f4d82824c85160c4902415bd716e81118a713daa0f0a9f69",
+  "capture_source_sha256": "7f6662cf5b8895cb2e2681a44343de291b262cca29f001a46923077de38d894c",
   "records": [
     {
       "id": "chat-project",
@@ -234,7 +234,7 @@
         "version": 1,
         "sha256": "5b987d02da473e69bbb1da396ae893fbf40d85928c6e010b86ead6559a3df410"
       },
-      "raw_sse": "event: progress\ndata: {\"step\": \"cache_hit\", \"message\": \"Instant match found in verification cache.\", \"percent\": 100}\n\nevent: complete\ndata: {\"role_title\": \"Replay test role\", \"jd_hash\": \"f83dce9e8f223073987409d7bf9780f68bf08855f95201bd085c566a6914fccc\", \"score\": {\"must_have_total\": 2, \"must_have_strong\": 1, \"must_have_partial\": 0, \"must_have_gap\": 1, \"nice_to_have_total\": 0, \"nice_to_have_strong\": 0, \"nice_to_have_partial\": 0, \"nice_to_have_gap\": 0, \"total_requirements\": 2, \"overall_fit\": \"Partial Match\", \"headline\": \"Covers 1 of 2 must-haves (0 partial, 1 gap)\"}, \"requirements\": [{\"requirement\": {\"id\": \"req-python\", \"text\": \"Python API development\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"strong\", \"evidence_chunk_ids\": [\"skill-programming-languages\"], \"explanation\": \"Recorded Python programming evidence.\", \"ramp_up\": null, \"downgraded\": false}, {\"requirement\": {\"id\": \"req-aws\", \"text\": \"Production AWS operations\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"gap\", \"evidence_chunk_ids\": [\"skill-not-claimed\"], \"explanation\": \"Hands-on AWS operations are not established.\", \"ramp_up\": \"Future learning plan only; not existing experience.\", \"downgraded\": false}], \"summary\": \"Aamir has documented Python programming experience. Hands-on AWS operations remain a gap. Discuss the requirements and evidence directly.\", \"cached\": true, \"telemetry\": {\"version\": 1, \"origin\": \"cache\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [], \"retrieval\": [], \"stages_ms\": {\"preparing\": 0.0, \"cache_hit\": 0.0}, \"usage_complete\": true, \"input_tokens\": 0, \"output_tokens\": 0, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
+      "raw_sse": "event: progress\ndata: {\"step\": \"cache_hit\", \"message\": \"Instant match found in verification cache.\", \"percent\": 100, \"origin\": \"cache\"}\n\nevent: complete\ndata: {\"role_title\": \"Replay test role\", \"jd_hash\": \"f83dce9e8f223073987409d7bf9780f68bf08855f95201bd085c566a6914fccc\", \"score\": {\"must_have_total\": 2, \"must_have_strong\": 1, \"must_have_partial\": 0, \"must_have_gap\": 1, \"nice_to_have_total\": 0, \"nice_to_have_strong\": 0, \"nice_to_have_partial\": 0, \"nice_to_have_gap\": 0, \"total_requirements\": 2, \"overall_fit\": \"Partial Match\", \"headline\": \"Covers 1 of 2 must-haves (0 partial, 1 gap)\"}, \"requirements\": [{\"requirement\": {\"id\": \"req-python\", \"text\": \"Python API development\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"strong\", \"evidence_chunk_ids\": [\"skill-programming-languages\"], \"explanation\": \"Recorded Python programming evidence.\", \"ramp_up\": null, \"downgraded\": false}, {\"requirement\": {\"id\": \"req-aws\", \"text\": \"Production AWS operations\", \"importance\": \"must_have\", \"type\": \"skill\"}, \"verdict\": \"gap\", \"evidence_chunk_ids\": [\"skill-not-claimed\"], \"explanation\": \"Hands-on AWS operations are not established.\", \"ramp_up\": \"Future learning plan only; not existing experience.\", \"downgraded\": false}], \"summary\": \"Aamir has documented Python programming experience. Hands-on AWS operations remain a gap. Discuss the requirements and evidence directly.\", \"cached\": true, \"telemetry\": {\"version\": 1, \"origin\": \"cache\", \"total_ms\": 0.0, \"first_text_ms\": 0.0, \"calls\": [], \"retrieval\": [], \"stages_ms\": {\"preparing\": 0.0, \"cache_hit\": 0.0}, \"usage_complete\": true, \"input_tokens\": 0, \"output_tokens\": 0, \"prompt_sha256\": \"8b9462d16e693bd782881d3cbaf351a6f3e3dc0d5a763c4528f13b674566e236\", \"index_sha256\": \"809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e\", \"index_built_at\": \"2026-11-04T08:48:15.421979+00:00\"}}\n\n",
       "preset_report": null,
       "retrieved_chat_ids": [],
       "retrieval_queries": [

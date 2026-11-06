@@ -7,6 +7,11 @@
 
 import { z } from "zod";
 
+export const ApiErrorPayloadSchema = z.object({
+  error: z.object({ message: z.string(), state: z.literal("resting").optional() }).optional(),
+  detail: z.string().optional(),
+});
+
 const Milliseconds = z.number().nonnegative().finite();
 const Tokens = z.number().int().nonnegative().nullable();
 export const RequestTelemetrySchema = z.object({
@@ -92,6 +97,7 @@ export const DoneEventPayloadSchema = z.object({
 
 export const ErrorEventPayloadSchema = z.object({
   detail: z.string().min(1),
+  state: z.literal("resting").optional(),
   telemetry: RequestTelemetrySchema.optional(),
 });
 
@@ -144,6 +150,7 @@ export const FitProgressDataSchema = z.object({
 });
 
 export const FitErrorPayloadSchema = z.object({
+  state: z.literal("resting").optional(),
   telemetry: RequestTelemetrySchema.optional(),
   code: z.string().min(1),
   message: z.string().min(1),

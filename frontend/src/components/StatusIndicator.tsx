@@ -1,4 +1,4 @@
-export type ServerState = "checking" | "warming" | "ready" | "error";
+export type ServerState = "checking" | "warming" | "ready" | "resting" | "error";
 
 export interface StatusIndicatorProps {
   state: ServerState;
@@ -9,6 +9,12 @@ export function StatusIndicator({
   state,
   errorMessage,
 }: StatusIndicatorProps) {
+  if (state === "resting") return (
+    <div className="status-pill" aria-label="Server status: live answers resting">
+      <span className="status-dot warming" aria-hidden="true" />
+      <span>Live answers resting</span>
+    </div>
+  );
   if (state === "ready") {
     return (
       <div className="status-pill" aria-label="Server status: ready">

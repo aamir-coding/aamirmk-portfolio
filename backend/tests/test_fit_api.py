@@ -11,6 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.fit import set_fit_pipeline
+from app.fit.cache import ReportCache
 from app.fit.models import FitReport, FitRequest, FitScoreSummary
 from app.fit.pipeline import FitPipeline
 from app.fit.sample_jds import load_sample_jds
@@ -157,7 +158,11 @@ def test_post_fit_streams_progress_and_completion_events() -> None:
     )
     fake_retriever = FakeRetriever(canned_chunks=[fake_chunk])
 
-    pipeline = FitPipeline(llm=fake_llm, retriever=fake_retriever, cache={})
+    pipeline = FitPipeline(
+        llm=fake_llm,
+        retriever=fake_retriever,
+        cache=ReportCache(identity="isolated-test", include_curated=False),
+    )
     set_fit_pipeline(pipeline)
 
     sample_jd = (
@@ -184,7 +189,7 @@ def test_post_fit_enforces_daily_rate_limit() -> None:
     limiter = SlidingWindowRateLimiter(requests_per_window=2, window_seconds=86400.0)
     app.dependency_overrides[get_fit_rate_limiter] = lambda: limiter
 
-    fake_report = FitReport(
+    _fake_report = FitReport(
         role_title="Test Role",
         jd_hash="a" * 64,
         score=FitScoreSummary(
@@ -204,7 +209,9 @@ def test_post_fit_enforces_daily_rate_limit() -> None:
         summary="Good match summary.",
     )
     pipeline = FitPipeline(
-        llm=FakeLLM(), retriever=FakeRetriever(), cache={"a" * 64: fake_report}
+        llm=FakeLLM(),
+        retriever=FakeRetriever(),
+        cache=ReportCache(identity="isolated-test", include_curated=False),
     )
     set_fit_pipeline(pipeline)
 

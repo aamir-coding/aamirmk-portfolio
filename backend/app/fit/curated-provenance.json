@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "review_reference": "P7 Increment 4: preserve authored examples from phase-8-done 440e81d; not calibrated ground truth",
+  "facts_sha256": "3c52b2c5c66c733724304bbb81d4b13ded2175a70ab4d4b1548947eb8474a390",
+  "reports_sha256": "5b20c7e17f9af3f009b5a84b4ed09b38e4cdc20203a90da72d0cdf941294c470",
+  "samples": {
+    "01-fullstack-ai-engineer": "4cd05826910ac09c631e32a03f0ceb8187de2d3429e7822c3f6828fd472d2ffb",
+    "02-backend-python-engineer": "992c67504f15361225175f51f996f3f46ef2aa4814ea874e72a5cc1893116e88",
+    "03-genai-application-developer": "5fe116baaed37ce0273f9838bb1bfa36cbf619e91e562ec0e852fcfdbdbe13e2",
+    "04-embedded-firmware-engineer": "c5cbda4b17befbe8115835b60955c0b2bde3d519017bd914ea33f172dccbf59b"
+  }
+}

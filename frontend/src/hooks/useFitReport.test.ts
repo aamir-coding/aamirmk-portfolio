@@ -11,6 +11,18 @@ describe("useFitReport hook", () => {
     vi.spyOn(apiModule, "fetchFitPresets").mockResolvedValue([]);
   });
 
+  it("clears preset identity when starting a custom submission", async () => {
+    vi.spyOn(sseModule, "streamFitReport").mockImplementation(async (opts) => {
+      opts.callbacks.onError("resting");
+    });
+    const {result} = renderHook(() => useFitReport());
+    act(() => result.current.loadPreset({id:"a", title:"Preset A", company:"",
+      match_expectation:"partial", text:"A".repeat(60)}));
+    expect(result.current.activePreset?.id).toBe("a");
+    await act(async () => { await result.current.submit("B".repeat(60), "Custom B"); });
+    expect(result.current.activePreset).toBeNull();
+  });
+
   it("initializes with idle state and null report", async () => {
     let hookResult: { current: ReturnType<typeof useFitReport> };
     await act(async () => {

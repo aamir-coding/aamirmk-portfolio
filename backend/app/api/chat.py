@@ -16,6 +16,7 @@ from fastapi.responses import StreamingResponse
 
 from app.llm import (
     LLMAuthError,
+    LLMCapacityError,
     LLMClient,
     LLMError,
     LLMRateLimitError,
@@ -46,6 +47,10 @@ from app.tools.registry import ToolRegistry, get_tool_registry
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["chat"])
+RESTING_MESSAGE = (
+    "Live answers are resting. Use a saved answer, "
+    "read the resume source or contact Aamir."
+)
 
 
 class StreamHeartbeat(Enum):
@@ -236,6 +241,12 @@ async def chat(
             prompt_tokens = completion.prompt_tokens
             completion_tokens = completion.completion_tokens
 
+    except LLMCapacityError as exc:
+        raise HTTPException(
+            status_code=429,
+            detail=RESTING_MESSAGE,
+            headers={"X-Assistant-State": "resting"},
+        ) from exc
     except LLMRateLimitError as exc:
         logger.warning("[%s] Groq rate limit: %s", conv_id, exc)
         raise HTTPException(
@@ -451,6 +462,15 @@ async def chat_stream(
             )
             yield f"event: done\ndata: {done_payload}\n\n"
 
+        except LLMCapacityError:
+            err_payload = json.dumps(
+                {
+                    "detail": RESTING_MESSAGE,
+                    "state": "resting",
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
+                }
+            )
+            yield f"event: error\ndata: {err_payload}\n\n"
         except LLMRateLimitError as exc:
             logger.warning("[%s] Groq rate limit during stream: %s", conv_id, exc)
             err_payload = json.dumps(

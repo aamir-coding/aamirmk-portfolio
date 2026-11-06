@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { EvalBadge } from "./components/Evals/EvalBadge";
+import { AssistantFallback } from "./components/AssistantFallback";
 import { fetchHealth } from "./lib/api";
 import { useChat } from "./hooks/useChat";
 import { useTheme } from "./hooks/useTheme";
@@ -35,6 +36,7 @@ function Portfolio() {
     messages,
     isStreaming,
     error,
+    isResting,
     sendMessage,
     sendInstantAnswer,
     stopStreaming,
@@ -59,9 +61,9 @@ function Portfolio() {
 
     async function checkBackend() {
       try {
-        await fetchHealth(controller.signal);
+        const health = await fetchHealth(controller.signal);
         clearTimeout(warmingTimer);
-        setServerState("ready");
+        setServerState(health.assistant_state === "resting" ? "resting" : "ready");
         setHealthError(null);
       } catch (err) {
         if (!controller.signal.aborted) {
@@ -85,7 +87,7 @@ function Portfolio() {
   const handleSelectPrompt = (prompt: string) => {
     setViewMode("chat");
     // If backend is asleep or still warming, answer instantly from bundled answers.json
-    if (serverState !== "ready" && BUNDLED_ANSWERS[prompt]) {
+    if ((serverState !== "ready" || isResting) && BUNDLED_ANSWERS[prompt]) {
       sendInstantAnswer(prompt, BUNDLED_ANSWERS[prompt]);
       return;
     }
@@ -161,9 +163,14 @@ function Portfolio() {
             resolvedTheme={resolvedTheme}
             onCycle={cycleTheme}
           />
-          <StatusIndicator state={serverState} errorMessage={healthError} />
+          <StatusIndicator state={isResting ? "resting" : serverState} errorMessage={healthError} />
         </div>
       </header>
+
+      {(serverState === "resting" || isResting) && <div className="banner-notice warning" role="status" aria-live="polite">
+        <div><p>Live answers are resting. Starter inquiries and curated role examples remain available.</p>
+          <AssistantFallback /></div>
+      </div>}
 
       {serverState === "warming" && (
         <div

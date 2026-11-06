@@ -21,6 +21,7 @@ from fastapi import FastAPI  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
 from app.api.fit import get_fit_pipeline  # noqa: E402
+from app.fit.cache import ReportCache  # noqa: E402
 from app.fit.models import FitReport  # noqa: E402
 from app.fit.pipeline import FitPipeline  # noqa: E402
 from app.llm import (  # noqa: E402
@@ -306,7 +307,12 @@ def capture_contracts() -> CaptureBundle:
         },
     )
     settings = Settings(ENVIRONMENT="test", GROQ_API_KEY="")
-    pipeline = FitPipeline(llm, retriever, settings=settings, cache={})
+    pipeline = FitPipeline(
+        llm,
+        retriever,
+        settings=settings,
+        cache=ReportCache(identity="isolated-test", include_curated=False),
+    )
     app = _capture_app(llm, retriever, pipeline)
     case_id = "fit-cloud-negative"
     checks = ReplayChecks(
@@ -376,7 +382,14 @@ def capture_contracts() -> CaptureBundle:
     llm = TraceFakeLLM(canned_replies=["not JSON", "still not JSON"])
     retriever = CaptureRetriever([])
     app = _capture_app(
-        llm, retriever, FitPipeline(llm, retriever, settings=settings, cache={})
+        llm,
+        retriever,
+        FitPipeline(
+            llm,
+            retriever,
+            settings=settings,
+            cache=ReportCache(identity="isolated-test", include_curated=False),
+        ),
     )
     with closing(TestClient(app)) as client:
         response = client.post(

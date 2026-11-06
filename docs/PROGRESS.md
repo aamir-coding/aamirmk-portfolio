@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — approved; Increments 1–3 implemented**
+**Phase 7 (remaining): Safety hardening — approved; Increments 1–4 implemented**
 on `phase-7-safety-hardening`, based on `main` at `440e81d`.
 [Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -28,7 +28,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: useful resting mode and bounded/versioned fit caching (Increment 4).
+Next: grounding/attack enforcement (Increment 5), then privacy/CI/review (Increment 6).
 Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
@@ -59,7 +59,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Approved; Increments 1–3 implemented; resting/cache next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
+| P7: Safety (rest) | 🟡 Approved; Increments 1–4 implemented; grounding next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -215,7 +215,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with resting mode and bounded/versioned cache (Increment 4); no Phase 10/9 work starts.
+1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with grounding/attack enforcement (Increment 5); no Phase 10/9 work starts.
 2. Phase 8 remote main/tag identity is verified at `440e81d`; deployment is user-confirmed. CI results and deployed runtime revision remain independently unverified.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -605,3 +605,32 @@ the following kickoff supersedes its remote-status statements.
 - Frontend session/SSE/receipt tests: **26 passed**; ESLint passed. No dependencies,
   provider calls, production probes, push or deployment. Final full checks and P8
   artifact identity review remain phase-close work.
+
+### Remaining Phase 7 Increment 4 — 6 November 2026
+
+- Typed resting responses for chat/fit and capacity state in health. Service readiness
+  stays distinct from inference capacity. Existing dossier UI offers authored starter
+  answers, curated role examples, contact and a working tracked résumé-source link.
+  There is no exported résumé PDF yet; PDF/source-link acceptance remains P10 work.
+- App-owned generated fit cache: 64-entry LRU, 15-minute TTL, exact JD/title plus
+  source/fact/index/model identity. Explicit `force_live` bypasses generated and authored
+  entries but never provider admission. Fit pipeline has a 90-second total deadline.
+- Authored presets remain separate from generated reports. New curated provenance
+  manifest binds unchanged existing example text, unchanged report source and current
+  draft facts; it is integrity metadata, not semantic calibration/fact approval. Stale
+  examples fail closed both through cache and `/fit/presets` report projection.
+- Initial cache contracts failed for missing module. Read-only review found edited
+  sample text could reuse an old authored report; regression reproduced red, then fixed
+  with JD hash plus exact text/source/fact bindings. Also fixed stale activePreset on
+  custom submission and guarded late aborted resting callbacks. Final read-only recheck
+  found no blocker in those fixes.
+- **71 focused backend tests passed in 3.58s** before final provenance fixes; latest
+  cache/fit/health/inference/recording subset **50 passed, 1 warning in 9.27s**.
+  Latest frontend state/hook/SSE/capture subset **51 passed**. Earlier broader affected
+  frontend run **52 passed**; TypeScript/Vite build passed (166.57kB gzip reported by
+  Vite, final byte gate still due). Runtime/model calls in tests remain fakes only.
+- Updated v3 captures and replay's optional cache-origin progress field; original
+  v1/v2/human/judge artifacts unchanged. Source fingerprints remain intentionally stale
+  until final explicit compatibility review; no baseline scores/floors lowered.
+- Exact audit-tool proposal prepared in `docs/briefs/phase-07-audit-tools.md` and an
+  inert `.yml.proposed` file. Approval question is pending; tools not installed/enabled.

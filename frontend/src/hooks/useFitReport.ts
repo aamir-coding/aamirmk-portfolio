@@ -23,7 +23,7 @@ export interface UseFitReportReturn {
   isLoadingPresets: boolean;
   activePreset: SampleJobDescription | null;
   loadPreset: (preset: SampleJobDescription) => void;
-  submit: (jdText: string, roleTitle?: string) => Promise<void>;
+  submit: (jdText: string, roleTitle?: string, forceLive?: boolean) => Promise<void>;
   abort: () => void;
   reset: () => void;
 }
@@ -109,7 +109,7 @@ export function useFitReport(): UseFitReportReturn {
   );
 
   const submit = useCallback(
-    async (jdText: string, roleTitle?: string) => {
+    async (jdText: string, roleTitle?: string, forceLive?: boolean) => {
       if (!jdText.trim() || jdText.trim().length < 50) {
         setError("Please provide a job description of at least 50 characters.");
         setStatus("error");
@@ -125,6 +125,7 @@ export function useFitReport(): UseFitReportReturn {
 
       setErrorReceipt(undefined);
       setStatus("streaming");
+      setActivePreset(null);
       setError(null);
       setReport(null);
       setProgress({
@@ -137,6 +138,7 @@ export function useFitReport(): UseFitReportReturn {
         await streamFitReport({
           jdText: jdText.trim(),
           roleTitle: roleTitle?.trim() || undefined,
+          forceLive,
           signal: controller.signal,
           callbacks: {
             onProgress: (p) => {

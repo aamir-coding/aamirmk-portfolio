@@ -179,6 +179,7 @@ class FitErrorPayload(ReplayModel):
 
 class ProgressPayload(ReplayModel):
     step: Text
+    origin: Literal["curated", "cache"] | None = None
     message: Text
     percent: float = Field(ge=0, le=100)
 

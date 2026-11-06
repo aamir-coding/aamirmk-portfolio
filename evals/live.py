@@ -350,6 +350,7 @@ async def generate_case(
     from fastapi import Response
 
     from app.api.chat import chat
+    from app.fit.cache import ReportCache
     from app.fit.models import FitReport, FitRequest
     from app.fit.pipeline import FitPipeline
     from app.models import ChatRequest
@@ -383,7 +384,7 @@ async def generate_case(
                 LLM_MODEL_MAIN=MAIN,
                 LLM_MODEL_UTILITY=UTILITY,
             ),
-            cache={},
+            cache=ReportCache(identity="isolated-test", include_curated=False),
         )
         output = None
         async for event in pipeline.run(

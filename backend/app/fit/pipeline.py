@@ -9,9 +9,11 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import time
 from collections.abc import AsyncIterator
 from typing import Any
 
+from app.fit.cache import ReportCache, cache_identity
 from app.fit.models import (
     FitReport,
     FitRequest,
@@ -26,7 +28,7 @@ from app.fit.prompts import (
     build_summary_messages,
 )
 from app.fit.scorer import compute_fit_summary, validate_and_downgrade_verdicts
-from app.llm import LLMClient, LLMError, Message
+from app.llm import LLMCapacityError, LLMClient, LLMError, Message
 from app.retrieval.models import RetrievedChunk
 from app.retrieval.retriever import Retriever
 from app.settings import Settings, get_settings
@@ -53,40 +55,36 @@ class FitPipeline:
         llm: LLMClient,
         retriever: Retriever,
         settings: Settings | None = None,
-        cache: dict[str, FitReport] | None = None,
+        cache: ReportCache | None = None,
     ) -> None:
         self._settings = settings or get_settings()
         self._llm = ObservedLLM(llm, main_model=self._settings.LLM_MODEL_MAIN)
         self._retriever = ObservedRetriever(retriever)
-        self._curated_keys: set[str] = set()
-        if cache is not None:
-            self._cache = cache
-            from app.fit.golden_benchmarks import GOLDEN_BENCHMARK_REPORTS
-
-            self._curated_keys = {
-                report.jd_hash
-                for report in GOLDEN_BENCHMARK_REPORTS.values()
-                if self._cache.get(report.jd_hash) == report
-            }
-        else:
-            from app.fit.golden_benchmarks import GOLDEN_BENCHMARK_REPORTS
-
-            self._cache = {
-                rep.jd_hash: rep for rep in GOLDEN_BENCHMARK_REPORTS.values()
-            }
-            self._curated_keys = set(self._cache)
+        self._cache = (
+            cache
+            if cache is not None
+            else ReportCache(
+                identity=cache_identity(
+                    (self._settings.LLM_MODEL_MAIN, self._settings.LLM_MODEL_UTILITY)
+                ),
+                include_curated=cache is None,
+            )
+        )
 
     async def run(self, request: FitRequest) -> AsyncIterator[dict[str, Any]]:
         trace = Trace()
         versions = await asyncio.to_thread(provenance)
         iterator = self._run(request)
+        deadline = time.monotonic() + 90
         try:
             while True:
                 # Heartbeat transport resumes each __anext__ in a separate task.
                 # Install/reset within that task, never across a yielded frame.
                 token = active_trace.set(trace)
                 try:
-                    frame = await anext(iterator)
+                    frame = await asyncio.wait_for(
+                        anext(iterator), timeout=max(0, deadline - time.monotonic())
+                    )
                 except StopAsyncIteration:
                     return
                 finally:
@@ -94,11 +92,7 @@ class FitPipeline:
                 if frame["event"] == "progress":
                     stage = frame["data"]["step"]
                     if stage == "cache_hit":
-                        trace.origin = (
-                            "curated"
-                            if request.compute_hash() in self._curated_keys
-                            else "cache"
-                        )
+                        trace.origin = frame["data"].get("origin", "cache")
                     trace.set_stage(stage)
                 elif frame["event"] in {"complete", "error"}:
                     if frame["event"] == "complete":
@@ -111,6 +105,18 @@ class FitPipeline:
                         },
                     }
                 yield frame
+        except TimeoutError:
+            yield {
+                "event": "error",
+                "data": {
+                    "code": "upstream_timeout",
+                    "message": (
+                        "The live report timed out. Try a curated example "
+                        "or contact Aamir."
+                    ),
+                    "telemetry": {**trace.snapshot().model_dump(), **versions},
+                },
+            }
         finally:
             await iterator.aclose()
 
@@ -119,15 +125,17 @@ class FitPipeline:
         jd_hash = request.compute_hash()
 
         # Step 0: Check content-hash cache
-        if jd_hash in self._cache:
+        cached = self._cache.get(request)
+        if cached is not None:
             logger.info("Fit cache hit for JD hash: %s", jd_hash)
-            cached_report = self._cache[jd_hash]
+            cached_report, origin = cached
             yield {
                 "event": "progress",
                 "data": {
                     "step": "cache_hit",
                     "message": "Instant match found in verification cache.",
                     "percent": 100,
+                    "origin": origin,
                 },
             }
             yield {
@@ -220,7 +228,7 @@ class FitPipeline:
                 cached=False,
             )
             # Store in in-memory cache
-            self._cache[jd_hash] = report
+            self._cache.put(request, report)
 
             yield {
                 "event": "complete",
@@ -235,6 +243,18 @@ class FitPipeline:
                     ("message"): (
                         "Could not extract valid job requirements. Please retry or "
                         "clarify the job description."
+                    ),
+                },
+            }
+        except LLMCapacityError:
+            yield {
+                "event": "error",
+                "data": {
+                    "code": "resting",
+                    "state": "resting",
+                    "message": (
+                        "Live reports are resting. Explore a curated example "
+                        "or contact Aamir."
                     ),
                 },
             }
