@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from "./api";
+import { getSessionId } from "./session";
 import type { RequestTelemetry } from "./contracts";
 import type {
   ChatHistoryMessage,
@@ -133,6 +134,7 @@ export async function streamChat({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Session-ID": getSessionId(),
       },
       body: JSON.stringify({
         message,
@@ -253,6 +255,7 @@ export async function streamFitReport({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Session-ID": getSessionId(),
       },
       body: JSON.stringify({
         jd_text: jdText,

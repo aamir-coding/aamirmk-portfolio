@@ -50,12 +50,12 @@ def test_slow_fit_stage_emits_heartbeat_and_finishes(
 def setup_test_pipeline() -> None:
     """Ensure a clean, lightweight fake retriever for test isolation."""
     fake_ret = FakeRetriever(canned_chunks=[])
-    get_fit_rate_limiter().reset()
+    app.state.fit_rate_limiter.reset()
     set_retriever(fake_ret)
     yield
     set_fit_pipeline(None)
     app.dependency_overrides.clear()
-    get_fit_rate_limiter().reset()
+    app.state.fit_rate_limiter.reset()
 
 
 def test_get_fit_presets_returns_curated_roles() -> None:

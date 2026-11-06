@@ -19,6 +19,8 @@ from app.api.fit import router as fit_router
 from app.api.health import router as health_router
 from app.llm import GroqLLM
 from app.safety.ip import get_client_ip
+from app.safety.middleware import RequestBoundsMiddleware
+from app.safety.rate_limiter import SlidingWindowRateLimiter
 from app.settings import Settings, get_settings
 
 logger = logging.getLogger("app")
@@ -75,6 +77,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = app_settings
     app.state.llm = GroqLLM(app_settings)
     app.state.fit_cache = None
+    app.state.chat_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=app_settings.RATE_LIMIT_REQUESTS_PER_MINUTE,
+        enabled=app_settings.RATE_LIMIT_ENABLED,
+        max_keys=app_settings.RATE_LIMIT_MAX_KEYS,
+    )
+    app.state.fit_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=app_settings.FIT_RATE_LIMIT_DAILY,
+        window_seconds=86400,
+        enabled=app_settings.RATE_LIMIT_ENABLED,
+        max_keys=app_settings.RATE_LIMIT_MAX_KEYS,
+    )
     app.dependency_overrides[get_settings] = lambda: app_settings
 
     # Pure ASGI path normalization middleware (runs before routing)
@@ -107,6 +120,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             client_ip,
         )
         return response
+
+    # Body-read disconnects must return outside BaseHTTPMiddleware's call_next.
+    app.add_middleware(
+        RequestBoundsMiddleware, max_bytes=app_settings.MAX_REQUEST_BYTES
+    )
 
     # CORS configuration with explicit allowlist (no wildcards)
     app.add_middleware(

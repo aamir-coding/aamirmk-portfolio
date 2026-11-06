@@ -66,6 +66,8 @@ class ChatRequest(BaseModel):
     )
     conversation_id: str | None = Field(
         default=None,
+        max_length=64,
+        pattern=r"^[A-Za-z0-9_-]+$",
         description="Optional tracking ID for the conversation session",
     )
     history: list[ChatHistoryMessage] = Field(

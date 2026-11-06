@@ -1,94 +1,81 @@
-"""Client IP extraction with proxy awareness and spoofing defense."""
+"""Canonical client identity through explicitly configured trusted proxy networks."""
 
 from __future__ import annotations
 
 import ipaddress
-import logging
-from collections.abc import Mapping
-from typing import Any
+from collections.abc import Mapping, Sequence
 
 from fastapi import Request
-
-logger = logging.getLogger(__name__)
 
 FALLBACK_IP = "127.0.0.1"
 
 
+def _canonical(value: str) -> str:
+    if not isinstance(value, str) or "%" in value:
+        raise ValueError("Scoped addresses cannot establish client identity")
+    address = ipaddress.ip_address(value.strip())
+    if isinstance(address, ipaddress.IPv6Address) and address.ipv4_mapped:
+        address = address.ipv4_mapped
+    return str(address)
+
+
 def is_valid_ip(ip_str: str) -> bool:
-    """Validate whether an input string is a valid IPv4 or IPv6 address."""
-    if not ip_str or not isinstance(ip_str, str):
-        return False
     try:
-        ipaddress.ip_address(ip_str.strip())
+        _canonical(ip_str)
         return True
-    except ValueError:
+    except (ValueError, AttributeError):
         return False
 
 
 def extract_client_ip(
     headers: Mapping[str, str] | None = None,
     client_host: str | None = None,
-    trust_proxy: bool = True,
+    trust_proxy: bool = False,
+    trusted_proxies: Sequence[str] = (),
 ) -> str:
-    """Extract real client IP address from request headers or socket host.
+    """Walk XFF right-to-left only from a verified trusted socket peer.
 
-    Order of precedence when trust_proxy is True:
-    1. CF-Connecting-IP (Cloudflare)
-    2. True-Client-IP (Akamai/Cloudflare enterprise)
-    3. X-Forwarded-For (standard reverse proxy chain)
-       - Parsed into list of trimmed tokens
-       - Validated against ipaddress
-       - Returns the leftmost valid non-spoofed IP in the chain
-    4. Direct socket client host (request.client.host)
-    5. Fallback IP (127.0.0.1)
+    Malformed chains fail back to the socket. Vendor identity headers have no
+    authority here. Uvicorn must preserve the socket peer (--no-proxy-headers).
     """
-    headers = headers or {}
-    lower_headers = {k.lower(): v for k, v in headers.items()}
+    try:
+        peer = _canonical(client_host or FALLBACK_IP)
+    except ValueError:
+        return FALLBACK_IP
+    networks = [ipaddress.ip_network(cidr) for cidr in trusted_proxies]
 
-    if trust_proxy:
-        # 1. Cloudflare connecting IP
-        cf_ip = lower_headers.get("cf-connecting-ip")
-        if cf_ip and is_valid_ip(cf_ip.strip()):
-            return cf_ip.strip()
+    def trusted(value: str) -> bool:
+        address = ipaddress.ip_address(value)
+        return any(address in network for network in networks)
 
-        # 2. True-Client-IP
-        true_ip = lower_headers.get("true-client-ip")
-        if true_ip and is_valid_ip(true_ip.strip()):
-            return true_ip.strip()
-
-        # 3. X-Forwarded-For chain
-        forwarded_for = lower_headers.get("x-forwarded-for")
-        if forwarded_for:
-            # Comma-separated list: "client, proxy1, proxy2"
-            raw_ips = [
-                part.strip() for part in forwarded_for.split(",") if part.strip()
-            ]
-            valid_ips = [ip for ip in raw_ips if is_valid_ip(ip)]
-            if valid_ips:
-                # Return leftmost valid client IP
-                return valid_ips[0]
-
-    # 4. Direct socket host fallback
-    if client_host and is_valid_ip(client_host.strip()):
-        return client_host.strip()
-
-    return FALLBACK_IP
+    if not trust_proxy or not trusted(peer):
+        return peer
+    values = [v for k, v in (headers or {}).items() if k.lower() == "x-forwarded-for"]
+    if len(values) != 1:
+        return peer
+    forwarded = values[0]
+    if not forwarded or len(forwarded) > 2048:
+        return peer
+    parts = forwarded.split(",")
+    if len(parts) > 16:
+        return peer
+    try:
+        chain = [_canonical(part) for part in parts]
+    except ValueError:
+        return peer
+    for hop in reversed(chain):
+        if not trusted(peer):
+            break
+        peer = hop
+    return peer
 
 
 def get_client_ip(request: Request) -> str:
-    """FastAPI dependency or helper to retrieve the client IP from Request."""
-    client_host = request.client.host if request.client else None
-    trust_proxy = True
-    try:
-        app = request.app
-        settings: Any = getattr(app.state, "settings", None)
-        if settings is not None:
-            trust_proxy = getattr(settings, "TRUST_PROXY_HEADERS", True)
-    except (KeyError, AttributeError):
-        pass
-
+    settings = getattr(request.scope.get("app", None), "state", None)
+    settings = getattr(settings, "settings", None)
     return extract_client_ip(
         headers=request.headers,
-        client_host=client_host,
-        trust_proxy=trust_proxy,
+        client_host=request.client.host if request.client else None,
+        trust_proxy=getattr(settings, "TRUST_PROXY_HEADERS", False),
+        trusted_proxies=getattr(settings, "TRUSTED_PROXY_CIDRS", ()),
     )

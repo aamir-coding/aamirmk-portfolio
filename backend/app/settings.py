@@ -1,3 +1,4 @@
+import ipaddress
 import json
 from functools import lru_cache
 from typing import Any
@@ -28,7 +29,10 @@ class Settings(BaseSettings):
     LLM_MODEL_UTILITY: str = "openai/gpt-oss-20b"
 
     # Safety, Rate Limiting & Quota Guards (Phase 7)
-    TRUST_PROXY_HEADERS: bool = True
+    TRUST_PROXY_HEADERS: bool = False
+    TRUSTED_PROXY_CIDRS: list[str] = Field(default_factory=list, max_length=16)
+    MAX_REQUEST_BYTES: int = Field(default=65536, ge=64, le=262144)
+    RATE_LIMIT_MAX_KEYS: int = Field(default=4096, ge=2, le=16384)
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 10
     RATE_LIMIT_BURST: int = 15
@@ -66,6 +70,14 @@ class Settings(BaseSettings):
             if stripped.isascii() and stripped.isdecimal():
                 return int(stripped)
         return value
+
+    @field_validator("TRUSTED_PROXY_CIDRS")
+    @classmethod
+    def validate_proxy_networks(cls, values: list[str]) -> list[str]:
+        networks = [ipaddress.ip_network(value) for value in values]
+        if any(network.prefixlen == 0 for network in networks):
+            raise ValueError("Trust-all proxy networks are not allowed")
+        return [str(network) for network in networks]
 
     @field_validator("CORS_ORIGINS", mode="after")
     @classmethod

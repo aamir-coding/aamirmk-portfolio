@@ -772,3 +772,25 @@ or human calibration evidence. Changed code invalidates the P8 numeric summary u
 fresh compatible offline evidence and baseline identity review; no floors are lowered.
 Default production generation remains resting without a boot-bound allowance. This
 rollout does not supply durable accounting, operational activation or live acceptance.
+
+### DRN-056: Explicit proxy trust and bounded abuse admission
+
+**Date:** 2026-11-06. **Scope:** Remaining P7 Increment 3; qualifies DRN-015.
+
+IP syntax does not establish header authority. Default to canonical socket identity;
+only explicitly verified trusted networks and enabled proxy handling permit a bounded
+right-to-left XFF walk. Duplicate/malformed fields fail back to the socket, vendor
+headers have no independent authority, and mapped IPv4/IPv6 normalize consistently.
+Disable Uvicorn's competing proxy rewrite. Real Render topology remains unverified:
+deployment must not claim individual client limits until its chain is established.
+
+Rate counters belong to each app and enforce IP plus optional opaque tab-session caps.
+Both sit below shared inference capacity, so rotating sessions cannot bypass the IP or
+global ceilings. Limit key count; fail closed for new keys at capacity rather than
+evict active records. Tab IDs are abuse hints, not authentication or durable sessions.
+
+Raw ASGI body bounds run outside BaseHTTPMiddleware and inside CORS: cap actual bytes
+before JSON parsing, enforce a total read deadline and validate declared lengths and
+session IDs. Body-read disconnect returns without a response; placing this inside
+BaseHTTPMiddleware incorrectly produced `No response returned` server errors. No new
+dependency, storage, authentication scheme or deployment trust assertion is introduced.

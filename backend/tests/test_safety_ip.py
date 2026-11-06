@@ -36,42 +36,47 @@ def test_extract_client_ip_fallback_default():
 
 
 def test_extract_client_ip_cf_connecting_ip():
-    """Verify Cloudflare CF-Connecting-IP takes highest priority."""
+    """Unverified vendor headers have no authority over the socket peer."""
     headers = {
         "cf-connecting-ip": "198.51.100.10",
         "true-client-ip": "198.51.100.20",
         "x-forwarded-for": "198.51.100.30, 10.0.0.1",
     }
     ip = extract_client_ip(headers=headers, client_host="10.0.0.2")
-    assert ip == "198.51.100.10"
+    assert ip == "10.0.0.2"
 
 
 def test_extract_client_ip_true_client_ip():
-    """Verify True-Client-IP takes priority when CF-Connecting-IP is absent."""
+    """True-Client-IP alone cannot establish a trusted identity."""
     headers = {
         "true-client-ip": "198.51.100.20",
         "x-forwarded-for": "198.51.100.30, 10.0.0.1",
     }
     ip = extract_client_ip(headers=headers, client_host="10.0.0.2")
-    assert ip == "198.51.100.20"
+    assert ip == "10.0.0.2"
 
 
 def test_extract_client_ip_x_forwarded_for_chain():
-    """Verify X-Forwarded-For chain extraction selects leftmost valid client IP."""
+    """A verified chain walks trusted hops from the socket toward the client."""
     headers = {
         "x-forwarded-for": "203.0.113.55, 10.100.0.1, 10.200.0.1",
     }
-    ip = extract_client_ip(headers=headers, client_host="10.200.0.2")
+    ip = extract_client_ip(
+        headers=headers,
+        client_host="10.200.0.2",
+        trust_proxy=True,
+        trusted_proxies=["10.0.0.0/8"],
+    )
     assert ip == "203.0.113.55"
 
 
 def test_extract_client_ip_x_forwarded_for_with_malformed_entries():
-    """Verify parser skips invalid tokens and returns first valid IP."""
+    """Malformed chains fall back to the socket rather than skipping entries."""
     headers = {
         "x-forwarded-for": "unknown, bad_ip, 203.0.113.77, 10.0.0.1",
     }
     ip = extract_client_ip(headers=headers, client_host="10.0.0.2")
-    assert ip == "203.0.113.77"
+    assert ip == "10.0.0.2"
 
 
 def test_extract_client_ip_untrusted_proxies():
@@ -88,7 +93,14 @@ def test_extract_client_ip_untrusted_proxies():
 
 def test_get_client_ip_dependency(test_settings: Settings):
     """Verify get_client_ip works as a FastAPI dependency inside request scope."""
-    app = create_app(settings=test_settings)
+    app = create_app(
+        settings=test_settings.model_copy(
+            update={
+                "TRUST_PROXY_HEADERS": True,
+                "TRUSTED_PROXY_CIDRS": ["10.0.0.0/24"],
+            }
+        )
+    )
     scope = {
         "type": "http",
         "method": "GET",

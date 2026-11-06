@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — approved; Increments 1–2 implemented**
+**Phase 7 (remaining): Safety hardening — approved; Increments 1–3 implemented**
 on `phase-7-safety-hardening`, based on `main` at `440e81d`.
 [Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -28,7 +28,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: trusted identity, bounded IP/session admission and request-size caps (Increment 3).
+Next: useful resting mode and bounded/versioned fit caching (Increment 4).
 Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
@@ -59,7 +59,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Approved; Increments 1–2 implemented; abuse controls next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
+| P7: Safety (rest) | 🟡 Approved; Increments 1–3 implemented; resting/cache next | `phase-7-safety-hardening` | — | Existing P7 guide; update during build |
 | P10: Production | ⬜ Not Started | — | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
@@ -215,7 +215,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with trusted identity and bounded abuse admission (Increment 3); no Phase 10/9 work starts.
+1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md), starting with resting mode and bounded/versioned cache (Increment 4); no Phase 10/9 work starts.
 2. Phase 8 remote main/tag identity is verified at `440e81d`; deployment is user-confirmed. CI results and deployed runtime revision remain independently unverified.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -580,3 +580,28 @@ the following kickoff supersedes its remote-status statements.
   offline regeneration. No numeric accuracy claim, baseline weakening, push or deploy.
 - User chose to prepare exact audit-tool additions for version/workflow review;
   adding pip-audit or a secret-scanning action still awaits explicit approval.
+
+### Remaining Phase 7 Increment 3 — 6 November 2026
+
+- Unverified headers cannot replace the canonical socket IP. Explicit trusted CIDRs
+  plus proxy enablement allow a bounded right-to-left XFF walk; malformed/duplicate
+  fields fall back to the socket. IPv6/mapped IPv4 normalize; scoped identities are
+  rejected. Default trust is false/empty; Render command preserves socket identity.
+  Real Render chain verification is still a production acceptance gate, not supplied
+  by local tests. Without verified proxy config clients can share the proxy's IP cap.
+- Added preparse 64KiB raw body cap, ten-second total read deadline, Content-Length
+  validation and bounded opaque session header. App-owned per-IP/per-session limiters
+  cap key cardinality and reject new keys when full without evicting active limits.
+  Frontend sends a stable tab ID, including when sessionStorage is unavailable.
+- Initial regression reproduced vendor-header spoofing. Read-only review found body
+  disconnects becoming server errors under BaseHTTPMiddleware and duplicate-XFF
+  attacker-first identity. Both reproduced as failing full-stack/pure regressions,
+  fixed and read-only rechecked with no remaining blocker. Bounds now wrap outside
+  BaseHTTPMiddleware and preserve JSON errors/request IDs/CORS on rejection.
+- Latest focused backend: **69 passed, 1 existing warning in 4.51s**. Includes real
+  loopback Uvicorn load: twelve parallel requests, rotating sessions/forged XFF,
+  exactly **2 HTTP 200 / 10 HTTP 429**, Retry-After headers, **zero provider attempts**.
+  State-flood, chunked/lying Content-Length and body disconnect checks pass.
+- Frontend session/SSE/receipt tests: **26 passed**; ESLint passed. No dependencies,
+  provider calls, production probes, push or deployment. Final full checks and P8
+  artifact identity review remain phase-close work.
