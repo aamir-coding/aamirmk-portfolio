@@ -3,6 +3,26 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-064: On-demand health recovery and an external deterministic monitor
+
+**Date:** 2026-11-10. **Scope:** P10 Increments 3–4.
+
+Keep Render sleep. Browser health checks are cancelled at 90 seconds with explicit
+manual retry; no background polling or provider probes. Abort and unmount guard late
+updates. Missing capacity is conservatively resting; unready payloads cannot show Ready.
+Authored answers and contact remain useful while warming/unavailable. Remove historical
+25-second promises rather than presenting old measurements as current evidence.
+
+The external monitor validates HTTP and typed health with a 90-second total deadline,
+8KiB body cap and no redirects. Two consecutive bad observations trigger incidents,
+successful delivery deduplicates, recovery is immediate, and new incidents cool down
+15 minutes. Resting is expected unless explicitly monitoring a live window. Persist
+only bounded typed status/delivery metadata under an exclusive local lock, with target
+and policy binding. Failed delivery remains pending; default dry-run does not acknowledge.
+Optional HTTPS webhook sends only service/event/time and never remote text or secrets.
+No schedule/channel/notification is enabled before owner choice and delivery approval;
+this is not an in-API scheduler, account telemetry or durable P9 state.
+
 ### DRN-062: Verify committed release assets and distinguish readiness from capacity
 
 **Date:** 2026-11-10. **Scope:** P10 Increments 1–2, approved phase brief.

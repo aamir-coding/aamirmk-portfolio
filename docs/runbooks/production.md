@@ -39,8 +39,6 @@ Run full retrieval/replay gates before merge; do not lower thresholds to get gre
 Redeploy to load new immutable assets. Existing failed judge validation and held-out
 cases are not reusable tuning evidence.
 
-## Identity and privacy
-
 ## Operator activation
 
 `OPS_TOKEN` is a separate high-entropy credential (generate with
@@ -87,3 +85,39 @@ hash, not transcripts. Uvicorn access logs/WebSockets are disabled. Review hoste
 Render/Vercel/Groq log retention and access separately; record the account's actual
 retention here before launch. **Hosted retention: not yet verified.** No P9 message
 storage or 90-day cleanup is claimed.
+
+## External monitoring
+
+The provider-free CLI is `python -m app.monitoring` from backend. It makes only a
+bounded GET to health and, with separate explicit consent, a metadata-only webhook.
+It never sends chat, fit or judge requests. Default dry-run example:
+
+```powershell
+python -m app.monitoring --url https://aamirmk-portfolio-mlr4.onrender.com/api/health --state ../build/monitor.json
+```
+
+Run outside the API process, with one state file per URL/policy. A local exclusive
+lock prevents overlapping runs; after a crash, first verify no monitor is running
+before reviewing/removing its stale lock. Malformed/foreign state fails closed.
+The monitor waits up to 90 seconds (including cold boot), bounds response bytes and
+does not follow redirects. A 200 response must also validate ready/status/capacity.
+
+Default policy treats resting as expected. Add `--expect-inference` only during an
+operator-approved live window. Two consecutive bad checks produce one incident;
+successful delivery suppresses duplicates, recovery sends immediately, and new
+incidents are separated by 15 minutes. Failed delivery stays pending. Dry runs do
+not acknowledge delivery. This is monitor-local bookkeeping, not durable API quota.
+
+For an approved HTTPS JSON webhook, keep its secret URL in `MONITOR_WEBHOOK_URL`
+and add `--send`. Its contract is exactly `service`, `event`, `at`; a provider that
+requires another body needs a reviewed adapter. No destination is preconfigured or
+notification sent. Credential-bearing URLs and raw errors are never printed.
+Exit codes: 0 healthy/expected resting; 1 service/capacity incident; 2 config/delivery
+failure. Confirm a controlled outage, a resting transition and phone recovery delivery
+before claiming monitoring is operational.
+
+Schedule choice remains owner-controlled. Frequent polling can prevent Render sleep;
+default proposal is no keep-alive and no schedule created. A 30-minute external check
+preserves idle periods but has coarse detection and wakes the API; a five-minute check
+reduces detection latency and changes the instance-hours policy. Record that trade-off
+and check current account terms before enabling any schedule.
