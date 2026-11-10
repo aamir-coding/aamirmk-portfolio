@@ -29,6 +29,7 @@ class RequestBoundsMiddleware:
                     "X-Request-ID": request_id,
                     "X-Content-Type-Options": "nosniff",
                     "Referrer-Policy": "strict-origin-when-cross-origin",
+                    "Cache-Control": "no-store",
                 },
             )
             await response(scope, receive, send)

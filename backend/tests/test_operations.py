@@ -108,6 +108,9 @@ def test_ambiguous_auth_is_denied_and_attempts_are_bounded(ops: TestClient) -> N
 def test_control_has_no_public_schema_or_cache(ops: TestClient) -> None:
     assert "/api/ops/inference" not in ops.get("/openapi.json").text
     assert ops.get("/api/ops/inference").headers["cache-control"] == "no-store"
+    oversized = ops.post("/api/ops/inference", headers=AUTH, content=b"x" * 65537)
+    assert oversized.status_code == 413
+    assert oversized.headers["cache-control"] == "no-store"
 
 
 def test_operator_token_validation_and_redaction() -> None:
