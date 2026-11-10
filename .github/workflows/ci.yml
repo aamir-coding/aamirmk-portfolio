@@ -45,6 +45,12 @@ jobs:
         run: |
           python -m pytest -c backend/pyproject.toml backend/tests evals -v
 
+      - name: Verify release assets without regenerating the index
+        working-directory: backend
+        env:
+          RENDER_GIT_COMMIT: ${{ github.sha }}
+        run: python -m app.release
+
       - name: Offline retrieval, replay and compatible baseline gate
         run: python -m evals.run --full --output build/evals/results.json
 

@@ -1,10 +1,20 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 7 (remaining): Safety hardening — six increments implemented and locally verified; semantic/operational acceptance pending**
-on `phase-7-safety-hardening`, based on `main` at `440e81d`.
-[Phase brief and architectural pre-mortem](briefs/phase-07-safety-hardening.md).
+**Phase 10: Production hardening, monitoring and launch — approved; Build in progress**
+on `phase-10-production-hardening`, based on `main` at `de73fb5`.
+[Phase brief and architectural pre-mortem](briefs/phase-10-production-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
+
+**Phase 7 (remaining): Safety hardening — closed, merged and tagged.** On 6 November
+2026, Aamir confirms merging/pushing `main` at
+`de73fb511ef82fd9c5b5f3c7e864ab0fcf0c6454` and pushing remote tag
+`phase-7-hardening-done` at that commit, triggering CI/deployment. Local `main`,
+`origin/main` tracking ref and tag independently match. A fresh `git ls-remote`
+failed with `getaddrinfo() thread failed to start`; remote publication is user-confirmed,
+not independently reverified. Cloud CI success and deployed revision remain unchecked.
+Closure preserves the [P7 evidence ledger](audits/2026-11-06-phase-07-safety.md)
+and outstanding operational/semantic launch gates; it does not certify model accuracy.
 
 **Phase 8: Evals, under-the-hood panel and eval badge — merged and remotely tagged**
 at `440e81d`. On 6 November 2026, read-only `git ls-remote origin` independently
@@ -28,10 +38,10 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: review the [local verification/acceptance ledger](audits/2026-11-06-phase-07-safety.md)
-and outstanding operational/semantic gates; teach-back answers remain unassessed.
-No push/deploy or next phase is authorized.
-Aamir approved the six-increment brief on 6 November. A new factual accuracy claim
+Next: implement the approved [Phase 10 brief](briefs/phase-10-production-hardening.md).
+Aamir approved continuing through the phase on 10 November 2026. Phase 7 teach-back
+answers remain unassessed; its milestone is closed by Aamir's explicit confirmation.
+Aamir approved the Phase 7 six-increment brief on 6 November. A new factual accuracy claim
 still needs approved facts, reliable judging and compatible held-out generation evidence;
 further judge tuning needs a fresh independently graded validation version, never retuning
 and resampling these exposed eight outcomes. These are experiment/publication gates,
@@ -61,8 +71,8 @@ not unfinished work in the accepted offline engineering milestone.
 | **Markdown AST Migration (react-markdown)** | 🟢 Complete | `main` | `markdown-ast-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
-| P7: Safety (rest) | 🟡 Six increments locally verified; semantic/operational acceptance pending | `phase-7-safety-hardening` | — | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
-| P10: Production | ⬜ Not Started | — | — | — |
+| P7: Safety (rest) | 🟢 Closed; merge/remote push user-confirmed at `de73fb5`; launch gates carried forward | `main` | `phase-7-hardening-done` (remote user-confirmed; local verified) | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
+| P10: Production | 🟡 Approved; Build in progress | `phase-10-production-hardening` | — | — |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
 ## What's Done
@@ -217,8 +227,8 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Continue the approved [remaining Phase 7 brief](briefs/phase-07-safety-hardening.md): Increment 6 privacy/CI, approved security updates, full verification and review; no Phase 10/9 work starts.
-2. Phase 8 remote main/tag identity is verified at `440e81d`; deployment is user-confirmed. CI results and deployed runtime revision remain independently unverified.
+1. Complete the approved [Phase 10 brief and pre-mortem](briefs/phase-10-production-hardening.md); continue all independent work through verification, review and study guide.
+2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
 ## User-Reported Live Acceptance — 2026-11-04
@@ -423,7 +433,7 @@ independently spendable pools. Reconfirm current account-specific limits before 
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-The remaining Phase 7 brief is approved; no blocker to offline implementation.
+Phase 7 is closed. Phase 10 Build is approved on 10 November 2026.
 Production acceptance needs verified proxy behavior and current account limits/prior
 usage. In-memory accounting cannot establish durable organization-wide protection
 across restarts or independent eval processes; see the brief's fail-closed proposal.
@@ -727,9 +737,9 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
 - **Pending:** current account limits/remaining use from other processes, production
   activation design and fresh boot-bound allowance, and verified Render proxy chain.
   Default inference stays closed; no account-wide/restart durability claimed before P9.
-- **Pending:** separate approval to push/deploy this concrete branch, cloud checks and
-  deployed CSP/proxy/runtime verification. No new completion tag or next phase started.
-  Existing first-share `phase-7-done` will not be moved or force-pushed.
+- **Resolved by user, 6 November:** Phase 7 merged/pushed at `de73fb5`, remote
+  `phase-7-hardening-done` tag pushed. Cloud checks and deployed CSP/proxy/runtime
+  verification remain P10 gates. Existing first-share `phase-7-done` is unchanged.
 - **Tracked P10/P9:** public résumé PDF/source links; real-device/cold-start/no-JS checks;
   hosted log retention and monitoring; P9 database, durable quota, handoff and backups.
 - **Tracked audit follow-up:** reviewed Vitest/lint-tool updates for nine moderate npm

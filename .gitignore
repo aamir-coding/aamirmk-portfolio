@@ -45,6 +45,8 @@ frontend/.vercel/
 
 # Backend index (built at deploy time)
 backend/index/
+backend/release.json
+backend/release.tmp
 
 # Test / coverage
 .coverage
