@@ -5,6 +5,20 @@ import * as api from "./lib/api";
 import * as sse from "./lib/sse";
 
 describe("<App />", () => {
+  it("recovers from a chat resting response when service status is retried", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
+      opts.callbacks.onState?.("resting");
+      opts.callbacks.onError("Resting for this request");
+    });
+    render(<App />);
+    await screen.findByText("Ready");
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "A custom inquiry" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    await screen.findByLabelText("Server status: live answers resting");
+    fireEvent.click(screen.getByRole("button", { name: "Check service status" }));
+    await screen.findByText("Ready");
+  });
   beforeEach(() => {
     vi.restoreAllMocks();
     sessionStorage.clear();
@@ -151,7 +165,7 @@ describe("<App />", () => {
     });
 
     // Initially in Cover State
-    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Return to candidate dossier overview/i })
     ).not.toBeInTheDocument();
@@ -176,7 +190,7 @@ describe("<App />", () => {
     fireEvent.click(dossierBtn);
 
     // Should return to Cover State non-destructively
-    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
 
     // Resume Chat button is now available to jump back
     const resumeBtn = screen.getByRole("button", {
@@ -196,7 +210,7 @@ describe("<App />", () => {
     });
     fireEvent.click(clearBtn);
 
-    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Resume active chat conversation/i })
     ).not.toBeInTheDocument();

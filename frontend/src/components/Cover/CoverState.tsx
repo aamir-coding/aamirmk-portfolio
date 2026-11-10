@@ -18,18 +18,18 @@ export function CoverState({
     >
       <div className="dossier-masthead">
         <div className="dossier-eyebrow">
-          <span className="dossier-tag">VERIFIED DOSSIER</span>
+          <span className="dossier-tag">CANDIDATE DOSSIER</span>
           <span className="dossier-dispatch-id">REF: AMK-PORTFOLIO</span>
         </div>
         <h2 className="dossier-name">Aamir Mohammed Khan</h2>
         <p className="dossier-role">AI Systems & Full-Stack Engineer</p>
 
-        <div className="dossier-credentials-ribbon" aria-label="Candidate Credentials">
+        <div className="dossier-credentials-ribbon" role="group" aria-label="Candidate Credentials">
           <span className="dossier-credential-pill">
-            AMU B.Tech (CGPA 9.77/10)
+            MSRUAS B.Tech (CGPA 9.77/10)
           </span>
           <span className="dossier-credential-pill">
-            Aligarh, India
+            Bengaluru, India
           </span>
           <span className="dossier-credential-pill dossier-credential-available">
             <span className="credential-dot" aria-hidden="true" />
@@ -38,6 +38,8 @@ export function CoverState({
         </div>
 
         <nav className="dossier-external-links" aria-label="Direct Candidate Links">
+          <a href="/resume-draft.pdf" target="_blank" rel="noopener noreferrer"
+            className="dossier-external-link">Résumé draft (PDF)</a>
           <a
             href="https://github.com/aamir-coding"
             target="_blank"
@@ -68,13 +70,11 @@ export function CoverState({
 
       <div className="dossier-statement">
         <p>
-          I am an AI digital assistant trained exclusively on Aamir’s verified
-          résumé, engineering projects, and system architectures. Inquiries are
-          grounded strictly in verified facts.
+          I'm an AI assistant trained on Aamir's verified résumé, projects, and experience.
         </p>
       </div>
 
-      <div className="dossier-meta-grid" aria-label="Core Competencies">
+      <div className="dossier-meta-grid" role="group" aria-label="Core Competencies">
         <div className="dossier-meta-card">
           <span className="meta-label">CORE FOCUS</span>
           <span className="meta-value">
@@ -96,7 +96,7 @@ export function CoverState({
       </div>
 
       {onOpenFitModal && (
-        <div className="dossier-fit-cta-box" aria-label="Job Description Fit Analysis">
+        <div className="dossier-fit-cta-box" role="group" aria-label="Job Description Fit Analysis">
           <div className="dossier-fit-cta-text">
             <span className="dossier-fit-cta-title">JOB DESCRIPTION FIT ANALYSIS</span>
             <span className="dossier-fit-cta-desc">

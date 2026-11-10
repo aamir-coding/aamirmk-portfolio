@@ -18,6 +18,7 @@ export interface UseChatReturn {
   conversationId: string | null;
   error: string | null;
   isResting?: boolean;
+  clearResting: () => void;
   sendMessage: (text: string) => Promise<void>;
   sendInstantAnswer: (question: string, answer: InstantAnswer) => void;
   stopStreaming: () => void;
@@ -304,6 +305,7 @@ export function useChat(): UseChatReturn {
 
   return {
     isResting,
+    clearResting: () => setIsResting(false),
     messages,
     isStreaming,
     conversationId,

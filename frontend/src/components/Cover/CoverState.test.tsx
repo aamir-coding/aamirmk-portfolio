@@ -7,7 +7,7 @@ describe("<CoverState />", () => {
     const onSelectPrompt = vi.fn();
     render(<CoverState onSelectPrompt={onSelectPrompt} />);
 
-    expect(screen.getByText("VERIFIED DOSSIER")).toBeInTheDocument();
+    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
     expect(screen.getByText("REF: AMK-PORTFOLIO")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { level: 2, name: /Aamir Mohammed Khan/i })
@@ -26,9 +26,9 @@ describe("<CoverState />", () => {
     render(<CoverState onSelectPrompt={onSelectPrompt} />);
 
     expect(
-      screen.getByText(/AMU B\.Tech \(CGPA 9\.77\/10\)/i)
+      screen.getByText(/MSRUAS B\.Tech \(CGPA 9\.77\/10\)/i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/Aligarh, India/i)).toBeInTheDocument();
+    expect(screen.getByText(/Bengaluru, India/i)).toBeInTheDocument();
     expect(screen.getByText(/Available for Hire/i)).toBeInTheDocument();
 
     const githubLink = screen.getByRole("link", { name: /GitHub ↗/i });

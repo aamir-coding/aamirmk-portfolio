@@ -17,7 +17,7 @@ export function StarterChips({
   disabled = false,
 }: StarterChipsProps) {
   return (
-    <div className="starter-chips-container" aria-label="Suggested starter questions">
+    <div className="starter-chips-container" role="group" aria-label="Suggested starter questions">
       <span className="starter-chips-label">Suggested Inquiries</span>
       <div className="starter-chips-grid">
         {onOpenFitModal && (

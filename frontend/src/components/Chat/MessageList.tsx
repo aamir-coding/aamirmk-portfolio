@@ -26,7 +26,7 @@ export function MessageList({
 
   if (isCoverState || messages.length === 0) {
     return (
-      <div className="chat-empty-state" aria-label="Welcome and suggestions">
+      <div className="chat-empty-state" role="group" aria-label="Welcome and suggestions">
         <CoverState
           onSelectPrompt={onSelectPrompt}
           onOpenFitModal={onOpenFitModal}

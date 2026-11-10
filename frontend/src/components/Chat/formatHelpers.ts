@@ -38,6 +38,19 @@ export function formatSafeHref(rawHref?: string): string | undefined {
  * Handles Unicode whitespace, non-breaking hyphens, glued list numerals,
  * and repairs unclosed bold contact headers without mutating domain names.
  */
+// Anonymous GETs returned 404 on 2026-11-10; retain receipts without dead links.
+const UNAVAILABLE_PUBLIC_SOURCES = new Set([
+  "https://github.com/aamir-coding/aamirmk-portfolio",
+  "https://github.com/aamirmkh",
+  "https://github.com/aamir-coding/portfolio-assistant",
+]);
+
+export function formatPublicSourceHref(rawHref?: string): string | undefined {
+  const safe = formatSafeHref(rawHref);
+  if (!safe) return undefined;
+  return UNAVAILABLE_PUBLIC_SOURCES.has(safe.replace(/\/$/, "")) ? undefined : safe;
+}
+
 export function sanitizeMarkdown(text: string): string {
   if (!text) return "";
   return (

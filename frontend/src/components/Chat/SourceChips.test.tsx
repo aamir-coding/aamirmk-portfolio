@@ -4,6 +4,12 @@ import { SourceChips } from "./SourceChips";
 import type { SourceCitation } from "../../lib/types";
 
 describe("SourceChips", () => {
+  it("preserves an inaccessible source as a receipt without a broken link", () => {
+    render(<SourceChips sources={[{chunk_id:"private-source",title:"Portfolio source",type:"project",source_url:"https://github.com/aamir-coding/aamirmk-portfolio"}]} />);
+    expect(screen.getByText("Portfolio source")).toBeInTheDocument();
+    expect(screen.queryByRole("link")).toBeNull();
+    expect(screen.getByTitle(/Source not publicly accessible/)).toBeInTheDocument();
+  });
   it("renders nothing when sources array is empty", () => {
     const { container } = render(<SourceChips sources={[]} />);
     expect(container.firstChild).toBeNull();

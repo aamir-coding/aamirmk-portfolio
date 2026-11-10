@@ -1,5 +1,6 @@
 import React from "react";
 import type { ProjectCardData } from "../../lib/types";
+import { formatPublicSourceHref } from "./formatHelpers";
 
 export interface ProjectCardProps {
   card: ProjectCardData;
@@ -10,6 +11,7 @@ export const ProjectCard = React.memo(function ProjectCard({
   card,
   onInspectArchitecture,
 }: ProjectCardProps) {
+  const githubHref = formatPublicSourceHref(card.github_url ?? undefined);
   return (
     <section
       className="dossier-card"
@@ -84,9 +86,9 @@ export const ProjectCard = React.memo(function ProjectCard({
               Live Demo ↗
             </a>
           )}
-          {card.github_url && (
+          {githubHref && (
             <a
-              href={card.github_url}
+              href={githubHref}
               target="_blank"
               rel="noopener noreferrer"
               className="dossier-link"

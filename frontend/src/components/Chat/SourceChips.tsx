@@ -1,5 +1,5 @@
 import React from "react";
-import { formatSafeHref } from "./formatHelpers";
+import { formatPublicSourceHref } from "./formatHelpers";
 import type { SourceCitation } from "../../lib/types";
 
 export interface SourceChipsProps {
@@ -23,7 +23,7 @@ export const SourceChips = React.memo(function SourceChips({
       <ul className="source-chips-list">
         {sources.map((src) => {
           const sectionBadge = src.source_section ? `[${src.source_section}]` : "";
-          const safeUrl = formatSafeHref(src.source_url ?? undefined);
+          const safeUrl = formatPublicSourceHref(src.source_url ?? undefined);
           const hasUrl = Boolean(safeUrl);
 
           return (
@@ -49,7 +49,7 @@ export const SourceChips = React.memo(function SourceChips({
                 <span
                   className="source-chip"
                   role="group"
-                  title={`Grounded in questionnaire receipt: ${src.title}`}
+                  title={src.source_url ? `Source not publicly accessible. Receipt: ${src.title}` : `Grounded in questionnaire receipt: ${src.title}`}
                   aria-label={`${src.title} ${sectionBadge}`}
                 >
                   {sectionBadge && (

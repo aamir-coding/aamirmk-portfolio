@@ -14,7 +14,7 @@
   /* Text & Inks */
   --text-primary: #0f172a;
   --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-muted: #526279;
   --text-inverse: #f8fafc;
   
   /* Hairline Dossier Borders */
@@ -46,7 +46,7 @@
   --accent-ink: var(--text-primary);
   
   /* Status Semantics */
-  --status-ready: #059669;
+  --status-ready: #047857;
   --status-ready-bg: #ecfdf5;
   --status-warming: #d97706;
   --status-warming-bg: #fffbeb;
@@ -147,7 +147,7 @@
     --accent-ink: var(--text-primary);
     
     /* Status Semantics */
-    --status-ready: #10b981;
+    --status-ready: #34d399;
     --status-ready-bg: #064e3b;
     --status-warming: #f59e0b;
     --status-warming-bg: #451a03;
@@ -202,7 +202,7 @@
   --accent-ink: var(--text-primary);
   
   /* Status Semantics */
-  --status-ready: #10b981;
+  --status-ready: #34d399;
   --status-ready-bg: #064e3b;
   --status-warming: #f59e0b;
   --status-warming-bg: #451a03;

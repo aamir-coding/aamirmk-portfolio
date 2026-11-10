@@ -35,6 +35,7 @@ function Portfolio() {
     isStreaming,
     error,
     isResting,
+    clearResting,
     sendMessage,
     sendInstantAnswer,
     stopStreaming,
@@ -72,6 +73,11 @@ function Portfolio() {
   const handleResetChat = () => {
     resetChat();
     setViewMode("cover");
+  };
+
+  const handleRefreshHealth = () => {
+    clearResting();
+    refreshHealth();
   };
 
   return (
@@ -137,10 +143,10 @@ function Portfolio() {
           <AssistantFallback /></div>
       </div>}
 
-      {(serverState === "resting" || serverState === "error") && <div className="banner-notice warning" role="status">
+      {(serverState === "resting" || isResting || serverState === "error") && <div className="banner-notice warning" role="status">
         <div>{healthError && <p>{healthError}</p>}
           {serverState === "error" && <AssistantFallback />}
-          <button type="button" className="btn btn-secondary" onClick={refreshHealth}>Check service status</button>
+          <button type="button" className="btn btn-secondary" onClick={handleRefreshHealth}>Check service status</button>
         </div>
       </div>}
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import type { ProjectCardData } from "../../lib/types";
+import { formatPublicSourceHref } from "./formatHelpers";
 
 export interface ProjectModalProps {
   card: ProjectCardData | null;
@@ -70,6 +71,7 @@ export const ProjectModal = React.memo(function ProjectModal({
   if (!isOpen || !card) {
     return null;
   }
+  const githubHref = formatPublicSourceHref(card.github_url ?? undefined);
 
   return (
     <div className="modal-portal" role="presentation">
@@ -182,9 +184,9 @@ export const ProjectModal = React.memo(function ProjectModal({
                 Launch Live App ↗
               </a>
             )}
-            {card.github_url && (
+            {githubHref && (
               <a
-                href={card.github_url}
+                href={githubHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-secondary"
