@@ -32,7 +32,7 @@ export function StatusIndicator({
       >
         <span className="status-dot warming" aria-hidden="true" />
         <span>
-          {state === "warming" ? "Waking Up (Render ~25s)" : "Connecting..."}
+          {state === "warming" ? "Waking up…" : "Connecting..."}
         </span>
       </div>
     );

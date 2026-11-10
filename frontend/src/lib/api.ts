@@ -9,7 +9,7 @@ export interface HealthStatus {
 }
 
 const HealthStatusSchema = z.object({
-  status: z.string(), ready: z.boolean(),
+  status: z.literal("ok"), ready: z.literal(true),
   assistant_state: z.enum(["ready", "resting"]).optional(),
 });
 

@@ -37,7 +37,7 @@ describe("<App />", () => {
   });
 
   it("transitions status pill to 'Ready' when health check succeeds", async () => {
-    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     render(<App />);
 
     await waitFor(() => {
@@ -68,7 +68,7 @@ describe("<App />", () => {
   });
 
   it("allows user to type a question and stream assistant answer", async () => {
-    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
       opts.callbacks.onToken("Aamir has 3+ years ");
       opts.callbacks.onToken("building AI apps.");
@@ -97,7 +97,7 @@ describe("<App />", () => {
   });
 
   it("allows clicking a starter inquiry to start chat", async () => {
-    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
       opts.callbacks.onToken("Core strengths include FastAPI and ONNX.");
       opts.callbacks.onDone({ conversation_id: "conv-app-2" });
@@ -138,7 +138,7 @@ describe("<App />", () => {
   });
 
   it("shows '← Dossier Overview' button during active chat and resets to CoverState on click", async () => {
-    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
       opts.callbacks.onToken("Aamir is specialized in distributed LLM architectures.");
       opts.callbacks.onDone({ conversation_id: "conv-app-3" });
@@ -203,7 +203,7 @@ describe("<App />", () => {
   });
 
   it("renders summoned project card and opens architecture modal on click", async () => {
-    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true });
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
       opts.callbacks.onCard?.({
         id: "entropy-oj",

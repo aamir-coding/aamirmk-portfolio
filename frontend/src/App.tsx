@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { EvalBadge } from "./components/Evals/EvalBadge";
 import { AssistantFallback } from "./components/AssistantFallback";
-import { fetchHealth } from "./lib/api";
+import { useServerHealth } from "./hooks/useServerHealth";
 import { useChat } from "./hooks/useChat";
 import { useTheme } from "./hooks/useTheme";
 import { MessageList } from "./components/Chat/MessageList";
@@ -9,7 +9,6 @@ import { ChatInput } from "./components/Chat/ChatInput";
 import { ThemeToggle } from "./components/ThemeToggle";
 import {
   StatusIndicator,
-  type ServerState,
 } from "./components/StatusIndicator";
 import { FitReportModal } from "./components/Fit/FitReportModal";
 import answersData from "./data/answers.json";
@@ -27,8 +26,7 @@ export function App() {
 }
 
 function Portfolio() {
-  const [serverState, setServerState] = useState<ServerState>("checking");
-  const [healthError, setHealthError] = useState<string | null>(null);
+  const { state: serverState, error: healthError, refresh: refreshHealth } = useServerHealth();
   const [isFitModalOpen, setIsFitModalOpen] = useState(false);
   const { theme, resolvedTheme, cycleTheme } = useTheme();
 
@@ -50,39 +48,6 @@ function Portfolio() {
   );
 
   const isCoverState = viewMode === "cover" || messages.length === 0;
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    // If health check takes > 2.5s, signal to the user that Render is warming up
-    const warmingTimer = setTimeout(() => {
-      setServerState("warming");
-    }, 2500);
-
-    async function checkBackend() {
-      try {
-        const health = await fetchHealth(controller.signal);
-        clearTimeout(warmingTimer);
-        setServerState(health.assistant_state === "resting" ? "resting" : "ready");
-        setHealthError(null);
-      } catch (err) {
-        if (!controller.signal.aborted) {
-          clearTimeout(warmingTimer);
-          setServerState("error");
-          setHealthError(
-            err instanceof Error ? err.message : "Failed to connect to backend"
-          );
-        }
-      }
-    }
-
-    void checkBackend();
-
-    return () => {
-      clearTimeout(warmingTimer);
-      controller.abort();
-    };
-  }, []);
 
   const handleSelectPrompt = (prompt: string) => {
     setViewMode("chat");
@@ -172,6 +137,13 @@ function Portfolio() {
           <AssistantFallback /></div>
       </div>}
 
+      {(serverState === "resting" || serverState === "error") && <div className="banner-notice warning" role="status">
+        <div>{healthError && <p>{healthError}</p>}
+          {serverState === "error" && <AssistantFallback />}
+          <button type="button" className="btn btn-secondary" onClick={refreshHealth}>Check service status</button>
+        </div>
+      </div>}
+
       {serverState === "warming" && (
         <div
           className="banner-notice warning"
@@ -179,10 +151,11 @@ function Portfolio() {
           aria-live="polite"
         >
           <span>
-            <strong>Render free tier notice:</strong> Backend is cold starting
-            from idle. This typically takes ~25s on the initial request.
-            Starter inquiries answer instantly while waking.
+            <strong>The assistant service is waking up.</strong> Starter inquiries
+            answer instantly while it connects. You can also view Aamir's résumé
+            or contact him directly.
           </span>
+          <AssistantFallback />
         </div>
       )}
 
