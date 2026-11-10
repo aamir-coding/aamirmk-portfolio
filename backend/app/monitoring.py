@@ -12,7 +12,9 @@ from typing import Literal
 from urllib.parse import urlsplit
 
 import httpx
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, ValidationError
+
+from app.settings import get_settings
 
 State = Literal["ready", "resting", "unavailable"]
 
@@ -30,7 +32,7 @@ class MonitorState(BaseModel):
     observed: State = "ready"
     consecutive: int = Field(default=0, ge=0, le=2)
     notified: State = "ready"
-    last_sent: datetime | None = None
+    last_sent: AwareDatetime | None = None
 
 
 class Alert(BaseModel):
@@ -103,12 +105,26 @@ def https_url(value: str) -> str:
     return value
 
 
-async def send_alert(client: httpx.AsyncClient, url: str, alert: Alert) -> None:
+async def send_alert(
+    client: httpx.AsyncClient,
+    url: str,
+    alert: Alert,
+    *,
+    format: Literal["generic", "discord"] = "generic",
+) -> None:
+    payload = (
+        {
+            "content": f"Portfolio assistant: {alert.event} at {alert.at.isoformat()}.",
+            "allowed_mentions": {"parse": []},
+        }
+        if format == "discord"
+        else alert.model_dump(mode="json")
+    )
     async with asyncio.timeout(10):
         async with client.stream(
             "POST",
             https_url(url),
-            json=alert.model_dump(mode="json"),
+            json=payload,
             follow_redirects=False,
             timeout=10,
         ) as response:
@@ -143,9 +159,12 @@ async def run(args: argparse.Namespace) -> int:
             )
             failed = False
             if alert is not None and args.send:
-                webhook = os.environ.get("MONITOR_WEBHOOK_URL", "")
+                settings = get_settings()
+                webhook = settings.ALERT_WEBHOOK_URL.get_secret_value()
                 try:
-                    await send_alert(client, webhook, alert)
+                    await send_alert(
+                        client, webhook, alert, format=settings.ALERT_WEBHOOK_FORMAT
+                    )
                 except (httpx.HTTPError, TimeoutError, ValueError):
                     failed = True
                 else:

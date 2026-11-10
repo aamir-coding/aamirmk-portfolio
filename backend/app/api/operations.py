@@ -19,16 +19,19 @@ async def operator_ledger(request: Request) -> InferenceLedger:
     configured = request.app.state.settings.OPS_TOKEN.get_secret_value()
     if not configured:
         raise HTTPException(404, "Not Found")
-    decision = await request.app.state.ops_rate_limiter.check("operator")
-    if not decision.allowed:
-        raise HTTPException(
-            429, "Operator request limit reached", headers={"Retry-After": "60"}
-        )
     values = request.headers.getlist("authorization")
     supplied = values[0] if len(values) == 1 else ""
     expected = f"Bearer {configured}".encode()
     valid = len(supplied) <= 135 and secrets.compare_digest(supplied.encode(), expected)
-    if not valid or "origin" in request.headers:
+    valid = valid and "origin" not in request.headers
+    decision = await request.app.state.ops_rate_limiter.check(
+        "valid" if valid else "invalid"
+    )
+    if not decision.allowed:
+        raise HTTPException(
+            429, "Operator request limit reached", headers={"Retry-After": "60"}
+        )
+    if not valid:
         raise HTTPException(401, "Operator authentication required")
     return request.app.state.llm.ledger
 

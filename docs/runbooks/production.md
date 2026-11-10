@@ -52,7 +52,8 @@ without an Origin header; never place credentials in a URL or command history.
    that evidence privately. Settings are ceilings, not an allowance.
 2. GET `/api/ops/inference` with `Authorization: Bearer <operator credential>` from
    a private operator client to read this process's boot ID. Both methods are globally
-   capped at 30 calls/minute; rejected auth also counts. No browser control page exists.
+   capped at 30 calls/minute; failed authentication uses a separate bounded 30/minute
+   bucket so anonymous traffic cannot exhaust operator capacity. No browser control page exists.
 3. Submit an `Allowance` to POST at the same path: `boot_id`, UTC `verified_at`, UTC
    `expires_at`, integer `requests`, integer `tokens`. Verification must be at most
    60 seconds old; expiry must be later than verification and no later than next UTC
@@ -108,7 +109,7 @@ successful delivery suppresses duplicates, recovery sends immediately, and new
 incidents are separated by 15 minutes. Failed delivery stays pending. Dry runs do
 not acknowledge delivery. This is monitor-local bookkeeping, not durable API quota.
 
-For an approved HTTPS JSON webhook, keep its secret URL in `MONITOR_WEBHOOK_URL`
+For an approved HTTPS JSON webhook, keep its secret URL in `ALERT_WEBHOOK_URL`
 and add `--send`. Its contract is exactly `service`, `event`, `at`; a provider that
 requires another body needs a reviewed adapter. No destination is preconfigured or
 notification sent. Credential-bearing URLs and raw errors are never printed.
@@ -121,3 +122,37 @@ default proposal is no keep-alive and no schedule created. A 30-minute external 
 preserves idle periods but has coarse detection and wakes the API; a five-minute check
 reduces detection latency and changes the instance-hours policy. Record that trade-off
 and check current account terms before enabling any schedule.
+
+### Free channel example: Discord
+
+Create a private Discord channel, open its Integrations → Webhooks, create an incoming
+webhook and copy its secret URL into the monitor host's `.env` as `ALERT_WEBHOOK_URL`.
+Set `ALERT_WEBHOOK_FORMAT=discord`, enable phone notifications for that private channel,
+then explicitly run the monitor with `--send` against a controlled test incident.
+Discord receives a fixed `content` message with mentions disabled; no IP, usage tokens,
+prompt or webhook URL is included. A 2xx webhook response proves HTTP acceptance only;
+verify actual phone delivery separately. Rotate the webhook if its URL is disclosed.
+See [Discord incoming webhooks](https://docs.discord.com/developers/resources/webhook).
+No Discord signup/channel creation/message has been performed by this implementation.
+
+`ALERT_WEBHOOK_URL` is optional and validated as an HTTPS secret setting. The existing
+HTTPX dependency supplies transport; no notifier SDK/dependency is added. The notifier
+lives in `backend/app/monitoring.py` as an operational adapter, not in request handling.
+
+Alternatively configure a free external HTTP monitor (Better Stack/UptimeRobot) for
+GET `/api/health`, accepting only HTTP 200 and checking JSON `ready:true`. HTTP-only
+checks do not detect unexpected resting: add a JSON-body capacity assertion or run
+the supplied CLI with `--expect-inference` during approved live windows. Account-specific
+free feature limits and notification destinations must be checked at setup time.
+
+### Physical device smoke test after deployment
+
+- On physical iOS Safari and Android Chrome, open the default Vercel URL in a new tab.
+- Check 375×667/390×844-equivalent portrait and landscape: readable text, no horizontal
+  page scroll, usable 44px touch targets, theme toggle and keyboard composer behavior.
+- With a throttled 4G connection and API idle for 20 minutes, use an authored starter
+  immediately; record wake-up duration/status, resting alternatives and status retry.
+- Open the résumé PDF/source, role examples and source links; try no-JS fallback.
+- Share the URL privately in WhatsApp/LinkedIn and inspect its image/title/description.
+- Record device/OS/browser, network, deployment SHA, date and any failed step. Browser
+  viewport emulation is automated coverage, not evidence from either physical device.

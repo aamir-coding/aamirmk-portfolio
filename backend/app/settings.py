@@ -2,7 +2,8 @@ import ipaddress
 import json
 import re
 from functools import lru_cache
-from typing import Any
+from typing import Any, Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -17,6 +18,8 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     OPS_TOKEN: SecretStr = SecretStr("")
+    ALERT_WEBHOOK_URL: SecretStr = SecretStr("")
+    ALERT_WEBHOOK_FORMAT: Literal["generic", "discord"] = "generic"
     ENABLE_DEBUG_RETRIEVAL: bool = False
 
     # CORS configuration - accepts comma-separated string or list of origins
@@ -62,6 +65,7 @@ class Settings(BaseSettings):
         env_file=(".env", "../.env"),
         env_file_encoding="utf-8",
         extra="ignore",
+        hide_input_in_errors=True,
     )
 
     @field_validator("OPS_TOKEN")
@@ -70,6 +74,30 @@ class Settings(BaseSettings):
         token = value.get_secret_value()
         if token and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", token):
             raise ValueError("Operator credential must be 43-128 URL-safe characters")
+        return value
+
+    @field_validator("ALERT_WEBHOOK_URL")
+    @classmethod
+    def validate_alert_url(cls, value: SecretStr) -> SecretStr:
+        raw = value.get_secret_value()
+        if not raw:
+            return value
+        try:
+            url = urlsplit(raw)
+            valid = (
+                len(raw) <= 2048
+                and url.scheme == "https"
+                and url.hostname
+                and url.username is None
+                and url.password is None
+                and not url.fragment
+            )
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ValueError(
+                "Alert destination must be an HTTPS webhook without userinfo"
+            )
         return value
 
     @field_validator("INFERENCE_MAX_ACTIVE", "INFERENCE_MAX_WAITERS", mode="before")

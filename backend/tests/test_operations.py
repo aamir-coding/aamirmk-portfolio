@@ -102,6 +102,7 @@ def test_ambiguous_auth_is_denied_and_attempts_are_bounded(ops: TestClient) -> N
     )
     statuses = [ops.get("/api/ops/inference").status_code for _ in range(35)]
     assert 429 in statuses
+    assert ops.get("/api/ops/inference", headers=AUTH).status_code == 200
 
 
 def test_control_has_no_public_schema_or_cache(ops: TestClient) -> None:
@@ -113,3 +114,13 @@ def test_operator_token_validation_and_redaction() -> None:
     with pytest.raises(ValueError):
         Settings(_env_file=None, OPS_TOKEN="short")
     assert TOKEN not in repr(Settings(_env_file=None, OPS_TOKEN=TOKEN))
+
+
+def test_invalid_operator_settings_do_not_print_credentials() -> None:
+    for key, value in {
+        "OPS_TOKEN": "short-private-sentinel",
+        "ALERT_WEBHOOK_URL": "http://notify.invalid/private-webhook-sentinel",
+    }.items():
+        with pytest.raises(ValueError) as error:
+            Settings(_env_file=None, **{key: value})
+        assert value not in str(error.value)

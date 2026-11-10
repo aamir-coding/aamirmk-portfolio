@@ -3,6 +3,39 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-065: Fix reviewed operational failure paths and preserve evidence identity
+
+**Date:** 2026-11-10. **Scope:** P10 review and launch assets.
+
+Read-only review reproduced invalid-secret exposure in settings validation errors,
+anonymous starvation of the shared operator bucket, sticky chat resting after health
+retry and naive persisted monitor timestamps. Hide settings input in error strings;
+separate valid/invalid auth into two bounded 30/minute buckets; make explicit refresh
+clear stale chat resting and retry abort-guarded health; validate aware checkpoint time.
+Regression tests reproduce the actual paths, including webhook failure/retry/lock cleanup.
+DRN-063's original single bucket is superseded by these two buckets. No spending rule
+or ledger implementation changed.
+
+The user chooses existing domains, normal Render sleep, optional ALERT_WEBHOOK_URL
+and no new notifier dependency. Generic JSON and a Discord content adapter carry only
+fixed metadata, with mentions disabled. No external message or schedule was enabled.
+The user requests four emulated viewports and a physical-device postdeploy checklist;
+physical-device evidence is not claimed from emulation.
+
+Prepare a clearly marked DRAFT public resume/PDF from existing sources; omit phone,
+unreconciled externship dates, honours/metrics and claims of implemented P9 features.
+Correct the cover's AMU/Aligarh text to existing MSRUAS/Bengaluru evidence. No fact
+file or approval flag changes. Use an absolute 1200×630 PNG social URL. Public source
+checks found anonymous 404s for the portfolio repositories and obsolete GitHub profile;
+preserve receipt metadata but suppress those exact inaccessible destinations in source
+chips/project repository links. Recheck the documented list before restoring links.
+LinkedIn's 999 automated response is unverified access, not proof of a broken profile.
+
+Browser-measured touch/contrast issues are fixed using existing tokens, including
+explicit-light mode when the OS is dark. Keep original frozen captures/human/judge
+evidence. Operational source changes invalidate evaluation identity; review new
+fingerprints only after all seven original scores reproduce unchanged.
+
 ### DRN-064: On-demand health recovery and an external deterministic monitor
 
 **Date:** 2026-11-10. **Scope:** P10 Increments 3–4.

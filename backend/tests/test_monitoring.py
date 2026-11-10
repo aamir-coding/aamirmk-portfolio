@@ -6,6 +6,7 @@ import httpx
 import pytest
 
 from app.monitoring import MonitorState, acknowledge, observe, probe, send_alert
+from app.settings import Settings
 
 NOW = datetime(2026, 11, 10, tzinfo=UTC)
 
@@ -104,3 +105,92 @@ async def test_webhook_payload_is_fixed_metadata_and_failures_propagate() -> Non
         "event",
         "at",
     }
+
+
+@pytest.mark.asyncio
+async def test_discord_adapter_sends_safe_content_without_mentions() -> None:
+    import json
+
+    _, alert = observe(
+        MonitorState(consecutive=1, observed="unavailable"), "unavailable", NOW
+    )
+    assert alert is not None
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(204)
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        await send_alert(client, "https://discord.test/secret", alert, format="discord")
+    payload = json.loads(requests[0].content)
+    assert payload["allowed_mentions"] == {"parse": []}
+    assert (
+        payload["content"]
+        == "Portfolio assistant: unavailable at 2026-11-10T00:00:00+00:00."
+    )
+    assert "secret" not in payload["content"]
+
+
+def test_optional_alert_settings_are_validated_and_secret() -> None:
+    assert Settings(_env_file=None).ALERT_WEBHOOK_URL.get_secret_value() == ""
+    with pytest.raises(ValueError):
+        Settings(_env_file=None, ALERT_WEBHOOK_URL="http://unsafe.test/token")
+    configured = Settings(
+        _env_file=None, ALERT_WEBHOOK_URL="https://notify.test/private-token"
+    )
+    assert "private-token" not in repr(configured)
+
+
+def test_naive_monitor_checkpoint_fails_validation() -> None:
+    with pytest.raises(ValueError):
+        MonitorState(last_sent=datetime(2026, 11, 10))
+
+
+@pytest.mark.asyncio
+async def test_cli_persists_failed_delivery_then_retries_without_secret_output(
+    tmp_path,
+    monkeypatch,
+    capsys,
+) -> None:
+    import argparse
+
+    from app import monitoring
+
+    original_client = httpx.AsyncClient
+    posts: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            posts.append(request)
+            return httpx.Response(503 if len(posts) == 1 else 204)
+        return httpx.Response(503, text="private-response-sentinel")
+
+    monkeypatch.setattr(
+        monitoring.httpx,
+        "AsyncClient",
+        lambda **kw: original_client(transport=httpx.MockTransport(handler)),
+    )
+    monkeypatch.setattr(
+        monitoring,
+        "get_settings",
+        lambda: Settings(
+            _env_file=None, ALERT_WEBHOOK_URL="https://notify.test/private-webhook"
+        ),
+    )
+    path = tmp_path / "monitor.json"
+    args = argparse.Namespace(
+        url="https://portfolio.test/api/health",
+        state=path,
+        send=True,
+        expect_inference=False,
+    )
+    assert await monitoring.run(args) == 1
+    assert await monitoring.run(args) == 2
+    assert MonitorState.model_validate_json(path.read_text()).last_sent is None
+    assert await monitoring.run(args) == 1
+    assert MonitorState.model_validate_json(path.read_text()).last_sent is not None
+    assert len(posts) == 2
+    assert not path.with_suffix(".lock").exists()
+    output = capsys.readouterr().out
+    assert "private-" not in output

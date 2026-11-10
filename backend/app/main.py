@@ -113,7 +113,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.ops_rate_limiter = SlidingWindowRateLimiter(
         requests_per_window=30,
-        max_keys=1,
+        max_keys=2,
     )
     app.dependency_overrides[get_settings] = lambda: app_settings
 
