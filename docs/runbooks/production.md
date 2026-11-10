@@ -41,6 +41,37 @@ cases are not reusable tuning evidence.
 
 ## Identity and privacy
 
+## Operator activation
+
+`OPS_TOKEN` is a separate high-entropy credential (generate with
+`secrets.token_urlsafe(32)`), configured only in Render, never Vite or browser storage.
+Empty means both control methods return 404. This credential authenticates an operator;
+it does not itself authorize any generation. Use HTTPS on the public Render URL,
+without an Origin header; never place credentials in a URL or command history.
+
+1. Verify actual account limits, today's remaining tokens/requests and all other
+   processes sharing the key. Coordinate or stop independent usage first. Record
+   that evidence privately. Settings are ceilings, not an allowance.
+2. GET `/api/ops/inference` with `Authorization: Bearer <operator credential>` from
+   a private operator client to read this process's boot ID. Both methods are globally
+   capped at 30 calls/minute; rejected auth also counts. No browser control page exists.
+3. Submit an `Allowance` to POST at the same path: `boot_id`, UTC `verified_at`, UTC
+   `expires_at`, integer `requests`, integer `tokens`. Verification must be at most
+   60 seconds old; expiry must be later than verification and no later than next UTC
+   midnight. Requests/tokens must not exceed configured shared daily ceilings and must
+   deduct all prior/independent use. There are no extra fields or automatic renewals.
+4. Success retains the ledger's 60-second unknown-minute drain. Duplicate/stale/foreign
+   boot grants return sanitized 409. Rejections do not open a closed ledger. Expiry,
+   restart, sleep or redeploy requires a newly verified boot/remaining allowance.
+5. Confirm capacity via health after the drain. A ready snapshot means locally admitted
+   capacity, not guaranteed provider availability or account-wide durable accounting.
+
+Control bodies/credentials never enter application logs. All control responses, including
+errors, use no-store. Allowance values are private operational evidence. No control
+request or live allowance has been sent to production during implementation.
+
+## Proxy and hosted privacy verification
+
 Leave `TRUST_PROXY_HEADERS=false` until the actual socket peer and header chain are
 verified. Uvicorn proxy rewriting remains disabled. On Render, gather only redacted
 peer/network metadata through a temporary owner-controlled diagnostic; do not enable

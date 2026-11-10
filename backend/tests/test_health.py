@@ -7,7 +7,12 @@ def test_health_returns_ok(client: TestClient) -> None:
 
     assert response.status_code == 200
     data = response.json()
-    assert data == {"status": "ok", "ready": True, "assistant_state": "resting"}
+    assert data == {
+        "status": "ok",
+        "ready": True,
+        "assistant_state": "resting",
+        "release": client.app.state.release.model_dump(),
+    }
 
 
 def test_cors_allows_listed_origin(client: TestClient) -> None:
@@ -80,7 +85,17 @@ def test_double_slash_path_normalized(client: TestClient) -> None:
         "status": "ok",
         "ready": True,
         "assistant_state": "resting",
+        "release": client.app.state.release.model_dump(),
     }
+
+
+def test_failed_retrieval_is_not_ready(client: TestClient) -> None:
+    client.app.state.retrieval_ready = False
+    response = client.get("/api/health")
+    assert response.status_code == 503
+    assert response.json()["ready"] is False
+    assert response.headers["cache-control"] == "no-store"
+    assert "boot_id" not in response.text
 
 
 def test_404_returns_consistent_json_error(client: TestClient) -> None:

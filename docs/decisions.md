@@ -3,6 +3,36 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-062: Verify committed release assets and distinguish readiness from capacity
+
+**Date:** 2026-11-10. **Scope:** P10 Increments 1–2, approved phase brief.
+
+Render explicitly provisions the existing pinned model, then verifies corpus, matrix
+and cached model compatibility using a local query; it never repairs the committed
+index during deployment. The build writes an ignored release receipt using Render's
+full commit SHA. Frontend builds similarly emit a revision receipt from Vercel/GitHub
+metadata; local unknown identity is explicit. Health publishes only revision/index
+identity and service/capacity state, never boot ID or allowances. Startup warms retrieval
+off the event loop; failure yields unready HTTP 503, while exhausted/closed inference
+alone remains a healthy HTTP 200 with resting capacity. This avoids restart loops.
+Provider outage is not inferred from a locally ready ledger. CI/dashboard ordering
+still requires account-setting evidence; a blueprint does not establish it.
+
+### DRN-063: Opt-in operator adapter preserves one-shot boot allowance semantics
+
+**Date:** 2026-11-10. **Scope:** P10 Increment 2.
+
+Use a distinct SecretStr operator credential (43–128 URL-safe characters) and constant-time
+byte comparison. No credential means 404. Controls reject Origin and duplicate auth
+headers, have a bounded per-app global 30/minute limiter including failed auth and
+no-store responses, and are absent from public OpenAPI. GET returns private boot/status;
+POST delegates strict Allowance validation and one-shot authorization to the existing
+ledger. Reject grants above configured shared ceilings; preserve freshness, UTC expiry,
+cooldown, unknown charges and closed restarts. No reusable environment spending grant,
+new ledger, browser admin UI, storage or live activation is introduced. Operators must
+use HTTPS ingress and separately verify remaining account capacity/other processes.
+Semantic evaluation and production spending require their existing concrete approvals.
+
 ### DRN-050: Frozen validation outcome is a quality result, not a retryable error
 
 **Date:** 2026-11-05

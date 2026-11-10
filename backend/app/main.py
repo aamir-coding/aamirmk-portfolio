@@ -1,3 +1,4 @@
+import asyncio
 import hashlib
 import hmac
 import logging
@@ -20,9 +21,11 @@ from app.api.debug import router as debug_router
 from app.api.evals import router as evals_router
 from app.api.fit import router as fit_router
 from app.api.health import router as health_router
+from app.api.operations import router as operations_router
 from app.fit.cache import ReportCache, cache_identity
 from app.llm import GroqLLM
 from app.logging_config import JsonLogFormatter
+from app.release import load_release
 from app.safety.ip import get_client_ip
 from app.safety.middleware import RequestBoundsMiddleware
 from app.safety.rate_limiter import SlidingWindowRateLimiter
@@ -62,7 +65,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     try:
         from app.retrieval.retriever import get_retriever
 
-        get_retriever()
+        retriever = await asyncio.to_thread(get_retriever)
+        await retriever.retrieve("engineering experience", top_k=1)
+        app.state.retrieval_ready = True
         logger.info("Hybrid retrieval index initialized and ready")
     except Exception as exc:
         logger.warning("Retriever startup unavailable: %s", type(exc).__name__)
@@ -85,6 +90,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.release = load_release()
+    app.state.retrieval_ready = False
     app.state.log_ip_salt = secrets.token_bytes(32)
     app.state.llm = GroqLLM(app_settings)
     app.state.tool_registry = ToolRegistry()
@@ -103,6 +110,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         window_seconds=86400,
         enabled=app_settings.RATE_LIMIT_ENABLED,
         max_keys=app_settings.RATE_LIMIT_MAX_KEYS,
+    )
+    app.state.ops_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=30,
+        max_keys=1,
     )
     app.dependency_overrides[get_settings] = lambda: app_settings
 
@@ -128,6 +139,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        if (
+            request.url.path.startswith("/api/ops/")
+            or request.url.path == "/api/health"
+        ):
+            response.headers["Cache-Control"] = "no-store"
 
         client_ip = get_client_ip(request)
         ip_hash = hmac.new(
@@ -231,6 +247,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Mount API routers
     app.include_router(health_router, prefix="/api")
+    app.include_router(operations_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")
     app.include_router(fit_router, prefix="/api")
     app.include_router(debug_router, prefix="/api")

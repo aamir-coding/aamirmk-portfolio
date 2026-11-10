@@ -1,9 +1,10 @@
 import ipaddress
 import json
+import re
 from functools import lru_cache
 from typing import Any
 
-from pydantic import Field, field_validator
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.safety.admission import CapacityLimits
@@ -15,6 +16,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
+    OPS_TOKEN: SecretStr = SecretStr("")
     ENABLE_DEBUG_RETRIEVAL: bool = False
 
     # CORS configuration - accepts comma-separated string or list of origins
@@ -61,6 +63,14 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+    @field_validator("OPS_TOKEN")
+    @classmethod
+    def validate_ops_token(cls, value: SecretStr) -> SecretStr:
+        token = value.get_secret_value()
+        if token and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", token):
+            raise ValueError("Operator credential must be 43-128 URL-safe characters")
+        return value
 
     @field_validator("INFERENCE_MAX_ACTIVE", "INFERENCE_MAX_WAITERS", mode="before")
     @classmethod
