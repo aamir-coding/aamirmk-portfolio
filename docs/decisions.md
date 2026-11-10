@@ -3,6 +3,24 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-066: P10 operational identity refresh preserves the evaluation result
+
+**Date:** 2026-11-10. **Scope:** P10 final offline compatibility review.
+
+Against clean source `3c2b61a30d676b050fdc8b02bd275e5e6cc0b0b7`, actual retrieval/replay
+reproduced all seven existing baseline scores exactly, with all eight current records
+passing. Root and independent read-only reviewer both confirmed only the application
+fingerprint changed; facts, prompts, index, cases, captures, rubric, labels, evaluator
+and dependency fingerprints remain identical. The candidate gate reports only
+incompatible_baseline; substituting new identity in memory yields no failures.
+
+Approve a fingerprints/review-reference-only refresh, preserving numeric floors,
+two-percentage-point tolerance and every critical check. Commit compatible inputs before
+generating final result/public projection. This does not certify changed generator
+outputs, execute held-out cases, approve draft facts or repair failed independent judge
+validation. Frozen P8/P7 captures and grading evidence stay unchanged. Source safety
+changes are operational control/readiness/cache headers, not model behavior changes.
+
 ### DRN-065: Fix reviewed operational failure paths and preserve evidence identity
 
 **Date:** 2026-11-10. **Scope:** P10 review and launch assets.

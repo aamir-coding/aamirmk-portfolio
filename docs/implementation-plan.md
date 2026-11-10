@@ -549,10 +549,10 @@ The outcome is a public, monitored site on a link you are proud to put on a rés
 **Build**
 
 1. Decide how to handle the sleeping API. Render's free web service spins down after 15 idle minutes and takes about a minute to wake. Options: accept it and rely on the Phase 3 warm-up experience; point a free uptime monitor at `/api/health` every 10 to 14 minutes during the weeks you are applying (this also gives you downtime alerts); or pay for the smallest always-on instance. An always-on free service uses about 744 of the 750 free instance hours in a 31-day month, so keep only one free web service in the workspace, and check Render's current terms before relying on pings.
-2. Keep state out of the Render disk. Use the external Postgres for everything durable, run Alembic migrations on each deploy, and remember the search index is built during the Render build, so a change to `knowledge/` needs a redeploy.
+2. Keep state out of the Render disk. P9 owns external Postgres and deploy-time migrations; P10 retains conservative boot-local capacity with closed restarts. Facts live in `backend/app/data/facts/`; explicitly build/review the committed embedding artifact and compatible eval evidence in the content PR. Render provisions model assets and verifies the committed artifact, never silently regenerates it during deploy.
 3. Database backups and a real restore test depend on P9 storage (Band 4). Do not introduce Postgres ahead of the approved execution order.
 4. Keep configuration in Git (`render.yaml`, `vercel.json`) and secrets only in the dashboards. Decide how preview deployments are handled in the CORS allowlist: production and localhost only is safest.
-5. Add your domain to Vercel for the frontend, and optionally a subdomain such as `api.` for Render. HTTPS is automatic. Then update the CORS allowlist, the Content-Security-Policy and `VITE_API_BASE_URL`.
+5. Aamir chose the existing Vercel/Render default HTTPS domains on 10 November 2026; no purchase/DNS change. A future custom domain remains optional and requires matching CORS, CSP and `VITE_API_BASE_URL` changes.
 6. Observability: structured JSON logs with the request id, optional error tracking with a free tier, an uptime monitor, and an alert to your phone when the health check fails or resting mode starts.
 7. CI/CD: lint, tests, offline retrieval/replay and dependency/secret audits on pull requests; auto-deploy on merge to `main`. Live evals require separately approved scope/budget and valid judging; no automatic live badge publication.
 8. Content workflow: edit a knowledge file, open a pull request, let evals run, merge, and the index and "updated" date refresh on deploy.
@@ -564,7 +564,7 @@ The outcome is a public, monitored site on a link you are proud to put on a rés
 - [ ] All 20 attack prompts pass, and the eval suite, including the blind set, meets your target.
 - [ ] The daily token budget sits below the limits on your Groq Limits page, and you forced resting mode to prove it works.
 - [ ] After 20 idle minutes the site still gives a useful first experience, and you know your measured wake-up time.
-- [ ] Tested on a real Android and a real iPhone, including a throttled 4G connection.
+- [ ] Automated viewport/44px/overflow/contrast coverage at 375×667, 390×844, tablet and desktop; physical iOS/Android/throttled-4G smoke checklist after deployment, as chosen by Aamir on 10 November.
 - [ ] The link preview looks right in WhatsApp and LinkedIn.
 - [ ] The static fallback works with JavaScript disabled.
 - [ ] Every source link and the résumé PDF return a working page.
@@ -585,7 +585,7 @@ The outcome is a public, monitored site on a link you are proud to put on a rés
 
 **Done when**
 
-- The site is live on your own domain and both halves redeploy when you merge to `main`.
+- The site uses the chosen default HTTPS domains and both halves redeploy when `main` changes; P10 runtime identity and deploy/check ordering require cloud verification after release.
 - Database restore acceptance is recorded in P9, after storage exists.
 - An alert for downtime or resting mode reaches your phone.
 - You can say how long a cold start takes and what a visitor sees during it.

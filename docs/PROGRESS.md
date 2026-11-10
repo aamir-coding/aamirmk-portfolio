@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 10: Production hardening, monitoring and launch — approved; Build in progress**
+**Phase 10: Production hardening, monitoring and launch — six increments implemented locally; final verification/review in progress**
 on `phase-10-production-hardening`, based on `main` at `de73fb5`.
 [Phase brief and architectural pre-mortem](briefs/phase-10-production-hardening.md).
 Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
@@ -13,6 +13,9 @@ Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
 `origin/main` tracking ref and tag independently match. A fresh `git ls-remote`
 failed with `getaddrinfo() thread failed to start`; remote publication is user-confirmed,
 not independently reverified. Cloud CI success and deployed revision remain unchecked.
+**10 November follow-up:** outside-sandbox read-only verification confirms both remote
+refs at the full SHA above and successful main CI/security jobs. P10 deployed revision
+and hosting settings still require release evidence; see the P10 ledger below.
 Closure preserves the [P7 evidence ledger](audits/2026-11-06-phase-07-safety.md)
 and outstanding operational/semantic launch gates; it does not certify model accuracy.
 
@@ -38,7 +41,8 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: implement the approved [Phase 10 brief](briefs/phase-10-production-hardening.md).
+Next: finish the approved [Phase 10 brief](briefs/phase-10-production-hardening.md)
+verification and present the local phase for final review.
 Aamir approved continuing through the phase on 10 November 2026. Phase 7 teach-back
 answers remain unassessed; its milestone is closed by Aamir's explicit confirmation.
 Aamir approved the Phase 7 six-increment brief on 6 November. A new factual accuracy claim
@@ -72,7 +76,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | 🟢 Closed; merge/remote push user-confirmed at `de73fb5`; launch gates carried forward | `main` | `phase-7-hardening-done` (remote user-confirmed; local verified) | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
-| P10: Production | 🟡 Approved; Build in progress | `phase-10-production-hardening` | — | — |
+| P10: Production | 🟡 Six increments implemented locally; final verification/review | `phase-10-production-hardening` | — | [P10 guide](study-guides/phase-10-production-hardening.md) |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
 ## What's Done
@@ -227,7 +231,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Complete the approved [Phase 10 brief and pre-mortem](briefs/phase-10-production-hardening.md); continue all independent work through verification, review and study guide.
+1. Finish final compatible P10 checks and review the [evidence ledger](audits/2026-11-10-phase-10-production.md). The runbook/study guide and six local increments are implemented; no P9 work begins.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -433,7 +437,8 @@ independently spendable pools. Reconfirm current account-specific limits before 
 2. **Local Postgres 18**: User has Postgres 18 installed locally. Could use for local dev instead of SQLite, but DB not needed until Phase 9.
 
 ## Blockers
-Phase 7 is closed. Phase 10 Build is approved on 10 November 2026.
+Phase 7 is closed. Phase 10's six local increments are implemented under the 10 November
+approval; final compatible verification and owner release review remain.
 Production acceptance needs verified proxy behavior and current account limits/prior
 usage. In-memory accounting cannot establish durable organization-wide protection
 across restarts or independent eval processes; see the brief's fail-closed proposal.

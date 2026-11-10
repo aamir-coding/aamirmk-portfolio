@@ -116,3 +116,18 @@ These describe provider behavior, not verified account settings or measured app 
 
 No application tests, provider calls, installs, remote writes, deploys, alert messages
 or production probes in this Step 1 kickoff. Historical P7 checks remain historical.
+
+## Approved implementation — 10 November 2026
+
+Aamir approved all six increments and autonomous continuation through final review.
+Follow-up scope: existing default domains, normal Render sleep without internal pings,
+optional ALERT_WEBHOOK_URL notifier through existing dependencies, four emulated
+viewports and a manual physical-device postdeploy checklist. Temporary
+agent-browser@0.42.0 explicitly approved; no global/project dependency added.
+
+All six local increments, the production runbook and P10 study guide are implemented.
+Read-only architecture review findings were reproduced/fixed and independently rechecked.
+Exact verification, compatibility review and remaining release/semantic gates are in
+the [P10 evidence ledger](../audits/2026-11-10-phase-10-production.md). Final local
+verification and review do not imply push, deployment, actual phone delivery, fact
+approval or a completion tag. P9 remains deferred.
