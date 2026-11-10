@@ -20,8 +20,8 @@ changed. No real Groq call, fact approval, cloud configuration write or notifica
 | `7007ff3` | Draft résumé/social assets, source-backed cover, accessibility/source-link presentation |
 | `3c2b61a` | Binary asset protection and no-store on preparse control rejection |
 
-Code source is committed before final result generation. Final result/artifact and
-full-suite evidence will be added below after the reviewed identity refresh.
+Code source is committed before final result generation. The compatible result and
+projection were generated against clean `cdbfd0701e2cbd073e163ec500590df92bc6e86c`.
 
 ## Actual verification before final artifact refresh
 
@@ -120,7 +120,7 @@ and reserved/unexecuted held-out cases must remain visible in the final projecti
 
 | Item | Status |
 |---|---|
-| Six increments, tests, runbook, reviewed source and study guide | Implemented locally; final compatible verification recorded below |
+| Six increments, tests, runbook, reviewed source and study guide | Complete and verified locally; ready for owner final review |
 | Existing default HTTPS domains / normal Render sleep | Explicit owner choice; no DNS purchase/pinger |
 | Emulated mobile/tablet/desktop + no-JS + PDF/social assets | Verified within stated local scope |
 | P7 remote identity/cloud jobs | Independently verified |
@@ -138,3 +138,31 @@ and reserved/unexecuted held-out cases must remain visible in the final projecti
 
 This ledger distinguishes completed implementation from external release/semantic
 acceptance. It does not reopen the user's closed P7 or accepted P8 offline milestones.
+
+## Final verification — supersedes intermediate counts
+
+| Command / check actually run | Result |
+|---|---|
+| `.venv/Scripts/python.exe -m pytest -c backend/pyproject.toml backend/tests evals -q --tb=short` | **640 passed**, 2 existing warnings, **96.45s**, exit 0 |
+| `npm test -- --reporter=dot` in frontend | **181 passed / 24 files**, **16.05s**, exit 0 |
+| Ruff lint and format checks over backend/evals | **All checks passed; 108 files already formatted** |
+| Frontend ESLint, TypeScript/Vite build | Passed; existing annotation/chunk warnings only |
+| `node frontend/scripts/check-bundle.mjs` | **167,339 gzip bytes / 200,000**, passed |
+| `python -m evals.run --full --output evals/results.json` | **gate_failures: []**, all seven original scores unchanged, exit 0 |
+| `python -m evals.publish` | Public projection refreshed; **model accuracy unavailable** |
+| Final four-viewport rendered geometry assertions | **375×667, 390×844, 768×1024, 1440×900**: no horizontal overflow, no sub-44px controls |
+| Local browser after projection refresh | Badge **Replay checks: 8/8 (offline)**; no page errors reported |
+| `git diff --check` | Passed |
+
+The public projection is checked to retain **failed judge validation**, **76 draft
+chunks**, **five disagreements**, unavailable generation accuracy and unexecuted
+reserved held-out cases. Inference ledger/LLM/fit behavior, facts, prompts, vectors,
+cases, recorded responses and grading archives have no diff from main. Only the
+reviewed application fingerprint and review reference changed in the baseline.
+
+Three interactive teach-back questions were sent with the study guide; answers remain
+unassessed. A final staged Gitleaks scan covers the documentation/result refresh before
+commit. No remote write, deployment, live allowance, semantic run or alert delivery is
+inferred from these local results. No `phase-10-done` tag is created before final review
+and the separately documented release acceptance. Local fake QA processes are stopped
+after verification, so they cannot be mistaken for a live assistant.
