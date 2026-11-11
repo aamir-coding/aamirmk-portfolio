@@ -47,11 +47,11 @@ class Settings(BaseSettings):
 
     # A ledger remains closed until a fresh, boot-bound allowance is authorized.
     INFERENCE_SHARED_LIMITS: CapacityLimits = Field(
-        default_factory=lambda: CapacityLimits(rpm=24, tpm=20000, rpd=800, tpd=160000)
+        default_factory=lambda: CapacityLimits(rpm=24, tpm=32000, rpd=800, tpd=160000)
     )
     INFERENCE_MODEL_LIMITS: dict[str, CapacityLimits] = Field(
         default_factory=lambda: {
-            model: CapacityLimits(rpm=24, tpm=20000, rpd=800, tpd=160000)
+            model: CapacityLimits(rpm=24, tpm=32000, rpd=800, tpd=160000)
             for model in ("openai/gpt-oss-120b", "openai/gpt-oss-20b")
         },
         min_length=1,

@@ -15,8 +15,9 @@ tokens, `cost.total` is ~9,000 byte-tokens.
 The initial default `tpm=6400` was derived by taking 80% of Groq's 8,000 real-token limit, but applying it
 against byte-based tokens made every grounded chat request fail locally with `QuotaDenied("request_too_large")`
 before reaching Groq. Because Groq counts real tokens (~1,700 tokens per chat request, well within Groq's 8,000
-real TPM limit), raising the local ledger limit to `tpm=20000` safely admits valid grounded queries while
-limiting minute throughput to ~5,700 real tokens, preserving an ~30% safety cushion against Groq's 8,000 TPM ceiling.
+real TPM limit), calibrating the local byte-based ledger limit to `tpm=32000` (8,000 real tokens × 4 bytes/token)
+safely admits valid grounded queries and multi-turn tool calling (~18,500 total bytes across turn 1 and turn 2)
+while strictly bounding minute throughput within Groq's 8,000 real TPM ceiling.
 
 ### DRN-067: Boot-bound inference capacity auto-authorization for ephemeral production hosting
 
