@@ -254,6 +254,7 @@ async def chat(
             completion_tokens = completion.completion_tokens
 
     except LLMCapacityError as exc:
+        logger.warning("Inference capacity error: %s", exc)
         raise HTTPException(
             status_code=429,
             detail=RESTING_MESSAGE,
@@ -496,7 +497,8 @@ async def chat_stream(
             )
             yield f"event: done\ndata: {done_payload}\n\n"
 
-        except LLMCapacityError:
+        except LLMCapacityError as exc:
+            logger.warning("Inference capacity error during stream: %s", exc)
             err_payload = json.dumps(
                 {
                     "detail": RESTING_MESSAGE,

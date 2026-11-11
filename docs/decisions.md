@@ -3,6 +3,21 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-068: Calibrate byte-based inference ledger TPM to accommodate grounded prompt context
+
+**Date:** 2026-11-11. **Scope:** P10 live production inference admission.
+
+Under DRN-054, `reserve_input_tokens` uses UTF-8 bytes plus framing headroom (`len(encoded) + 512 + 32 * count`)
+as a strict upper-bound estimator for input tokens to ensure `usage.input_tokens` never overruns reservation.
+In chat, a system prompt with four retrieved chunks and tool schemas is ~7,500 bytes. With 1,024 max completion
+tokens, `cost.total` is ~9,000 byte-tokens.
+
+The initial default `tpm=6400` was derived by taking 80% of Groq's 8,000 real-token limit, but applying it
+against byte-based tokens made every grounded chat request fail locally with `QuotaDenied("request_too_large")`
+before reaching Groq. Because Groq counts real tokens (~1,700 tokens per chat request, well within Groq's 8,000
+real TPM limit), raising the local ledger limit to `tpm=20000` safely admits valid grounded queries while
+limiting minute throughput to ~5,700 real tokens, preserving an ~30% safety cushion against Groq's 8,000 TPM ceiling.
+
 ### DRN-067: Boot-bound inference capacity auto-authorization for ephemeral production hosting
 
 **Date:** 2026-11-11. **Scope:** P10 live production resilience.
