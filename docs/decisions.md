@@ -3,6 +3,22 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-067: Boot-bound inference capacity auto-authorization for ephemeral production hosting
+
+**Date:** 2026-11-11. **Scope:** P10 live production resilience.
+
+Render free tier hosts sleep after 15 minutes of inactivity. When a new request wakes the container,
+a fresh boot occurs. Under DRN-063, `InferenceLedger` started unallocated (`self._allowance = None`)
+requiring an external operator POST to activate. This caused wakeups to remain in "Live answers are resting"
+mode even with a valid `GROQ_API_KEY`.
+
+Choice: Introduce `AUTO_AUTHORIZE_INFERENCE` (defaults to False in tests/development) and container startup
+auto-authorization in `lifespan` when `ENVIRONMENT == "production"` and `GROQ_API_KEY` is present.
+The startup creates a fresh, non-reusable `Allowance` tied to the container's random `boot_id`, expiring
+at midnight UTC, bounded by configured `INFERENCE_SHARED_LIMITS` (`rpd` and `tpd`), with `warm_up_seconds=0.0`.
+Test environments remain untouched (`assistant_state: resting` by default in test suite), preserving test
+isolation and safety ledger guarantees.
+
 ### DRN-066: P10 operational identity refresh preserves the evaluation result
 
 **Date:** 2026-11-10. **Scope:** P10 final offline compatibility review.

@@ -59,6 +59,13 @@ class Settings(BaseSettings):
     )
     INFERENCE_MAX_ACTIVE: int = Field(default=2, ge=1, le=16, strict=True)
     INFERENCE_MAX_WAITERS: int = Field(default=8, ge=0, le=64, strict=True)
+    AUTO_AUTHORIZE_INFERENCE: bool = Field(
+        default=False,
+        description=(
+            "Auto-authorize daily inference allowance on boot in production "
+            "if GROQ_API_KEY is present."
+        ),
+    )
 
     model_config = SettingsConfigDict(
         # Try backend/.env first, then repo-root .env (for monorepo layout)

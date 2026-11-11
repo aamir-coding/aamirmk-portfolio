@@ -190,7 +190,7 @@ class InferenceLedger:
         self._active = 0
         self._waiting = 0
 
-    def authorize(self, allowance: Allowance) -> None:
+    def authorize(self, allowance: Allowance, *, warm_up_seconds: float = 60.0) -> None:
         """One-shot boot-local activation; never load a reusable env allowance."""
         if self._allowance is not None:
             raise ValueError("Ledger already authorized")
@@ -203,7 +203,7 @@ class InferenceLedger:
         self._allowance = allowance
         self._expires = self.monotonic() + (allowance.expires_at - now).total_seconds()
         # Previous provider-minute traffic is unknown even with verified daily use.
-        self._ready = self.monotonic() + 60
+        self._ready = self.monotonic() + warm_up_seconds
 
     def _check_allowance(self) -> None:
         if self._fault is not None:

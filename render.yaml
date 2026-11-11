@@ -12,6 +12,8 @@ services:
         value: 3.13.2
       - key: ENVIRONMENT
         value: production
+      - key: AUTO_AUTHORIZE_INFERENCE
+        value: "true"
       - key: FASTEMBED_CACHE_PATH
         value: .cache/fastembed
       - key: CORS_ORIGINS

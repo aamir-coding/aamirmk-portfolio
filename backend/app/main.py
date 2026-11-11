@@ -73,6 +73,38 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         logger.info("Hybrid retrieval index initialized and ready")
     except Exception as exc:
         logger.warning("Retriever startup unavailable: %s", type(exc).__name__)
+
+    # Auto-authorize boot-bound inference capacity if configured or in production
+    auto_authorize = settings.AUTO_AUTHORIZE_INFERENCE or (
+        settings.ENVIRONMENT == "production" and bool(settings.GROQ_API_KEY)
+    )
+    if auto_authorize and getattr(app.state, "llm", None) is not None:
+        try:
+            from datetime import UTC, datetime, timedelta
+
+            from app.safety.admission import Allowance
+
+            now = datetime.now(UTC)
+            midnight = datetime.combine(
+                now.date() + timedelta(days=1), datetime.min.time(), UTC
+            )
+            shared = settings.INFERENCE_SHARED_LIMITS
+            allowance = Allowance(
+                boot_id=app.state.llm.ledger.boot_id,
+                verified_at=now,
+                expires_at=midnight,
+                requests=shared.rpd,
+                tokens=shared.tpd,
+            )
+            app.state.llm.ledger.authorize(allowance, warm_up_seconds=0.0)
+            logger.info(
+                "Inference capacity authorized for boot %s (requests=%d, tokens=%d)",
+                allowance.boot_id,
+                allowance.requests,
+                allowance.tokens,
+            )
+        except Exception as exc:
+            logger.warning("Inference auto-authorization skipped or failed: %s", exc)
     try:
         yield
     finally:

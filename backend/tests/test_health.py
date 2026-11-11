@@ -119,3 +119,23 @@ def test_response_security_headers(client: TestClient) -> None:
     assert response.headers.get("X-Content-Type-Options") == "nosniff"
     assert response.headers.get("X-Frame-Options") == "DENY"
     assert response.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+
+def test_auto_authorize_inference_in_production() -> None:
+    """When AUTO_AUTHORIZE_INFERENCE=True, health returns assistant_state='ready'."""
+    from app.main import create_app
+    from app.settings import Settings
+
+    settings = Settings(
+        _env_file=None,
+        ENVIRONMENT="production",
+        GROQ_API_KEY="gsk_dummy_test_key_for_health",
+        AUTO_AUTHORIZE_INFERENCE=True,
+    )
+    app = create_app(settings)
+    with TestClient(app) as test_client:
+        response = test_client.get("/api/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["ready"] is True
+        assert data["assistant_state"] == "ready"
