@@ -38,8 +38,8 @@ export function CoverState({
         </div>
 
         <nav className="dossier-external-links" aria-label="Direct Candidate Links">
-          <a href="/resume-draft.pdf" target="_blank" rel="noopener noreferrer"
-            className="dossier-external-link">Résumé draft (PDF)</a>
+          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer"
+            className="dossier-external-link">Résumé (PDF)</a>
           <a
             href="https://github.com/aamir-coding"
             target="_blank"
