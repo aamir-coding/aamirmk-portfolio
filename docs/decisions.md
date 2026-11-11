@@ -3,6 +3,40 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-070: Post-Phase 10 operational identity and eval baseline refresh
+
+**Date:** 2026-11-11. **Scope:** Post-P10 production hardening & release provenance.
+
+Operational fixes in `backend/app/` (persistent model caching in `dense.py`, boot-bound inference
+authorization in `main.py`, admission capacity calibration in `settings.py` and `admission.py`, and
+observability logging in `chat.py`) altered the application code SHA-256 fingerprint from
+`48bb48bb...` to `2956c6a80809f678923e73a220087330a579eb8764dbc9b8f750af09338e5399`.
+All other fingerprints (prompts, checker, rubric, recordings, evaluator, cases, safety assets,
+corpus, index, dataset, dependencies, retrieval) remained identical.
+
+Synchronize `evals/baseline.json` with the updated application hash, preserving all seven numeric score
+floors (1.0 replay, 0.911 Hit@3, 1.0 Hit@5, 0.889 MRR@5), re-run `python -m evals.run --full`, and publish
+updated public projection `backend/app/data/eval-summary.json`. All 643 backend tests pass and offline
+gate reports zero failures.
+
+### DRN-069: Persistent in-tree model cache isolates FastEmbed across ephemeral container transitions
+
+**Date:** 2026-11-11. **Scope:** P10 container deployment reliability.
+
+On container platforms like Render, the build environment and runtime environment run in separate
+container layers and do not share the `/tmp` directory. During the build step, FastEmbed downloaded
+`BAAI/bge-small-en-v1.5` to `/tmp/fastembed_cache`. At runtime, `/tmp` was fresh and empty. Because
+production runtime enforces `local_files_only=True` to prevent runtime downloads and OOM crashes,
+`DenseIndex` initialization failed on container boot. Because the retriever failed to load,
+`app.state.retrieval_ready` stayed `False`, causing `/api/health` to return `503 Service Unavailable`.
+
+Choice: Define `DEFAULT_PROJECT_CACHE_DIR = Path(__file__).resolve().parents[2] / ".cache" / "fastembed"`
+(`backend/.cache/fastembed`), which resides within the preserved application directory. Add
+`ensure_model_cached()` to `backend/app/retrieval/dense.py` and invoke it during both the build command
+and `lifespan` startup. Configure `FASTEMBED_CACHE_PATH: .cache/fastembed` in `render.yaml` and update
+`.gitignore` to track `.cache/fastembed/.gitkeep` while ignoring downloaded weights/binaries.
+Retrieval index initializes reliably on boot, restoring `app.state.retrieval_ready = True` and 200 OK health.
+
 ### DRN-068: Calibrate byte-based inference ledger TPM to accommodate grounded prompt context
 
 **Date:** 2026-11-11. **Scope:** P10 live production inference admission.

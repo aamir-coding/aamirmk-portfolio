@@ -1,10 +1,22 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 10: Production hardening, monitoring and launch — six increments complete and verified locally; ready for final review**
-on `phase-10-production-hardening`, based on `main` at `de73fb5`.
+**Phase 10: Production hardening, monitoring and launch — 🟢 Closed, deployed, and verified live on Render & Vercel**
+Merged and tagged on `main` at `phase-10-done` (commit `701e903`).
 [Phase brief and architectural pre-mortem](briefs/phase-10-production-hardening.md).
-Band 3 order is P6 → P8 → remaining P7 → P10; P9 remains Band 4.
+Band 3 order (P6 → P8 → remaining P7 → P10) is fully complete. Next milestone: Band 4 / Phase 9 (Handoff + Analytics).
+
+**Phase 10 Post-Completion & Launch Hardening — 11 November 2026:**
+Following initial Phase 10 tagging, live deployment to Render and Vercel revealed three operational failure modes that were resolved, verified with real requests, and recorded:
+1. **FastEmbed Container Cache Isolation (503 Service Unavailable):** On Render, the build container and runtime container do not share `/tmp`. At runtime, `/tmp` was empty, causing `DenseIndex` initialization to fail with `local_files_only=True`. Because the retriever failed to load, `app.state.retrieval_ready` stayed `False`, returning 503 on `/api/health`.
+   - *Fix (DRN-069):* Created `backend/.cache/fastembed`, added `ensure_model_cached()` to `backend/app/retrieval/dense.py`, called during both build and `lifespan` startup, and configured `FASTEMBED_CACHE_PATH: .cache/fastembed` in `render.yaml`.
+2. **Cold-Start Unallocated Boot Allowance ("Live answers are resting"):** Render free tier sleeps after 15 minutes of inactivity. Under DRN-063, `InferenceLedger` initialized with `self._allowance = None`, requiring an external operator POST to activate. Wakeup containers remained in resting mode despite a valid `GROQ_API_KEY`.
+   - *Fix (DRN-067):* Added `AUTO_AUTHORIZE_INFERENCE: bool` and boot-bound auto-authorization in `lifespan` when `ENVIRONMENT == "production"` and `GROQ_API_KEY` is present, binding a fresh UTC-midnight allowance to `app.state.llm.ledger.boot_id` with `warm_up_seconds=0.0`. Test isolation is preserved.
+3. **TPM Byte Ceiling Bottleneck (`QuotaDenied("request_too_large")`):** Under DRN-054, `reserve_input_tokens` uses serialized UTF-8 bytes plus headroom (`len(encoded) + 512 + 32 * count`) as an upper-bound token estimator. Grounded chat prompts with 4 chunks + tool schemas total ~9,000 byte-tokens. The initial default `tpm=6400` was naively set to 80% of 8,000 without realizing the estimator measures in bytes rather than real tokens (~1,700 real tokens). Every chat query failed locally with `request_too_large`, and 2-turn tool calls (~18,500 total bytes) failed with `wait_expired`.
+   - *Fix (DRN-068):* Calibrated `tpm` to `32,000` byte-tokens ($8,000 \text{ real tokens} \times 4 \text{ bytes/token}$), safely admitting grounded queries and multi-turn tool calling while keeping actual Groq token consumption within Groq's 8,000 real TPM limit.
+4. **Baseline Eval Fingerprint Synchronization (DRN-070):** Changes in `backend/app/` updated the `"application"` SHA-256 fingerprint. Synchronized `evals/baseline.json` (`2956c6a8...`), re-ran `evals.run` and `evals.publish` (`eval-summary.json` updated), with all 643 backend tests and 181 frontend tests passing.
+5. **Candidate Resume Asset:** Linked official candidate resume (`frontend/public/resume.pdf`), deleted `resume-draft.pdf`, and updated UI labels.
+6. **Live End-to-End Verification:** Live smoke tests confirmed Render `GET /api/health` 200 OK (`assistant_state: "ready"`), `POST /api/chat` 200 OK (Groq `openai/gpt-oss-120b` executed in 1.59s), `POST /api/chat/stream` 200 OK SSE token streaming with sources, and interactive project card tool summoning 200 OK.
 
 **Phase 7 (remaining): Safety hardening — closed, merged and tagged.** On 6 November
 2026, Aamir confirms merging/pushing `main` at
@@ -41,8 +53,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: review the completed local [Phase 10 evidence ledger](audits/2026-11-10-phase-10-production.md)
-and [production runbook](runbooks/production.md). No P9 work begins before approval.
+Next: Phase 10 is complete, merged to `main`, tagged `phase-10-done`, and verified live on Render and Vercel. Band 4 (Phase 9: Handoff, database durability, analytics) is the next milestone. No P9 work begins before explicit user approval.
 Aamir approved continuing through the phase on 10 November 2026. Phase 7 teach-back
 answers remain unassessed; its milestone is closed by Aamir's explicit confirmation.
 Aamir approved the Phase 7 six-increment brief on 6 November. A new factual accuracy claim
@@ -76,7 +87,7 @@ not unfinished work in the accepted offline engineering milestone.
 | **Protocol & Session Hardening (DRN-034)** | 🟢 Complete | `main` | `protocol-hardening-done` | [`quality-and-multi-turn-hardening.md`](study-guides/quality-and-multi-turn-hardening.md) |
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | 🟢 Closed; merge/remote push user-confirmed at `de73fb5`; launch gates carried forward | `main` | `phase-7-hardening-done` (remote user-confirmed; local verified) | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
-| P10: Production | 🟡 Locally complete/verified; final review and release acceptance pending | `phase-10-production-hardening` | — | [P10 guide](study-guides/phase-10-production-hardening.md) |
+| P10: Production | 🟢 Complete; live deployment verified on Render & Vercel | `main` | `phase-10-done` | [P10 guide](study-guides/phase-10-production-hardening.md) |
 | P9: Handoff + analytics | ⬜ Not Started | — | — | — |
 
 ## What's Done
@@ -787,3 +798,18 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   independent validation and fact approval before accuracy claims. P9 durability,
   storage, handoff, company pages and backups remain deferred. No provider calls,
   external messages, push, merge, deploy, completion tag or P9 work performed.
+
+### Phase 10 deployment, launch hardening, and live smoke test verification — 11 November 2026
+
+- **Deployment & Post-P10 Production Hardening**: Merged `phase-10-production-hardening` to `main` at `de73fb5` and pushed remote tag `phase-10-done`. Live deployment to Render revealed and resolved three operational failure modes:
+  1. *FastEmbed Container Transition Isolation (DRN-069)*: Render build and runtime containers do not share `/tmp`. FastEmbed was seeking cached model assets in `/tmp/fastembed_cache/bge-small-en-v1.5` with `local_files_only=True`, which was missing at runtime. Because retriever failed to load on startup, `app.state.retrieval_ready` stayed `False`, returning 503 on `/api/health`. Fixed by defining `DEFAULT_PROJECT_CACHE_DIR = backend/.cache/fastembed`, adding `ensure_model_cached()`, invoking during build and lifespan, and setting `FASTEMBED_CACHE_PATH` in `render.yaml`.
+  2. *Unallocated Boot Allowance (Cold-Start Resting) (DRN-067)*: Render free tier spins down after 15 minutes of idle time. Under DRN-063, `InferenceLedger` initialized with `self._allowance = None`, causing woke containers to remain in "Live answers are resting" mode. Fixed with boot-bound auto-authorization in `lifespan` when `ENVIRONMENT == "production"` and `GROQ_API_KEY` is present (or `AUTO_AUTHORIZE_INFERENCE=True`), binding a fresh UTC-midnight allowance to `app.state.llm.ledger.boot_id` with `warm_up_seconds=0.0`. Test isolation is preserved.
+  3. *TPM Byte Ceiling Bottleneck (`QuotaDenied("request_too_large")`) (DRN-068)*: `reserve_input_tokens()` uses UTF-8 bytes plus headroom (`len(encoded) + 512 + 32 * count`) as an upper-bound estimator. Grounded chat prompts with 4 retrieved chunks + tool schemas total ~9,000 byte-tokens. The initial default `tpm=6400` was naively set to 80% of 8,000 without realizing the estimator measures in bytes rather than real tokens (~1,700 real tokens). Every chat query failed locally with `request_too_large`, and 2-turn tool calls (~18,500 total bytes) failed with `wait_expired`. Calibrated `tpm` to `32,000` byte-tokens ($8,000 \text{ real tokens} \times 4 \text{ bytes/token}$), safely admitting grounded queries and multi-turn tool calling while keeping actual Groq token consumption within Groq's 8,000 real TPM limit.
+  4. *Baseline Eval Fingerprint Synchronization (DRN-070)*: Changes in `backend/app/` updated the `"application"` SHA-256 fingerprint. Synchronized `evals/baseline.json` (`2956c6a80809f678923e73a220087330a579eb8764dbc9b8f750af09338e5399`), re-ran `evals.run` and `evals.publish` (`eval-summary.json` updated), with all 643 backend tests and 181 frontend tests passing.
+  5. *Official Candidate Resume*: Replaced draft PDF with official candidate resume at `frontend/public/resume.pdf`, deleted `resume-draft.pdf`, and removed draft source links.
+- **Verification Evidence**:
+  - `GET /api/health`: 200 OK (`ready: true`, `assistant_state: "ready"`).
+  - `POST /api/chat`: 200 OK (Groq `openai/gpt-oss-120b` executed in 1.59s, 1,459 input tokens, 211 output tokens, status complete).
+  - `POST /api/chat/stream`: 200 OK (sources emitted, smooth SSE token stream, complete telemetry receipt).
+  - `POST /api/chat/stream` with tool calling ("Show me the Entropy-OJ project"): 200 OK (emitted `event: card` with full architecture details, streamed Turn 2 verbal explanation).
+- Tag `phase-10-done` updated and force-pushed to origin targeting commit `701e903`. All GitHub Actions CI and security audits passing green. Phase 10 is complete; next milestone is Phase 9.

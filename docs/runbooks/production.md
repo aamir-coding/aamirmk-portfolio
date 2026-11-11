@@ -69,6 +69,19 @@ Control bodies/credentials never enter application logs. All control responses, 
 errors, use no-store. Allowance values are private operational evidence. No control
 request or live allowance has been sent to production during implementation.
 
+### Ephemeral container boot authorization (Render Free Tier)
+
+Under DRN-067, Render free tier container sleep/restart cycles automatically authorize
+a fresh, non-reusable boot allowance on startup when `ENVIRONMENT == "production"` and
+`GROQ_API_KEY` is present (or `AUTO_AUTHORIZE_INFERENCE=True`). The allowance binds to
+the container's random `boot_id`, expires at UTC midnight, and uses `warm_up_seconds=0.0`
+to eliminate cold-start wait penalties. The manual operator activation protocol above remains
+available for operator-driven allowance refreshes or custom quota bounds.
+
+Under DRN-068, byte-based ledger limits are calibrated to `tpm=32000` (`INFERENCE_SHARED_LIMITS`
+and `INFERENCE_MODEL_LIMITS`), accommodating ~9,000-byte grounded chat prompts and ~18,500-byte
+2-turn tool calls while bounding real provider traffic strictly within Groq's 8,000 real TPM ceiling.
+
 ## Proxy and hosted privacy verification
 
 Leave `TRUST_PROXY_HEADERS=false` until the actual socket peer and header chain are
