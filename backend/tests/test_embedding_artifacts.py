@@ -203,3 +203,53 @@ def test_model_asset_change_cannot_query_existing_index(
     index = DenseIndex(chunks, model_name="test/model", embeddings_path=path)
     with pytest.raises(IndexArtifactError, match="model assets"):
         index.search("python")
+
+
+def test_resolve_cache_dir_precedence(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    from app.retrieval.dense import resolve_cache_dir
+
+    # 1. Explicit argument overrides all
+    explicit = str(tmp_path / "explicit_cache")
+    assert resolve_cache_dir(explicit) == explicit
+
+    # 2. Environment variable overrides defaults
+    env_cache = str(tmp_path / "env_cache")
+    monkeypatch.setenv("FASTEMBED_CACHE_PATH", env_cache)
+    assert resolve_cache_dir() == env_cache
+
+    # 3. When unset, returns a non-empty string path
+    monkeypatch.delenv("FASTEMBED_CACHE_PATH", raising=False)
+    resolved = resolve_cache_dir()
+    assert isinstance(resolved, str) and len(resolved) > 0
+
+
+def test_ensure_model_cached_provisions_when_local_absent(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import fastembed
+
+    from app.retrieval.dense import ensure_model_cached
+
+    calls: list[dict[str, object]] = []
+
+    class FakeProvisioningModel:
+        def __init__(self, **kwargs: object) -> None:
+            calls.append(kwargs)
+            if kwargs.get("local_files_only") is True:
+                raise ValueError("model not found in local cache")
+
+    monkeypatch.setattr(
+        fastembed, "TextEmbedding", lambda **kwargs: FakeProvisioningModel(**kwargs)
+    )
+    monkeypatch.setattr(
+        "app.retrieval.dense.model_assets_sha256", lambda model: "dummy_hash"
+    )
+
+    test_cache = tmp_path / "cache"
+    ensure_model_cached("test/model", cache_dir=test_cache)
+
+    assert len(calls) == 2
+    assert calls[0]["local_files_only"] is True
+    assert calls[1]["local_files_only"] is False

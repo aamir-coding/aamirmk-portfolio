@@ -63,8 +63,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         logging.getLogger(name).setLevel(logging.WARNING)
     logger.info("Starting up application in %s environment", settings.ENVIRONMENT)
     try:
+        from app.retrieval.dense import ensure_model_cached
         from app.retrieval.retriever import get_retriever
 
+        await asyncio.to_thread(ensure_model_cached)
         retriever = await asyncio.to_thread(get_retriever)
         await retriever.retrieve("engineering experience", top_k=1)
         app.state.retrieval_ready = True

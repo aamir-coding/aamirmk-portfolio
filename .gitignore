@@ -47,6 +47,8 @@ frontend/.vercel/
 backend/index/
 backend/release.json
 backend/release.tmp
+.cache/
+backend/.cache/
 
 # Test / coverage
 .coverage

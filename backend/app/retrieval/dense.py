@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -25,6 +27,67 @@ DEFAULT_EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 # Default precomputed embeddings matrix path (saves 1.2GB RAM and 12s CPU at boot)
 DEFAULT_EMBEDDINGS_PATH = Path(__file__).resolve().parent / "facts_embeddings.npz"
 
+# Persistent model cache directory inside repository root
+# Avoids data loss on platforms like Render where /tmp is discarded across build/deploy
+DEFAULT_PROJECT_CACHE_DIR = Path(__file__).resolve().parents[2] / ".cache" / "fastembed"
+
+
+def resolve_cache_dir(explicit: str | Path | None = None) -> str | None:
+    """Resolve local model cache directory with persistence fallback.
+
+    Precedence:
+    1. Explicitly passed cache_dir.
+    2. FASTEMBED_CACHE_PATH environment variable.
+    3. Persistent repository cache at backend/.cache/fastembed (if it exists).
+    4. System temporary directory (fastembed_cache) if it exists.
+    5. Persistent repository cache default.
+    """
+    if explicit is not None:
+        return str(explicit)
+    if env_path := os.environ.get("FASTEMBED_CACHE_PATH"):
+        return env_path
+    if DEFAULT_PROJECT_CACHE_DIR.is_dir() and any(DEFAULT_PROJECT_CACHE_DIR.iterdir()):
+        return str(DEFAULT_PROJECT_CACHE_DIR)
+    temp_dir = Path(tempfile.gettempdir()) / "fastembed_cache"
+    if temp_dir.is_dir() and any(temp_dir.iterdir()):
+        return str(temp_dir)
+    return str(DEFAULT_PROJECT_CACHE_DIR)
+
+
+def ensure_model_cached(
+    model_name: str = DEFAULT_EMBEDDING_MODEL,
+    cache_dir: str | Path | None = None,
+) -> None:
+    """Ensure ONNX embedding model assets exist locally before strictly local loading.
+
+    If cached files are missing (e.g. ephemeral container startup where build-time /tmp
+    was discarded by the hosting provider), provisions them with single-thread arena.
+    """
+    resolved = resolve_cache_dir(cache_dir)
+    from fastembed import TextEmbedding
+
+    try:
+        model = TextEmbedding(
+            model_name=model_name,
+            cache_dir=resolved,
+            threads=1,
+            local_files_only=True,
+        )
+        model_assets_sha256(model)
+        return
+    except Exception:
+        pass
+
+    if resolved:
+        Path(resolved).mkdir(parents=True, exist_ok=True)
+    model = TextEmbedding(
+        model_name=model_name,
+        cache_dir=resolved,
+        threads=1,
+        local_files_only=False,
+    )
+    model_assets_sha256(model)
+
 
 class DenseIndex:
     """In-process semantic vector index using fastembed and NumPy dot-products."""
@@ -47,7 +110,7 @@ class DenseIndex:
             embeddings_path: Path to precomputed .npz file containing IDs and matrix.
         """
         self.model_name = model_name
-        self.cache_dir = cache_dir
+        self.cache_dir = resolve_cache_dir(cache_dir)
         self.embeddings_path = Path(embeddings_path) if embeddings_path else None
         self._model = embedding_model
         self._injected_model = embedding_model is not None
