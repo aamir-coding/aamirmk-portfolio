@@ -3,7 +3,7 @@
 ## Current Phase
 **Phase 9: Handoff, per-company links, forwardable summary and analytics — in progress.**
 Aamir approved the seven-increment brief on 12 November 2026 and authorized
-local work through Increment 6. Build branch: `phase-9-handoff-analytics`.
+local work through Increment 7. Build branch: `phase-9-handoff-analytics`.
 
 **Phase 10: Production hardening, monitoring and launch — 🟢 Closed, deployed, and verified live on Render & Vercel**
 The locally verified `main`, `origin/main` tracking ref and `phase-10-done` tag
@@ -60,7 +60,7 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 Band 4 is active under the 12 November Phase 9 approval. The current build covers
 company links, the Postgres foundation, recruiter handoff, private analytics,
-forwardable summaries, and durable inference quota.
+forwardable summaries, durable inference quota, retention, and database restore.
 Aamir approved continuing through the phase on 10 November 2026. Phase 7 teach-back
 answers remain unassessed; its milestone is closed by Aamir's explicit confirmation.
 Aamir approved the Phase 7 six-increment brief on 6 November. A new factual accuracy claim
@@ -249,8 +249,9 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review Phase 9 Increment 6. Increment 7 covers retention and restore. Hosted
-   verification will use the credentials Aamir provides later.
+1. Review Phase 9 Increment 7 and verify the hosted recruiter workflow once
+   the Supabase and Telegram credentials are available. Confirm the scheduled
+   cleanup and Telegram delivery before closing Phase 9.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -914,3 +915,24 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
 - Durable quota is opt-in. Hosted verification remains pending, including the
   Supabase migration and configuration of the daily ceilings against remaining
   provider capacity.
+
+### Phase 9 Increment 7 — 12 November 2026
+
+- Migration `0004` adds a private Postgres function for daily cleanup. Tests
+  covered the 90-day record cutoff, old questions in active visits, dependent
+  feedback, expired summaries, and preservation of current quota. The mobile
+  footer discloses the policy and Telegram delivery. Agent-browser verified
+  the notice at 390 px with no horizontal overflow.
+- The PostgreSQL 18 archive restored into a fresh database at `0004`. The
+  rehearsal restored recent and expired rows, ran cleanup, and checked that
+  expired rows were removed and current data remained available. Health, the
+  private admin read, and a synthetic summary lookup returned HTTP 200.
+  See DRN-078 and the [retention and restore runbook](runbooks/production.md#phase-9-retention).
+- Local verification reported **697 pytest passed, 2 warnings** and **190 Vitest
+  passed**. Ruff, ESLint, the release asset check, and the production build
+  passed. Initial JavaScript was **171,362 gzip bytes / 200,000**. The offline
+  gate returned `gate_failures: []` with all seven scores preserved. The
+  tracked result and public projection use clean source `66c67fb`.
+- The local build is complete through Increment 7. Hosted migration, Supabase
+  Cron activation and first-run evidence, Telegram delivery, and phase closeout
+  remain pending.
