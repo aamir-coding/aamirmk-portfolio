@@ -13,8 +13,8 @@ No uptime ping is configured to keep the service awake. An on-demand probe wakes
    `python -m alembic -c backend/alembic.ini upgrade head` from the repository root.
    Use `current` to confirm the applied revision. Supply `DATABASE_URL` to the API
    runtime. Credentials stay in the shell or hosting environment.
-3. Keep `ANALYTICS_IP_HASH_KEY` unset in hosted environments until scheduled
-   retention is ready. With a database and key configured, the API writes
+3. Verify the hosted [retention job](#phase-9-retention) before setting
+   `ANALYTICS_IP_HASH_KEY`. With a database and key configured, the API writes
    successful questions, usage and known company opens in the background.
    The worker may drop records during a database outage or when its queue fills.
 4. For local migration and write tests, set `PORTFOLIO_TEST_DATABASE_URL` to a
@@ -88,6 +88,85 @@ No uptime ping is configured to keep the service awake. An on-demand probe wakes
    settlement can leave its full grant charged through the end of that UTC
    day. The stored amounts track application reservations and charges. Check
    actual provider usage separately.
+
+## Phase 9 retention
+
+Apply Alembic revision `0004`. It installs `portfolio.purge_expired_data()`.
+The function deletes questions, feedback, fit usage and handoffs at 90 days and
+visits after 90 days of inactivity. Removing a question also removes its
+feedback. Summary links expire on read after 30 days and the job deletes their
+rows once expired. It keeps the latest 90 UTC quota budget dates and the current
+date. Telegram manages its separate message copies.
+
+Enable Supabase Cron and register the daily job as the schema owner or a
+maintenance role with schema usage, function execution, and the required table
+read and delete privileges. The job runs inside Postgres even while Render is
+asleep. Check the cron timezone and use UTC for the time shown below.
+
+```sql
+SELECT cron.schedule(
+    'portfolio-retention', '20 3 * * *',
+    'SELECT portfolio.purge_expired_data()'
+);
+```
+
+In a hosted verification database, seed synthetic expired and current rows.
+Run the function once and compare counts, then check the first successful
+scheduled run in Supabase Cron History before enabling hosted collection.
+Check the job history after a project pause or outage. Run cleanup once after
+recovery if a scheduled run was missed. Unschedule `portfolio-retention` before
+downgrading revision `0004`. [Supabase Cron quickstart](https://supabase.com/docs/guides/cron/quickstart)
+
+## Phase 9 backup and restore
+
+For the Supabase Free project, export a logical archive with PostgreSQL tools.
+Use a direct or session-pooler connection, a `pg_dump` version at least as new
+as the source server, and credentials from a private `PGPASSFILE`. Set the
+connection with libpq variables (`PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`,
+`PGSSLMODE=verify-full`). Supply `PGSSLROOTCERT` if your client needs the hosted
+CA. Make the export from a trusted operator machine between migrations. Run
+the following from a private directory on encrypted storage. Record the export
+time and archive checksum, keep a protected off-site copy, and rotate old copies
+under your backup retention policy. The archive contains recruiter data.
+[Supabase backup guidance](https://supabase.com/docs/guides/platform/backups), [PostgreSQL password file](https://www.postgresql.org/docs/16/libpq-pgpass.html), [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html)
+
+```sh
+psql -X -At -v ON_ERROR_STOP=1 -c 'SELECT version_num FROM public.portfolio_alembic_version' > portfolio.revision
+pg_dump --schema=portfolio --format=custom --file=portfolio.dump
+pg_restore --list portfolio.dump
+```
+
+Restore to an isolated target with no `portfolio` schema and no portfolio
+migration history. Point libpq and `MIGRATION_DATABASE_URL` at that target and
+confirm the database identity before running the commands. Use the recorded
+revision in place of `0004` if restoring an older archive. The restore creates
+the schema and tables. Alembic `stamp` records their existing revision before
+applying later migrations. [pg_restore](https://www.postgresql.org/docs/18/app-pgrestore.html), [Alembic stamp](https://alembic.sqlalchemy.org/en/latest/api/commands.html#alembic.command.stamp)
+
+```sh
+pg_restore --dbname="$PGDATABASE" --single-transaction --no-owner --no-privileges portfolio.dump
+python -m alembic -c backend/alembic.ini stamp 0004
+python -m alembic -c backend/alembic.ini upgrade head
+python -m alembic -c backend/alembic.ini check
+```
+
+Before connecting Render to the restored database:
+
+1. Reapply the private schema and role grants for the runtime and maintenance
+   roles. With `--no-privileges`, explicitly restore
+   `REVOKE EXECUTE ON FUNCTION portfolio.purge_expired_data() FROM PUBLIC`.
+   Run `SELECT portfolio.purge_expired_data()` and check aggregate counts.
+   Register the Cron job again since the archive covers only `portfolio`.
+2. Keep Telegram credentials unset until you reconcile restored pending
+   handoffs against the destination chat by UUID. A backup may predate a
+   successful delivery. Review the rows before enabling the worker.
+3. Keep `DURABLE_INFERENCE_QUOTA=true` and `AUTO_AUTHORIZE_INFERENCE=false`
+   until today's account spend and any missing grants are reconciled, or until
+   the next UTC budget day. A restored snapshot can lag current provider usage.
+4. Compare recent row counts and test `/api/health`, a synthetic admin read,
+   and a synthetic summary link before switching traffic. Expired records
+   must stay absent after cleanup. Preserve the previous database for rollback
+   under the existing retention policy.
 
 ## Release and rollback
 
@@ -183,8 +262,8 @@ change requires matching CSP connect-src, CORS and `VITE_API_BASE_URL` changes.
 Application logs contain request ID, route, status, duration and ephemeral salted IP
 hash, not transcripts. Uvicorn access logs/WebSockets are disabled. Review hosted
 Render/Vercel/Groq log retention and access separately; record the account's actual
-retention here before launch. **Hosted retention: not yet verified.** No P9 message
-storage or 90-day cleanup is claimed.
+retention here before launch. **Hosted retention and the first scheduled
+database cleanup are still pending verification.**
 
 ## External monitoring
 

@@ -251,12 +251,14 @@ function Portfolio() {
       </main>
 
       <footer className="fit-form-notice">
-        <p>AI assistant about Aamir. Live questions and job descriptions are processed by Groq.
+        <p>AI assistant about Aamir. Groq processes live questions and job descriptions.
           This browser tab stores a copy of the chat. When analytics is enabled, the service
-          stores questions, usage, basic visit details, and submitted feedback to improve the portfolio.
-          Reports are reused for up to 15 minutes and
+          stores questions, usage, basic visit details, and feedback to improve the portfolio.
+          Analytics and handoff records are removed in daily cleanup after 90 days.
+          Handoffs you approve are sent to Aamir on Telegram, which keeps its own copy.
+          Summary links expire after 30 days. Reports are reused for up to 15 minutes and
           held in bounded server memory until eviction or restart.
-          Service logs use request IDs and temporary salted IP hashes, without message text.</p>
+          Service logs record only operational metadata, including request IDs and temporary salted IP hashes.</p>
       </footer>
 
       {isFitModalOpen && (

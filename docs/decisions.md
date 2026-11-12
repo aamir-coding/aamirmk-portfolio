@@ -3,6 +3,21 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-078: Schedule retention in Postgres and rehearse a schema restore
+
+**Date:** 2026-11-12. Put cleanup in revision `0004` and register its daily
+schedule in Supabase Cron. Render sleep does not control the schedule. A
+security-invoker function runs the deletes in one transaction at a consistent
+statement cutoff. It uses each event's own age so an active tab cannot extend
+the lifetime of older questions. Summary cleanup uses each link's expiry.
+Quota cleanup uses complete UTC dates and leaves current grants alone.
+
+Use a private logical archive of the portfolio schema and record its Alembic
+revision alongside it. Restore to a separate target, stamp the archived
+revision, and apply later migrations. The restore runbook covers permission
+setup, cleanup before traffic, pending Telegram delivery reconciliation, and
+account quota reconciliation before activating a restored ledger.
+
 ### DRN-077: Reserve daily inference capacity before opening a boot ledger
 
 **Date:** 2026-11-12. An automatic allowance on every Render wake-up can

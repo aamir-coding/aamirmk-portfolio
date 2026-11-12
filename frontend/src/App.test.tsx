@@ -35,6 +35,15 @@ describe("<App />", () => {
     window.history.replaceState(null, "", "/");
   });
 
+  it("discloses analytics retention and handoff delivery in the footer", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    render(<App />);
+    await screen.findByText("Ready");
+    const footer = screen.getByRole("contentinfo");
+    expect(footer).toHaveTextContent(/daily cleanup after 90 days/i);
+    expect(footer).toHaveTextContent(/Telegram/i);
+  });
+
   it("shows Ecolab suggestions and carries the resolved slug into chat", async () => {
     window.history.replaceState(null, "", "/?for=ecolab-5a2b");
     vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });

@@ -18,10 +18,12 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
-from sqlalchemy import select, update
+from sqlalchemy import select, text, update
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.db.models import (
+    FeedbackRecord,
+    FitRunRecord,
     HandoffRecord,
     MessageRecord,
     QuotaGrant,
@@ -152,6 +154,130 @@ def test_postgres_migration_round_trip(postgres_url: str) -> None:
     command.downgrade(config, "base")
     command.upgrade(config, "head")
     command.check(config)
+
+
+def test_postgres_retention_purges_by_record_age_and_summary_expiry(
+    postgres_url: str,
+) -> None:
+    async def verify() -> None:
+        engine = create_database_engine(SecretStr(postgres_url), pooled=False)
+        try:
+            async with async_sessionmaker(engine).begin() as session:
+                now = datetime.now(UTC)
+                old = now - timedelta(days=91)
+                recent = now - timedelta(days=89)
+                active, inactive = uuid4(), uuid4()
+                session.add_all(
+                    [
+                        RecruiterSession(
+                            id=id,
+                            ip_hash="a" * 64,
+                            device_class="unknown",
+                            last_seen_at=seen,
+                        )
+                        for id, seen in [(active, recent), (inactive, old)]
+                    ]
+                )
+                await session.flush()
+                old_message, recent_message = uuid4(), uuid4()
+                session.add_all(
+                    [
+                        MessageRecord(
+                            id=id,
+                            session_id=active,
+                            question="Synthetic question",
+                            latency_ms=1,
+                            created_at=created,
+                        )
+                        for id, created in [
+                            (old_message, old),
+                            (recent_message, recent),
+                        ]
+                    ]
+                )
+                await session.flush()
+                session.add_all(
+                    [
+                        FeedbackRecord(
+                            message_id=old_message, rating=-1, created_at=recent
+                        ),
+                        FeedbackRecord(
+                            message_id=recent_message, rating=1, created_at=recent
+                        ),
+                    ]
+                )
+                for created in (old, recent):
+                    session.add_all(
+                        [
+                            HandoffRecord(
+                                session_id=inactive, transcript=[], created_at=created
+                            ),
+                            FitRunRecord(created_at=created),
+                            QuotaUsage(
+                                budget_date=created.date(),
+                                bucket="shared",
+                                requests=1,
+                                tokens=20,
+                            ),
+                            QuotaGrant(
+                                boot_id=uuid4().hex,
+                                budget_date=created.date(),
+                                expires_at=created + timedelta(hours=1),
+                                requests=1,
+                                tokens=20,
+                            ),
+                        ]
+                    )
+                for digest, expires in [("a", now), ("b", now + timedelta(seconds=60))]:
+                    session.add(
+                        SummaryRecord(
+                            token_hash=digest * 64,
+                            content={},
+                            created_at=expires - timedelta(days=30),
+                            expires_at=expires,
+                        )
+                    )
+                await session.flush()
+
+                # Run the exact statement Supabase Cron will execute.
+                for _ in range(2):
+                    await session.execute(text("SELECT portfolio.purge_expired_data()"))
+                assert (await session.scalars(select(RecruiterSession.id))).all() == [
+                    active
+                ]
+                assert (await session.scalars(select(MessageRecord.id))).all() == [
+                    recent_message
+                ]
+                assert (
+                    await session.scalars(select(FeedbackRecord.message_id))
+                ).all() == [recent_message]
+                assert (
+                    await session.scalars(select(HandoffRecord.created_at))
+                ).all() == [recent]
+                assert (
+                    await session.scalars(select(HandoffRecord.session_id))
+                ).all() == [None]
+                assert (
+                    await session.scalars(select(FitRunRecord.created_at))
+                ).all() == [recent]
+                assert (
+                    await session.scalars(select(QuotaUsage.budget_date))
+                ).all() == [recent.date()]
+                assert (
+                    await session.scalars(select(QuotaGrant.budget_date))
+                ).all() == [recent.date()]
+                assert (
+                    await session.scalars(select(SummaryRecord.token_hash))
+                ).all() == ["b" * 64]
+        finally:
+            await engine.dispose()
+
+    config = Config(str(ALEMBIC_INI))
+    command.upgrade(config, "head")
+    try:
+        asyncio.run(verify())
+    finally:
+        command.downgrade(config, "base")
 
 
 def test_postgres_serializes_quota_grants_and_retains_interrupted_boots(
