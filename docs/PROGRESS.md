@@ -850,5 +850,10 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   deliveries after a restart. The local tests use a fake Telegram notifier
   and disposable PostgreSQL 18. See DRN-074 and the
   [handoff runbook](runbooks/production.md#phase-9-handoff).
+- Local verification reported **675 pytest passed, 2 warnings** and
+  **184 Vitest passed**. Ruff, ESLint, and the production build passed.
+  Initial JavaScript was **169,019 gzip bytes / 200,000**. The full offline
+  gate returned `gate_failures: []` with all seven scores preserved. The
+  tracked result and public projection use clean source `bbec78a`.
 - Hosted Supabase and Telegram delivery verification remain pending. Feedback
   and admin, summaries, durable quota, retention and restore are later increments.
