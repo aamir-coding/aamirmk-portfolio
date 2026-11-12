@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints, TypeAdapte
 
 from app.tools.projects import PROJECT_CATALOG
 
-_COMPANIES_PATH = Path(__file__).parent / "data" / "companies.yaml"
+COMPANIES_PATH = Path(__file__).parent / "data" / "companies.yaml"
 _Slug = Annotated[
     str,
     StringConstraints(
@@ -46,7 +46,7 @@ class CompanyContext(BaseModel):
     why_us: str
 
 
-def load_company_contexts(path: Path = _COMPANIES_PATH) -> dict[str, CompanyContext]:
+def load_company_contexts(path: Path = COMPANIES_PATH) -> dict[str, CompanyContext]:
     entries = TypeAdapter(dict[_Slug, _CompanyEntry]).validate_python(
         yaml.safe_load(path.read_text(encoding="utf-8"))
     )

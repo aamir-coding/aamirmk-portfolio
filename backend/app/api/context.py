@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query, Request, Response
 from pydantic import BaseModel
 
 from app.companies import CompanyContext
+from app.db.analytics import Analytics
 
 router = APIRouter(tags=["context"])
 
@@ -25,6 +26,10 @@ class ContextResponse(BaseModel):
 
 
 @router.get("/context")
-async def get_context(response: Response, company: ResolvedCompany) -> ContextResponse:
+async def get_context(
+    response: Response, company: ResolvedCompany, analytics: Analytics
+) -> ContextResponse:
     response.headers["Cache-Control"] = "private, no-store"
+    if company is not None and analytics is not None:
+        analytics.record(company.slug)
     return ContextResponse(company=company)

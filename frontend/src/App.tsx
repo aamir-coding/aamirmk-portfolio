@@ -221,7 +221,9 @@ function Portfolio() {
 
       <footer className="fit-form-notice">
         <p>AI assistant about Aamir. Live questions and job descriptions are processed by Groq.
-          Chat stays in this browser tab. Reports are reused for up to 15 minutes and
+          This browser tab stores a copy of the chat. When analytics is enabled, the service
+          stores questions, usage, and basic visit details to improve the portfolio.
+          Reports are reused for up to 15 minutes and
           held in bounded server memory until eviction or restart.
           Service logs use request IDs and temporary salted IP hashes, without message text.</p>
       </footer>

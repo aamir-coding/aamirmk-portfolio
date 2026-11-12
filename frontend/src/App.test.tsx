@@ -74,7 +74,8 @@ describe("<App />", () => {
       expect.stringContaining("/api/context?for=unknown-company"), expect.anything(),
     ));
     fireEvent.click(screen.getByRole("button", { name: "What are Aamir's core technical strengths?" }));
-    expect(stream.mock.calls[0][0].companySlug).toBeUndefined();
+    expect(stream).toHaveBeenCalledOnce();
+    expect(stream.mock.lastCall?.[0].companySlug).toBeUndefined();
   });
 
   it("renders header, status indicator, and starter chips on mount", async () => {

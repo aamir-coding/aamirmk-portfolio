@@ -3,6 +3,42 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-073: Phase 9 company configuration in eval identity
+
+**Date:** 2026-11-12. Company notes affect tailored prompts, so include
+`companies.yaml` in the offline application and public runtime fingerprints.
+The offline candidate reproduced all seven baseline scores. Update only the
+application and evaluator fingerprints and review reference. The replay uses
+default links and the Ecolab behavior is covered by separate fake-backed tests.
+The independent judge validation, held-out cases and score floors are preserved.
+
+### DRN-072: Private Postgres schema and optional analytics
+
+**Date:** 2026-11-12. Use a dedicated `portfolio` schema, SQLAlchemy async sessions
+with asyncpg and explicit Alembic migrations. Keep migration and runtime
+credentials separate. The runtime engine connects lazily, so analytics
+availability does not gate the chat routes.
+
+With a configured database and hash key, enqueue successful live questions and
+known-company opens on a bounded in-process queue. Write each event in one
+transaction. A failed or dropped write leaves the recruiter response usable.
+Associate events with a keyed hash derived from the client IP, opaque tab ID
+and resolved company. Store only the coarse device class and keyed IP hash.
+Count one company open per such session. Keep unknown token counts null and
+store the latest question without assistant text or conversation history.
+Hosted collection starts after retention is in place. Telegram delivery,
+durable inference admission and expiry cleanup are later increments.
+
+### DRN-071: Company links control emphasis
+
+**Date:** 2026-11-12. Resolve exact suffixed company slugs against the app-owned
+catalog for both the cover and chat. The default page renders immediately.
+Known slugs load a greeting, three questions and project titles from the
+existing project catalog. The Ecolab entry uses Aamir's two selected projects.
+Its note describes which engineering work to explore, without attributing a
+motive to Aamir or asserting Ecolab's requirements. The raw slug never enters
+the prompt. The separately delimited note guides emphasis among verified facts.
+
 ### DRN-070: Post-Phase 10 operational identity and eval baseline refresh
 
 **Date:** 2026-11-11. **Scope:** Post-P10 production hardening & release provenance.

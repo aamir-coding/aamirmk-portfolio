@@ -10,6 +10,7 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 
+from app.companies import COMPANIES_PATH
 from app.retrieval.artifacts import Sha256, canonical_sha256, corpus_sha256, file_sha256
 from app.retrieval.dense import DEFAULT_EMBEDDINGS_PATH
 from app.retrieval.loader import FactLoader
@@ -100,7 +101,7 @@ def input_fingerprints() -> dict[str, str]:
             for p in sorted(DEFAULT_ROOT.glob("*.py"))
             if not p.name.startswith("test")
         ],
-        "application": sorted((REPO_ROOT / "backend/app").rglob("*.py")),
+        "application": [*(REPO_ROOT / "backend/app").rglob("*.py"), COMPANIES_PATH],
         "cases": sorted((DEFAULT_ROOT / "cases").glob("*.yaml")),
         "safety_assets": [
             *sorted((DEFAULT_ROOT / "attacks").glob("*.json")),

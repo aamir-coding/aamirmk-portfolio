@@ -1,8 +1,26 @@
 # Production operations
 
 Default deployment: one Render free worker, existing Vercel frontend, normal API
-sleep, no database until P9. Generation starts closed after every process boot.
+sleep. Phase 9 adds optional Postgres connectivity.
 No uptime ping is configured to keep the service awake. An on-demand probe wakes it.
+
+## Phase 9 database setup
+
+1. Keep the `portfolio` schema private in Supabase. Use a direct TLS connection
+   or the IPv4 session pooler. Give the runtime role access to the application
+   schema and tables. Keep the migration role's DDL credentials separate.
+2. Set `MIGRATION_DATABASE_URL` in the migration shell and run
+   `python -m alembic -c backend/alembic.ini upgrade head` from the repository root.
+   Use `current` to confirm the applied revision. Supply `DATABASE_URL` to the API
+   runtime. Credentials stay in the shell or hosting environment.
+3. Keep `ANALYTICS_IP_HASH_KEY` unset in hosted environments until scheduled
+   retention is ready. With a database and key configured, the API writes
+   successful questions, usage and known company opens in the background.
+   The worker may drop records during a database outage or when its queue fills.
+4. For local migration and write tests, set `PORTFOLIO_TEST_DATABASE_URL` to a
+   disposable loopback database named `portfolio_test` and run
+   `python -m pytest -c backend/pyproject.toml backend/tests/test_database.py`.
+   The integration tests exercise downgrade as well as upgrade.
 
 ## Release and rollback
 

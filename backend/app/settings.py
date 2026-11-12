@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     ALERT_WEBHOOK_URL: SecretStr = SecretStr("")
     ALERT_WEBHOOK_FORMAT: Literal["generic", "discord"] = "generic"
     ENABLE_DEBUG_RETRIEVAL: bool = False
+    DATABASE_URL: SecretStr = SecretStr("")
+    ANALYTICS_IP_HASH_KEY: SecretStr = SecretStr("")
 
     # CORS configuration - accepts comma-separated string or list of origins
     CORS_ORIGINS: str | list[str] = [
@@ -81,6 +83,14 @@ class Settings(BaseSettings):
         token = value.get_secret_value()
         if token and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", token):
             raise ValueError("Operator credential must be 43-128 URL-safe characters")
+        return value
+
+    @field_validator("ANALYTICS_IP_HASH_KEY")
+    @classmethod
+    def validate_analytics_hash_key(cls, value: SecretStr) -> SecretStr:
+        key = value.get_secret_value()
+        if key and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", key):
+            raise ValueError("Analytics hash key must be 43-128 URL-safe characters")
         return value
 
     @field_validator("ALERT_WEBHOOK_URL")

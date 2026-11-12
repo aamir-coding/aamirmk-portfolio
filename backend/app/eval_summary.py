@@ -9,6 +9,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.companies import COMPANIES_PATH
 from app.retrieval.artifacts import Sha256, canonical_sha256, corpus_sha256, file_sha256
 from app.retrieval.loader import FactLoader
 
@@ -139,7 +140,11 @@ class EvalSummary(PublicModel):
 
 def runtime_fingerprint() -> str:
     # Independent of git availability and OS newline convention on Render.
-    paths = [*APP_ROOT.rglob("*.py"), *(APP_ROOT / "prompts").glob("*.txt")]
+    paths = [
+        *APP_ROOT.rglob("*.py"),
+        *(APP_ROOT / "prompts").glob("*.txt"),
+        COMPANIES_PATH,
+    ]
     return canonical_sha256(
         {
             "source": {

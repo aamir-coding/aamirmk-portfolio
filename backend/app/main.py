@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Receive, Scope, Send
 
@@ -24,6 +25,8 @@ from app.api.fit import router as fit_router
 from app.api.health import router as health_router
 from app.api.operations import router as operations_router
 from app.companies import load_company_contexts
+from app.db.analytics import AnalyticsWriter
+from app.db.session import create_database_engine
 from app.fit.cache import ReportCache, cache_identity
 from app.llm import GroqLLM
 from app.logging_config import JsonLogFormatter
@@ -107,10 +110,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
             )
         except Exception as exc:
             logger.warning("Inference auto-authorization skipped or failed: %s", exc)
+    database = None
+    analytics = None
     try:
+        if settings.DATABASE_URL.get_secret_value():
+            database = create_database_engine(settings.DATABASE_URL)
+            sessions = async_sessionmaker(database, expire_on_commit=False)
+            app.state.db_sessions = sessions
+            key = settings.ANALYTICS_IP_HASH_KEY.get_secret_value()
+            if key:
+                analytics = AnalyticsWriter(sessions, key.encode())
+                app.state.analytics = analytics
         yield
     finally:
-        await app.state.llm.aclose()
+        try:
+            if analytics is not None:
+                await analytics.close()
+        finally:
+            app.state.analytics = None
+            app.state.db_sessions = None
+            try:
+                if database is not None:
+                    await database.dispose()
+            finally:
+                await app.state.llm.aclose()
         logger.info("Shutting down application")
 
 
@@ -128,6 +151,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = app_settings
     app.state.release = load_release()
     app.state.company_contexts = load_company_contexts()
+    app.state.db_sessions = None
+    app.state.analytics = None
     app.state.retrieval_ready = False
     app.state.log_ip_salt = secrets.token_bytes(32)
     app.state.llm = GroqLLM(app_settings)

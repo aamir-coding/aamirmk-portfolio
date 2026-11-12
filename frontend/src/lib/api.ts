@@ -1,5 +1,6 @@
 import type { SampleJobDescription } from "./types";
 import { SampleJobDescriptionSchema } from "./contracts";
+import { getSessionId } from "./session";
 import { z } from "zod";
 
 export interface HealthStatus {
@@ -56,7 +57,10 @@ export async function fetchCompanyContext(
   slug: string, signal: AbortSignal,
 ): Promise<CompanyContext | null> {
   const params = new URLSearchParams({ for: slug });
-  const response = await fetch(`${getApiBaseUrl()}/api/context?${params}`, { signal });
+  const response = await fetch(`${getApiBaseUrl()}/api/context?${params}`, {
+    signal,
+    headers: { "X-Session-ID": getSessionId() },
+  });
   if (!response.ok) return null;
   const { company } = ContextResponseSchema.parse(await response.json());
   return company?.slug === slug ? company : null;

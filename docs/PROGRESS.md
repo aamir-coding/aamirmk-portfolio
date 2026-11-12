@@ -1,8 +1,13 @@
 # Progress Tracker
 
 ## Current Phase
+**Phase 9: Handoff, per-company links, forwardable summary and analytics — in progress.**
+Aamir approved the seven-increment brief on 12 November 2026 and authorized
+local work on Increments 1–2. Build branch: `phase-9-handoff-analytics`.
+
 **Phase 10: Production hardening, monitoring and launch — 🟢 Closed, deployed, and verified live on Render & Vercel**
-Merged and tagged on `main` at `phase-10-done` (commit `701e903`).
+The locally verified `main`, `origin/main` tracking ref and `phase-10-done` tag
+matched at `5f487d4` at Phase 9 kickoff.
 [Phase brief and architectural pre-mortem](briefs/phase-10-production-hardening.md).
 Band 3 order (P6 → P8 → remaining P7 → P10) is fully complete. Next milestone: Band 4 / Phase 9 (Handoff + Analytics).
 
@@ -88,7 +93,7 @@ not unfinished work in the accepted offline engineering milestone.
 | P8: Evals | 🟢 Merged/tag verified on origin; deployment user-confirmed; validation failure preserved | `main` (`440e81d`) | `phase-8-done` (origin verified) | [`phase-08-evals.md`](study-guides/phase-08-evals.md) |
 | P7: Safety (rest) | 🟢 Closed; merge/remote push user-confirmed at `de73fb5`; launch gates carried forward | `main` | `phase-7-hardening-done` (remote user-confirmed; local verified) | [Updated P7 guide](study-guides/phase-07-safety-rate-limiting.md) |
 | P10: Production | 🟢 Complete; live deployment verified on Render & Vercel | `main` | `phase-10-done` | [P10 guide](study-guides/phase-10-production-hardening.md) |
-| P9: Handoff + analytics | ⬜ Not Started | — | — | — |
+| P9: Handoff + analytics | 🟡 In progress | `phase-9-handoff-analytics` | — | — |
 
 ## What's Done
 - [x] Implementation plan read and understood
@@ -813,3 +818,15 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   - `POST /api/chat/stream`: 200 OK (sources emitted, smooth SSE token stream, complete telemetry receipt).
   - `POST /api/chat/stream` with tool calling ("Show me the Entropy-OJ project"): 200 OK (emitted `event: card` with full architecture details, streamed Turn 2 verbal explanation).
 - Tag `phase-10-done` updated and force-pushed to origin targeting commit `701e903`. All GitHub Actions CI and security audits passing green. Phase 10 is complete; next milestone is Phase 9.
+
+### Phase 9 Increments 1–2 — 12 November 2026
+
+- `?for=ecolab-5a2b` loads the Ecolab cover, three questions and highlights for
+  Entropy-OJ and the AI Digital Assistant. Unknown slugs use the default.
+  JSON and SSE chat use the same resolved company note. See DRN-071.
+- Added a private Postgres schema and Alembic revision `0001` for sessions,
+  messages, feedback, handoffs, summaries and quota usage. Local capture uses
+  the configured database and hash key. Database writes run in a bounded
+  background queue. See DRN-072 and the [database runbook](runbooks/production.md).
+- Hosted Supabase verification, Telegram handoff and its live delivery test
+  remain pending. Analytics retention and backup restore are later increments.

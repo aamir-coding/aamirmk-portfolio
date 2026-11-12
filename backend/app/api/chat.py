@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 
 from app.api.context import ResolvedCompany
+from app.db.analytics import Analytics
 from app.llm import (
     LLMAuthError,
     LLMCapacityError,
@@ -130,6 +131,7 @@ async def chat(
     tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     company: ResolvedCompany = None,
+    analytics: Analytics = None,
 ) -> ChatResponse:
     """Process user message using LLM grounded with retrieved context chunks."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -294,8 +296,15 @@ async def chat(
             status_code=503, detail="Generated answer exceeded its size limit."
         )
     trace.text()
+    telemetry = trace.snapshot().model_copy(update=versions)
+    if analytics is not None:
+        analytics.record(
+            company.slug if company else None,
+            question=request.message,
+            telemetry=telemetry,
+        )
     return ChatResponse(
-        telemetry=trace.snapshot().model_copy(update=versions),
+        telemetry=telemetry,
         reply=reply_text,
         conversation_id=conv_id,
         model=completion.model,
@@ -321,6 +330,7 @@ async def chat_stream(
     tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     company: ResolvedCompany = None,
+    analytics: Analytics = None,
 ) -> StreamingResponse:
     """Stream user message using LLM via Server-Sent Events (SSE)."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -494,12 +504,19 @@ async def chat_stream(
                             payload = json.dumps({"token": token})
                             yield f"event: token\ndata: {payload}\n\n"
 
+            telemetry = trace.snapshot().model_copy(update=versions)
+            if analytics is not None:
+                analytics.record(
+                    company.slug if company else None,
+                    question=request.message,
+                    telemetry=telemetry,
+                )
             done_payload = json.dumps(
                 {
                     "conversation_id": conv_id,
                     "sources": [c.model_dump() for c in citations],
                     "cards": [c.model_dump() for c in summoned_cards],
-                    "telemetry": {**trace.snapshot().model_dump(), **versions},
+                    "telemetry": telemetry.model_dump(),
                 }
             )
             yield f"event: done\ndata: {done_payload}\n\n"

@@ -10,3 +10,6 @@ groq==1.7.0
 fastembed==0.9.1
 numpy==2.5.4
 PyYAML==6.0.3
+SQLAlchemy[asyncio]==2.0.57
+asyncpg==0.32.0
+alembic==1.20.1
