@@ -867,5 +867,11 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   and feedback from Postgres. Migration `0002` adds fit-run usage and handoff
   classification. See DRN-075 and the
   [admin runbook](runbooks/production.md#phase-9-feedback-and-admin).
+- Local verification reported **682 pytest passed, 2 warnings** and
+  **186 Vitest passed**. Ruff, ESLint, the production build and the migration
+  round trip on disposable PostgreSQL 18 passed. Initial JavaScript was
+  **169,898 gzip bytes / 200,000**. The offline gate returned
+  `gate_failures: []` with all seven scores preserved. The tracked result
+  and public projection use clean source `2ea0f09`.
 - Hosted admin verification and retention remain pending. Summary links,
   durable quota, and backup restore are later increments.
