@@ -27,7 +27,7 @@ Provider errors record a failed status for operator review. Telegram messages
 use plain text and long transcripts use a text attachment.
 
 The offline candidate reproduced all seven baseline scores. Refresh the
-application fingerprint and regenerate the matching result and public
+application and retrieval fingerprints and regenerate the matching result and public
 projection. The frozen replay and independent judge validation are preserved.
 
 ### DRN-073: Phase 9 company configuration in eval identity
