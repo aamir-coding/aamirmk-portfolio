@@ -58,7 +58,8 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
-Next: Phase 10 is complete, merged to `main`, tagged `phase-10-done`, and verified live on Render and Vercel. Band 4 (Phase 9: Handoff, database durability, analytics) is the next milestone. No P9 work begins before explicit user approval.
+Band 4 is active under the 12 November Phase 9 approval. The current build covers
+company links and the local Postgres foundation.
 Aamir approved continuing through the phase on 10 November 2026. Phase 7 teach-back
 answers remain unassessed; its milestone is closed by Aamir's explicit confirmation.
 Aamir approved the Phase 7 six-increment brief on 6 November. A new factual accuracy claim
@@ -247,7 +248,9 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review the completed local P10 [evidence ledger](audits/2026-11-10-phase-10-production.md), runbook and study guide. All six increments and compatible checks pass; no P9 work begins.
+1. Review Phase 9 Increments 1–2. Increment 3 adds the recruiter handoff using a
+   fake Telegram client locally. Hosted verification will use the credentials
+   Aamir provides later.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -828,5 +831,12 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   messages, feedback, handoffs, summaries and quota usage. Local capture uses
   the configured database and hash key. Database writes run in a bounded
   background queue. See DRN-072 and the [database runbook](runbooks/production.md).
+- Local verification passed on disposable PostgreSQL 18, including upgrade,
+  downgrade, re-upgrade, schema drift checks and analytics writes. The full
+  Python suite reported **655 passed, 2 warnings**. Vitest reported **183 passed**.
+  Ruff, ESLint and the production build passed. Initial JavaScript was
+  **167,953 gzip bytes / 200,000**. The offline gate reported
+  `gate_failures: []` with all seven baseline scores preserved. The tracked
+  result and public projection were generated from clean source `b1741c4`.
 - Hosted Supabase verification, Telegram handoff and its live delivery test
   remain pending. Analytics retention and backup restore are later increments.
