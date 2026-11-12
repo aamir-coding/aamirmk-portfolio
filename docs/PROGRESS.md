@@ -249,9 +249,9 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review Phase 9 Increment 7 and verify the hosted recruiter workflow once
-   the Supabase and Telegram credentials are available. Confirm the scheduled
-   cleanup and Telegram delivery before closing Phase 9.
+1. Review the Phase 9 findings and complete the teach-back. Resolve the pending
+   handoff age finding before enabling hosted delivery. Verify the hosted
+   recruiter workflow once the Supabase and Telegram credentials are available.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -936,3 +936,20 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
 - The local build is complete through Increment 7. Hosted migration, Supabase
   Cron activation and first-run evidence, Telegram delivery, and phase closeout
   remain pending.
+
+### Phase 9 Review and teach-back — 12 November 2026
+
+- Fresh local review at `1a3b91d` reported **697 pytest passed, 2 warnings** and
+  **190 Vitest passed**. Ruff, ESLint, and the production build passed. Initial
+  JavaScript was **171,362 gzip bytes / 200,000**. The offline gate returned
+  `gate_failures: []` with all seven scores preserved.
+- Local browser review verified Ecolab and unknown links, consented handoff to
+  a recording notifier, and anonymous summary at 390 × 844. The single-page
+  printout preserved source links and omitted the share URL. The Postgres
+  integration suite verified read-time summary expiry.
+- The [review record](audits/2026-11-12-phase-09-recruiter-workflow.md) tracks
+  expired pending handoff delivery, an automatic grant crossing UTC midnight,
+  and the eight Postgres tests skipped by current GitHub CI configuration.
+  These findings remain open. The [study guide](study-guides/phase-09-recruiter-workflow.md)
+  includes the three teach-back prompts. Answers and hosted verification are
+  pending, and Phase 9 remains open.
