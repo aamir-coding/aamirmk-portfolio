@@ -31,12 +31,14 @@ from app.api.operations import router as operations_router
 from app.api.summary import router as summary_router
 from app.companies import load_company_contexts
 from app.db.analytics import AnalyticsWriter
+from app.db.quota import PostgresQuotaStore
 from app.db.session import create_database_engine
 from app.fit.cache import ReportCache, cache_identity
 from app.handoff import HandoffNotifier, Handoffs, TelegramNotifier
 from app.llm import GroqLLM
 from app.logging_config import JsonLogFormatter
 from app.release import load_release
+from app.safety.boot_quota import BootQuota
 from app.safety.ip import get_client_ip
 from app.safety.middleware import RequestBoundsMiddleware
 from app.safety.rate_limiter import SlidingWindowRateLimiter
@@ -89,7 +91,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     auto_authorize = settings.AUTO_AUTHORIZE_INFERENCE or (
         settings.ENVIRONMENT == "production" and bool(settings.GROQ_API_KEY)
     )
-    if auto_authorize and getattr(app.state, "llm", None) is not None:
+    if auto_authorize and not settings.DURABLE_INFERENCE_QUOTA:
         try:
             from datetime import UTC, datetime, timedelta
 
@@ -123,6 +125,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
             resources.push_async_callback(database.dispose)
             sessions = async_sessionmaker(database, expire_on_commit=False)
             app.state.db_sessions = sessions
+            if settings.DURABLE_INFERENCE_QUOTA:
+                boot_quota = BootQuota(
+                    app.state.llm.ledger,
+                    PostgresQuotaStore(sessions),
+                    settings.durable_daily_ceiling,
+                    settings.INFERENCE_BOOT_ALLOWANCE,
+                )
+                app.state.boot_quota = boot_quota
+                resources.push_async_callback(boot_quota.close)
+                if (
+                    settings.AUTO_AUTHORIZE_INFERENCE
+                    and settings.GROQ_API_KEY
+                    and settings.ENVIRONMENT != "test"
+                ):
+                    boot_quota.start()
             key = settings.ANALYTICS_IP_HASH_KEY.get_secret_value()
             if key:
                 analytics = AnalyticsWriter(sessions, key.encode())
@@ -150,6 +167,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         try:
             yield
         finally:
+            app.state.boot_quota = None
             app.state.handoffs = None
             app.state.analytics = None
             app.state.db_sessions = None
@@ -173,6 +191,7 @@ def create_app(
     app.state.release = load_release()
     app.state.company_contexts = load_company_contexts()
     app.state.db_sessions = None
+    app.state.boot_quota = None
     app.state.analytics = None
     app.state.handoffs = None
     app.state.handoff_notifier = handoff_notifier

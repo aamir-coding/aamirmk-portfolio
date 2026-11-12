@@ -60,6 +60,35 @@ No uptime ping is configured to keep the service awake. An on-demand probe wakes
    and includes the résumé receipts and public contact. Refresh the authored
    summary copy when the published résumé changes.
 
+## Phase 9 durable inference quota
+
+1. Apply Alembic revision `0003` and grant the runtime role access to
+   `portfolio.quota_usage` and `portfolio.quota_grants`. Before first enabling
+   `DURABLE_INFERENCE_QUOTA=true`, stop legacy quota writers and set the daily
+   ceilings using the remaining account capacity after any earlier or
+   independent usage. Revisit those ceilings if the account budget changes.
+2. Use `AUTO_AUTHORIZE_INFERENCE=true` and a configured `GROQ_API_KEY` for
+   background reservations. The requested boot cap defaults to 200 requests and
+   64,000 ledger token units. Set `INFERENCE_BOOT_ALLOWANCE` as JSON with
+   `requests` and `tokens` to tune it. The store clamps the automatic grant to
+   the remaining daily balance under the lowest shared or model daily ceiling.
+   The operator endpoint can instead request an exact grant and returns HTTP
+   409 if it cannot fit or HTTP 503 if storage cannot confirm it.
+3. Check readiness and `assistant_state` separately. The service stays resting
+   while an automatic reservation is pending, then drains the previous minute
+   for 60 seconds before admitting inference. During a database outage, the
+   boot can spend its existing grant until it expires or runs out. A boot
+   still waiting for a grant retries every 30 seconds. Each activated boot
+   receives one grant, expiring no later than UTC midnight. A new UTC day has
+   a fresh balance for new boots. To resume after midnight on a still-running
+   boot, restart it with the durable configuration in place.
+4. Compare the grant and daily usage rows before and after a synthetic restart.
+   A clean, idle shutdown returns unused capacity. Unknown provider usage is
+   charged at the attempt's full reservation. An interrupted boot or failed
+   settlement can leave its full grant charged through the end of that UTC
+   day. The stored amounts track application reservations and charges. Check
+   actual provider usage separately.
+
 ## Release and rollback
 
 1. Open a PR to main. Require CI backend/frontend/offline eval and security checks.
@@ -125,18 +154,19 @@ Control bodies/credentials never enter application logs. All control responses, 
 errors, use no-store. Allowance values are private operational evidence. No control
 request or live allowance has been sent to production during implementation.
 
-### Ephemeral container boot authorization (Render Free Tier)
+### Legacy container boot authorization (Render Free Tier)
 
-Under DRN-067, Render free tier container sleep/restart cycles automatically authorize
+With durable quota disabled, DRN-067's Render sleep/restart path automatically authorizes
 a fresh, non-reusable boot allowance on startup when `ENVIRONMENT == "production"` and
 `GROQ_API_KEY` is present (or `AUTO_AUTHORIZE_INFERENCE=True`). The allowance binds to
 the container's random `boot_id`, expires at UTC midnight, and uses `warm_up_seconds=0.0`
 to eliminate cold-start wait penalties. The manual operator activation protocol above remains
 available for operator-driven allowance refreshes or custom quota bounds.
 
-Under DRN-068, byte-based ledger limits are calibrated to `tpm=32000` (`INFERENCE_SHARED_LIMITS`
-and `INFERENCE_MODEL_LIMITS`), accommodating ~9,000-byte grounded chat prompts and ~18,500-byte
-2-turn tool calls while bounding real provider traffic strictly within Groq's 8,000 real TPM ceiling.
+Under DRN-068, `tpm=32000` in `INFERENCE_SHARED_LIMITS` and
+`INFERENCE_MODEL_LIMITS` accommodates grounded chat prompts and two-turn tool
+calls. The ledger reserves by byte-based estimates. Verify current provider
+limits and actual token usage separately.
 
 ## Proxy and hosted privacy verification
 

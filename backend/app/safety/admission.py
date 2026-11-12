@@ -32,14 +32,17 @@ class CapacityLimits(AdmissionModel):
     tpd: int = Field(gt=0, strict=True)
 
 
-class Allowance(AdmissionModel):
-    """Operator-confirmed *remaining* capacity for this one process boot."""
+class DailyCapacity(AdmissionModel):
+    requests: int = Field(gt=0, strict=True)
+    tokens: int = Field(gt=0, strict=True)
+
+
+class Allowance(DailyCapacity):
+    """Remaining capacity granted to one process boot."""
 
     boot_id: str = Field(min_length=1, max_length=64)
     verified_at: datetime
     expires_at: datetime
-    requests: int = Field(gt=0, strict=True)
-    tokens: int = Field(gt=0, strict=True)
 
     @model_validator(mode="after")
     def utc_window(self) -> Self:
@@ -82,6 +85,13 @@ class LedgerSnapshot(AdmissionModel):
     active: int
     waiting: int
     reason: str | None
+
+
+@dataclass(frozen=True)
+class SettledAllowance:
+    allowance: Allowance
+    requests: int
+    tokens: int
 
 
 class QuotaDenied(Exception):
@@ -183,6 +193,7 @@ class InferenceLedger:
         self._max_active = max_active
         self._max_waiters = max_waiters
         self._allowance: Allowance | None = None
+        self._sealed = False
         self._expires = 0.0
         self._ready = 0.0
         self._fault: str | None = None
@@ -190,8 +201,10 @@ class InferenceLedger:
         self._active = 0
         self._waiting = 0
 
-    def authorize(self, allowance: Allowance, *, warm_up_seconds: float = 60.0) -> None:
-        """One-shot boot-local activation; never load a reusable env allowance."""
+    def validate_allowance(self, allowance: Allowance) -> datetime:
+        """Check the boot and time window before reserving capacity."""
+        if self._sealed or self._fault is not None:
+            raise ValueError("Ledger cannot be authorized")
         if self._allowance is not None:
             raise ValueError("Ledger already authorized")
         if allowance.boot_id != self.boot_id:
@@ -200,12 +213,19 @@ class InferenceLedger:
         age = (now - allowance.verified_at).total_seconds()
         if not 0 <= age <= 60 or allowance.expires_at <= now:
             raise ValueError("Allowance verification is stale or in the future")
+        return now
+
+    def authorize(self, allowance: Allowance, *, warm_up_seconds: float = 60.0) -> None:
+        """Activate one grant for this process boot."""
+        now = self.validate_allowance(allowance)
         self._allowance = allowance
         self._expires = self.monotonic() + (allowance.expires_at - now).total_seconds()
         # Previous provider-minute traffic is unknown even with verified daily use.
         self._ready = self.monotonic() + warm_up_seconds
 
     def _check_allowance(self) -> None:
+        if self._sealed:
+            raise QuotaDenied("allowance_closed")
         if self._fault is not None:
             raise QuotaDenied(self._fault)
         grant = self._allowance
@@ -327,3 +347,17 @@ class InferenceLedger:
     def stop(self, reason: Literal["model_mismatch", "provider_contract"]) -> None:
         """An invalid provider contract makes further local accounting unsafe."""
         self._fault = reason
+
+    def seal(self) -> SettledAllowance | None:
+        """Stop admission and report the charge if the ledger is idle and healthy."""
+        if self._sealed:
+            return None
+        self._sealed = True
+        grant = self._allowance
+        if grant is None or self._active or self._fault is not None:
+            return None
+        return SettledAllowance(
+            allowance=grant,
+            requests=len(self._records),
+            tokens=sum(record.charged for record in self._records),
+        )

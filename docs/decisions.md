@@ -3,6 +3,30 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-077: Reserve daily inference capacity before opening a boot ledger
+
+**Date:** 2026-11-12. An automatic allowance on every Render wake-up can
+multiply the daily budget. In durable mode, serialize reservations through the
+shared UTC-day row in Postgres. Record the boot grant and charge its full
+capacity in the same transaction. An identical retry can recover a committed
+grant without charging it twice. Automatic grants can take a partial balance.
+Operator grants require the exact requested capacity. Both paths use the
+lowest configured shared or model daily ceiling and the existing minute drain.
+
+Keep provider-attempt accounting in the boot ledger so an active grant survives
+Postgres downtime and provider calls incur zero quota-related database I/O.
+A clean shutdown first closes admission, then returns unused capacity if the
+ledger has no active permits or contract fault. Retain the reservation for an
+interrupted boot, and charge the reservation for an attempt with unknown
+usage. A boot without a confirmed grant remains resting. Confirmed grants
+expire by UTC midnight and remain one-shot per boot.
+
+Durable mode is opt-in until revision `0003` is applied and the operator has
+budgeted prior and independent provider use. Postgres caps reservations made
+by this application. Provider limits and minute accounting remain separate.
+The offline candidate reproduced all seven baseline scores. Refresh the
+application fingerprint and regenerate the matching result and public projection.
+
 ### DRN-076: Forwardable summaries from the published resume
 
 **Date:** 2026-11-12. Build a deterministic snapshot from the published résumé.

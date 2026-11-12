@@ -89,6 +89,22 @@ def test_restart_cannot_reuse_prior_boot_grant(ops: TestClient) -> None:
     )
 
 
+def test_durable_operator_cannot_grant_without_storage() -> None:
+    app = create_app(
+        Settings(
+            _env_file=None,
+            ENVIRONMENT="test",
+            OPS_TOKEN=TOKEN,
+            DATABASE_URL="",
+            DURABLE_INFERENCE_QUOTA=True,
+        )
+    )
+    client = TestClient(app)
+    response = client.post("/api/ops/inference", headers=AUTH, json=grant(client))
+    assert response.status_code == 503
+    assert app.state.llm.ledger.snapshot().reason == "allowance_unknown"
+
+
 def test_ambiguous_auth_is_denied_and_attempts_are_bounded(ops: TestClient) -> None:
     assert (
         ops.get(

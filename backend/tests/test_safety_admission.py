@@ -10,11 +10,14 @@ from app.safety.admission import (
     Allowance,
     AttemptCost,
     CapacityLimits,
+    DailyCapacity,
     InferenceLedger,
     ProviderUsage,
     QuotaDenied,
+    SettledAllowance,
     reserve_input_tokens,
 )
+from app.safety.boot_quota import BootQuota, QuotaStorageUnavailable
 
 MAIN = "openai/gpt-oss-120b"
 UTILITY = "openai/gpt-oss-20b"
@@ -39,6 +42,82 @@ class Clock:
 def limits(**changes: int) -> CapacityLimits:
     values = {"rpm": 10, "tpm": 1000, "rpd": 100, "tpd": 10000}
     return CapacityLimits(**(values | changes))
+
+
+async def test_sealed_ledger_accounts_for_unknown_attempt_and_stops_dispatch() -> None:
+    clock = Clock()
+    book = ledger(clock)
+    cost = AttemptCost(model=MAIN, input_tokens=100, output_tokens=20)
+    async with book.attempt(cost) as permit:
+        permit.dispatch()
+    settlement = book.seal()
+    assert settlement is not None
+    assert (settlement.requests, settlement.tokens) == (1, 120)
+    assert book.seal() is None
+    with pytest.raises(QuotaDenied, match="allowance_closed"):
+        async with book.attempt(cost):
+            pytest.fail("The sealed grant is still usable")
+
+
+async def test_sealing_an_active_grant_keeps_the_full_reservation() -> None:
+    clock = Clock()
+    book = ledger(clock)
+    cost = AttemptCost(model=MAIN, input_tokens=100, output_tokens=20)
+    async with book.attempt(cost) as permit:
+        assert book.seal() is None
+        with pytest.raises(QuotaDenied, match="allowance_closed"):
+            permit.dispatch()
+
+
+async def test_active_grant_survives_storage_failure_until_utc_midnight() -> None:
+    class Store:
+        available = False
+        reservations = 0
+        settlement: SettledAllowance | None = None
+
+        async def reserve(
+            self, requested: Allowance, ceiling: DailyCapacity, *, exact: bool
+        ) -> Allowance:
+            self.reservations += 1
+            if not self.available:
+                raise QuotaStorageUnavailable
+            assert exact and requested.tokens <= ceiling.tokens
+            return requested
+
+        async def settle(self, settlement: SettledAllowance) -> bool:
+            self.settlement = settlement
+            raise QuotaStorageUnavailable
+
+    clock = Clock()
+    book = ledger(clock, authorize=False)
+    store = Store()
+    daily = DailyCapacity(requests=2, tokens=1000)
+    quota = BootQuota(book, store, daily, daily)
+    midnight = clock.start.replace(hour=0) + timedelta(days=1)
+    requested = Allowance(
+        **daily.model_dump(),
+        boot_id=book.boot_id,
+        verified_at=clock.utcnow(),
+        expires_at=midnight,
+    )
+    with pytest.raises(QuotaStorageUnavailable):
+        await quota.authorize(requested)
+    assert book.snapshot().reason == "allowance_unknown"
+    store.available = True
+    assert await quota.authorize(requested) == requested
+    clock.elapsed += 60
+    store.available = False
+    cost = AttemptCost(model=MAIN, input_tokens=100, output_tokens=20)
+    async with book.attempt(cost) as permit:
+        permit.dispatch()
+    assert book.snapshot().charged_tokens == 120
+    assert store.reservations == 2
+    clock.elapsed = (midnight - clock.start).total_seconds()
+    with pytest.raises(QuotaDenied, match="allowance_expired"):
+        async with book.attempt(cost):
+            pytest.fail("The expired grant is still usable")
+    await quota.close()
+    assert store.settlement == SettledAllowance(requested, 1, 120)
 
 
 def ledger(

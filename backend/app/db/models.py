@@ -143,3 +143,25 @@ class QuotaUsage(Base):
     bucket: Mapped[str] = mapped_column(String(64), primary_key=True)
     requests: Mapped[int]
     tokens: Mapped[int]
+
+
+class QuotaGrant(Base):
+    __tablename__ = "quota_grants"
+    __table_args__ = (
+        CheckConstraint("requests > 0 AND tokens > 0", name="positive"),
+        CheckConstraint(
+            "(charged_requests IS NULL AND charged_tokens IS NULL) OR "
+            "(charged_requests IS NOT NULL AND charged_tokens IS NOT NULL AND "
+            "charged_requests BETWEEN 0 AND requests AND "
+            "charged_tokens BETWEEN 0 AND tokens)",
+            name="settlement",
+        ),
+    )
+
+    boot_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    budget_date: Mapped[date] = mapped_column(index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    requests: Mapped[int]
+    tokens: Mapped[int]
+    charged_requests: Mapped[int | None]
+    charged_tokens: Mapped[int | None]

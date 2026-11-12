@@ -6,6 +6,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, ConfigDict
 
 from app.safety.admission import Allowance, InferenceLedger, LedgerSnapshot
+from app.safety.boot_quota import (
+    BootQuota,
+    DurableCapacityUnavailable,
+    QuotaStorageUnavailable,
+)
 
 
 class OperatorStatus(BaseModel):
@@ -52,13 +57,22 @@ async def activate_inference(
     request: Request,
     ledger: InferenceLedger = Depends(operator_ledger),
 ) -> LedgerSnapshot:
-    limits = request.app.state.settings.INFERENCE_SHARED_LIMITS
+    settings = request.app.state.settings
+    limits = settings.INFERENCE_SHARED_LIMITS
     if allowance.requests > limits.rpd or allowance.tokens > limits.tpd:
         raise HTTPException(409, "Allowance exceeds configured ceilings")
     try:
-        ledger.authorize(allowance)
-    except ValueError:
+        if settings.DURABLE_INFERENCE_QUOTA:
+            boot_quota: BootQuota | None = request.app.state.boot_quota
+            if boot_quota is None:
+                raise QuotaStorageUnavailable
+            await boot_quota.authorize(allowance)
+        else:
+            ledger.authorize(allowance)
+    except (ValueError, DurableCapacityUnavailable):
         raise HTTPException(
             409, "Allowance rejected for this boot or time window"
         ) from None
+    except QuotaStorageUnavailable:
+        raise HTTPException(503, "Durable quota storage is unavailable.") from None
     return ledger.snapshot()

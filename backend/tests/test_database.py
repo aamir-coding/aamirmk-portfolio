@@ -19,14 +19,24 @@ from alembic.config import Config
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.db.models import HandoffRecord, MessageRecord, RecruiterSession, SummaryRecord
+from app.db.models import (
+    HandoffRecord,
+    MessageRecord,
+    QuotaGrant,
+    QuotaUsage,
+    RecruiterSession,
+    SummaryRecord,
+)
+from app.db.quota import PostgresQuotaStore
 from app.db.session import create_database_engine
 from app.fit.models import FitRequest
 from app.llm import FakeLLM, get_llm_client
 from app.main import create_app
 from app.retrieval.models import FactChunk
 from app.retrieval.retriever import FakeRetriever, get_retriever
+from app.safety.admission import Allowance, DailyCapacity, SettledAllowance
 from app.settings import Settings
 
 ALEMBIC_INI = Path(__file__).resolve().parents[1] / "alembic.ini"
@@ -38,6 +48,7 @@ TABLES = (
     "handoffs",
     "summaries",
     "quota_usage",
+    "quota_grants",
 )
 
 
@@ -89,6 +100,33 @@ def test_chat_remains_available_after_analytics_connection_failure(
     assert "Synthetic question" not in caplog.text
 
 
+def test_durable_startup_stays_resting_when_postgres_is_unreachable(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    attempted = Event()
+
+    async def unavailable(**_: object) -> None:
+        attempted.set()
+        raise ConnectionError("database-private-error")
+
+    monkeypatch.setattr(asyncpg, "connect", unavailable)
+    settings = Settings(
+        _env_file=None,
+        ENVIRONMENT="production",
+        DATABASE_URL="postgresql://app:synthetic-password@localhost/portfolio",
+        GROQ_API_KEY="synthetic-key",
+        DURABLE_INFERENCE_QUOTA=True,
+        AUTO_AUTHORIZE_INFERENCE=True,
+    )
+    with TestClient(create_app(settings)) as client:
+        assert attempted.wait(timeout=5)
+        response = client.get("/api/health")
+        assert response.status_code == 200
+        assert response.json()["assistant_state"] == "resting"
+    assert "Durable inference grant pending: storage unavailable" in caplog.text
+    assert "database-private-error" not in caplog.text
+
+
 @pytest.fixture
 def postgres_url(monkeypatch: pytest.MonkeyPatch) -> str:
     url = os.getenv("PORTFOLIO_TEST_DATABASE_URL")
@@ -114,6 +152,117 @@ def test_postgres_migration_round_trip(postgres_url: str) -> None:
     command.downgrade(config, "base")
     command.upgrade(config, "head")
     command.check(config)
+
+
+def test_postgres_serializes_quota_grants_and_retains_interrupted_boots(
+    postgres_url: str,
+) -> None:
+    day = datetime(2026, 11, 12, 12, tzinfo=UTC)
+    ceiling = DailyCapacity(requests=6, tokens=100)
+
+    def requested(now: datetime = day) -> Allowance:
+        return Allowance(
+            boot_id=uuid4().hex,
+            verified_at=now,
+            expires_at=(now + timedelta(days=1)).replace(hour=0),
+            requests=4,
+            tokens=70,
+        )
+
+    async def verify() -> None:
+        engine = create_database_engine(SecretStr(postgres_url), pooled=False)
+        try:
+            sessions = async_sessionmaker(engine, expire_on_commit=False)
+            grants = await asyncio.gather(
+                *(
+                    PostgresQuotaStore(sessions).reserve(
+                        requested(), ceiling, exact=False
+                    )
+                    for _ in range(3)
+                )
+            )
+            assert grants.count(None) == 1
+            assert sorted((g.requests, g.tokens) for g in grants if g) == [
+                (2, 30),
+                (4, 70),
+            ]
+            granted = next(g for g in grants if g and g.requests == 4)
+
+            restarted = PostgresQuotaStore(sessions)
+            assert await restarted.reserve(granted, ceiling, exact=True) == granted
+            assert await restarted.reserve(requested(), ceiling, exact=False) is None
+            charge = SettledAllowance(allowance=granted, requests=2, tokens=40)
+            assert await restarted.settle(charge) is True
+            assert await restarted.settle(charge) is False
+            assert await restarted.reserve(granted, ceiling, exact=True) is None
+            assert await restarted.reserve(requested(), ceiling, exact=True) is None
+            replacement = await restarted.reserve(requested(), ceiling, exact=False)
+            assert replacement is not None
+            assert (replacement.requests, replacement.tokens) == (2, 30)
+            assert await restarted.reserve(requested(), ceiling, exact=False) is None
+
+            tomorrow = requested(day + timedelta(days=1))
+            assert await restarted.reserve(tomorrow, ceiling, exact=True) == tomorrow
+            async with sessions() as session:
+                usage = (await session.scalars(select(QuotaUsage))).all()
+                assert {(u.budget_date, u.requests, u.tokens) for u in usage} == {
+                    (day.date(), 6, 100),
+                    (tomorrow.verified_at.date(), 4, 70),
+                }
+        finally:
+            await engine.dispose()
+
+    config = Config(str(ALEMBIC_INI))
+    command.upgrade(config, "head")
+    try:
+        asyncio.run(verify())
+    finally:
+        command.downgrade(config, "base")
+
+
+def test_durable_startup_reserves_then_refunds_an_idle_grant(postgres_url: str) -> None:
+    config = Config(str(ALEMBIC_INI))
+    command.upgrade(config, "head")
+    token = "o" * 43
+    settings = Settings(
+        _env_file=None,
+        ENVIRONMENT="production",
+        DATABASE_URL=postgres_url,
+        GROQ_API_KEY="synthetic-key",
+        DURABLE_INFERENCE_QUOTA=True,
+        AUTO_AUTHORIZE_INFERENCE=True,
+        INFERENCE_BOOT_ALLOWANCE=DailyCapacity(requests=3, tokens=4000),
+        OPS_TOKEN=token,
+    )
+    app = create_app(settings)
+    boot_id = app.state.llm.ledger.boot_id
+
+    async def state() -> tuple[int, int | None]:
+        engine = create_database_engine(SecretStr(postgres_url), pooled=False)
+        try:
+            async with async_sessionmaker(engine)() as session:
+                grant = await session.get(QuotaGrant, boot_id)
+                assert grant is not None and (grant.requests, grant.tokens) == (3, 4000)
+                usage = await session.get(QuotaUsage, (grant.budget_date, "shared"))
+                assert usage is not None
+                return usage.requests, grant.charged_requests
+        finally:
+            await engine.dispose()
+
+    try:
+        with TestClient(app) as client:
+            headers = {"Authorization": f"Bearer {token}"}
+            for _ in range(50):
+                response = client.get("/api/ops/inference", headers=headers)
+                assert response.is_success
+                if response.json()["capacity"]["reason"] == "minute_capacity":
+                    break
+                Event().wait(0.025)
+            assert response.json()["capacity"]["reason"] == "minute_capacity"
+            assert asyncio.run(state()) == (3, None)
+        assert asyncio.run(state()) == (0, 0)
+    finally:
+        command.downgrade(config, "base")
 
 
 def test_analytics_records_resolved_company_and_questions_off_response_path(

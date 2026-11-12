@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from app.safety.admission import CapacityLimits
+from app.safety.admission import CapacityLimits, DailyCapacity
 
 
 class Settings(BaseSettings):
@@ -71,6 +71,18 @@ class Settings(BaseSettings):
             "if GROQ_API_KEY is present."
         ),
     )
+    DURABLE_INFERENCE_QUOTA: bool = False
+    INFERENCE_BOOT_ALLOWANCE: DailyCapacity = Field(
+        default_factory=lambda: DailyCapacity(requests=200, tokens=64000)
+    )
+
+    @property
+    def durable_daily_ceiling(self) -> DailyCapacity:
+        limits = (self.INFERENCE_SHARED_LIMITS, *self.INFERENCE_MODEL_LIMITS.values())
+        return DailyCapacity(
+            requests=min(limit.rpd for limit in limits),
+            tokens=min(limit.tpd for limit in limits),
+        )
 
     model_config = SettingsConfigDict(
         # Try backend/.env first, then repo-root .env (for monorepo layout)

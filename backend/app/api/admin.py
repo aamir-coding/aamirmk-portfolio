@@ -52,6 +52,12 @@ async def get_dashboard(
     request: Request,
     sessions: Annotated[async_sessionmaker[AsyncSession], Depends(require_admin)],
 ) -> Dashboard:
+    settings = request.app.state.settings
+    ceiling = (
+        settings.durable_daily_ceiling.tokens
+        if settings.DURABLE_INFERENCE_QUOTA
+        else settings.INFERENCE_SHARED_LIMITS.tpd
+    )
     try:
         async with sessions.begin() as session:
             await session.execute(
@@ -59,7 +65,7 @@ async def get_dashboard(
             )
             return await load_dashboard(
                 session,
-                daily_token_ceiling=request.app.state.settings.INFERENCE_SHARED_LIMITS.tpd,
+                daily_token_ceiling=ceiling,
                 now=datetime.now(UTC),
             )
     except (
