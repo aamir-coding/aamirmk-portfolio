@@ -174,6 +174,30 @@ Schema/replay success cannot establish novel semantic entailment or injection re
 judgment with retries selects evidence. The failure is a useful engineering outcome;
 new independent validation needs a new reviewed protocol, not relabelled old answers.
 
+## 7. Production interaction tuning: token estimation vs. byte sliding windows
+
+In rapid conversational testing, an in-memory rate limiter can inadvertently penalize
+honest interaction if its capacity unit is miscalibrated against prompt geometry.
+
+1. **Serialized UTF-8 Bytes vs. Real LLM Tokens:** `reserve_input_tokens` approximates
+   worst-case token counts using serialized UTF-8 message bytes plus headroom:
+   `len(encoded) + 512 + 32 * count`. A multi-turn conversation with 4 retrieved chunks
+   and JSON tool definitions is ~1,700 real BPE tokens, but serializes to ~29,000 JSON bytes.
+   Under a sliding minute window of 32,000 bytes, a second prompt within 60 seconds
+   pushes the sliding window to 38,500 bytes, causing the ledger to reject requests with
+   `wait_expired`. Calibrating the local capacity ceiling to 1,000,000 TPM admits rapid
+   sequential queries while preserving all concurrency, rate-limiting, and quota structures.
+
+2. **Tool-Call Message Formatting:** The Groq API adheres strictly to the OpenAI specification:
+   assistant messages containing `tool_calls` require `content: null` when there is no text.
+   Sending `content: ""` triggers HTTP 400 `tool_use_failed`. In `backend/app/llm.py`,
+   sanitizing `entry["content"] = m.content or None` prevents API rejections on card summoning.
+
+3. **Query Rewriting Trade-Off:** In interactive chat, running a speculative query rewrite
+   adds 1.5–2.0 seconds of latency and consumes additional utility quota. Exposing
+   `ENABLE_QUERY_REWRITE` allows turning this off for near-instant direct retrieval during
+   testing and demos, with zero architectural code deletion.
+
 ## Retrieval practice — answer before looking back
 
 1. After a Render restart, health returns 200/resting. Why should an uptime monitor
