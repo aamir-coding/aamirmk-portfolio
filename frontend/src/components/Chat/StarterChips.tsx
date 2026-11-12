@@ -2,6 +2,7 @@ export interface StarterChipsProps {
   onSelect: (prompt: string) => void;
   onOpenFitModal?: () => void;
   disabled?: boolean;
+  prompts?: readonly string[];
 }
 
 const STARTER_PROMPTS = [
@@ -15,6 +16,7 @@ export function StarterChips({
   onSelect,
   onOpenFitModal,
   disabled = false,
+  prompts = STARTER_PROMPTS,
 }: StarterChipsProps) {
   return (
     <div className="starter-chips-container" role="group" aria-label="Suggested starter questions">
@@ -31,7 +33,7 @@ export function StarterChips({
             ⚡ Check Role Fit (Paste JD)
           </button>
         )}
-        {STARTER_PROMPTS.map((prompt) => (
+        {prompts.map((prompt) => (
           <button
             key={prompt}
             type="button"

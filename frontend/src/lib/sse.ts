@@ -38,6 +38,7 @@ export interface StreamChatCallbacks {
 
 export interface StreamChatOptions {
   message: string;
+  companySlug?: string;
   conversationId?: string;
   history?: ChatHistoryMessage[];
   signal?: AbortSignal;
@@ -120,6 +121,7 @@ async function readEventStream(
  */
 export async function streamChat({
   message,
+  companySlug,
   conversationId,
   history,
   signal,
@@ -127,7 +129,8 @@ export async function streamChat({
   baseUrl,
 }: StreamChatOptions): Promise<void> {
   const base = baseUrl ?? getApiBaseUrl();
-  const url = `${base}/api/chat/stream`;
+  const query = companySlug ? `?${new URLSearchParams({ for: companySlug })}` : "";
+  const url = `${base}/api/chat/stream${query}`;
   const started = performance.now();
   let firstText: number | null = null;
 

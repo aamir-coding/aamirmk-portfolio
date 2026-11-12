@@ -32,6 +32,49 @@ describe("<App />", () => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
     sessionStorage.clear();
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("shows Ecolab suggestions and carries the resolved slug into chat", async () => {
+    window.history.replaceState(null, "", "/?for=ecolab-5a2b");
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    vi.mocked(fetch).mockImplementation(async (url) => {
+      if (!String(url).includes("/api/context?for=ecolab-5a2b")) {
+        return new Response(null, { status: 503 });
+      }
+      return Response.json({
+        company: {
+          slug: "ecolab-5a2b",
+          greeting: "Welcome, Ecolab recruiting team.",
+          why_us: "Explore Aamir’s work on reliable software.",
+          suggested_questions: ["How does the judge queue work?", "How are answers grounded?", "What did Aamir build?"],
+          highlighted_projects: [{ id: "entropy-oj", title: "Entropy Online Judge" }],
+        },
+      });
+    });
+    const stream = vi.spyOn(sse, "streamChat").mockResolvedValue();
+    render(<App />);
+    expect(await screen.findByText("Welcome, Ecolab recruiting team.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Entropy Online Judge" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "How are answers grounded?" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "How does the judge queue work?" }));
+    expect(stream).toHaveBeenCalledWith(expect.objectContaining({
+      message: "How does the judge queue work?",
+      companySlug: "ecolab-5a2b",
+    }));
+  });
+
+  it("keeps the default cover and chat for an unknown company", async () => {
+    window.history.replaceState(null, "", "/?for=unknown-company");
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    vi.mocked(fetch).mockImplementation(async () => Response.json({ company: null }));
+    const stream = vi.spyOn(sse, "streamChat").mockResolvedValue();
+    render(<App />);
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/context?for=unknown-company"), expect.anything(),
+    ));
+    fireEvent.click(screen.getByRole("button", { name: "What are Aamir's core technical strengths?" }));
+    expect(stream.mock.calls[0][0].companySlug).toBeUndefined();
   });
 
   it("renders header, status indicator, and starter chips on mount", async () => {

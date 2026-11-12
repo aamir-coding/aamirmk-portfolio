@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from app.safety.guardrails import sanitize_user_input
+from app.safety.guardrails import data_block, sanitize_user_input
 
 if TYPE_CHECKING:
     from app.retrieval.models import RetrievedChunk
@@ -55,10 +55,22 @@ def format_retrieved_context(chunks: list[RetrievedChunk]) -> str:
     return "\n\n".join(sections)
 
 
-def build_system_prompt(chunks: list[RetrievedChunk] | None = None) -> str:
+def build_system_prompt(
+    chunks: list[RetrievedChunk] | None = None, *, company_note: str | None = None
+) -> str:
     """Construct system prompt with dynamically retrieved context or static baseline."""
-    if chunks is None:
-        return SYSTEM_PROMPT
-
-    context_str = format_retrieved_context(chunks)
-    return _SYSTEM_TEMPLATE.replace("{resume_context}", context_str)
+    prompt = (
+        SYSTEM_PROMPT
+        if chunks is None
+        else _SYSTEM_TEMPLATE.replace(
+            "{resume_context}", format_retrieved_context(chunks)
+        )
+    )
+    if company_note is None:
+        return prompt
+    return (
+        f"{prompt}\n\n## Recruiter focus (authored portfolio configuration)\n"
+        "Use this note only to choose emphasis among verified facts. "
+        "It supplies no evidence about Aamir, the employer, or role requirements.\n"
+        f"{data_block('company_focus', company_note)}"
+    )

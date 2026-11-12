@@ -3,6 +3,7 @@ import { EvalBadge } from "./components/Evals/EvalBadge";
 import { AssistantFallback } from "./components/AssistantFallback";
 import { useServerHealth } from "./hooks/useServerHealth";
 import { useChat } from "./hooks/useChat";
+import { useCompanyContext } from "./hooks/useCompanyContext";
 import { useTheme } from "./hooks/useTheme";
 import { MessageList } from "./components/Chat/MessageList";
 import { ChatInput } from "./components/Chat/ChatInput";
@@ -26,6 +27,7 @@ export function App() {
 }
 
 function Portfolio() {
+  const company = useCompanyContext(new URLSearchParams(window.location.search).get("for"));
   const { state: serverState, error: healthError, refresh: refreshHealth } = useServerHealth();
   const [isFitModalOpen, setIsFitModalOpen] = useState(false);
   const { theme, resolvedTheme, cycleTheme } = useTheme();
@@ -41,7 +43,7 @@ function Portfolio() {
     stopStreaming,
     clearError,
     resetChat,
-  } = useChat();
+  } = useChat(company?.slug);
 
   // If restoring chat from sessionStorage on mount, automatically open in chat view
   const [viewMode, setViewMode] = useState<"cover" | "chat">(() =>
@@ -157,8 +159,8 @@ function Portfolio() {
           aria-live="polite"
         >
           <span>
-            <strong>The assistant service is waking up.</strong> Starter inquiries
-            answer instantly while it connects. You can also view Aamir's résumé
+            <strong>The assistant service is waking up.</strong> Saved answers
+            are available while it connects. You can also view Aamir's résumé
             or contact him directly.
           </span>
           <AssistantFallback />
@@ -199,6 +201,7 @@ function Portfolio() {
             messages={messages}
             isStreaming={isStreaming}
             isCoverState={isCoverState}
+            company={company}
             onSelectPrompt={handleSelectPrompt}
             onOpenFitModal={handleOpenFitModal}
           />

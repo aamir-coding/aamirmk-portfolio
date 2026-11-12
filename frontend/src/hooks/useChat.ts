@@ -66,7 +66,7 @@ function savePersistedChat(
   }
 }
 
-export function useChat(): UseChatReturn {
+export function useChat(companySlug?: string): UseChatReturn {
   const initial = loadPersistedChat();
   const [messages, setMessages] = useState<ChatMessage[]>(initial.messages);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -208,6 +208,7 @@ export function useChat(): UseChatReturn {
 
       await streamChat({
         message: trimmed,
+        companySlug,
         conversationId: conversationId ?? undefined,
         history: historyPayload,
         signal: controller.signal,
@@ -300,7 +301,7 @@ export function useChat(): UseChatReturn {
         },
       });
     },
-    [isStreaming, conversationId]
+    [isStreaming, conversationId, companySlug]
   );
 
   return {

@@ -13,6 +13,19 @@ const HealthStatusSchema = z.object({
   assistant_state: z.enum(["ready", "resting"]).optional(),
 });
 
+const CompanyContextSchema = z.object({
+  slug: z.string().max(64).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*-[a-f0-9]{4,}$/),
+  greeting: z.string().min(1).max(180),
+  why_us: z.string().min(1).max(400),
+  suggested_questions: z.array(z.string().min(1).max(180)).length(3),
+  highlighted_projects: z.array(z.object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+  })).min(1).max(4),
+});
+const ContextResponseSchema = z.object({ company: CompanyContextSchema.nullable() });
+export type CompanyContext = z.infer<typeof CompanyContextSchema>;
+
 export const getApiBaseUrl = (): string => {
   const url = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
   return url.replace(/\/+$/, "");
@@ -37,6 +50,16 @@ export async function fetchHealth(signal?: AbortSignal): Promise<HealthStatus> {
   if (parsed.success) return parsed.data;
 
   throw new Error("Invalid response schema from health endpoint");
+}
+
+export async function fetchCompanyContext(
+  slug: string, signal: AbortSignal,
+): Promise<CompanyContext | null> {
+  const params = new URLSearchParams({ for: slug });
+  const response = await fetch(`${getApiBaseUrl()}/api/context?${params}`, { signal });
+  if (!response.ok) return null;
+  const { company } = ContextResponseSchema.parse(await response.json());
+  return company?.slug === slug ? company : null;
 }
 
 export async function fetchFitPresets(signal?: AbortSignal): Promise<SampleJobDescription[]> {

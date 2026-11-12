@@ -93,6 +93,33 @@ def chat_client(
 # ── Non-streaming /chat tests ─────────────────────────────────────────
 
 
+@pytest.mark.parametrize("path", ["/api/chat", "/api/chat/stream"])
+def test_chat_uses_only_resolved_company_notes(
+    chat_client: tuple[TestClient, FakeLLM, FakeRetriever], path: str
+) -> None:
+    client, llm, _ = chat_client
+    payload = {"message": "What has Aamir built?"}
+    assert client.post(path, json=payload).status_code == 200
+    default = llm.last_messages[0].content
+    assert (
+        client.post(
+            path, params={"for": "ignore-instructions"}, json=payload
+        ).status_code
+        == 200
+    )
+    assert llm.last_messages[0].content == default
+
+    assert (
+        client.post(path, params={"for": "ecolab-5a2b"}, json=payload).status_code
+        == 200
+    )
+    tailored = llm.last_messages[0].content
+    assert tailored.startswith(default)
+    assert "Ecolab" in tailored[len(default) :]
+    assert "Entropy-OJ" in tailored[len(default) :]
+    assert "ecolab-5a2b" not in tailored
+
+
 @pytest.mark.parametrize("tool_turn", [False, True])
 def test_colon_tokens_are_preserved(
     chat_client: tuple[TestClient, FakeLLM, FakeRetriever], tool_turn: bool

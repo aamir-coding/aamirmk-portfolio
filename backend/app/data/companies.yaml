@@ -1,0 +1,10 @@
+ecolab-5a2b:
+  greeting: Welcome, Ecolab recruiting team.
+  highlighted_projects:
+    - entropy-oj
+    - ai-digital-assistant
+  suggested_questions:
+    - How does Entropy-OJ keep code judging off the request path?
+    - How does the AI Digital Assistant ground its answers in sources?
+    - What is Aamir's experience with FastAPI and LLM systems?
+  why_us: For the Ecolab review, start with Entropy-OJ for asynchronous processing and the AI Digital Assistant for source-grounded answers.

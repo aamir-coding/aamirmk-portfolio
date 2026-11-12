@@ -14,6 +14,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 
+from app.api.context import ResolvedCompany
 from app.llm import (
     LLMAuthError,
     LLMCapacityError,
@@ -128,6 +129,7 @@ async def chat(
     retriever: Retriever = Depends(get_retriever),
     tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
+    company: ResolvedCompany = None,
 ) -> ChatResponse:
     """Process user message using LLM grounded with retrieved context chunks."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -175,7 +177,9 @@ async def chat(
     trace.set_stage("retrieval")
     retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
     citations = extract_citations(retrieved_chunks)
-    system_prompt = build_system_prompt(retrieved_chunks)
+    system_prompt = build_system_prompt(
+        retrieved_chunks, company_note=company.why_us if company else None
+    )
 
     # 4. Format user query with XML boundary fencing and assemble conversation messages
     safe_user_content = format_safe_user_message(request.message)
@@ -316,6 +320,7 @@ async def chat_stream(
     retriever: Retriever = Depends(get_retriever),
     tool_registry: ToolRegistry = Depends(get_tool_registry),
     rate_limit: RateLimitResult = Depends(check_rate_limit),
+    company: ResolvedCompany = None,
 ) -> StreamingResponse:
     """Stream user message using LLM via Server-Sent Events (SSE)."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -373,7 +378,9 @@ async def chat_stream(
     trace.set_stage("retrieval")
     retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
     citations = extract_citations(retrieved_chunks)
-    system_prompt = build_system_prompt(retrieved_chunks)
+    system_prompt = build_system_prompt(
+        retrieved_chunks, company_note=company.why_us if company else None
+    )
 
     # 4. Format user query with XML boundary fencing and assemble conversation messages
     safe_user_content = format_safe_user_message(request.message)

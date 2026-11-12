@@ -17,11 +17,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.api.chat import router as chat_router
+from app.api.context import router as context_router
 from app.api.debug import router as debug_router
 from app.api.evals import router as evals_router
 from app.api.fit import router as fit_router
 from app.api.health import router as health_router
 from app.api.operations import router as operations_router
+from app.companies import load_company_contexts
 from app.fit.cache import ReportCache, cache_identity
 from app.llm import GroqLLM
 from app.logging_config import JsonLogFormatter
@@ -125,6 +127,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.settings = app_settings
     app.state.release = load_release()
+    app.state.company_contexts = load_company_contexts()
     app.state.retrieval_ready = False
     app.state.log_ip_salt = secrets.token_bytes(32)
     app.state.llm = GroqLLM(app_settings)
@@ -281,6 +284,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Mount API routers
     app.include_router(health_router, prefix="/api")
+    app.include_router(context_router, prefix="/api")
     app.include_router(operations_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")
     app.include_router(fit_router, prefix="/api")

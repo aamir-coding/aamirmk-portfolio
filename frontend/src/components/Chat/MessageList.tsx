@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import type { ChatMessage } from "../../hooks/useChat";
+import type { CompanyContext } from "../../lib/api";
 import { MessageItem } from "./MessageItem";
 import { CoverState } from "../Cover/CoverState";
 
@@ -7,6 +8,7 @@ export interface MessageListProps {
   messages: ChatMessage[];
   isStreaming: boolean;
   isCoverState?: boolean;
+  company?: CompanyContext | null;
   onSelectPrompt: (prompt: string) => void;
   onOpenFitModal?: () => void;
 }
@@ -15,6 +17,7 @@ export function MessageList({
   messages,
   isStreaming,
   isCoverState = false,
+  company,
   onSelectPrompt,
   onOpenFitModal,
 }: MessageListProps) {
@@ -28,6 +31,7 @@ export function MessageList({
     return (
       <div className="chat-empty-state" role="group" aria-label="Welcome and suggestions">
         <CoverState
+          company={company}
           onSelectPrompt={onSelectPrompt}
           onOpenFitModal={onOpenFitModal}
           disabled={isStreaming}

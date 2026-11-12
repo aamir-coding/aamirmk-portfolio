@@ -1,15 +1,18 @@
 import { StarterChips } from "../Chat/StarterChips";
+import type { CompanyContext } from "../../lib/api";
 
 export interface CoverStateProps {
   onSelectPrompt: (prompt: string) => void;
   onOpenFitModal?: () => void;
   disabled?: boolean;
+  company?: CompanyContext | null;
 }
 
 export function CoverState({
   onSelectPrompt,
   onOpenFitModal,
   disabled = false,
+  company,
 }: CoverStateProps) {
   return (
     <section
@@ -69,6 +72,7 @@ export function CoverState({
       </div>
 
       <div className="dossier-statement">
+        {company && <p>{company.greeting}</p>}
         <p>
           I'm an AI assistant trained on Aamir's verified résumé, projects, and experience.
         </p>
@@ -116,7 +120,26 @@ export function CoverState({
       )}
 
       <div className="dossier-inquiries">
+        {company && (
+          <div className="starter-chips-container" role="group" aria-label="Highlighted projects">
+            <p>{company.why_us}</p>
+            <div className="starter-chips-grid">
+              {company.highlighted_projects.map(project => (
+                <button
+                  key={project.id}
+                  type="button"
+                  className="starter-chip"
+                  disabled={disabled}
+                  onClick={() => onSelectPrompt(`Show me the ${project.title} project.`)}
+                >
+                  {project.title}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <StarterChips
+          prompts={company?.suggested_questions}
           onSelect={onSelectPrompt}
           onOpenFitModal={onOpenFitModal}
           disabled={disabled}
