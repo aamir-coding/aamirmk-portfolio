@@ -884,5 +884,14 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
 - The API stores a token hash and enforces a 30-day expiry on read.
   Summary responses disable caching and indexing. See DRN-076 and the
   [summary runbook](runbooks/production.md#phase-9-team-summaries).
+- Local Chromium opened a real Postgres-backed link in a fresh 390 px mobile
+  context without horizontal overflow. A4 and US Letter each printed to one
+  page with résumé links intact and the capability URL absent. Both print
+  renders and the mobile screenshot were inspected.
+- Local verification reported **689 pytest passed, 2 warnings** and
+  **189 Vitest passed**. Ruff, ESLint and the production build passed.
+  Initial JavaScript was **171,253 gzip bytes / 200,000**. The offline gate
+  returned `gate_failures: []` with all seven scores preserved. The tracked
+  result and public projection use clean source `e0ec459`.
 - Hosted link and header verification remain pending. Scheduled expiry cleanup
   remains part of the retention increment.
