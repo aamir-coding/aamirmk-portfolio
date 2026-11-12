@@ -5,6 +5,8 @@ import { useFitReport } from "../../hooks/useFitReport";
 import type { SampleJobDescription } from "../../lib/types";
 import { FitProgressStepper } from "./FitProgressStepper";
 import { FitReportCard } from "./FitReportCard";
+import { SummaryAction } from "../Summary/SummaryAction";
+import { summaryProjectIds } from "../../lib/summary";
 
 export interface FitReportModalProps {
   isOpen: boolean;
@@ -133,13 +135,18 @@ export function FitReportModal({
 
         <div className="fit-modal-body">
           {status === "completed" && report ? (
-            <FitReportCard
-              report={report}
-              activePreset={activePreset}
-              onAskGap={handleAskGapBridge}
-              onReset={handleModalReset}
-              onRerunLive={handleRerunLive}
-            />
+            <>
+              <FitReportCard
+                report={report}
+                activePreset={activePreset}
+                onAskGap={handleAskGapBridge}
+                onReset={handleModalReset}
+                onRerunLive={handleRerunLive}
+              />
+              <SummaryAction projectIds={summaryProjectIds(
+                report.requirements.flatMap(requirement => requirement.evidence_chunk_ids),
+              )} />
+            </>
           ) : status === "streaming" ? (
             <FitProgressStepper progress={progress} onAbort={abort} />
           ) : (

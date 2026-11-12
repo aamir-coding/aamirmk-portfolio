@@ -25,6 +25,14 @@
           "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://aamirmk-portfolio-mlr4.onrender.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'none';"
         }
       ]
+    },
+    {
+      "source": "/s/:path*",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Referrer-Policy", "value": "no-referrer" }
+      ]
     }
   ],
   "rewrites": [

@@ -1,0 +1,24 @@
+.summary-action {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  margin-block: var(--space-2);
+  padding-block: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.summary-action p {
+  margin: 0;
+}
+
+.summary-action-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.summary-action-links a {
+  color: var(--accent-cobalt);
+}

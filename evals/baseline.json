@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "review_reference": "docs/decisions.md#drn-075-feedback-and-private-analytics",
+  "review_reference": "docs/decisions.md#drn-076-forwardable-summaries-from-the-published-resume",
   "fingerprints": {
     "prompts": "7c4cce85973091781db074874719d097246e3c612cf4ec1941ca4a99e9b6db1f",
     "checker": "d794445fd485d42da7eec7453851f889916fcc2289643bc6921ce2a00a66665e",
     "rubric": "135a8bfe0638e48d191bb75f1d05fca2b84b176e3bc5b6089875d79819beb4bb",
     "recordings": "5f92eae982b10ec9c93598f5ee2181634dab177a0e5789c44604da60d630b93f",
     "evaluator": "c46637265c4fd3b0c72e8ea08e3cb57fe7b700960950d3e3db540ef5c155dbe2",
-    "application": "90755c214b70c65a4b5d23f9a5e79e2362308de022dfca3cf55cd33ca21a53c1",
+    "application": "ad2abfe7e8f05196f43cc3134273bc366f6dc7bc498ff7dad5a37e58941c1e43",
     "cases": "132aa0aa5f602dbaf149fdb605125aa7cc688f7be3da46ce2b48a9ce97f0e51a",
     "safety_assets": "4dc3ee71b09571ada65732ab1b4de616cc33f8ea3591c8b4b3dbc4365ac34297",
     "corpus": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",

@@ -48,6 +48,18 @@ No uptime ping is configured to keep the service awake. An on-demand probe wakes
    hosted question capture disabled until scheduled retention is in place.
    Use synthetic questions and a test database for verification.
 
+## Phase 9 team summaries
+
+1. The existing Postgres `summaries` table supports this feature. Create a
+   summary after two completed chat replies or a completed fit report.
+   Confirm that the creation request contains only allowlisted project IDs.
+2. Open `/s/<token>` in a fresh browser tab without signing in. Confirm the
+   frontend and API return noindex, no-store, and no-referrer controls on the
+   hosted domains. Anyone with the link can open it for 30 days.
+3. Print the summary or save it as PDF. Check that the PDF fits on one page
+   and includes the résumé receipts and public contact. Refresh the authored
+   summary copy when the published résumé changes.
+
 ## Release and rollback
 
 1. Open a PR to main. Require CI backend/frontend/offline eval and security checks.

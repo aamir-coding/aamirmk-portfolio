@@ -166,6 +166,36 @@ describe("<FitReportModal />", () => {
     expect(screen.getByRole("article", { name: /Job Fit Report: Full-Stack AI Engineer/i })).toBeInTheDocument();
   });
 
+  it("shares project IDs from a completed report without sending the role text", async () => {
+    const fetch = vi.fn().mockResolvedValue(Response.json({
+      token: "C".repeat(43), expires_at: "2026-12-12T00:00:00Z",
+    }, { status: 201 }));
+    vi.stubGlobal("fetch", fetch);
+    vi.mocked(useFitReportModule.useFitReport).mockReturnValue({
+      ...defaultHookState,
+      status: "completed",
+      report: {
+        ...mockReport,
+        role_title: "PRIVATE ROLE TITLE",
+        requirements: [{
+          requirement: { id: "summary-example", text: "PRIVATE REQUIREMENT", importance: "must_have", type: "skill" },
+          verdict: "strong",
+          evidence_chunk_ids: ["proj-entropy-oj-stack"],
+          explanation: "Example match",
+        }],
+      },
+    });
+    try {
+      render(<FitReportModal isOpen onClose={vi.fn()} onAskGap={vi.fn()} />);
+      fireEvent.click(screen.getByRole("button", { name: "Summarize for my team" }));
+      await screen.findByRole("link", { name: "Open team summary" });
+      const init = fetch.mock.calls[0]?.[1] as RequestInit | undefined;
+      expect(JSON.parse(String(init?.body)) as unknown).toEqual({ project_ids: ["entropy-oj"] });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it("closes modal on close button click and Escape key", () => {
     const handleClose = vi.fn();
     render(

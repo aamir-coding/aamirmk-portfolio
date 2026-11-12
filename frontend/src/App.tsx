@@ -12,17 +12,32 @@ import {
   StatusIndicator,
 } from "./components/StatusIndicator";
 import { FitReportModal } from "./components/Fit/FitReportModal";
+import { SummaryAction } from "./components/Summary/SummaryAction";
 import answersData from "./data/answers.json";
 import type { InstantAnswer } from "./lib/types";
+import { summaryProjectIds } from "./lib/summary";
 import "./styles/chat.css";
 
 const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
 
 const EvalPage = lazy(() => import("./components/Evals/EvalPage"));
 const AdminPage = lazy(() => import("./components/Admin/AdminPage"));
+const SummaryPage = lazy(() => import("./components/Summary/SummaryPage"));
 
 export function App() {
   const path = window.location.pathname.replace(/\/$/, "");
+  if (path === "/s" || path.startsWith("/s/")) {
+    const token = path.slice(3);
+    return (
+      <>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="referrer" content="no-referrer" />
+        <Suspense fallback={<p role="status">Loading team summary…</p>}>
+          <SummaryPage key={token} token={token} />
+        </Suspense>
+      </>
+    );
+  }
   if (path === "/admin") {
     return <Suspense fallback={<p role="status">Loading dashboard…</p>}><AdminPage /></Suspense>;
   }
@@ -56,6 +71,16 @@ function Portfolio() {
   );
 
   const isCoverState = viewMode === "cover" || messages.length === 0;
+  const completedReplies = isCoverState ? [] : messages.filter(message =>
+    message.role === "assistant" && message.status === "done" &&
+    message.delivery !== "cancelled" && message.content.trim()
+  );
+  const summaryTopics = completedReplies.length >= 2 ? summaryProjectIds(
+    completedReplies.slice(-4).reverse().flatMap(message => [
+      ...(message.cards ?? []).map(card => card.id),
+      ...(message.sources ?? []).map(source => source.chunk_id),
+    ]),
+  ) : null;
 
   const handleSelectPrompt = (prompt: string) => {
     setViewMode("chat");
@@ -213,6 +238,7 @@ function Portfolio() {
         </div>
 
         <div className="chat-input-container">
+          {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
           <ChatInput
             onSend={(text) => {
               setViewMode("chat");

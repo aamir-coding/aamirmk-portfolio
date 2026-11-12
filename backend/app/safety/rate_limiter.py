@@ -171,3 +171,9 @@ async def check_feedback_rate_limit(request: Request) -> None:
     await _enforce(
         request, request.app.state.feedback_rate_limiter, "Feedback limit reached"
     )
+
+
+async def check_summary_rate_limit(request: Request) -> None:
+    await _enforce(
+        request, request.app.state.summary_rate_limiter, "Summary limit reached"
+    )

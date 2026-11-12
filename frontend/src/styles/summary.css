@@ -1,0 +1,158 @@
+.summary-page {
+  width: min(100% - 2rem, 48rem);
+  margin-inline: auto;
+  padding-block: var(--space-5);
+  color: var(--text-primary);
+}
+
+.summary-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.summary-page a {
+  color: var(--accent-cobalt);
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.summary-sheet {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  padding: clamp(1rem, 4vw, 2.5rem);
+  line-height: var(--leading-relaxed);
+}
+
+.summary-heading {
+  padding-bottom: var(--space-4);
+  border-bottom: 2px solid var(--border-active);
+}
+
+.summary-heading h1 {
+  margin: 0;
+  font-size: clamp(1.65rem, 5vw, 2.3rem);
+  line-height: var(--leading-tight);
+}
+
+.summary-heading p {
+  color: var(--text-secondary);
+}
+
+.summary-sheet section {
+  margin-top: var(--space-5);
+  break-inside: avoid;
+}
+
+.summary-sheet h2,
+.summary-sheet h3,
+.summary-sheet p {
+  margin: 0;
+}
+
+.summary-sheet .summary-heading p {
+  margin-top: var(--space-1);
+}
+
+.summary-sheet h2 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-2);
+}
+
+.summary-sheet h3 {
+  font-size: var(--text-base);
+}
+
+.summary-sheet ul {
+  margin: 0;
+  padding-inline-start: var(--space-5);
+}
+
+.summary-sheet li + li {
+  margin-top: var(--space-2);
+}
+
+.summary-source,
+.summary-sheet footer {
+  font-size: var(--text-sm);
+}
+
+.summary-sheet footer {
+  margin-top: var(--space-5);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+@media print {
+  @page {
+    margin: 0;
+  }
+
+  body {
+    background: white;
+  }
+
+  .summary-page,
+  .summary-sheet {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    color: #121212;
+    background: white;
+    border: 0;
+    font-size: 10.5pt;
+    line-height: 1.38;
+  }
+
+  .summary-toolbar {
+    display: none;
+  }
+
+  .summary-page {
+    padding: 15mm;
+  }
+
+  .summary-heading {
+    border-color: #121212;
+    padding-bottom: 8pt;
+  }
+
+  .summary-heading h1 {
+    font-size: 22pt;
+  }
+
+  .summary-page a,
+  .summary-heading p,
+  .summary-sheet footer {
+    color: #121212;
+  }
+
+  .summary-sheet section {
+    margin-top: 10pt;
+  }
+
+  .summary-sheet h2 {
+    font-size: 13pt;
+    margin-bottom: 3pt;
+  }
+
+  .summary-sheet h3 {
+    font-size: 11pt;
+  }
+
+  .summary-source,
+  .summary-sheet footer {
+    font-size: 9pt;
+  }
+
+  .summary-sheet footer {
+    border-color: #b5b5b5;
+    margin-top: 10pt;
+    padding-top: 6pt;
+  }
+}

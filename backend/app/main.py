@@ -28,6 +28,7 @@ from app.api.fit import router as fit_router
 from app.api.handoff import router as handoff_router
 from app.api.health import router as health_router
 from app.api.operations import router as operations_router
+from app.api.summary import router as summary_router
 from app.companies import load_company_contexts
 from app.db.analytics import AnalyticsWriter
 from app.db.session import create_database_engine
@@ -209,6 +210,11 @@ def create_app(
     app.state.admin_rate_limiter = SlidingWindowRateLimiter(
         requests_per_window=30, max_keys=2
     )
+    app.state.summary_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=5,
+        window_seconds=3600,
+        max_keys=app_settings.RATE_LIMIT_MAX_KEYS,
+    )
     app.state.ops_rate_limiter = SlidingWindowRateLimiter(
         requests_per_window=30,
         max_keys=2,
@@ -243,6 +249,11 @@ def create_app(
             or request.url.path == "/api/health"
         ):
             response.headers["Cache-Control"] = "no-store"
+        path = request.url.path
+        if path == "/api/summary" or path.startswith("/api/summary/"):
+            response.headers["Cache-Control"] = "no-store"
+            response.headers["X-Robots-Tag"] = "noindex, nofollow"
+            response.headers["Referrer-Policy"] = "no-referrer"
 
         client_ip = get_client_ip(request)
         ip_hash = hmac.new(
@@ -350,6 +361,7 @@ def create_app(
     app.include_router(handoff_router, prefix="/api")
     app.include_router(feedback_router, prefix="/api")
     app.include_router(admin_router, prefix="/api")
+    app.include_router(summary_router, prefix="/api")
     app.include_router(operations_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")
     app.include_router(fit_router, prefix="/api")

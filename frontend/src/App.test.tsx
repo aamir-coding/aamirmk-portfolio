@@ -176,6 +176,67 @@ describe("<App />", () => {
     expect(screen.queryByRole("heading", { name: "Candidate eval cases" })).not.toBeInTheDocument();
   });
 
+  it("creates a team summary with project IDs only", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    vi.spyOn(sse, "streamChat").mockImplementation(async ({ callbacks }) => {
+      callbacks.onToken("An answer about Aamir.");
+      callbacks.onDone({
+        conversation_id: "summary-chat",
+        sources: [{ chunk_id: "proj-healthtracker-overview", title: "HealthTracker", type: "project" }],
+      });
+    });
+    const token = "A".repeat(43);
+    const writes: unknown[] = [];
+    vi.mocked(fetch).mockImplementation(async (url, init) => {
+      if (!String(url).endsWith("/api/summary")) return new Response(null, { status: 503 });
+      writes.push(JSON.parse(String(init?.body)));
+      return Response.json({ token, expires_at: "2026-12-12T00:00:00Z" }, { status: 201 });
+    });
+    render(<App />);
+    await screen.findByText("Ready");
+    expect(screen.queryByRole("button", { name: "Summarize for my team" })).not.toBeInTheDocument();
+    for (const query of ["PRIVATE RECRUITER QUESTION", "PRIVATE RECRUITER FOLLOW-UP"]) {
+      fireEvent.change(screen.getByRole("textbox"), { target: { value: query } });
+      fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    }
+    fireEvent.click(await screen.findByRole("button", { name: "Summarize for my team" }));
+    const link = await screen.findByRole("link", { name: "Open team summary" });
+    expect(link).toHaveAttribute("href", `/s/${token}`);
+    expect(writes).toEqual([{ project_ids: ["health-tracker"] }]);
+  });
+
+  it("opens a shared summary without a login and marks the page noindex", async () => {
+    const token = "B".repeat(43);
+    window.history.replaceState(null, "", `/s/${token}`);
+    vi.mocked(fetch).mockResolvedValue(Response.json({
+      summary: {
+        name: "Aamir Mohammed Khan",
+        headline: "Full-stack and AI application development",
+        strengths: [
+          { title: "Full-stack applications", description: "React and FastAPI.", source: "Technical Skills" },
+          { title: "Grounded answers", description: "Hybrid retrieval and citations.", source: "Technical Projects" },
+          { title: "Async workloads", description: "Worker queues and execution limits.", source: "Experience" },
+        ],
+        projects: [{ id: "entropy-oj", title: "Entropy-OJ", description: "Asynchronous judging.", source: "Experience" }],
+        gaps: "Confirm role-specific requirements directly.",
+        availability: "Confirm availability with Aamir.",
+        contact_email: "aamir@example.test",
+      },
+      expires_at: "2026-12-12T00:00:00Z",
+    }));
+    render(<App />);
+    await screen.findByRole("heading", { name: "Aamir Mohammed Khan" });
+    expect(screen.getByRole("heading", { name: "Entropy-OJ" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to chat" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("button", { name: "Print or save as PDF" })).toBeInTheDocument();
+    expect(document.head.querySelector('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining(`/api/summary/${token}`),
+      expect.objectContaining({ credentials: "omit", cache: "no-store", referrerPolicy: "no-referrer" }),
+    );
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("renders header, status indicator, and starter chips on mount", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     render(<App />);

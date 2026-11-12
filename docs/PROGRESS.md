@@ -248,7 +248,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review Phase 9 Increments 1–4. Increment 5 adds forwardable summaries. Hosted
+1. Review Phase 9 Increments 1–5. Increment 6 adds durable quota. Hosted
    verification will use the credentials Aamir provides later.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
@@ -875,3 +875,14 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   and public projection use clean source `2ea0f09`.
 - Hosted admin verification and retention remain pending. Summary links,
   durable quota, and backup restore are later increments.
+
+### Phase 9 Increment 5 — 12 November 2026
+
+- Chat and fit reports can create a summary from allowlisted project IDs.
+  The snapshot uses the published résumé and Aamir's professional email.
+  The share page opens without login and offers print or save as PDF.
+- The API stores a token hash and enforces a 30-day expiry on read.
+  Summary responses disable caching and indexing. See DRN-076 and the
+  [summary runbook](runbooks/production.md#phase-9-team-summaries).
+- Hosted link and header verification remain pending. Scheduled expiry cleanup
+  remains part of the retention increment.

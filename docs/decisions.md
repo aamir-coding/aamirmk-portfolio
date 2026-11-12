@@ -3,6 +3,27 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-076: Forwardable summaries from the published resume
+
+**Date:** 2026-11-12. Build a deterministic snapshot from the published résumé.
+The two entry points accept only allowlisted project IDs derived from chat or
+fit evidence. Chat shows the action after two completed replies. The summary
+includes three résumé-sourced strengths, up to two projects, points to confirm,
+and Aamir's public professional email. Availability directs readers to confirm
+the start date and work arrangements with Aamir.
+
+Postgres stores the snapshot and a SHA-256 hash of a 32-byte random link token.
+The public lookup requires an unexpired token and returns the same 404 for an
+expired or missing link. Creation is limited to five requests per IP and tab
+per hour. The share page and API use noindex, no-store, and no-referrer
+controls. The print stylesheet hides the action bar and supplies its own
+page padding so Chromium can suppress URL headers and footers. Deleting
+expired rows is part of the later retention increment.
+
+The offline candidate reproduced all seven baseline scores. Refresh the
+application fingerprint and regenerate the matching result and public
+projection.
+
 ### DRN-075: Feedback and private analytics
 
 **Date:** 2026-11-12. Use the recorded answer's random UUID as the feedback

@@ -1,8 +1,12 @@
 import asyncio
+import hashlib
 import io
 import json
+import logging
 import os
+import re
 from collections.abc import AsyncIterator
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from threading import Event
 from urllib.parse import parse_qs, urlsplit
@@ -14,9 +18,9 @@ from alembic import command
 from alembic.config import Config
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
-from sqlalchemy import select
+from sqlalchemy import select, update
 
-from app.db.models import HandoffRecord, MessageRecord, RecruiterSession
+from app.db.models import HandoffRecord, MessageRecord, RecruiterSession, SummaryRecord
 from app.db.session import create_database_engine
 from app.fit.models import FitRequest
 from app.llm import FakeLLM, get_llm_client
@@ -381,5 +385,72 @@ def test_feedback_and_admin_use_saved_recruiter_activity(postgres_url: str) -> N
             assert data["handoffs"][0]["question"] == question
             assert sum(day["known_tokens"] for day in data["usage"]) == 10
             assert sum(day["unknown_runs"] for day in data["usage"]) == 1
+    finally:
+        command.downgrade(config, "base")
+
+
+def test_summary_links_are_hashed_public_and_expire(
+    postgres_url: str,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    async def expire(token: str, expected: dict[str, object]) -> None:
+        engine = create_database_engine(SecretStr(postgres_url), pooled=False)
+        try:
+            async with engine.begin() as connection:
+                row = (await connection.execute(select(SummaryRecord))).one()
+                assert row.token_hash == hashlib.sha256(token.encode()).hexdigest()
+                assert token not in json.dumps(row.content)
+                assert row.content == expected["summary"]
+                assert row.expires_at - row.created_at == timedelta(days=30)
+                now = datetime.now(UTC)
+                await connection.execute(
+                    update(SummaryRecord)
+                    .where(SummaryRecord.id == row.id)
+                    .values(
+                        created_at=now - timedelta(days=30, seconds=1),
+                        expires_at=now - timedelta(seconds=1),
+                    )
+                )
+        finally:
+            await engine.dispose()
+
+    config = Config(str(ALEMBIC_INI))
+    command.upgrade(config, "head")
+    settings = Settings(_env_file=None, ENVIRONMENT="test", DATABASE_URL=postgres_url)
+    try:
+        with caplog.at_level(logging.INFO), TestClient(create_app(settings)) as client:
+            created = client.post(
+                "/api/summary",
+                json={"project_ids": ["health-tracker", "health-tracker"]},
+            )
+            assert created.status_code == 201
+            assert created.headers["Cache-Control"] == "no-store"
+            token = created.json()["token"]
+            assert re.fullmatch(r"[A-Za-z0-9_-]{43}", token)
+            shared = client.get(f"/api/summary/{token}")
+            assert shared.status_code == 200
+            assert shared.headers["X-Robots-Tag"] == "noindex, nofollow"
+            assert shared.headers["Cache-Control"] == "no-store"
+            assert shared.headers["Referrer-Policy"] == "no-referrer"
+            body = shared.json()
+            assert body["expires_at"] == created.json()["expires_at"]
+            assert [project["id"] for project in body["summary"]["projects"]] == [
+                "health-tracker",
+                "entropy-oj",
+            ]
+            assert len(body["summary"]["strengths"]) == 3
+            assert "+91" not in shared.text and token not in shared.text
+            asyncio.run(expire(token, body))
+            expired = client.get(f"/api/summary/{token}")
+            unknown = client.get(f"/api/summary/{'z' * 43}")
+            assert expired.status_code == unknown.status_code == 404
+            assert (
+                expired.json()["error"]["message"] == unknown.json()["error"]["message"]
+            )
+            assert expired.headers["Cache-Control"] == "no-store"
+            assert token not in caplog.text
+            for _ in range(4):
+                assert client.post("/api/summary", json={}).status_code == 201
+            assert client.post("/api/summary", json={}).status_code == 429
     finally:
         command.downgrade(config, "base")
