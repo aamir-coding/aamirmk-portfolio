@@ -3,7 +3,7 @@
 ## Current Phase
 **Phase 9: Handoff, per-company links, forwardable summary and analytics — in progress.**
 Aamir approved the seven-increment brief on 12 November 2026 and authorized
-local work on Increments 1–2. Build branch: `phase-9-handoff-analytics`.
+local work through Increment 6. Build branch: `phase-9-handoff-analytics`.
 
 **Phase 10: Production hardening, monitoring and launch — 🟢 Closed, deployed, and verified live on Render & Vercel**
 The locally verified `main`, `origin/main` tracking ref and `phase-10-done` tag
@@ -59,7 +59,8 @@ Approved scope: preset evidence/narratives, requirement-local citation validatio
 **Phase 6: Job Description Fit Report** — 🟢 Complete. Fixed 5-stage verification pipeline, structured extraction, per-requirement hybrid retrieval, batched alignment judging, deterministic anti-overclaiming invariant enforcement, honest ramp-up narratives (`skills.yaml`), SSE progress streaming (`POST /api/fit`), presets endpoint (`GET /api/fit/presets`), fit rate limiter (5 reports/day/IP), SHA-256 caching, frontend `FitReportModal`, `FitReportCard`, `FitProgressStepper`, and bidirectional gap bridge to chat.
 
 Band 4 is active under the 12 November Phase 9 approval. The current build covers
-company links and the local Postgres foundation.
+company links, the Postgres foundation, recruiter handoff, private analytics,
+forwardable summaries, and durable inference quota.
 Aamir approved continuing through the phase on 10 November 2026. Phase 7 teach-back
 answers remain unassessed; its milestone is closed by Aamir's explicit confirmation.
 Aamir approved the Phase 7 six-increment brief on 6 November. A new factual accuracy claim
@@ -248,7 +249,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review Phase 9 Increments 1–5. Increment 6 adds durable quota. Hosted
+1. Review Phase 9 Increment 6. Increment 7 covers retention and restore. Hosted
    verification will use the credentials Aamir provides later.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
@@ -895,3 +896,21 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   result and public projection use clean source `e0ec459`.
 - Hosted link and header verification remain pending. Scheduled expiry cleanup
   remains part of the retention increment.
+
+### Phase 9 Increment 6 — 12 November 2026
+
+- Alembic revision `0003` adds per-boot grant records. Postgres serializes
+  each reservation against the shared UTC-day balance. The existing ledger
+  handles individual provider attempts without a database round trip.
+- A boot with a confirmed grant can continue during a Postgres outage. A boot
+  awaiting a grant stays resting. Clean, idle shutdown returns unused capacity.
+  An interrupted boot keeps its reservation charged for that UTC day. See
+  DRN-077 and the [durable quota runbook](runbooks/production.md#phase-9-durable-inference-quota).
+- Local verification reported **696 pytest passed, 2 warnings** and
+  **189 Vitest passed**. The PostgreSQL 18 migration round trip, Ruff, ESLint,
+  and production build passed. Initial JavaScript was **171.08 kB gzip**.
+  The offline gate returned `gate_failures: []` with all seven scores preserved.
+  The tracked result and public projection use clean source `0da8053`.
+- Durable quota is opt-in. Hosted verification remains pending, including the
+  Supabase migration and configuration of the daily ceilings against remaining
+  provider capacity.
