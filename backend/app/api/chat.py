@@ -9,12 +9,13 @@ import uuid
 from collections.abc import AsyncIterator
 from contextlib import aclosing, suppress
 from enum import Enum
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import StreamingResponse
 
 from app.api.context import ResolvedCompany
+from app.api.handoff import handoff_available
 from app.db.analytics import Analytics
 from app.llm import (
     LLMAuthError,
@@ -45,7 +46,7 @@ from app.safety.rate_limiter import (
 from app.settings import get_settings
 from app.telemetry import ObservedLLM, ObservedRetriever, Trace, provenance
 from app.tools.projects import ProjectCardData
-from app.tools.registry import ToolRegistry, get_tool_registry
+from app.tools.registry import HandoffOffer, ToolRegistry, get_tool_registry
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,27 @@ RESTING_MESSAGE = (
     "Live answers are resting. Use a saved answer, "
     "read the resume source or contact Aamir."
 )
+HANDOFF_REPLY = "I don’t have enough verified information to answer that fully."
+HandoffAvailable = Annotated[bool, Depends(handoff_available)]
+
+
+def weak_evidence(query: str, chunks: list[RetrievedChunk]) -> bool:
+    if query.lower().strip(" .!?\t\r\n") in {
+        "hi",
+        "hello",
+        "hey",
+        "hi there",
+        "hey there",
+    }:
+        return False
+    public = [hit for hit in chunks if hit.chunk.indexed and not hit.chunk.private]
+    if not public:
+        return True
+    similarities = [
+        hit.dense_similarity for hit in public if hit.dense_similarity is not None
+    ]
+    # RRF values rank hits. The cosine floor only catches very weak matches.
+    return bool(similarities) and max(similarities) < 0.55
 
 
 class StreamHeartbeat(Enum):
@@ -132,6 +154,7 @@ async def chat(
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     company: ResolvedCompany = None,
     analytics: Analytics = None,
+    can_handoff: HandoffAvailable = False,
 ) -> ChatResponse:
     """Process user message using LLM grounded with retrieved context chunks."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -178,6 +201,23 @@ async def chat(
     # 3. Retrieve relevant factual context chunks & generate receipts
     trace.set_stage("retrieval")
     retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
+    if can_handoff and weak_evidence(search_query, retrieved_chunks):
+        trace.text()
+        telemetry = trace.snapshot().model_copy(update=versions)
+        if analytics is not None:
+            analytics.record(
+                company.slug if company else None,
+                question=request.message,
+                telemetry=telemetry,
+            )
+        return ChatResponse(
+            telemetry=telemetry,
+            reply=HANDOFF_REPLY,
+            conversation_id=conv_id,
+            model="retrieval",
+            usage=TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
+            handoff=True,
+        )
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(
         retrieved_chunks, company_note=company.why_us if company else None
@@ -207,12 +247,17 @@ async def chat(
         Message(role="user", content=safe_user_content),
     ]
 
-    tool_schemas = tool_registry.get_schemas()
+    tool_schemas = tool_registry.get_schemas(handoff=can_handoff)
     summoned_cards: list[ProjectCardData] = []
+    offer_handoff = False
 
     try:
         trace.set_stage("answer")
         completion = await llm.complete(messages, tools=tool_schemas)
+        reply_text = completion.content
+        total_tokens = completion.total_tokens
+        prompt_tokens = completion.prompt_tokens
+        completion_tokens = completion.completion_tokens
 
         # If LLM requested tool calls, execute them and run turn 2 for text reply
         if completion.tool_calls:
@@ -226,12 +271,15 @@ async def chat(
                 )
             )
             for tc in completion.tool_calls:
-                card = tool_registry.execute(tc.name, tc.arguments)
-                if card:
-                    summoned_cards.append(card)
+                result = tool_registry.execute(tc.name, tc.arguments)
+                if isinstance(result, ProjectCardData):
+                    summoned_cards.append(result)
                     tool_content = json.dumps(
-                        {"status": "card_displayed", "title": card.title}
+                        {"status": "card_displayed", "title": result.title}
                     )
+                elif can_handoff and isinstance(result, HandoffOffer):
+                    offer_handoff = True
+                    tool_content = '{"status":"handoff_offered"}'
                 else:
                     tool_content = json.dumps({"error": "Project not found"})
 
@@ -244,20 +292,15 @@ async def chat(
                     )
                 )
 
-            # Turn 2: verbal explanation grounded in tool output
-            trace.set_stage("tool_answer")
-            second_completion = await llm.complete(messages)
-            reply_text = second_completion.content
-            total_tokens = completion.total_tokens + second_completion.total_tokens
-            prompt_tokens = completion.prompt_tokens + second_completion.prompt_tokens
-            completion_tokens = (
-                completion.completion_tokens + second_completion.completion_tokens
-            )
-        else:
-            reply_text = completion.content
-            total_tokens = completion.total_tokens
-            prompt_tokens = completion.prompt_tokens
-            completion_tokens = completion.completion_tokens
+            if offer_handoff:
+                reply_text = HANDOFF_REPLY
+            else:
+                trace.set_stage("tool_answer")
+                second_completion = await llm.complete(messages)
+                reply_text = second_completion.content
+                total_tokens += second_completion.total_tokens
+                prompt_tokens += second_completion.prompt_tokens
+                completion_tokens += second_completion.completion_tokens
 
     except LLMCapacityError as exc:
         logger.warning("Inference capacity error: %s", exc)
@@ -315,6 +358,7 @@ async def chat(
         ),
         sources=citations,
         cards=summoned_cards,
+        handoff=offer_handoff,
     )
 
 
@@ -331,6 +375,7 @@ async def chat_stream(
     rate_limit: RateLimitResult = Depends(check_rate_limit),
     company: ResolvedCompany = None,
     analytics: Analytics = None,
+    can_handoff: HandoffAvailable = False,
 ) -> StreamingResponse:
     """Stream user message using LLM via Server-Sent Events (SSE)."""
     conv_id = request.conversation_id or uuid.uuid4().hex
@@ -387,6 +432,33 @@ async def chat_stream(
     # 3. Retrieve relevant factual context chunks & generate receipts
     trace.set_stage("retrieval")
     retrieved_chunks = await retriever.retrieve(search_query, top_k=4)
+    if can_handoff and weak_evidence(search_query, retrieved_chunks):
+
+        async def handoff_generator() -> AsyncIterator[str]:
+            trace.text()
+            telemetry = trace.snapshot().model_copy(update=versions)
+            if analytics is not None:
+                analytics.record(
+                    company.slug if company else None,
+                    question=request.message,
+                    telemetry=telemetry,
+                )
+            payload = json.dumps({"token": HANDOFF_REPLY})
+            yield f"event: token\ndata: {payload}\n\n"
+            done_payload = json.dumps(
+                {
+                    "conversation_id": conv_id,
+                    "sources": [],
+                    "cards": [],
+                    "telemetry": telemetry.model_dump(),
+                    "handoff": True,
+                }
+            )
+            yield f"event: done\ndata: {done_payload}\n\n"
+
+        return StreamingResponse(
+            handoff_generator(), media_type="text/event-stream", headers=headers
+        )
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(
         retrieved_chunks, company_note=company.why_us if company else None
@@ -416,12 +488,13 @@ async def chat_stream(
         Message(role="user", content=safe_user_content),
     ]
 
-    tool_schemas = tool_registry.get_schemas()
+    tool_schemas = tool_registry.get_schemas(handoff=can_handoff)
 
     async def event_generator() -> AsyncIterator[str]:
         tokens_emitted = 0
         summoned_cards: list[ProjectCardData] = []
         output_chars = 0
+        offer_handoff = False
         try:
             trace.set_stage("answer")
             # Emit verified source receipts before stream begins
@@ -464,14 +537,17 @@ async def chat_stream(
                     )
                 )
                 for tc in detected_tool_calls:
-                    card = tool_registry.execute(tc.name, tc.arguments)
-                    if card:
-                        summoned_cards.append(card)
-                        card_payload = json.dumps({"card": card.model_dump()})
+                    result = tool_registry.execute(tc.name, tc.arguments)
+                    if isinstance(result, ProjectCardData):
+                        summoned_cards.append(result)
+                        card_payload = json.dumps({"card": result.model_dump()})
                         yield f"event: card\ndata: {card_payload}\n\n"
                         tool_content = json.dumps(
-                            {"status": "card_displayed", "title": card.title}
+                            {"status": "card_displayed", "title": result.title}
                         )
+                    elif can_handoff and isinstance(result, HandoffOffer):
+                        offer_handoff = True
+                        tool_content = '{"status":"handoff_offered"}'
                     else:
                         tool_content = json.dumps({"error": "Project not found"})
 
@@ -484,8 +560,14 @@ async def chat_stream(
                         )
                     )
 
+            if offer_handoff:
+                trace.text()
+                text = f"\n\n{HANDOFF_REPLY}" if tokens_emitted else HANDOFF_REPLY
+                if output_chars + len(text) <= 6000:
+                    payload = json.dumps({"token": text})
+                    yield f"event: token\ndata: {payload}\n\n"
+            elif detected_tool_calls:
                 trace.set_stage("tool_answer")
-                # Turn 2: stream verbal explanation
                 async with aclosing(
                     stream_with_heartbeat(llm.stream(messages))
                 ) as items:
@@ -517,6 +599,7 @@ async def chat_stream(
                     "sources": [c.model_dump() for c in citations],
                     "cards": [c.model_dump() for c in summoned_cards],
                     "telemetry": telemetry.model_dump(),
+                    **({"handoff": True} if offer_handoff else {}),
                 }
             )
             yield f"event: done\ndata: {done_payload}\n\n"

@@ -1,4 +1,4 @@
-import type { SampleJobDescription } from "./types";
+import type { ChatHistoryMessage, SampleJobDescription } from "./types";
 import { SampleJobDescriptionSchema } from "./contracts";
 import { getSessionId } from "./session";
 import { z } from "zod";
@@ -64,6 +64,41 @@ export async function fetchCompanyContext(
   if (!response.ok) return null;
   const { company } = ContextResponseSchema.parse(await response.json());
   return company?.slug === slug ? company : null;
+}
+
+interface HandoffSubmission {
+  id: string;
+  consent: true;
+  website: string;
+  reply_email: string | null;
+  transcript: readonly ChatHistoryMessage[];
+}
+
+const HandoffAcceptedSchema = z.object({
+  id: z.string().uuid(),
+  status: z.literal("accepted"),
+});
+
+export async function submitHandoff(payload: HandoffSubmission, signal: AbortSignal): Promise<void> {
+  const response = await fetch(`${getApiBaseUrl()}/api/handoff`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Session-ID": getSessionId() },
+    body: JSON.stringify(payload),
+    signal,
+  });
+  if (!response.ok) {
+    const messages: Record<number, string> = {
+      409: "This request was already submitted. Contact Aamir directly to add details.",
+      413: "This transcript is too large. Start a shorter chat and try again.",
+      422: "Check the reply email and try again.",
+      429: "The handoff limit was reached. Try again later or contact Aamir directly.",
+    };
+    throw new Error(messages[response.status] ?? "Handoff is unavailable. Try again or contact Aamir directly.");
+  }
+  const accepted = HandoffAcceptedSchema.safeParse(await response.json());
+  if (!accepted.success || accepted.data.id !== payload.id) {
+    throw new Error("The handoff could not be confirmed.");
+  }
 }
 
 export async function fetchFitPresets(signal?: AbortSignal): Promise<SampleJobDescription[]> {

@@ -248,9 +248,8 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review Phase 9 Increments 1–2. Increment 3 adds the recruiter handoff using a
-   fake Telegram client locally. Hosted verification will use the credentials
-   Aamir provides later.
+1. Review Phase 9 Increments 1–3. Increment 4 adds feedback and admin. Hosted
+   verification will use the credentials Aamir provides later.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
 
@@ -840,3 +839,16 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   result and public projection were generated from clean source `b1741c4`.
 - Hosted Supabase verification, Telegram handoff and its live delivery test
   remain pending. Analytics retention and backup restore are later increments.
+
+### Phase 9 Increment 3 — 12 November 2026
+
+- Both chat transports offer a handoff for weak public evidence or an
+  `offer_handoff` tool request. The card previews the messages and requires
+  consent before `POST /api/handoff` shares the transcript and optional email.
+- The endpoint persists before acknowledging, applies honeypot and rate
+  checks, and uses the submission UUID for retries. The app resumes pending
+  deliveries after a restart. The local tests use a fake Telegram notifier
+  and disposable PostgreSQL 18. See DRN-074 and the
+  [handoff runbook](runbooks/production.md#phase-9-handoff).
+- Hosted Supabase and Telegram delivery verification remain pending. Feedback
+  and admin, summaries, durable quota, retention and restore are later increments.

@@ -3,7 +3,9 @@ import io
 import json
 import os
 from pathlib import Path
+from threading import Event
 from urllib.parse import parse_qs, urlsplit
+from uuid import UUID, uuid4
 
 import asyncpg
 import pytest
@@ -13,7 +15,7 @@ from fastapi.testclient import TestClient
 from pydantic import SecretStr
 from sqlalchemy import select
 
-from app.db.models import MessageRecord, RecruiterSession
+from app.db.models import HandoffRecord, MessageRecord, RecruiterSession
 from app.db.session import create_database_engine
 from app.llm import FakeLLM, get_llm_client
 from app.main import create_app
@@ -166,3 +168,75 @@ def test_analytics_records_resolved_company_and_questions_off_response_path(
         asyncio.run(verify_rows())
     finally:
         command.downgrade(Config(str(ALEMBIC_INI)), "base")
+
+
+def test_handoff_returns_before_delivery_and_recovers_pending_row(
+    postgres_url: str,
+) -> None:
+    class BlockedTelegram:
+        def __init__(self) -> None:
+            self.started = Event()
+
+        async def send(self, row: HandoffRecord) -> None:
+            self.started.set()
+            await asyncio.Event().wait()
+
+    class FakeTelegram:
+        def __init__(self) -> None:
+            self.delivered: list[UUID] = []
+
+        async def send(self, row: HandoffRecord) -> None:
+            if row.transcript[0]["content"] == "Simulate delivery failure":
+                raise ConnectionError("Synthetic Telegram failure")
+            self.delivered.append(row.id)
+
+    async def wait_for_status(id: UUID, status: str) -> None:
+        engine = create_database_engine(SecretStr(postgres_url), pooled=False)
+        try:
+            async with engine.connect() as connection, asyncio.timeout(5):
+                while True:
+                    actual = await connection.scalar(
+                        select(HandoffRecord.delivery_status).where(
+                            HandoffRecord.id == id
+                        )
+                    )
+                    if actual == status:
+                        return
+                    await asyncio.sleep(0.025)
+        finally:
+            await engine.dispose()
+
+    def payload(id: UUID, text: str) -> dict[str, object]:
+        return {
+            "id": str(id),
+            "consent": True,
+            "transcript": [{"role": "user", "content": text}],
+        }
+
+    config = Config(str(ALEMBIC_INI))
+    command.upgrade(config, "head")
+    settings = Settings(_env_file=None, ENVIRONMENT="test", DATABASE_URL=postgres_url)
+    first = uuid4()
+    second = uuid4()
+    blocked = BlockedTelegram()
+    try:
+        with TestClient(create_app(settings, handoff_notifier=blocked)) as client:
+            submission = payload(first, "A real question in a synthetic transcript")
+            assert client.post("/api/handoff", json=submission).status_code == 202
+            assert blocked.started.wait(timeout=5)
+            asyncio.run(wait_for_status(first, "pending"))
+            assert client.post("/api/handoff", json=submission).status_code == 202
+            conflict = client.post("/api/handoff", json=payload(first, "Changed"))
+            assert conflict.status_code == 409
+
+        notifier = FakeTelegram()
+        with TestClient(create_app(settings, handoff_notifier=notifier)) as client:
+            asyncio.run(wait_for_status(first, "sent"))
+            failed = client.post(
+                "/api/handoff", json=payload(second, "Simulate delivery failure")
+            )
+            assert failed.status_code == 202
+            asyncio.run(wait_for_status(second, "failed"))
+        assert notifier.delivered == [first]
+    finally:
+        command.downgrade(config, "base")

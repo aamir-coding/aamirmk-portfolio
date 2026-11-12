@@ -152,3 +152,16 @@ async def check_fit_rate_limit(
     limiter: SlidingWindowRateLimiter = Depends(get_fit_rate_limiter),
 ) -> RateLimitResult:
     return await _enforce(request, limiter, "Daily JD Fit Report limit reached")
+
+
+async def check_handoff_rate_limit(request: Request) -> None:
+    await _enforce(
+        request, request.app.state.handoff_rate_limiter, "Handoff limit reached"
+    )
+    shared = await request.app.state.handoff_global_limiter.check("handoff")
+    if not shared.allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Handoff limit reached. Please try again later.",
+            headers={"Retry-After": str(shared.reset_seconds)},
+        )

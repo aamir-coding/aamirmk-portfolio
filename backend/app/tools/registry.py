@@ -85,6 +85,35 @@ class ShowProjectCardTool:
         return get_project_card(validated.project_id)
 
 
+class HandoffOffer:
+    """Marker for offering the visitor a form."""
+
+
+class OfferHandoffTool:
+    name = "offer_handoff"
+    description = (
+        "Offer to forward the question to Aamir when the evidence is insufficient. "
+        "A message is sent only after the visitor submits the form."
+    )
+
+    def get_schema(self) -> dict[str, Any]:
+        return {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": {
+                    "type": "object",
+                    "properties": {},
+                    "additionalProperties": False,
+                },
+            },
+        }
+
+    def execute(self, arguments: dict[str, Any]) -> HandoffOffer | None:
+        return None if arguments else HandoffOffer()
+
+
 class ToolRegistry:
     """Central registry and executor for assistant tools."""
 
@@ -95,14 +124,19 @@ class ToolRegistry:
                 self.register(tool)
         else:
             self.register(ShowProjectCardTool())
+            self.register(OfferHandoffTool())
 
     def register(self, tool: Tool) -> None:
         """Register a new tool instance."""
         self._tools[tool.name] = tool
 
-    def get_schemas(self) -> list[dict[str, Any]]:
+    def get_schemas(self, *, handoff: bool = False) -> list[dict[str, Any]]:
         """Return all registered tool schemas formatted for Groq/OpenAI."""
-        return [tool.get_schema() for tool in self._tools.values()]
+        return [
+            tool.get_schema()
+            for tool in self._tools.values()
+            if handoff or tool.name != OfferHandoffTool.name
+        ]
 
     def execute(self, name: str, arguments: dict[str, Any] | str) -> Any:
         """Safely execute a tool by name, handling string or dict arguments."""

@@ -31,11 +31,14 @@ def reciprocal_rank_fusion(
     """
     scores: dict[str, float] = {}
     chunk_map: dict[str, FactChunk] = {}
+    dense_similarities: dict[str, float] = {}
 
     for ranked_list in ranked_lists:
         for item in ranked_list:
             cid = item.chunk.id
             chunk_map[cid] = item.chunk
+            if item.retrieval_method == "dense":
+                dense_similarities[cid] = item.score
             # rank is 1-based
             scores[cid] = scores.get(cid, 0.0) + (1.0 / (rrf_k + item.rank))
 
@@ -50,6 +53,7 @@ def reciprocal_rank_fusion(
                 score=round(score, 6),
                 rank=rank_idx,
                 retrieval_method="hybrid_rrf",
+                dense_similarity=dense_similarities.get(cid),
             )
         )
 

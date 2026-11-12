@@ -1,17 +1,20 @@
 import { UnderHood } from "./UnderHood";
 import React, { useState, useCallback } from "react";
-import type { ChatMessage, ProjectCardData } from "../../lib/types";
+import type { ChatHistoryMessage, ChatMessage, ProjectCardData } from "../../lib/types";
 import { SourceChips } from "./SourceChips";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectModal } from "./ProjectModal";
 import { FormattedMessage } from "./FormattedMessage";
+import { HandoffCard } from "./HandoffCard";
 
 export interface MessageItemProps {
   message: ChatMessage;
+  handoffTranscript?: readonly ChatHistoryMessage[];
 }
 
 export const MessageItem = React.memo(function MessageItem({
   message,
+  handoffTranscript,
 }: MessageItemProps) {
   const isUser = message.role === "user";
   const [activeModalCard, setActiveModalCard] =
@@ -118,6 +121,9 @@ export const MessageItem = React.memo(function MessageItem({
         )}
         {!isUser && message.sources && message.sources.length > 0 && (
           <SourceChips sources={message.sources} />
+        )}
+        {!isUser && message.handoffId && handoffTranscript && (
+          <HandoffCard id={message.handoffId} transcript={handoffTranscript} />
         )}
         {!isUser && message.status !== "streaming" ? <UnderHood telemetry={message.telemetry} browserTiming={message.browserTiming} delivery={message.delivery} /> : null}
       </div>

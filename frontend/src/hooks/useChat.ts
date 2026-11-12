@@ -58,7 +58,12 @@ function savePersistedChat(
     if (typeof window !== "undefined" && window.sessionStorage) {
       window.sessionStorage.setItem(
         CHAT_SESSION_STORAGE_KEY,
-        JSON.stringify({ messages, conversationId })
+        JSON.stringify({
+          messages: messages.map(message =>
+            message.handoffId ? { ...message, handoffId: undefined } : message
+          ),
+          conversationId,
+        })
       );
     }
   } catch {
@@ -245,6 +250,7 @@ export function useChat(companySlug?: string): UseChatReturn {
           onDone: (data) => {
             if (controller.signal.aborted) return;
             setIsResting(false);
+            const handoffId = data.handoff ? crypto.randomUUID() : undefined;
             let activeConvId = conversationId;
             if (data.conversation_id) {
               setConversationId(data.conversation_id);
@@ -256,6 +262,7 @@ export function useChat(companySlug?: string): UseChatReturn {
                   ? {
                       ...msg,
                       status: "done" as const,
+                      handoffId,
                       telemetry: data.telemetry,
                       browserTiming: data.browserTiming,
                       sources:

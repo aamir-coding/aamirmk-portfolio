@@ -23,6 +23,8 @@ class Settings(BaseSettings):
     ENABLE_DEBUG_RETRIEVAL: bool = False
     DATABASE_URL: SecretStr = SecretStr("")
     ANALYTICS_IP_HASH_KEY: SecretStr = SecretStr("")
+    TELEGRAM_BOT_TOKEN: SecretStr = SecretStr("")
+    TELEGRAM_CHAT_ID: SecretStr = SecretStr("")
 
     # CORS configuration - accepts comma-separated string or list of origins
     CORS_ORIGINS: str | list[str] = [
@@ -91,6 +93,22 @@ class Settings(BaseSettings):
         key = value.get_secret_value()
         if key and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", key):
             raise ValueError("Analytics hash key must be 43-128 URL-safe characters")
+        return value
+
+    @field_validator("TELEGRAM_BOT_TOKEN")
+    @classmethod
+    def validate_telegram_token(cls, value: SecretStr) -> SecretStr:
+        token = value.get_secret_value()
+        if token and not re.fullmatch(r"[0-9]{1,20}:[A-Za-z0-9_-]{20,128}", token):
+            raise ValueError("Invalid Telegram bot token format")
+        return value
+
+    @field_validator("TELEGRAM_CHAT_ID")
+    @classmethod
+    def validate_telegram_chat_id(cls, value: SecretStr) -> SecretStr:
+        chat_id = value.get_secret_value()
+        if chat_id and not re.fullmatch(r"-?[0-9]{1,20}", chat_id):
+            raise ValueError("Telegram chat ID must be numeric")
         return value
 
     @field_validator("ALERT_WEBHOOK_URL")

@@ -7,8 +7,9 @@ import secrets
 import time
 import uuid
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 
+import httpx
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,12 +23,14 @@ from app.api.context import router as context_router
 from app.api.debug import router as debug_router
 from app.api.evals import router as evals_router
 from app.api.fit import router as fit_router
+from app.api.handoff import router as handoff_router
 from app.api.health import router as health_router
 from app.api.operations import router as operations_router
 from app.companies import load_company_contexts
 from app.db.analytics import AnalyticsWriter
 from app.db.session import create_database_engine
 from app.fit.cache import ReportCache, cache_identity
+from app.handoff import HandoffNotifier, Handoffs, TelegramNotifier
 from app.llm import GroqLLM
 from app.logging_config import JsonLogFormatter
 from app.release import load_release
@@ -110,34 +113,49 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
             )
         except Exception as exc:
             logger.warning("Inference auto-authorization skipped or failed: %s", exc)
-    database = None
-    analytics = None
-    try:
+    async with AsyncExitStack() as resources:
+        resources.push_async_callback(app.state.llm.aclose)
         if settings.DATABASE_URL.get_secret_value():
             database = create_database_engine(settings.DATABASE_URL)
+            resources.push_async_callback(database.dispose)
             sessions = async_sessionmaker(database, expire_on_commit=False)
             app.state.db_sessions = sessions
             key = settings.ANALYTICS_IP_HASH_KEY.get_secret_value()
             if key:
                 analytics = AnalyticsWriter(sessions, key.encode())
                 app.state.analytics = analytics
-        yield
-    finally:
+                resources.push_async_callback(analytics.close)
+            notifier: HandoffNotifier | None = app.state.handoff_notifier
+            token = settings.TELEGRAM_BOT_TOKEN.get_secret_value()
+            chat_id = settings.TELEGRAM_CHAT_ID.get_secret_value()
+            if (
+                notifier is None
+                and token
+                and chat_id
+                and settings.ENVIRONMENT != "test"
+            ):
+                client = await resources.enter_async_context(
+                    httpx.AsyncClient(
+                        timeout=8, follow_redirects=False, trust_env=False
+                    )
+                )
+                notifier = TelegramNotifier(client, token, chat_id)
+            if notifier is not None:
+                handoffs = Handoffs(sessions, notifier)
+                app.state.handoffs = handoffs
+                resources.push_async_callback(handoffs.close)
         try:
-            if analytics is not None:
-                await analytics.close()
+            yield
         finally:
+            app.state.handoffs = None
             app.state.analytics = None
             app.state.db_sessions = None
-            try:
-                if database is not None:
-                    await database.dispose()
-            finally:
-                await app.state.llm.aclose()
-        logger.info("Shutting down application")
+    logger.info("Shutting down application")
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None, *, handoff_notifier: HandoffNotifier | None = None
+) -> FastAPI:
     """Application factory for FastAPI app instance."""
     app_settings = settings or get_settings()
 
@@ -153,6 +171,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.company_contexts = load_company_contexts()
     app.state.db_sessions = None
     app.state.analytics = None
+    app.state.handoffs = None
+    app.state.handoff_notifier = handoff_notifier
     app.state.retrieval_ready = False
     app.state.log_ip_salt = secrets.token_bytes(32)
     app.state.llm = GroqLLM(app_settings)
@@ -172,6 +192,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         window_seconds=86400,
         enabled=app_settings.RATE_LIMIT_ENABLED,
         max_keys=app_settings.RATE_LIMIT_MAX_KEYS,
+    )
+    app.state.handoff_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=3,
+        window_seconds=3600,
+        max_keys=app_settings.RATE_LIMIT_MAX_KEYS,
+    )
+    app.state.handoff_global_limiter = SlidingWindowRateLimiter(
+        requests_per_window=15, window_seconds=3600, max_keys=1
     )
     app.state.ops_rate_limiter = SlidingWindowRateLimiter(
         requests_per_window=30,
@@ -310,6 +338,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     # Mount API routers
     app.include_router(health_router, prefix="/api")
     app.include_router(context_router, prefix="/api")
+    app.include_router(handoff_router, prefix="/api")
     app.include_router(operations_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")
     app.include_router(fit_router, prefix="/api")

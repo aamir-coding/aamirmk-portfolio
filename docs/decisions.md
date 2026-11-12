@@ -3,6 +3,33 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-074: Consent-based handoff and durable delivery
+
+**Date:** 2026-11-12. Use the raw dense cosine score as a conservative retrieval
+signal. A score below 0.55 across the selected public hits, or zero public hits,
+offers a handoff. Simple greetings follow the normal chat path. The local
+examples included 0.4483 for a weather question and 0.7189 for FastAPI experience.
+Unsupported experience questions also scored above 0.70, so relevance alone
+cannot establish answerability. When configured, the model can use the empty
+`offer_handoff` tool for gaps that the cutoff misses.
+
+JSON and SSE carry an offer flag. The browser previews the last ten completed
+messages through the offer. The visitor explicitly consents before sharing
+the transcript and optional email. The API validates the payload and honeypot,
+and limits submissions to three per hour per IP and tab with a shared cap of
+fifteen. A submission UUID identifies retries of the same payload.
+
+Postgres commit precedes HTTP 202. The app-owned worker locks a pending row
+while sending it to Telegram, then commits the delivery status. Pending rows
+are picked up on restart. An interruption after Telegram accepts the send and
+before the status commits can repeat the notification with the same UUID.
+Provider errors record a failed status for operator review. Telegram messages
+use plain text and long transcripts use a text attachment.
+
+The offline candidate reproduced all seven baseline scores. Refresh the
+application fingerprint and regenerate the matching result and public
+projection. The frozen replay and independent judge validation are preserved.
+
 ### DRN-073: Phase 9 company configuration in eval identity
 
 **Date:** 2026-11-12. Company notes affect tailored prompts, so include

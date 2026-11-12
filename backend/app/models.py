@@ -110,5 +110,6 @@ class ChatResponse(BaseModel):
         default_factory=list,
         description="Authoritative generative UI cards summoned via tool calls",
     )
+    handoff: bool = False
 
     model_config = ConfigDict(frozen=True)

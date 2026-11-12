@@ -47,9 +47,15 @@ export function MessageList({
       aria-label="Conversation history"
       aria-live="polite"
     >
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} />
-      ))}
+      {messages.map((message, index) => {
+        const transcript = message.handoffId
+          ? messages.slice(0, index + 1)
+            .filter(item => item.status === "done" && item.delivery !== "cancelled" && item.content.trim())
+            .slice(-10)
+            .map(({ role, content }) => ({ role, content }))
+          : undefined;
+        return <MessageItem key={message.id} message={message} handoffTranscript={transcript} />;
+      })}
       <div ref={bottomRef} aria-hidden="true" />
     </div>
   );

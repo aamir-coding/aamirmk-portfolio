@@ -93,6 +93,7 @@ export const DoneEventPayloadSchema = z.object({
   sources: z.array(SourceCitationSchema).optional(),
   cards: z.array(ProjectCardDataSchema).optional(),
   telemetry: RequestTelemetrySchema.optional(),
+  handoff: z.literal(true).optional(),
 });
 
 export const ErrorEventPayloadSchema = z.object({

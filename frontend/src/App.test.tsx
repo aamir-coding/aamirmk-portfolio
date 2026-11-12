@@ -78,6 +78,41 @@ describe("<App />", () => {
     expect(stream.mock.lastCall?.[0].companySlug).toBeUndefined();
   });
 
+  it("previews an offered handoff and shares it only after consent", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    vi.spyOn(sse, "streamChat").mockImplementation(async ({ callbacks }) => {
+      callbacks.onToken("I don’t have verified information about that.");
+      callbacks.onDone({ conversation_id: "handoff-chat", handoff: true });
+    });
+    const handoffRequests: RequestInit[] = [];
+    vi.mocked(fetch).mockImplementation(async (url, init) => {
+      if (!String(url).endsWith("/api/handoff")) return new Response(null, { status: 503 });
+      handoffRequests.push(init ?? {});
+      const { id } = JSON.parse(String(init?.body)) as { id: string };
+      return Response.json({ id, status: "accepted" }, { status: 202 });
+    });
+    render(<App />);
+    await screen.findByText("Ready");
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "A question for Aamir" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    const send = await screen.findByRole("button", { name: "Send to Aamir" });
+    expect(send).toBeDisabled();
+    expect(screen.getByText("Preview messages to share")).toBeInTheDocument();
+    expect(handoffRequests).toHaveLength(0);
+    fireEvent.change(screen.getByLabelText("Reply email (optional)"), { target: { value: "recruiter@example.test" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: /agree to share/i }));
+    fireEvent.click(send);
+    await screen.findByText("Request received.");
+    expect(JSON.parse(String(handoffRequests[0]?.body)) as unknown).toMatchObject({
+      consent: true,
+      reply_email: "recruiter@example.test",
+      transcript: [
+        { role: "user", content: "A question for Aamir" },
+        { role: "assistant", content: "I don’t have verified information about that." },
+      ],
+    });
+  });
+
   it("renders header, status indicator, and starter chips on mount", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     render(<App />);

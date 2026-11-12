@@ -22,6 +22,20 @@ No uptime ping is configured to keep the service awake. An on-demand probe wakes
    `python -m pytest -c backend/pyproject.toml backend/tests/test_database.py`.
    The integration tests exercise downgrade as well as upgrade.
 
+## Phase 9 handoff
+
+1. Apply the database migrations before enabling handoff. Set `DATABASE_URL`,
+   `TELEGRAM_BOT_TOKEN` and the intended private `TELEGRAM_CHAT_ID` in the API
+   environment for hosted verification. Open the bot chat with the recipient
+   account before testing delivery.
+2. Submit a synthetic transcript through the card. HTTP 202 means the request
+   is stored. Confirm arrival in Telegram and match the notification's UUID
+   to the handoff row. Long transcripts arrive as a plain-text attachment.
+3. The worker sends pending rows when the process is awake. A failed send
+   records `failed`. An interruption before the status commit leaves the row
+   pending. Compare notification UUIDs when a delivery may have succeeded
+   before a restart.
+
 ## Release and rollback
 
 1. Open a PR to main. Require CI backend/frontend/offline eval and security checks.

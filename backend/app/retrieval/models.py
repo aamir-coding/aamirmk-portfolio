@@ -59,3 +59,4 @@ class RetrievedChunk(BaseModel):
         default="hybrid_rrf",
         description="Method used: bm25, dense, or hybrid_rrf",
     )
+    dense_similarity: float | None = Field(default=None, ge=-1, le=1)

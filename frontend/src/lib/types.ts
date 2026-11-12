@@ -48,6 +48,7 @@ export interface ChatMessage {
   telemetry?: RequestTelemetry;
   browserTiming?: BrowserTiming;
   delivery?: "instant" | "cancelled";
+  handoffId?: string;
 }
 
 export interface ChatHistoryMessage {
