@@ -65,6 +65,7 @@ class MessageRecord(Base):
     latency_ms: Mapped[float] = mapped_column(Float)
     input_tokens: Mapped[int | None]
     output_tokens: Mapped[int | None]
+    handoff_offered: Mapped[bool | None]
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
@@ -82,6 +83,21 @@ class FeedbackRecord(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
+
+
+class FitRunRecord(Base):
+    __tablename__ = "fit_runs"
+    __table_args__ = (
+        CheckConstraint("input_tokens >= 0 AND output_tokens >= 0", name="tokens"),
+        CheckConstraint(
+            "(input_tokens IS NULL) = (output_tokens IS NULL)", name="usage_pair"
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
+    input_tokens: Mapped[int | None]
+    output_tokens: Mapped[int | None]
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
 
 
 class HandoffRecord(Base):

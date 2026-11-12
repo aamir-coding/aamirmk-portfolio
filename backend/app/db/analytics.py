@@ -14,7 +14,7 @@ from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.db.models import MessageRecord, RecruiterSession
+from app.db.models import FitRunRecord, MessageRecord, RecruiterSession
 from app.safety.ip import get_client_ip
 from app.telemetry import RequestTelemetry
 
@@ -32,18 +32,38 @@ class _Event:
     latency_ms: float | None
     input_tokens: int | None
     output_tokens: int | None
+    answer_id: UUID | None
+    handoff_offered: bool | None
+
+
+@dataclass(frozen=True, slots=True)
+class _FitRun:
+    at: datetime
+    input_tokens: int | None
+    output_tokens: int | None
 
 
 class AnalyticsWriter:
     def __init__(self, sessions: async_sessionmaker[AsyncSession], key: bytes) -> None:
         self.sessions = sessions
         self.key = key
-        self._queue: asyncio.Queue[_Event] = asyncio.Queue(maxsize=128)
+        self._queue: asyncio.Queue[_Event | _FitRun] = asyncio.Queue(maxsize=128)
+        self._pending_answers: dict[UUID, asyncio.Event] = {}
         self._worker = asyncio.create_task(self._run())
 
-    def enqueue(self, event: _Event) -> None:
-        with suppress(asyncio.QueueFull):
+    def enqueue(self, event: _Event | _FitRun) -> bool:
+        try:
             self._queue.put_nowait(event)
+        except asyncio.QueueFull:
+            return False
+        if isinstance(event, _Event) and event.answer_id is not None:
+            self._pending_answers[event.answer_id] = asyncio.Event()
+        return True
+
+    async def wait_for_answer(self, answer_id: UUID) -> None:
+        pending = self._pending_answers.get(answer_id)
+        if pending is not None:
+            await asyncio.wait_for(pending.wait(), timeout=5)
 
     async def _run(self) -> None:
         failed = False
@@ -59,9 +79,21 @@ class AnalyticsWriter:
                     )
                 failed = True
             finally:
+                if isinstance(event, _Event) and event.answer_id is not None:
+                    self._pending_answers.pop(event.answer_id).set()
                 self._queue.task_done()
 
-    async def _write(self, event: _Event) -> None:
+    async def _write(self, event: _Event | _FitRun) -> None:
+        if isinstance(event, _FitRun):
+            async with self.sessions.begin() as session:
+                session.add(
+                    FitRunRecord(
+                        created_at=event.at,
+                        input_tokens=event.input_tokens,
+                        output_tokens=event.output_tokens,
+                    )
+                )
+            return
         visit = insert(RecruiterSession).values(
             id=event.session_id,
             ip_hash=event.ip_hash,
@@ -87,11 +119,13 @@ class AnalyticsWriter:
             if event.question is not None:
                 session.add(
                     MessageRecord(
+                        id=event.answer_id,
                         session_id=event.session_id,
                         question=event.question,
                         latency_ms=event.latency_ms,
                         input_tokens=event.input_tokens,
                         output_tokens=event.output_tokens,
+                        handoff_offered=event.handoff_offered,
                         created_at=event.at,
                     )
                 )
@@ -119,12 +153,14 @@ class AnalyticsRequest:
         *,
         question: str | None = None,
         telemetry: RequestTelemetry | None = None,
-    ) -> None:
+        handoff_offered: bool | None = None,
+    ) -> UUID | None:
         session_key = f"session\n{self.ip_hash}\n{self.tab_id}\n{company_slug or ''}"
         session_id = UUID(
             bytes=hmac.digest(self.writer.key, session_key.encode(), "sha256")[:16]
         )
-        self.writer.enqueue(
+        answer_id = uuid4() if question is not None else None
+        queued = self.writer.enqueue(
             _Event(
                 session_id=session_id,
                 ip_hash=self.ip_hash,
@@ -135,6 +171,18 @@ class AnalyticsRequest:
                 if question is not None
                 else None,
                 latency_ms=telemetry.total_ms if telemetry else None,
+                input_tokens=telemetry.input_tokens if telemetry else None,
+                output_tokens=telemetry.output_tokens if telemetry else None,
+                answer_id=answer_id,
+                handoff_offered=handoff_offered,
+            )
+        )
+        return answer_id if queued else None
+
+    def record_fit(self, telemetry: RequestTelemetry | None) -> None:
+        self.writer.enqueue(
+            _FitRun(
+                at=datetime.now(UTC),
                 input_tokens=telemetry.input_tokens if telemetry else None,
                 output_tokens=telemetry.output_tokens if telemetry else None,
             )

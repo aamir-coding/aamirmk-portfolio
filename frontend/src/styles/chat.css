@@ -745,6 +745,48 @@ body {
   cursor: pointer;
 }
 
+.answer-feedback {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.feedback-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.feedback-options button[aria-pressed="true"] {
+  border-color: var(--accent-cobalt);
+  background: var(--accent-cobalt-subtle);
+}
+
+.feedback-reason {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.feedback-reason label {
+  display: grid;
+  width: min(100%, 28rem);
+  gap: var(--space-1);
+}
+
+.feedback-reason textarea {
+  min-width: 0;
+  resize: vertical;
+  padding: var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font: inherit;
+}
+
 /* ==========================================================================
    Editorial Prose Typography & Formatted Markdown Elements
    ========================================================================== */

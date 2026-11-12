@@ -1,4 +1,4 @@
-import type { ChatHistoryMessage, SampleJobDescription } from "./types";
+import type { ChatHistoryMessage, FeedbackRating, SampleJobDescription } from "./types";
 import { SampleJobDescriptionSchema } from "./contracts";
 import { getSessionId } from "./session";
 import { z } from "zod";
@@ -99,6 +99,27 @@ export async function submitHandoff(payload: HandoffSubmission, signal: AbortSig
   if (!accepted.success || accepted.data.id !== payload.id) {
     throw new Error("The handoff could not be confirmed.");
   }
+}
+
+const FeedbackSavedSchema = z.object({ rating: z.enum(["up", "down"]) });
+
+export async function submitFeedback(
+  answerId: string, rating: FeedbackRating, reason: string | null, signal: AbortSignal,
+): Promise<FeedbackRating> {
+  const response = await fetch(`${getApiBaseUrl()}/api/feedback`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Session-ID": getSessionId() },
+    body: JSON.stringify({ answer_id: answerId, rating, reason }),
+    signal,
+  });
+  if (!response.ok) {
+    if (response.status === 404) throw new Error("Feedback is unavailable for this answer.");
+    if (response.status === 429) throw new Error("Feedback limit reached. Try again in a minute.");
+    throw new Error("Feedback could not be saved. Try again.");
+  }
+  const saved = FeedbackSavedSchema.safeParse(await response.json());
+  if (!saved.success) throw new Error("Feedback could not be confirmed. Try again.");
+  return saved.data.rating;
 }
 
 export async function fetchFitPresets(signal?: AbortSignal): Promise<SampleJobDescription[]> {

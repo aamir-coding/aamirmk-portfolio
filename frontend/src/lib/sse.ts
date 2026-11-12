@@ -29,6 +29,7 @@ export interface StreamChatCallbacks {
     sources?: SourceCitation[];
     cards?: ProjectCardData[];
     handoff?: true;
+    feedback_id?: string;
     telemetry?: RequestTelemetry;
     browserTiming?: BrowserTiming;
   }) => void;
@@ -197,6 +198,7 @@ export async function streamChat({
               sources: res.data.sources,
               cards: res.data.cards,
               handoff: res.data.handoff,
+              feedback_id: res.data.feedback_id,
               telemetry: res.data.telemetry,
               browserTiming: { total_ms: performance.now() - started, first_text_ms: firstText },
             });

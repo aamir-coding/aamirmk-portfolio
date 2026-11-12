@@ -16,7 +16,8 @@ from fastapi.responses import StreamingResponse
 
 from app.api.context import ResolvedCompany
 from app.api.handoff import handoff_available
-from app.db.analytics import Analytics
+from app.companies import CompanyContext
+from app.db.analytics import Analytics, AnalyticsRequest
 from app.llm import (
     LLMAuthError,
     LLMCapacityError,
@@ -44,7 +45,13 @@ from app.safety.rate_limiter import (
     check_rate_limit,
 )
 from app.settings import get_settings
-from app.telemetry import ObservedLLM, ObservedRetriever, Trace, provenance
+from app.telemetry import (
+    ObservedLLM,
+    ObservedRetriever,
+    RequestTelemetry,
+    Trace,
+    provenance,
+)
 from app.tools.projects import ProjectCardData
 from app.tools.registry import HandoffOffer, ToolRegistry, get_tool_registry
 
@@ -57,6 +64,23 @@ RESTING_MESSAGE = (
 )
 HANDOFF_REPLY = "I don’t have enough verified information to answer that fully."
 HandoffAvailable = Annotated[bool, Depends(handoff_available)]
+
+
+def _record_answer(
+    analytics: AnalyticsRequest | None,
+    company: CompanyContext | None,
+    question: str,
+    telemetry: RequestTelemetry,
+    handoff_offered: bool | None,
+) -> uuid.UUID | None:
+    if analytics is None:
+        return None
+    return analytics.record(
+        company.slug if company else None,
+        question=question,
+        telemetry=telemetry,
+        handoff_offered=handoff_offered,
+    )
 
 
 def weak_evidence(query: str, chunks: list[RetrievedChunk]) -> bool:
@@ -204,12 +228,6 @@ async def chat(
     if can_handoff and weak_evidence(search_query, retrieved_chunks):
         trace.text()
         telemetry = trace.snapshot().model_copy(update=versions)
-        if analytics is not None:
-            analytics.record(
-                company.slug if company else None,
-                question=request.message,
-                telemetry=telemetry,
-            )
         return ChatResponse(
             telemetry=telemetry,
             reply=HANDOFF_REPLY,
@@ -217,6 +235,9 @@ async def chat(
             model="retrieval",
             usage=TokenUsage(prompt_tokens=0, completion_tokens=0, total_tokens=0),
             handoff=True,
+            feedback_id=_record_answer(
+                analytics, company, request.message, telemetry, True
+            ),
         )
     citations = extract_citations(retrieved_chunks)
     system_prompt = build_system_prompt(
@@ -340,12 +361,6 @@ async def chat(
         )
     trace.text()
     telemetry = trace.snapshot().model_copy(update=versions)
-    if analytics is not None:
-        analytics.record(
-            company.slug if company else None,
-            question=request.message,
-            telemetry=telemetry,
-        )
     return ChatResponse(
         telemetry=telemetry,
         reply=reply_text,
@@ -359,6 +374,13 @@ async def chat(
         sources=citations,
         cards=summoned_cards,
         handoff=offer_handoff,
+        feedback_id=_record_answer(
+            analytics,
+            company,
+            request.message,
+            telemetry,
+            offer_handoff if can_handoff else None,
+        ),
     )
 
 
@@ -437,12 +459,9 @@ async def chat_stream(
         async def handoff_generator() -> AsyncIterator[str]:
             trace.text()
             telemetry = trace.snapshot().model_copy(update=versions)
-            if analytics is not None:
-                analytics.record(
-                    company.slug if company else None,
-                    question=request.message,
-                    telemetry=telemetry,
-                )
+            feedback_id = _record_answer(
+                analytics, company, request.message, telemetry, True
+            )
             payload = json.dumps({"token": HANDOFF_REPLY})
             yield f"event: token\ndata: {payload}\n\n"
             done_payload = json.dumps(
@@ -452,6 +471,7 @@ async def chat_stream(
                     "cards": [],
                     "telemetry": telemetry.model_dump(),
                     "handoff": True,
+                    **({"feedback_id": str(feedback_id)} if feedback_id else {}),
                 }
             )
             yield f"event: done\ndata: {done_payload}\n\n"
@@ -587,12 +607,13 @@ async def chat_stream(
                             yield f"event: token\ndata: {payload}\n\n"
 
             telemetry = trace.snapshot().model_copy(update=versions)
-            if analytics is not None:
-                analytics.record(
-                    company.slug if company else None,
-                    question=request.message,
-                    telemetry=telemetry,
-                )
+            feedback_id = _record_answer(
+                analytics,
+                company,
+                request.message,
+                telemetry,
+                offer_handoff if can_handoff else None,
+            )
             done_payload = json.dumps(
                 {
                     "conversation_id": conv_id,
@@ -600,6 +621,7 @@ async def chat_stream(
                     "cards": [c.model_dump() for c in summoned_cards],
                     "telemetry": telemetry.model_dump(),
                     **({"handoff": True} if offer_handoff else {}),
+                    **({"feedback_id": str(feedback_id)} if feedback_id else {}),
                 }
             )
             yield f"event: done\ndata: {done_payload}\n\n"

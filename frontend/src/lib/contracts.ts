@@ -94,6 +94,7 @@ export const DoneEventPayloadSchema = z.object({
   cards: z.array(ProjectCardDataSchema).optional(),
   telemetry: RequestTelemetrySchema.optional(),
   handoff: z.literal(true).optional(),
+  feedback_id: z.string().uuid().optional(),
 });
 
 export const ErrorEventPayloadSchema = z.object({

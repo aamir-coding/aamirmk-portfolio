@@ -10,14 +10,17 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Request, status
 from fastapi.responses import StreamingResponse
+from pydantic import ValidationError
 
 from app.api.chat import StreamHeartbeat, stream_with_heartbeat
+from app.db.analytics import Analytics
 from app.fit.models import FitRequest
 from app.fit.pipeline import FitPipeline
 from app.llm import LLMClient, get_llm_client
 from app.retrieval.retriever import Retriever, get_retriever
 from app.safety.rate_limiter import check_fit_rate_limit
 from app.settings import Settings, get_settings
+from app.telemetry import RequestTelemetry
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +85,7 @@ async def generate_fit_report(
     body: FitRequest,
     _rate: Any = Depends(check_fit_rate_limit),
     pipeline: FitPipeline = Depends(get_fit_pipeline),
+    analytics: Analytics = None,
 ) -> StreamingResponse:
     """Analyze a pasted job description and stream progress and fit report via SSE."""
     logger.info("Initiating fit report generation")
@@ -90,6 +94,13 @@ async def generate_fit_report(
         async with aclosing(pipeline.run(body)) as frames:
             async for frame in frames:
                 event_name = frame["event"]
+                if analytics is not None and event_name == "complete":
+                    raw_telemetry = frame["data"].get("telemetry")
+                    try:
+                        telemetry = RequestTelemetry.model_validate(raw_telemetry)
+                    except ValidationError:
+                        telemetry = None
+                    analytics.record_fit(telemetry)
                 event_data = json.dumps(frame["data"])
                 yield f"event: {event_name}\ndata: {event_data}\n\n"
 

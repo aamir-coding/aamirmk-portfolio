@@ -113,6 +113,69 @@ describe("<App />", () => {
     });
   });
 
+  it("saves a downvote and optional reason for a recorded answer", async () => {
+    vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
+    const id = "0582803f-86e7-4ec0-b182-0901c1838567";
+    vi.spyOn(sse, "streamChat").mockImplementation(async ({ callbacks }) => {
+      callbacks.onToken("A reply with sources.");
+      callbacks.onDone({ conversation_id: "feedback-chat", feedback_id: id });
+    });
+    const writes: unknown[] = [];
+    vi.mocked(fetch).mockImplementation(async (url, init) => {
+      if (!String(url).endsWith("/api/feedback")) return new Response(null, { status: 503 });
+      writes.push(JSON.parse(String(init?.body)));
+      return Response.json({ rating: "down" });
+    });
+    render(<App />);
+    await screen.findByText("Ready");
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "A question for Aamir" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Not helpful" }));
+    expect(writes).toHaveLength(0);
+    fireEvent.change(screen.getByLabelText("Reason (optional)"), { target: { value: "Needs an example" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send feedback" }));
+    await screen.findByText("Feedback saved.");
+    expect(writes).toEqual([{ answer_id: id, rating: "down", reason: "Needs an example" }]);
+  });
+
+  it("loads the admin dashboard with an in-memory bearer and clears it on sign out", async () => {
+    window.history.replaceState(null, "", "/admin");
+    const token = "admin-test-token";
+    vi.mocked(fetch).mockImplementation(async () => Response.json({
+      start_date: "2026-11-06", end_date: "2026-11-12",
+      question_count: 1, classified_questions: 1, unanswered_count: 1,
+      average_latency_ms: 100, fit_reports: 0, handoff_count: 0, candidate_count: 1,
+      daily_token_ceiling: 160000, usage: [], company_opens: [], top_questions: [],
+      unanswered: [], handoffs: [], feedback: [], candidates: [{
+        id: "0582803f-86e7-4ec0-b182-0901c1838567",
+        question: "Where did the claim come from?",
+        created_at: "2026-11-12T00:20:00Z",
+        rating: "down",
+        reason: "Needs a source",
+      }],
+    }));
+    render(<App />);
+    const input = await screen.findByLabelText("Admin token");
+    expect(fetch).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: token } });
+    fireEvent.click(screen.getByRole("button", { name: "Open dashboard" }));
+    await screen.findByRole("heading", { name: "Candidate eval cases" });
+    expect(screen.getByRole("cell", { name: "Where did the claim come from?" })).toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/admin/dashboard"),
+      expect.objectContaining({
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "omit",
+        cache: "no-store",
+      }),
+    );
+    expect(JSON.stringify(localStorage)).not.toContain(token);
+    expect(JSON.stringify(sessionStorage)).not.toContain(token);
+    fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
+    expect(screen.getByLabelText("Admin token")).toHaveValue("");
+    expect(screen.queryByRole("heading", { name: "Candidate eval cases" })).not.toBeInTheDocument();
+  });
+
   it("renders header, status indicator, and starter chips on mount", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     render(<App />);

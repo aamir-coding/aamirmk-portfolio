@@ -36,6 +36,18 @@ No uptime ping is configured to keep the service awake. An on-demand probe wakes
    pending. Compare notification UUIDs when a delivery may have succeeded
    before a restart.
 
+## Phase 9 feedback and admin
+
+1. Apply Alembic revision `0002` before using the dashboard or enabling feedback
+   capture. Set a dedicated `ADMIN_TOKEN` in the API environment, distinct from
+   `OPS_TOKEN`. Open `/admin` on the portfolio frontend and enter the bearer there.
+2. The dashboard reads the last seven UTC days. Handoff offer rate uses
+   classified questions. Known token totals count recorded usage, with unknown
+   runs shown separately. The ceiling comes from API configuration.
+3. Feedback appears on completed live responses queued for analytics. Keep
+   hosted question capture disabled until scheduled retention is in place.
+   Use synthetic questions and a test database for verification.
+
 ## Release and rollback
 
 1. Open a PR to main. Require CI backend/frontend/offline eval and security checks.

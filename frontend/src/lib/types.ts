@@ -49,7 +49,10 @@ export interface ChatMessage {
   browserTiming?: BrowserTiming;
   delivery?: "instant" | "cancelled";
   handoffId?: string;
+  feedbackId?: string;
 }
+
+export type FeedbackRating = "up" | "down";
 
 export interface ChatHistoryMessage {
   role: "user" | "assistant";

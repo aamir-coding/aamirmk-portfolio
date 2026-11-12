@@ -5,7 +5,7 @@ from functools import lru_cache
 from typing import Any, Literal
 from urllib.parse import urlsplit
 
-from pydantic import Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.safety.admission import CapacityLimits
@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
     OPS_TOKEN: SecretStr = SecretStr("")
+    ADMIN_TOKEN: SecretStr = SecretStr("")
     ALERT_WEBHOOK_URL: SecretStr = SecretStr("")
     ALERT_WEBHOOK_FORMAT: Literal["generic", "discord"] = "generic"
     ENABLE_DEBUG_RETRIEVAL: bool = False
@@ -86,6 +87,20 @@ class Settings(BaseSettings):
         if token and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", token):
             raise ValueError("Operator credential must be 43-128 URL-safe characters")
         return value
+
+    @field_validator("ADMIN_TOKEN")
+    @classmethod
+    def validate_admin_token(cls, value: SecretStr) -> SecretStr:
+        token = value.get_secret_value()
+        if token and not re.fullmatch(r"[A-Za-z0-9_-]{43,128}", token):
+            raise ValueError("Admin credential must be 43-128 URL-safe characters")
+        return value
+
+    @model_validator(mode="after")
+    def separate_bearer_tokens(self) -> "Settings":
+        if self.ADMIN_TOKEN.get_secret_value() and self.ADMIN_TOKEN == self.OPS_TOKEN:
+            raise ValueError("Admin and operator credentials must be distinct")
+        return self
 
     @field_validator("ANALYTICS_IP_HASH_KEY")
     @classmethod

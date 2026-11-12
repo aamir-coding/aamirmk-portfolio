@@ -3,6 +3,30 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-075: Feedback and private analytics
+
+**Date:** 2026-11-12. Use the recorded answer's random UUID as the feedback
+handle. The chat response can expose it as soon as the background writer
+queues the record. A feedback submission waits briefly for that pending write
+and keeps the first recorded vote. The original vote and optional reason
+survive retries. A downvote is a candidate for human review. It leaves the
+frozen eval cases, recordings and judge evidence unchanged.
+
+Use a separate admin bearer validated with `secrets.compare_digest`. The
+browser holds the bearer only in memory and clears it on sign out. Admin
+responses are uncached. The dashboard reads one consistent Postgres snapshot
+over the last seven UTC days, with at most twenty rows per detail list.
+
+Revision `0002` adds nullable handoff classification and a table for completed
+fit-run usage. Existing and unclassified questions stay outside the handoff
+rate denominator. Known tokens count reported usage on recorded chat answers
+and completed fit reports. The dashboard also shows runs with unknown usage
+and the configured daily ceiling. Fit analytics stores no job description.
+
+The offline candidate reproduced all seven baseline scores. Refresh the
+application fingerprint and regenerate the matching result and public
+projection.
+
 ### DRN-074: Consent-based handoff and durable delivery
 
 **Date:** 2026-11-12. Use the raw dense cosine score as a conservative retrieval

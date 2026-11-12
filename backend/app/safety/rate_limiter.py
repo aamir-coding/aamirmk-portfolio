@@ -165,3 +165,9 @@ async def check_handoff_rate_limit(request: Request) -> None:
             detail="Handoff limit reached. Please try again later.",
             headers={"Retry-After": str(shared.reset_seconds)},
         )
+
+
+async def check_feedback_rate_limit(request: Request) -> None:
+    await _enforce(
+        request, request.app.state.feedback_rate_limiter, "Feedback limit reached"
+    )

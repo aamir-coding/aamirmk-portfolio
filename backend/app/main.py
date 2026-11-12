@@ -18,10 +18,12 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp, Receive, Scope, Send
 
+from app.api.admin import router as admin_router
 from app.api.chat import router as chat_router
 from app.api.context import router as context_router
 from app.api.debug import router as debug_router
 from app.api.evals import router as evals_router
+from app.api.feedback import router as feedback_router
 from app.api.fit import router as fit_router
 from app.api.handoff import router as handoff_router
 from app.api.health import router as health_router
@@ -201,6 +203,12 @@ def create_app(
     app.state.handoff_global_limiter = SlidingWindowRateLimiter(
         requests_per_window=15, window_seconds=3600, max_keys=1
     )
+    app.state.feedback_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=15, max_keys=app_settings.RATE_LIMIT_MAX_KEYS
+    )
+    app.state.admin_rate_limiter = SlidingWindowRateLimiter(
+        requests_per_window=30, max_keys=2
+    )
     app.state.ops_rate_limiter = SlidingWindowRateLimiter(
         requests_per_window=30,
         max_keys=2,
@@ -231,6 +239,7 @@ def create_app(
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         if (
             request.url.path.startswith("/api/ops/")
+            or request.url.path.startswith("/api/admin/")
             or request.url.path == "/api/health"
         ):
             response.headers["Cache-Control"] = "no-store"
@@ -339,6 +348,8 @@ def create_app(
     app.include_router(health_router, prefix="/api")
     app.include_router(context_router, prefix="/api")
     app.include_router(handoff_router, prefix="/api")
+    app.include_router(feedback_router, prefix="/api")
+    app.include_router(admin_router, prefix="/api")
     app.include_router(operations_router, prefix="/api")
     app.include_router(chat_router, prefix="/api")
     app.include_router(fit_router, prefix="/api")

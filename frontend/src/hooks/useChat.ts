@@ -263,6 +263,7 @@ export function useChat(companySlug?: string): UseChatReturn {
                       ...msg,
                       status: "done" as const,
                       handoffId,
+                      feedbackId: data.feedback_id,
                       telemetry: data.telemetry,
                       browserTiming: data.browserTiming,
                       sources:

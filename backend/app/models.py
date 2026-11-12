@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -111,5 +112,6 @@ class ChatResponse(BaseModel):
         description="Authoritative generative UI cards summoned via tool calls",
     )
     handoff: bool = False
+    feedback_id: UUID | None = None
 
     model_config = ConfigDict(frozen=True)

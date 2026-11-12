@@ -19,9 +19,14 @@ import "./styles/chat.css";
 const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
 
 const EvalPage = lazy(() => import("./components/Evals/EvalPage"));
+const AdminPage = lazy(() => import("./components/Admin/AdminPage"));
 
 export function App() {
-  return window.location.pathname.replace(/\/$/, "") === "/evals"
+  const path = window.location.pathname.replace(/\/$/, "");
+  if (path === "/admin") {
+    return <Suspense fallback={<p role="status">Loading dashboard…</p>}><AdminPage /></Suspense>;
+  }
+  return path === "/evals"
     ? <Suspense fallback={<p role="status">Loading evaluation record…</p>}><EvalPage /></Suspense>
     : <Portfolio />;
 }
@@ -222,7 +227,7 @@ function Portfolio() {
       <footer className="fit-form-notice">
         <p>AI assistant about Aamir. Live questions and job descriptions are processed by Groq.
           This browser tab stores a copy of the chat. When analytics is enabled, the service
-          stores questions, usage, and basic visit details to improve the portfolio.
+          stores questions, usage, basic visit details, and submitted feedback to improve the portfolio.
           Reports are reused for up to 15 minutes and
           held in bounded server memory until eviction or restart.
           Service logs use request IDs and temporary salted IP hashes, without message text.</p>

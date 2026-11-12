@@ -248,7 +248,7 @@ not unfinished work in the accepted offline engineering milestone.
 - **Baseline for Phase 3 UX**: 25s average, 35s max timeout allowance.
 
 ## Next Step
-1. Review Phase 9 Increments 1–3. Increment 4 adds feedback and admin. Hosted
+1. Review Phase 9 Increments 1–4. Increment 5 adds forwardable summaries. Hosted
    verification will use the credentials Aamir provides later.
 2. Phase 7 is closed at `de73fb5` / `phase-7-hardening-done`; remote push is user-confirmed. Verify cloud checks and deployed runtime identity during P10 operational acceptance.
 3. Preserve all 28 human grades and five validation disagreements. Independent validation failed Completeness/Tone at 6/8 each. Fact approval, fresh independently graded validation and any live generation budget remain separate publication gates.
@@ -857,3 +857,15 @@ See the [full evidence ledger](audits/2026-11-06-phase-07-safety.md).
   tracked result and public projection use clean source `bbec78a`.
 - Hosted Supabase and Telegram delivery verification remain pending. Feedback
   and admin, summaries, durable quota, retention and restore are later increments.
+
+### Phase 9 Increment 4 — 12 November 2026
+
+- Recorded chat answers can receive one thumbs-up or thumbs-down and an
+  optional reason. Downvotes appear in a candidate eval review queue.
+- The lazy-loaded `/admin` page uses a separate in-memory bearer and shows
+  questions, handoff offers, latency, usage, fit counts, company opens, handoffs
+  and feedback from Postgres. Migration `0002` adds fit-run usage and handoff
+  classification. See DRN-075 and the
+  [admin runbook](runbooks/production.md#phase-9-feedback-and-admin).
+- Hosted admin verification and retention remain pending. Summary links,
+  durable quota, and backup restore are later increments.
