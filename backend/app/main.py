@@ -135,7 +135,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
                 app.state.boot_quota = boot_quota
                 resources.push_async_callback(boot_quota.close)
                 if (
-                    settings.AUTO_AUTHORIZE_INFERENCE
+                    auto_authorize
                     and settings.GROQ_API_KEY
                     and settings.ENVIRONMENT != "test"
                 ):

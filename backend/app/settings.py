@@ -47,23 +47,29 @@ class Settings(BaseSettings):
     RATE_LIMIT_REQUESTS_PER_MINUTE: int = 10
     RATE_LIMIT_BURST: int = 15
     FIT_RATE_LIMIT_DAILY: int = 5
-    QUOTA_DAILY_REQUEST_LIMIT: int = 800
-    QUOTA_DAILY_TOKEN_LIMIT: int = 180000
+    QUOTA_DAILY_REQUEST_LIMIT: int = 5000
+    QUOTA_DAILY_TOKEN_LIMIT: int = 2000000
+    ENABLE_QUERY_REWRITE: bool = Field(
+        default=True,
+        description="Enable conversational query rewriting before retrieval.",
+    )
 
     # A ledger remains closed until a fresh, boot-bound allowance is authorized.
     INFERENCE_SHARED_LIMITS: CapacityLimits = Field(
-        default_factory=lambda: CapacityLimits(rpm=24, tpm=32000, rpd=800, tpd=160000)
+        default_factory=lambda: CapacityLimits(
+            rpm=120, tpm=1000000, rpd=5000, tpd=2000000
+        )
     )
     INFERENCE_MODEL_LIMITS: dict[str, CapacityLimits] = Field(
         default_factory=lambda: {
-            model: CapacityLimits(rpm=24, tpm=32000, rpd=800, tpd=160000)
+            model: CapacityLimits(rpm=120, tpm=1000000, rpd=5000, tpd=2000000)
             for model in ("openai/gpt-oss-120b", "openai/gpt-oss-20b")
         },
         min_length=1,
         max_length=2,
     )
-    INFERENCE_MAX_ACTIVE: int = Field(default=2, ge=1, le=16, strict=True)
-    INFERENCE_MAX_WAITERS: int = Field(default=8, ge=0, le=64, strict=True)
+    INFERENCE_MAX_ACTIVE: int = Field(default=4, ge=1, le=16, strict=True)
+    INFERENCE_MAX_WAITERS: int = Field(default=16, ge=0, le=64, strict=True)
     AUTO_AUTHORIZE_INFERENCE: bool = Field(
         default=False,
         description=(
@@ -73,7 +79,7 @@ class Settings(BaseSettings):
     )
     DURABLE_INFERENCE_QUOTA: bool = False
     INFERENCE_BOOT_ALLOWANCE: DailyCapacity = Field(
-        default_factory=lambda: DailyCapacity(requests=200, tokens=64000)
+        default_factory=lambda: DailyCapacity(requests=1000, tokens=500000)
     )
 
     @property

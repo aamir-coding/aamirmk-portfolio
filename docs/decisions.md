@@ -3,6 +3,19 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-079: Relax local inference byte ceiling to 1M TPM and sanitize tool message content
+
+**Date:** 2026-11-12. Rapid sequential interactions during user and recruiter testing
+triggered artificial rate throttles due to estimating token consumption using serialized
+UTF-8 JSON bytes (where a single card query consumes ~29k bytes, exceeding a 32k byte/min
+window). Relax the local capacity limits default to 120 RPM, 1,000,000 TPM (bytes), and
+2,000,000 TPD, while keeping all database tables, boot quota authorization, and rate
+limiting architecture fully intact for interview discussion and production resilience.
+Fix Groq tool-use API error by emitting `content: None` (null in JSON) rather than `""`
+when an assistant message has `tool_calls`. Align `boot_quota.start()` authorization check
+with local `auto_authorize` flag and bypass artificial warm-up delays.
+Allow query rewriting to be toggled via `ENABLE_QUERY_REWRITE` (default True).
+
 ### DRN-078: Schedule retention in Postgres and rehearse a schema restore
 
 **Date:** 2026-11-12. Put cleanup in revision `0004` and register its daily

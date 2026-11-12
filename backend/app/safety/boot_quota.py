@@ -68,7 +68,7 @@ class BootQuota:
                 raise DurableCapacityUnavailable
             if not exact and self._ledger.utcnow() >= granted.expires_at:
                 raise DurableCapacityUnavailable
-            self._ledger.authorize(granted)
+            self._ledger.authorize(granted, warm_up_seconds=0.0)
             return granted
 
     def start(self) -> None:

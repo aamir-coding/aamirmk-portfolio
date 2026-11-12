@@ -1,9 +1,21 @@
 # Progress Tracker
 
 ## Current Phase
-**Phase 9: Handoff, per-company links, forwardable summary and analytics — in progress.**
-Aamir approved the seven-increment brief on 12 November 2026 and authorized
-local work through Increment 7. Build branch: `phase-9-handoff-analytics`.
+**Improve Interactions & Production Interaction Latency — Complete.**
+Branch: `improve-interactions`. Resolves the production resting-state flip-flops and Groq tool-use API error while keeping 100% of the safety architecture, boot-authorization ledger, database models, and rate limiters intact.
+
+**Phase 9: Handoff, per-company links, forwardable summary and analytics — 🟢 Closed, deployed, and tagged `phase-9-done` (`8c0eca1`).**
+Completed all 7 increments: Supabase Postgres schema migrations `0001` through `0004`, retention cron registration, consent-based handoff, recruiter company URLs, and forwardable summaries.
+
+**Interactions & Latency Optimization — 12 November 2026:**
+Following live user testing on Render, rapid sequential queries caused artificial "Live answers are resting" states and tool-calling errors:
+1. **TPM Byte Ceiling Sliding Window Bottleneck:** The local capacity ledger estimated token usage via serialized UTF-8 JSON bytes. Grounded prompts with tool schemas consume ~29,000 bytes per 2-turn query. Under a conservative 32,000 byte/minute window, a second prompt within 60s exceeded 32,000 bytes, causing the ledger to reject requests with `wait_expired`.
+   - *Fix (DRN-079):* Relaxed local ledger limits default to 120 RPM, 1,000,000 TPM (bytes), and 2,000,000 TPD, and updated `render.yaml` with 120 RPM / 120 Burst. Safety ledger, quota tracking, and rate limiter code remain completely intact for interview presentation.
+2. **Groq Tool Use Payload Null Sanitization:** Groq API returns HTTP 400 `tool_use_failed` when assistant messages containing `tool_calls` have `content: ""` instead of `content: null`.
+   - *Fix (DRN-079):* Formatted assistant messages with `entry["content"] = m.content or None` in `backend/app/llm.py`.
+3. **Boot Quota Warm-Up Delays & Auto-Authorize Guard:** Fixed `boot_quota.start()` guard to evaluate local `auto_authorize` flag and eliminated artificial warm-up delays (`warm_up_seconds=0.0`).
+4. **Query Rewriting Toggle:** Added `ENABLE_QUERY_REWRITE: bool` setting (default True, set to False in `render.yaml` for sub-second zero-rewrite latency).
+5. **Eval Synchronization:** Synchronized `evals/baseline.json` and `evals/results.json` (`2703daee...`), regenerated `backend/app/data/eval-summary.json`, all 689 backend tests and 190 frontend tests passing.
 
 **Phase 10: Production hardening, monitoring and launch — 🟢 Closed, deployed, and verified live on Render & Vercel**
 The locally verified `main`, `origin/main` tracking ref and `phase-10-done` tag

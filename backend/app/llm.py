@@ -222,6 +222,7 @@ class GroqLLM:
         for m in messages:
             entry: dict[str, Any] = {"role": m.role, "content": m.content}
             if m.role == "assistant" and m.tool_calls:
+                entry["content"] = m.content or None
                 entry["tool_calls"] = [
                     {
                         "id": tc.id,

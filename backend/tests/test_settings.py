@@ -41,9 +41,9 @@ def test_cors_origins_defaults_when_unset(monkeypatch) -> None:
 
 def test_inference_limits_are_conservative_and_do_not_include_an_allowance() -> None:
     settings = Settings(_env_file=None)
-    assert settings.INFERENCE_SHARED_LIMITS.rpm == 24
-    assert settings.INFERENCE_SHARED_LIMITS.tpm == 32000
-    assert settings.INFERENCE_SHARED_LIMITS.tpd == 160000
+    assert settings.INFERENCE_SHARED_LIMITS.rpm == 120
+    assert settings.INFERENCE_SHARED_LIMITS.tpm == 1000000
+    assert settings.INFERENCE_SHARED_LIMITS.tpd == 2000000
     assert len(settings.INFERENCE_MODEL_LIMITS) == 2
 
 

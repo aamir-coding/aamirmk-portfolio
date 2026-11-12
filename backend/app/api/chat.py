@@ -213,14 +213,17 @@ async def chat(
             cards=[],
         )
 
-    # 2. Rewrite follow-up query if conversation history is present
+    # 2. Rewrite follow-up query if conversation history is present and enabled
     trace.set_stage("rewrite")
-    search_query = await rewrite_follow_up_query(
-        request.message,
-        request.history,
-        llm=llm,
-        model=get_settings().LLM_MODEL_UTILITY,
-    )
+    if get_settings().ENABLE_QUERY_REWRITE:
+        search_query = await rewrite_follow_up_query(
+            request.message,
+            request.history,
+            llm=llm,
+            model=get_settings().LLM_MODEL_UTILITY,
+        )
+    else:
+        search_query = request.message
 
     # 3. Retrieve relevant factual context chunks & generate receipts
     trace.set_stage("retrieval")
@@ -442,14 +445,17 @@ async def chat_stream(
             headers=headers,
         )
 
-    # 2. Rewrite follow-up query if conversation history is present
+    # 2. Rewrite follow-up query if conversation history is present and enabled
     trace.set_stage("rewrite")
-    search_query = await rewrite_follow_up_query(
-        request.message,
-        request.history,
-        llm=llm,
-        model=get_settings().LLM_MODEL_UTILITY,
-    )
+    if get_settings().ENABLE_QUERY_REWRITE:
+        search_query = await rewrite_follow_up_query(
+            request.message,
+            request.history,
+            llm=llm,
+            model=get_settings().LLM_MODEL_UTILITY,
+        )
+    else:
+        search_query = request.message
 
     # 3. Retrieve relevant factual context chunks & generate receipts
     trace.set_stage("retrieval")
