@@ -1,16 +1,25 @@
 # Progress Tracker
 
 ## Current Phase
-**M6: Field of Evidence secondary screens and footer — implemented locally and ready for review.**
+**M7: Field of Evidence regression and polish — local release review complete.**
+Branch `codex/phase-m7-regression-polish`. Long fit-report text wraps within the dialog. The mobile masthead keeps the complete keyboard focus outline visible. The validation entry skips Zod’s optional eval probe under the existing CSP. See [DRN-086](decisions.md) and the [M7 study guide](study-guides/phase-m7-regression-polish.md).
+
+- Chrome checked the cover and keyboard flow at 375, 768, 1024, and 1440 px, reflow down to 320 CSS px, and 200% root text. At 320 px the expanded long-report fixture went from a 2,859 px scroll width to the available 318 px. The browser replays passed for chat, role fit, recruiter actions, summary, evaluations, and admin. The A4 and Letter summary exports omit the fixture share token.
+- The current assistant repository and both project demos returned HTTP 200. The retired repository returned 404. The corrected résumé PDF changes one link annotation and renders identically. Four legacy saved answers now use public résumé and project evidence.
+- ESLint, Vite/TypeScript build and 192 Vitest tests passed. Ruff lint and format checks passed. Backend and evaluation pytest reported 689 passed with 8 skipped. The offline CI replay gate passed 8 of 8 recordings with zero provider calls. Backend, knowledge corpus, API contracts, and hosting configuration have no diff against the deployed baseline.
+- Initial JavaScript was 171,290 gzip bytes against the 200,000-byte budget. In the paired throttled Chrome lab, median mobile LCP improved from 3.33 s to 2.77 s against the deployed build. The 2.50 s target remains open. Layout shift measured 0.00033. A diagnostic run with artwork blocked measured 2.60 s. No candidate animation was running in the idle samples.
+- Physical mobile keyboards, Firefox/WebKit, and screen-reader speech remain unverified. The existing draft-corpus review remains open, including the discrepancy between the public résumé’s Top 10 hackathon placement and the existing draft placement claim. M7 corrected the saved frontend answer. Local tag `phase-m6-done` is the M7 rollback point. Release requires owner approval.
+
+## Previous Work
+**M6: Field of Evidence secondary screens and footer — approved for M7.**
 Branch `codex/phase-m6-secondary-screens`. The footer makes direct contact and the full privacy disclosure easy to find. The team summary, evaluation record, admin dashboard, and response receipt use the Field of Evidence visual system. See [DRN-085](decisions.md) and the [M6 study guide](study-guides/phase-m6-secondary-screens.md).
 
 - Chrome tested all four surfaces at 320, 375, 768, 1024, and 1440 px without document-width overflow. The replay covered direct contact and disclosure by keyboard, summary availability, expiry and retry, stale and current evaluation evidence, admin rejection and sign-out, and keyboard scrolling of wide tables. Existing recruiter flows passed and the technical receipt opened by keyboard.
 - A4 and Letter each produced one page. With browser headers and footers requested, neither PDF contained the fixture share token in the text, metadata, or link annotations. The fixtures verified the configured summary privacy headers and actual referrer behavior. Print from other browsers and physical printers remains unverified.
 - Measured text pairings ran from 5.82:1 to 13.96:1. Initial JavaScript was 172,366 gzip bytes against a 200,000-byte budget. The secondary styles load with their respective routes. M6 adds no artwork, font download, or animation.
 - 192 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and eval suite passed 689 tests with 8 skipped. Browser verification ran in Chrome with local fixtures.
-- M7 Regression and polish is pending owner approval. Local tag `phase-m5-done` is the rollback point for all of M6. The secondary routes and footer have separate commits.
+- Local tag `phase-m5-done` is the rollback point for all of M6. The secondary routes and footer have separate commits.
 
-## Previous Work
 **M5: Field of Evidence fit and recruiter actions — approved for M6.**
 Branch `codex/phase-m5-fit-recruiter`. The dialog focuses the heading on entry, brings requirements and evidence into view early, and restores focus on dismissal. The recruiter actions disclose what gets analyzed, sent, or shared before the request. See [DRN-084](decisions.md) and the [M5 study guide](study-guides/phase-m5-fit-recruiter.md).
 

@@ -3,6 +3,30 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-086: Browser regression fixes and release evidence
+
+**Date:** 2026-11-18. **Scope:** Field of Evidence M7. The browser entry configures
+Zod before loading application schemas. In the production bundle, its optional
+code-generation probe raised a CSP violation even when the browser blocked it
+and validation fell back. JIT-less mode uses the existing validators and keeps
+the deployed policy intact.
+
+Fit report text can include long unbroken strings in summaries and ramp-up
+descriptions. The report container allows those strings to wrap within its
+grid. The mobile masthead paints above the cover so the header divider and
+cover cannot obscure its keyboard focus outlines.
+
+The assistant’s current public source is reachable wherever it appears. The
+retired repository URL still resolves to a reference-only receipt. The published
+résumé link was corrected in its LaTeX source and PDF annotation. Saved answers
+use the public résumé and publicly verified project links for their claims.
+
+Browser runs serve the deployed revision’s public entry assets and the new
+build under the same throttled loopback conditions. The comparison records
+paint, shift, load timing and idle main-thread work. It supplements offline
+replay and fixture checks. Real device keyboard and browser coverage remain
+release checks.
+
 ### DRN-085: Secondary route typography, print, and tabular records
 
 **Date:** 2026-11-18. **Scope:** Field of Evidence M6. The footer collects
