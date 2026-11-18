@@ -88,11 +88,6 @@ export function CandidateDetails() {
         <dt>Primary stack</dt>
         <dd>Python, FastAPI, Groq, React, TypeScript, Docker</dd>
       </dl>
-      <nav aria-label="Direct candidate links">
-        <a href="https://github.com/aamir-coding" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.linkedin.com/in/aamir-mk/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="mailto:aamirmkh25@gmail.com">Email Aamir</a>
-      </nav>
     </section>
   );
 }

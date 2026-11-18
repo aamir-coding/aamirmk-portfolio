@@ -35,11 +35,17 @@ describe("<App />", () => {
     window.history.replaceState(null, "", "/");
   });
 
-  it("discloses analytics retention and handoff delivery in the footer", async () => {
+  it("links to Aamir and discloses analytics retention and handoff delivery in the footer", async () => {
     vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     render(<App />);
     await screen.findByText("Ready");
     const footer = screen.getByRole("contentinfo");
+    expect(within(footer).getByRole("link", { name: "Email Aamir" }))
+      .toHaveAttribute("href", "mailto:aamirmkh25@gmail.com");
+    expect(within(footer).getByRole("link", { name: "LinkedIn" }))
+      .toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
+    expect(within(footer).getByRole("link", { name: "GitHub" }))
+      .toHaveAttribute("href", "https://github.com/aamir-coding");
     expect(footer).toHaveTextContent(/daily cleanup after 90 days/i);
     expect(footer).toHaveTextContent(/Telegram/i);
   });

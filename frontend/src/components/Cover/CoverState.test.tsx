@@ -27,17 +27,11 @@ describe("Portfolio introduction and proof", () => {
       .toHaveAttribute("href", "https://github.com/aamir-coding/health-tracker");
   });
 
-  it("retains credentials, location, availability, and direct profile links", () => {
+  it("retains credentials, location, and availability", () => {
     render(<CandidateDetails />);
 
     expect(screen.getByText(/MSRUAS B\.Tech \(CGPA 9\.77\/10\)/i)).toBeInTheDocument();
     expect(screen.getByText(/Bengaluru, India/i)).toBeInTheDocument();
     expect(screen.getByText(/Available for Hire/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "GitHub" }))
-      .toHaveAttribute("href", "https://github.com/aamir-coding");
-    expect(screen.getByRole("link", { name: "LinkedIn" }))
-      .toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
-    expect(screen.getByRole("link", { name: "Email Aamir" }))
-      .toHaveAttribute("href", "mailto:aamirmkh25@gmail.com");
   });
 });
