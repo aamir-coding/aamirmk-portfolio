@@ -1,16 +1,25 @@
 # Progress Tracker
 
 ## Current Phase
-**M4: Field of Evidence assistant UX — implemented locally and ready for review.**
+**M5: Field of Evidence fit and recruiter actions — implemented locally and ready for review.**
+Branch `codex/phase-m5-fit-recruiter`. The dialog focuses the heading on entry, brings requirements and evidence into view early, and restores focus on dismissal. The recruiter actions disclose what gets analyzed, sent, or shared before the request. See [DRN-084](decisions.md) and the [M5 study guide](study-guides/phase-m5-fit-recruiter.md).
+
+- Chrome passed five viewport sizes from 320 to 1440 px. At 375 × 812 px the first full must-have row ended at y716. The replay covered keyboard focus, background wheel containment, Escape, cancellation, recovery, curated and cached reports, forced live analysis, and the return to chat. The earlier recruiter flow replay also passed.
+- The consent replay verified zero handoff writes before submit, the same handoff payload on retry, explicit feedback submission, and a team-summary request limited to project IDs. The replays used local fixtures.
+- The light and dark fit text colors measured at least 6.23:1 against their default report surfaces. Initial JavaScript measured 172,290 gzip bytes against the 200,000-byte budget. M5 adds no visual assets or animation.
+- 192 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and evaluator suite passed 689 tests with 8 skipped. Physical mobile keyboards, Safari scroll containment, and screen-reader speech remain unverified.
+- M6 Secondary screens and footer is pending owner approval. Local tag `phase-m4-done` is the rollback point for M5.
+
+## Previous Work
+**M4: Field of Evidence assistant UX — approved for M5.**
 Branch `codex/phase-m4-assistant-ux`. The conversation follows explicit reading intent, keeps drafts during streaming and cancellation, and presents full source titles and one recovery panel. See [DRN-083](decisions.md) and the [M4 study guide](study-guides/phase-m4-assistant-ux.md).
 
 - Local Chrome replay passed at 320, 375, 768, 1024, and 1440 px. It covered full sources, the project architecture dialog, keyboard and IME, long replies, earlier-message reading, Jump to latest, cancellation and tab restoration, refusal, HTTP 429, stream errors, warming, resting, and offline states. Earlier-message reading and explicit catch-up both kept the document offset unchanged in the controlled replay.
 - The composer boundary measured 3.56:1 in the light transcript. Initial JavaScript measured 172,629 gzip bytes against the 200,000-byte limit. M4 adds no visual asset.
 - 192 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and evaluator suite passed 689 tests with 8 skipped. The browser checked announcement markup and keyboard focus. Physical mobile keyboards and screen-reader speech remain release checks.
 - The new recovery button uses the résumé-backed AlgoUniversity answer. Older bundled answers contain claims that need a separate factual review against the résumé before wider use.
-- M5 Fit and recruiter actions is pending owner approval. Local tag `phase-m3-done` is the rollback point for M4.
+- Local tag `phase-m3-done` is the rollback point for M4.
 
-## Previous Work
 **M3: Field of Evidence work and credibility — approved for M4.**
 Branch `codex/phase-m3-work-credibility`. Selected work features the assistant's saved-answer example, evaluation record, and public repository. Entropy Online Judge and HealthTracker each link to a live demo and source code. The no-script entry includes both demos, all three repositories, and the résumé. See [DRN-082](decisions.md) and the [M3 study guide](study-guides/phase-m3-work-credibility.md).
 

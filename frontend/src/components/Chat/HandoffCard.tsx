@@ -58,10 +58,10 @@ export function HandoffCard({ id, transcript }: HandoffCardProps) {
       <h3 id={heading}>Send this to Aamir?</h3>
       {sent ? <p role="status">Request received.</p> : (
         <form onSubmit={(event) => void handleSubmit(event)}>
-          <p>Aamir will receive up to 10 recent messages through Telegram. Include your email if you’d like a reply.</p>
+          <p>Aamir will receive up to 10 recent messages through Telegram, which keeps its own copy.</p>
           <details>
             <summary>Preview messages to share</summary>
-            <ol className="handoff-transcript">
+            <ol className="handoff-transcript" tabIndex={0} aria-label="Messages selected for handoff">
               {transcript.map(({ role, content }, index) => (
                 <li key={index}>
                   <strong>{role === "user" ? "You" : "Assistant"}</strong>
@@ -71,7 +71,7 @@ export function HandoffCard({ id, transcript }: HandoffCardProps) {
             </ol>
           </details>
           <label className="handoff-email">
-            Reply email (optional)
+            Email for a reply (optional)
             <input type="email" name="reply_email" autoComplete="email" maxLength={254} disabled={busy} />
           </label>
           <input type="text" name="website" autoComplete="off" tabIndex={-1} hidden />

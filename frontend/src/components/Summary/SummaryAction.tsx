@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { createSummary, type CreatedSummary, type SummaryProjectId } from "../../lib/summary";
 import "../../styles/summary-action.css";
 
@@ -7,6 +7,7 @@ const utcDate = new Intl.DateTimeFormat("en", {
 });
 
 export function SummaryAction({ projectIds }: { projectIds: readonly SummaryProjectId[] }) {
+  const shareScopeId = useId();
   const request = useRef<AbortController | null>(null);
   const [result, setResult] = useState<CreatedSummary | null>(null);
   const [busy, setBusy] = useState(false);
@@ -58,9 +59,11 @@ export function SummaryAction({ projectIds }: { projectIds: readonly SummaryProj
 
   return (
     <section className="summary-action" aria-label="Share a team summary">
-      <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => void createLink()}>
+      <button type="button" className="btn btn-secondary" aria-describedby={shareScopeId}
+        disabled={busy} onClick={() => void createLink()}>
         {busy ? "Creating summary…" : "Summarize for my team"}
       </button>
+      <p id={shareScopeId}>Share selected portfolio facts about Aamir through an expiring link.</p>
       {result && sharePath && (
         <>
           <div className="summary-action-links">

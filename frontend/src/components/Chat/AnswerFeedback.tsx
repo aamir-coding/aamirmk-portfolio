@@ -3,8 +3,8 @@ import { submitFeedback } from "../../lib/api";
 import type { FeedbackRating } from "../../lib/types";
 
 const RATINGS = [
-  { rating: "up", icon: "👍", label: "Helpful" },
-  { rating: "down", icon: "👎", label: "Not helpful" },
+  { rating: "up", label: "Helpful" },
+  { rating: "down", label: "Not helpful" },
 ] as const;
 
 export function AnswerFeedback({ answerId }: { answerId: string }) {
@@ -65,7 +65,7 @@ export function AnswerFeedback({ answerId }: { answerId: string }) {
             onClick={() => setRating(choice.rating)}
             disabled={busy}
           >
-            <span aria-hidden="true">{choice.icon}</span> {choice.label}
+            {choice.label}
           </button>
         ))}
       </div>

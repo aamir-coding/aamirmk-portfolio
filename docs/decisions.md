@@ -3,6 +3,29 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-084: Native fit dialog and recruiter evidence flow
+
+**Date:** 2026-11-18. **Scope:** Field of Evidence M5. A native modal dialog
+contains the role-fit workflow. It focuses the title at entry, the role
+heading when a report is ready, and the original launcher on dismissal. A gap
+follow-up closes the modal before handing focus to the conversation. Escape
+and the visible cancel action abort a running analysis through the existing
+hook.
+
+The report shows its origin and must-have counts first, with gaps followed by
+partial and strong results. Curated examples retain their authored provenance.
+Cached reports identify reused results and the absence of model calls for the
+current request. The job description stays available in a disclosure after the
+must-have requirements. Evidence
+retains the raw ID, with a link added only when its exact ID has a verified
+public destination.
+
+Privacy disclosures appear beside live analysis, Telegram handoff, and the
+team-summary action. Handoff still requires affirmative consent after access
+to the transcript preview. Feedback needs an explicit submit. Summary requests
+carry allowlisted portfolio project IDs. These presentation changes use the
+existing network contracts.
+
 ### DRN-083: Reader-controlled transcript and focused recovery
 
 **Date:** 2026-11-18. **Scope:** Field of Evidence M4. The first reply starts

@@ -443,6 +443,21 @@ button.portfolio-brand { cursor: pointer; }
   box-shadow: none;
 }
 
+.portfolio-conversation .handoff-email input,
+.portfolio-conversation .feedback-reason textarea {
+  border-color: var(--portfolio-field-rule);
+}
+
+@media (max-width: 40rem) {
+  .portfolio-conversation .handoff-card form {
+    gap: var(--space-2);
+  }
+
+  .portfolio-conversation .handoff-transcript {
+    max-block-size: min(6rem, 17dvh);
+  }
+}
+
 .portfolio-conversation .btn-primary:enabled {
   background: var(--portfolio-ink);
   color: var(--portfolio-paper);

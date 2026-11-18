@@ -108,7 +108,7 @@ describe("<App />", () => {
     expect(send).toBeDisabled();
     expect(screen.getByText("Preview messages to share")).toBeInTheDocument();
     expect(handoffRequests).toHaveLength(0);
-    fireEvent.change(screen.getByLabelText("Reply email (optional)"), { target: { value: "recruiter@example.test" } });
+    fireEvent.change(screen.getByLabelText("Email for a reply (optional)"), { target: { value: "recruiter@example.test" } });
     fireEvent.click(screen.getByRole("checkbox", { name: /agree to share/i }));
     fireEvent.click(send);
     await screen.findByText("Request received.");
