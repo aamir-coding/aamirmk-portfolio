@@ -640,6 +640,7 @@ button.portfolio-brand { cursor: pointer; }
 }
 
 @media (max-width: 37rem) {
+  .portfolio-bar { position: relative; z-index: 1; }
   .portfolio-bar-inner { justify-content: flex-start; align-content: start; }
   .portfolio-brand { width: 100%; }
   .portfolio-nav { gap: 0 var(--space-4); }

@@ -143,6 +143,7 @@
 
 .fit-modal-body p, .fit-report-card h3, .fit-report-card h4 { margin: 0; }
 .fit-report-header { display: grid; gap: var(--space-2); }
+.fit-report-card { overflow-wrap: anywhere; }
 .fit-role-title {
   font: var(--font-regular) clamp(1.75rem, 1.35rem + 1.6vw, 2.65rem)/1.05 var(--portfolio-display);
   min-width: 0;
