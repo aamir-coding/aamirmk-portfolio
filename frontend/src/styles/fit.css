@@ -1,0 +1,199 @@
+/* Hallmark · Field of Evidence · role fit report */
+/* Focus and first-fold evidence carry the fit experience. */
+:root { --fit-scrim: rgb(12 23 36 / .66); }
+
+.fit-modal-dialog {
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  inline-size: min(calc(100% - 2rem), 48rem);
+  max-inline-size: 100%;
+  max-block-size: 90dvh;
+  background: var(--portfolio-chat-sheet);
+  color: var(--portfolio-ink);
+  border: 1px solid var(--portfolio-rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.fit-modal-dialog[open] { display: flex; flex-direction: column; }
+
+.fit-modal-dialog::backdrop {
+  background: var(--fit-scrim);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.fit-modal-dialog :focus-visible {
+  outline: 2px solid var(--portfolio-focus-paper);
+  outline-offset: 2px;
+}
+
+.fit-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) clamp(1rem, 4vw, 1.75rem);
+  border-block-end: 1px solid var(--portfolio-rule);
+}
+
+.fit-modal-title-group h2 {
+  margin: 0;
+  font: var(--font-regular) clamp(1.15rem, 1rem + .8vw, 1.55rem)/1.1 var(--portfolio-display);
+  overflow-wrap: break-word;
+}
+
+.fit-modal-close {
+  background: transparent;
+  border: 1px solid var(--portfolio-rule);
+  color: inherit;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.fit-modal-dialog :is(button, summary) {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+}
+
+.fit-modal-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4) clamp(1rem, 4vw, 1.75rem) max(var(--space-5), env(safe-area-inset-bottom));
+}
+
+.fit-form, .fit-form-field, .fit-presets-container, .fit-report-card, .fit-stepper-container {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.fit-form-field { gap: var(--space-1); }
+.fit-field-label, .fit-presets-label { font-weight: var(--font-semibold); }
+.fit-input, .fit-textarea {
+  width: 100%;
+  min-block-size: 44px;
+  background: var(--portfolio-chat-sheet);
+  color: var(--portfolio-ink);
+  font: inherit;
+  border: 1px solid var(--portfolio-field-rule);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+.fit-input::placeholder, .fit-textarea::placeholder { color: var(--portfolio-muted); }
+.fit-textarea { resize: vertical; }
+.fit-field-header, .fit-modal-actions, .fit-report-footer, .fit-presets-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.fit-field-header { justify-content: space-between; }
+.fit-modal-actions { justify-content: flex-end; }
+.fit-modal-dialog .btn-primary:enabled {
+  background: var(--portfolio-ink);
+  border-color: var(--portfolio-ink);
+  color: var(--portfolio-paper);
+}
+
+.fit-modal-dialog .btn-primary:disabled {
+  background: var(--portfolio-chat-question);
+  border-color: var(--portfolio-rule);
+  color: var(--portfolio-muted);
+  opacity: 1;
+}
+
+.fit-form-notice, .fit-report-note, .fit-report-origin, .fit-rerun p,
+.fit-presets-subtext, .field-optional, .fit-char-count, .fit-field-hint,
+.fit-evidence-empty {
+  color: var(--portfolio-muted);
+  font-size: var(--text-sm);
+}
+
+.fit-presets-container {
+  padding-block-end: var(--space-3);
+  border-block-end: 1px solid var(--portfolio-rule);
+}
+
+.fit-presets-header { display: grid; }
+.fit-presets-list { gap: var(--space-2); }
+.fit-preset-chip {
+  display: grid;
+  gap: var(--space-1);
+  text-align: start;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--portfolio-field-rule);
+  border-radius: var(--radius-sm);
+  background: var(--portfolio-chat-question);
+  color: inherit;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.preset-chip-badge { color: var(--portfolio-muted); font-size: var(--text-xs); }
+.fit-stepper-container progress {
+  inline-size: 100%;
+  accent-color: var(--portfolio-focus-paper);
+}
+
+.fit-modal-body p, .fit-report-card h3, .fit-report-card h4 { margin: 0; }
+.fit-report-header { display: grid; gap: var(--space-2); }
+.fit-role-title {
+  font: var(--font-regular) clamp(1.75rem, 1.35rem + 1.6vw, 2.65rem)/1.05 var(--portfolio-display);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.fit-headline { color: var(--portfolio-ink); }
+.fit-score-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--portfolio-rule);
+}
+
+.score-metric-box { padding: var(--space-2); }
+.score-metric-box + .score-metric-box { border-inline-start: 1px solid var(--portfolio-rule); }
+.metric-name { color: var(--portfolio-muted); font-size: var(--text-xs); }
+.metric-number { margin: 0; font: var(--font-regular) 1.5rem/1.2 var(--portfolio-display); }
+.fit-group-title { font-size: 1rem; font-weight: var(--font-semibold); }
+.fit-req-group, .fit-summary-callout { display: grid; gap: var(--space-2); }
+.fit-req-row {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  padding-block: var(--space-3);
+  border-block-start: 1px solid var(--portfolio-rule);
+}
+
+.fit-req-text, .fit-req-explanation, .fit-evidence li { overflow-wrap: anywhere; }
+.fit-verdict-text {
+  display: inline-block;
+  margin-inline-end: var(--space-1);
+  padding-inline-end: var(--space-2);
+  border-inline-end: 1px solid var(--portfolio-field-rule);
+}
+.fit-req-explanation, .fit-downgrade-notice, .fit-summary-callout { color: var(--portfolio-muted); }
+.fit-evidence, .fit-jd-preview-details { min-width: 0; max-width: 100%; }
+.fit-modal-body details summary { cursor: pointer; text-decoration: underline; text-underline-offset: .18em; align-content: center; }
+.fit-evidence ul { margin: 0; padding-inline-start: var(--space-5); }
+.fit-evidence a { color: var(--portfolio-ink); margin-inline-end: var(--space-2); }
+.fit-jd-preview-text { padding: var(--space-3); margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--portfolio-chat-question); font: inherit; }
+.fit-report-footer { align-items: flex-start; padding-block-start: var(--space-3); border-block-start: 1px solid var(--portfolio-rule); }
+.fit-rerun { display: grid; justify-items: start; gap: var(--space-2); }
+.btn-ask-gap { color: var(--portfolio-ink); background: transparent; border: 1px solid var(--portfolio-field-rule); }
+
+@media (max-width: 40rem) {
+  .fit-modal-dialog {
+    margin-block-end: 0;
+    inline-size: 100%;
+    max-block-size: 94dvh;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+}

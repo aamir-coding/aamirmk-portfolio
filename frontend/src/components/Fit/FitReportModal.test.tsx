@@ -80,7 +80,7 @@ describe("<FitReportModal />", () => {
     );
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText("Job Description Fit Report")).toBeInTheDocument();
+    expect(screen.getByText("Job Description Fit Report")).toHaveFocus();
     expect(screen.getByText("Full-Stack AI Engineer")).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Paste complete job requirements/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Analyze Alignment/i })).toBeDisabled();
@@ -146,8 +146,8 @@ describe("<FitReportModal />", () => {
       <FitReportModal isOpen={true} onClose={vi.fn()} onAskGap={vi.fn()} />
     );
 
-    expect(screen.getByText("PIPELINE EXECUTION")).toBeInTheDocument();
-    expect(screen.getByText("50%")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "Role fit analysis progress" })).toHaveAttribute("value", "50");
+    expect(screen.getByText("50% complete")).toBeInTheDocument();
     expect(screen.getByText("Retrieving verified portfolio evidence...")).toBeInTheDocument();
   });
 
@@ -162,7 +162,7 @@ describe("<FitReportModal />", () => {
       <FitReportModal isOpen={true} onClose={vi.fn()} onAskGap={vi.fn()} />
     );
 
-    expect(screen.getByText("EVALUATION DOSSIER")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Full-Stack AI Engineer" })).toHaveFocus();
     expect(screen.getByRole("article", { name: /Job Fit Report: Full-Stack AI Engineer/i })).toBeInTheDocument();
   });
 
@@ -206,7 +206,7 @@ describe("<FitReportModal />", () => {
     fireEvent.click(closeBtn);
     expect(handleClose).toHaveBeenCalledTimes(1);
 
-    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent(closeBtn.closest("dialog")!, new Event("cancel", { cancelable: true }));
     expect(handleClose).toHaveBeenCalledTimes(2);
   });
 });

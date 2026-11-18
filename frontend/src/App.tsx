@@ -22,6 +22,7 @@ import type { InstantAnswer } from "./lib/types";
 import { summaryProjectIds } from "./lib/summary";
 import "./styles/chat.css";
 import "./styles/portfolio.css";
+import "./styles/fit.css";
 
 const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
 const FEATURED_PROMPT = "What did Aamir build at AlgoUniversity?";
@@ -137,7 +138,8 @@ function Portfolio() {
     void sendMessage(prompt);
   };
 
-  const handleOpenFitModal = () => {
+  const handleOpenFitModal = (event: MouseEvent<HTMLButtonElement>) => {
+    event.currentTarget.focus({ preventScroll: true });
     setIsFitModalOpen(true);
   };
 
@@ -175,7 +177,7 @@ function Portfolio() {
             <a href="#assistant">Assistant</a>
             <a href="#work">Selected work</a>
             <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">Résumé</a>
-            <button type="button" onClick={handleOpenFitModal} aria-label="Role fit — Evaluate Job Description Alignment">
+            <button type="button" onClick={handleOpenFitModal} aria-haspopup="dialog" aria-label="Role fit — Evaluate Job Description Alignment">
               Role fit
             </button>
           </nav>
@@ -306,7 +308,7 @@ function Portfolio() {
         <FitReportModal
           isOpen={isFitModalOpen}
           onClose={() => setIsFitModalOpen(false)}
-          onAskGap={handleAskGap}
+          onAskGap={isStreaming ? undefined : handleAskGap}
         />
       )}
     </div>

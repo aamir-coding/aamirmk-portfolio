@@ -1,6 +1,6 @@
 import { UnderHood } from "../Chat/UnderHood";
 import { AssistantFallback } from "../AssistantFallback";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useFitReport } from "../../hooks/useFitReport";
 import type { SampleJobDescription } from "../../lib/types";
 import { FitProgressStepper } from "./FitProgressStepper";
@@ -11,7 +11,7 @@ import { summaryProjectIds } from "../../lib/summary";
 export interface FitReportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAskGap: (requirementText: string) => void;
+  onAskGap?: (requirementText: string) => void;
 }
 
 export function FitReportModal({
@@ -21,8 +21,9 @@ export function FitReportModal({
 }: FitReportModalProps) {
   const [jdText, setJdText] = useState("");
   const [roleTitle, setRoleTitle] = useState("");
-  const modalRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const modalRef = useRef<HTMLDialogElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   const {
     status,
@@ -38,31 +39,28 @@ export function FitReportModal({
     reset,
   } = useFitReport();
 
-  // Escape key listener & focus management
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const dialog = modalRef.current;
+    if (!isOpen || !dialog) return;
+    dialog.showModal();
+    return () => { if (dialog.open) dialog.close(); };
+  }, [isOpen]);
+
+  useLayoutEffect(() => {
     if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        if (status === "streaming") {
-          abort();
-        }
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    const timer = setTimeout(() => {
-      textareaRef.current?.focus();
-    }, 50);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      clearTimeout(timer);
-    };
-  }, [isOpen, status, abort, onClose]);
+    const body = bodyRef.current;
+    if (body) body.scrollTop = 0;
+    const target = status === "completed" ? body?.querySelector<HTMLElement>(".fit-role-title") : titleRef.current;
+    target?.focus({ preventScroll: true });
+  }, [isOpen, status]);
 
   if (!isOpen) return null;
+
+  const dismiss = () => {
+    if (status === "streaming") abort();
+    modalRef.current?.close();
+    onClose();
+  };
 
   const handleSelectPreset = (preset: SampleJobDescription) => {
     setJdText(preset.text);
@@ -90,56 +88,55 @@ export function FitReportModal({
   };
 
   const handleAskGapBridge = (reqText: string) => {
-    onClose();
-    onAskGap(reqText);
+    dismiss();
+    onAskGap?.(reqText);
   };
 
-  const isTextTooShort = jdText.trim().length > 0 && jdText.trim().length < 50;
-  const isSubmitDisabled = jdText.trim().length < 50 || jdText.length > 6000 || status === "streaming";
+  const trimmedLength = jdText.trim().length;
+  const lengthHint = jdText.length > 6000
+    ? "Shorten the job description to 6,000 characters or fewer."
+    : trimmedLength > 0 && trimmedLength < 50
+      ? `Add ${50 - trimmedLength} more characters to enable analysis.`
+      : null;
+  const isSubmitDisabled = trimmedLength < 50 || jdText.length > 6000;
 
   return (
-    <div
-      className="fit-modal-backdrop"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          if (status === "streaming") abort();
-          onClose();
-        }
+    <dialog
+      className="fit-modal-dialog"
+      ref={modalRef}
+      aria-labelledby="fit-modal-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        dismiss();
       }}
-      role="presentation"
+      onClick={(event) => {
+        if (event.target !== event.currentTarget) return;
+        const { left, right, top, bottom } = event.currentTarget.getBoundingClientRect();
+        if (event.clientX < left || event.clientX > right || event.clientY < top || event.clientY > bottom) dismiss();
+      }}
     >
-      <div
-        className="fit-modal-dialog"
-        ref={modalRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="fit-modal-title"
-      >
         <div className="fit-modal-header">
           <div className="fit-modal-title-group">
-            <span className="fit-tag">Curated evidence review</span>
-            <h2 id="fit-modal-title">Job Description Fit Report</h2>
+            <h2 id="fit-modal-title" tabIndex={-1} ref={titleRef}>Job Description Fit Report</h2>
           </div>
           <button
             type="button"
             className="fit-modal-close"
-            onClick={() => {
-              if (status === "streaming") abort();
-              onClose();
-            }}
+            onClick={dismiss}
             aria-label="Close fit report dialog"
           >
             ✕
           </button>
         </div>
 
-        <div className="fit-modal-body">
+        <div className="fit-modal-body" ref={bodyRef}>
           {status === "completed" && report ? (
             <>
               <FitReportCard
                 report={report}
                 activePreset={activePreset}
-                onAskGap={handleAskGapBridge}
+                jobDescription={jdText}
+                onAskGap={onAskGap ? handleAskGapBridge : undefined}
                 onReset={handleModalReset}
                 onRerunLive={handleRerunLive}
               />
@@ -154,37 +151,29 @@ export function FitReportModal({
               {presets.length > 0 && (
                 <div className="fit-presets-container" role="group" aria-label="Sample Job Description Presets">
                   <div className="fit-presets-header">
-                    <span className="fit-presets-label">Curated examples (instant):</span>
-                    <span className="fit-presets-subtext">Authored development examples; not calibrated ground truth</span>
+                    <span className="fit-presets-label">Curated examples</span>
+                    <span className="fit-presets-subtext">Authored examples for illustration</span>
                   </div>
                   <div className="fit-presets-list">
-                    {presets.map((preset) => {
-                      const expectation = preset.match_expectation.toLowerCase();
-                      const isLowMatch = expectation.includes("low");
-                      return (
+                    {presets.map(preset => (
                         <button
                           key={preset.id}
                           type="button"
-                          className={`fit-preset-chip ${isLowMatch ? "preset-chip-low" : ""}`}
+                          className="fit-preset-chip"
                           onClick={() => handleSelectPreset(preset)}
                           title={`Explore ${preset.title}: ${preset.match_expectation}`}
                         >
                           <span className="preset-chip-title">{preset.title.split("(")[0]?.trim()}</span>
                           <span className="preset-chip-badge">{preset.match_expectation}</span>
                         </button>
-                      );
-                    })}
+                    ))}
                   </div>
                 </div>
               )}
 
-              <div className="fit-divider-or" aria-hidden="true">
-                <span>OR ANALYZE CUSTOM JOB DESCRIPTION</span>
-              </div>
-
               <div className="fit-form-field">
                 <label htmlFor="fit-role-title" className="fit-field-label">
-                  Target Role Title <span className="field-optional">(optional)</span>
+                  Target role title <span className="field-optional">(optional)</span>
                 </label>
                 <input
                   id="fit-role-title"
@@ -200,28 +189,25 @@ export function FitReportModal({
               <div className="fit-form-field">
                 <div className="fit-field-header">
                   <label htmlFor="fit-jd-text" className="fit-field-label">
-                    Paste Job Description <span className="field-required">*</span>
+                    Paste job description <span className="field-required">*</span>
                   </label>
-                  <span className={`fit-char-count ${jdText.length > 6000 ? "count-overflow" : ""}`}>
-                    {jdText.length} / 6,000 characters
+                  <span className="fit-char-count" id="fit-char-count">
+                    {jdText.length} / 6,000 characters (minimum 50)
                   </span>
                 </div>
                 <textarea
                   id="fit-jd-text"
-                  ref={textareaRef}
                   className="fit-textarea"
-                  rows={8}
+                  rows={5}
                   placeholder="Paste complete job requirements, stack expectations, and qualifications here..."
                   value={jdText}
                   onChange={(e) => setJdText(e.target.value)}
                   maxLength={6500}
+                  aria-invalid={lengthHint ? true : undefined}
+                  aria-describedby={`fit-char-count fit-data-note${lengthHint ? " fit-length-hint" : ""}`}
                   required
                 />
-                {isTextTooShort && (
-                  <span className="fit-field-hint warning">
-                    Minimum 50 characters required ({50 - jdText.trim().length} more needed).
-                  </span>
-                )}
+                {lengthHint && <p id="fit-length-hint" className="fit-field-hint">{lengthHint}</p>}
               </div>
 
               {error && (
@@ -232,12 +218,12 @@ export function FitReportModal({
 
               {errorReceipt ? <UnderHood {...errorReceipt} /> : null}
               <div className="fit-form-notice">
-                <p>
+                <p id="fit-data-note">
                   Your pasted job description is analyzed against curated portfolio facts.
                   Uncited requirement verdicts are downgraded; citation membership alone does not
                   prove semantic support. Live text is processed by Groq. Reports are reused
                   for up to 15 minutes and held in bounded server memory until eviction or
-                  restart. No message history is saved to a database.
+                  restart.
                 </p>
               </div>
 
@@ -247,7 +233,7 @@ export function FitReportModal({
                   className="btn btn-secondary"
                   onClick={() => {
                     handleModalReset();
-                    onClose();
+                    dismiss();
                   }}
                 >
                   Cancel
@@ -257,13 +243,12 @@ export function FitReportModal({
                   className="btn btn-primary"
                   disabled={isSubmitDisabled}
                 >
-                  ⚡ Analyze Alignment
+                  Analyze Alignment
                 </button>
               </div>
             </form>
           )}
         </div>
-      </div>
-    </div>
+    </dialog>
   );
 }

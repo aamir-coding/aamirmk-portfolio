@@ -32,7 +32,7 @@ const mockReport: FitReport = {
         type: "skill",
       },
       verdict: "strong",
-      evidence_chunk_ids: ["skills-backend", "projects-portfolio"],
+      evidence_chunk_ids: ["skills-backend", "projects-portfolio", "proj-entropy-oj-stack"],
       explanation: "Built production FastAPI backend with async streaming SSE.",
     },
     {
@@ -80,24 +80,24 @@ describe("<FitReportCard />", () => {
       prompt_sha256: null, index_sha256: null, index_built_at: null,
     });
     render(<FitReportCard report={{ ...mockReport, telemetry }} activePreset={mockPreset} />);
-    expect(screen.queryByText(/CURATED SAMPLE ASSESSMENT/)).not.toBeInTheDocument();
+    expect(screen.queryByText("Curated example")).not.toBeInTheDocument();
     expect(screen.queryByText(/None — saved authored response/)).not.toBeInTheDocument();
-    if (origin === "cache") expect(screen.getByText(/Cached report — no model calls/)).toBeInTheDocument();
+    if (origin === "cache") expect(screen.getByText(/This request reused an earlier report and made no model calls/)).toBeInTheDocument();
   });
   it("renders role title, overall fit badge, headline, and score metrics", () => {
     render(<FitReportCard report={mockReport} />);
 
     expect(screen.getByRole("article", { name: /Job Fit Report: Senior AI Engineer/i })).toBeInTheDocument();
     expect(screen.getByText("Strong Match")).toBeInTheDocument();
-    expect(screen.getByText("Direct architectural alignment with Core LLM and FastAPI services.")).toBeInTheDocument();
+    expect(screen.getByText(/Direct architectural alignment with Core LLM and FastAPI services/)).toBeInTheDocument();
     expect(screen.getByText("3/4")).toBeInTheDocument();
-    expect(screen.getByText("Must-Haves Evidenced")).toBeInTheDocument();
+    expect(screen.getByText("Must-have results")).toBeInTheDocument();
   });
 
   it("renders executive summary synthesis callout", () => {
     render(<FitReportCard report={mockReport} />);
 
-    expect(screen.getByText("EXECUTIVE SYNTHESIS")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Report summary" })).toBeInTheDocument();
     expect(screen.getByText(/Aamir possesses verified production experience/i)).toBeInTheDocument();
   });
 
@@ -106,12 +106,13 @@ describe("<FitReportCard />", () => {
 
     expect(screen.getByText("[skills-backend]")).toBeInTheDocument();
     expect(screen.getByText("[projects-portfolio]")).toBeInTheDocument();
+    expect(screen.getByText("Entropy Online Judge source")).toHaveAttribute("href", "https://github.com/aamir-coding/entropy-oj");
   });
 
   it("renders anti-overclaiming downgrade banner when downgraded is true", () => {
     render(<FitReportCard report={mockReport} />);
 
-    expect(screen.getByText(/Overclaiming Guard: Model claimed unevidenced match; downgraded to gap/i)).toBeInTheDocument();
+    expect(screen.getByText(/Downgraded to a gap because the proposed match had no valid supporting evidence/i)).toBeInTheDocument();
   });
 
   it("renders ramp-up narrative box for gaps and partial alignments", () => {
@@ -131,11 +132,11 @@ describe("<FitReportCard />", () => {
       />
     );
 
-    expect(screen.getByText(/CURATED SAMPLE ASSESSMENT \(CACHED SNAPSHOT\)/i)).toBeInTheDocument();
+    expect(screen.getByText("Curated example")).toBeInTheDocument();
     expect(screen.getByText(/Authored development example/i)).toBeInTheDocument();
     expect(screen.getByText(/View Evaluated Job Description/i)).toBeInTheDocument();
 
-    const rerunBtn = screen.getByRole("button", { name: /Re-Run Live Pipeline/i });
+    const rerunBtn = screen.getByRole("button", { name: "Run live analysis" });
     fireEvent.click(rerunBtn);
     expect(handleRerun).toHaveBeenCalledTimes(1);
   });

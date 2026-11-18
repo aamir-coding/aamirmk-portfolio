@@ -1,215 +1,155 @@
+import { useId } from "react";
 import { UnderHood } from "../Chat/UnderHood";
 import type { FitReport, JudgedRequirement, SampleJobDescription } from "../../lib/types";
 
-export interface FitReportCardProps {
+interface FitReportCardProps {
   report: FitReport;
   activePreset?: SampleJobDescription | null;
+  jobDescription?: string;
   onAskGap?: (requirementText: string) => void;
   onReset?: () => void;
   onRerunLive?: () => void;
 }
 
-export function FitReportCard({
-  report,
-  activePreset,
-  onAskGap,
-  onReset,
-  onRerunLive,
-}: FitReportCardProps) {
+const evidenceLinks = new Map([
+  ["proj-entropy-oj-stack", { title: "Entropy Online Judge source", href: "https://github.com/aamir-coding/entropy-oj" }],
+  ["proj-entropy-oj-pitch", { title: "Entropy Online Judge project", href: "https://github.com/aamir-coding/entropy-oj" }],
+]);
+
+const verdictLabels = { strong: "Strong", partial: "Partial", gap: "Gap" } as const;
+const verdictOrder = { gap: 0, partial: 1, strong: 2 } as const;
+
+function RequirementRow({ item, onAskGap }: {
+  item: JudgedRequirement;
+  onAskGap?: (requirementText: string) => void;
+}) {
+  const { requirement, verdict, evidence_chunk_ids, explanation, ramp_up, downgraded } = item;
+  const requirementId = useId();
+
+  return (
+    <div className={`fit-req-row verdict-${verdict}`}>
+      <p className="fit-req-text">
+        <strong className={`fit-verdict-text verdict-${verdict}`}>{verdictLabels[verdict]}</strong>{" "}
+        <span id={requirementId}>{requirement.text}</span>
+      </p>
+      <p className="fit-req-explanation">{explanation}</p>
+      {downgraded && (
+        <p className="fit-downgrade-notice" role="note">
+          Downgraded to a gap because the proposed match had no valid supporting evidence.
+        </p>
+      )}
+      {evidence_chunk_ids.length ? (
+        <details className="fit-evidence">
+          <summary aria-describedby={requirementId}>Evidence ({evidence_chunk_ids.length})</summary>
+          <ul>
+            {evidence_chunk_ids.map(id => {
+              const link = evidenceLinks.get(id);
+              return (
+                <li key={id}>
+                  {link && <a href={link.href} target="_blank" rel="noopener noreferrer">{link.title}</a>}
+                  <code>[{id}]</code>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      ) : <p className="fit-evidence-empty">No supporting evidence on record.</p>}
+      {ramp_up && (
+        <details className="fit-evidence">
+          <summary aria-describedby={requirementId}>Ramp-up plan</summary>
+          <p>{ramp_up}</p>
+        </details>
+      )}
+      {verdict !== "strong" && onAskGap && (
+        <button
+          type="button"
+          className="btn btn-ask-gap"
+          aria-describedby={requirementId}
+          onClick={() => onAskGap(requirement.text)}
+        >
+          Ask about this in chat
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function FitReportCard({ report, activePreset, jobDescription, onAskGap, onReset, onRerunLive }: FitReportCardProps) {
   const { score } = report;
+  const countsLabel = useId();
   const origin = report.telemetry?.origin ?? (activePreset?.report ? "curated" : undefined);
-  const isBenchmark = origin === "curated";
-
-  const mustHaves = report.requirements.filter(
-    (r) => r.requirement.importance === "must_have"
-  );
-  const niceToHaves = report.requirements.filter(
-    (r) => r.requirement.importance === "nice_to_have"
-  );
-
-  const getVerdictClass = (verdict: string) => {
-    switch (verdict) {
-      case "strong":
-        return "verdict-strong";
-      case "partial":
-        return "verdict-partial";
-      case "gap":
-      default:
-        return "verdict-gap";
-    }
-  };
-
-  const getVerdictIcon = (verdict: string) => {
-    switch (verdict) {
-      case "strong":
-        return "✓";
-      case "partial":
-        return "◑";
-      case "gap":
-      default:
-        return "✕";
-    }
-  };
-
-  const renderRequirementRow = (item: JudgedRequirement) => {
-    const { requirement, verdict, evidence_chunk_ids, explanation, ramp_up, downgraded } = item;
-    const isGapOrPartial = verdict === "gap" || verdict === "partial";
-
-    return (
-      <div key={requirement.id} className={`fit-req-row ${getVerdictClass(verdict)}`}>
-        <div className="fit-req-header">
-          <div className="fit-req-badges">
-            <span className={`fit-verdict-pill ${getVerdictClass(verdict)}`}>
-              <span className="verdict-icon" aria-hidden="true">{getVerdictIcon(verdict)}</span>
-              <span className="verdict-text">{verdict.toUpperCase()}</span>
-            </span>
-            <span className="fit-type-pill">{requirement.type.toUpperCase()}</span>
-            {requirement.importance === "must_have" && (
-              <span className="fit-importance-pill">MUST-HAVE</span>
-            )}
-          </div>
-        </div>
-
-        <p className="fit-req-text">{requirement.text}</p>
-
-        <p className="fit-req-explanation">{explanation}</p>
-
-        {downgraded && (
-          <div className="fit-downgrade-notice" role="note">
-            <span aria-hidden="true">⚠️</span>
-            <span>Overclaiming Guard: Model claimed unevidenced match; downgraded to gap.</span>
-          </div>
-        )}
-
-        {evidence_chunk_ids.length > 0 && (
-          <div className="fit-citations-row">
-            <span className="fit-citations-label">Verified Citations:</span>
-            {evidence_chunk_ids.map((cid) => (
-              <span key={cid} className="fit-citation-tag">
-                [{cid}]
-              </span>
-            ))}
-          </div>
-        )}
-
-        {ramp_up && (
-          <div className="fit-ramp-up-box">
-            <span className="ramp-up-label">RAMP-UP NARRATIVE:</span>
-            <p className="ramp-up-text">{ramp_up}</p>
-          </div>
-        )}
-
-        {isGapOrPartial && onAskGap && (
-          <div className="fit-ask-gap-action">
-            <button
-              type="button"
-              className="btn btn-ask-gap"
-              onClick={() => onAskGap(requirement.text)}
-              title={`Ask the assistant about: ${requirement.text}`}
-            >
-              💬 Ask about this in chat →
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  };
+  const isCurated = origin === "curated";
+  const isCached = origin === "cache" || (!origin && report.cached);
+  const reviewedDescription = jobDescription || activePreset?.text;
+  const mustHaves = report.requirements.filter(item => item.requirement.importance === "must_have")
+    .sort((a, b) => verdictOrder[a.verdict] - verdictOrder[b.verdict]);
+  const niceToHaves = report.requirements.filter(item => item.requirement.importance === "nice_to_have");
 
   return (
     <article className="fit-report-card" aria-label={`Job Fit Report: ${report.role_title}`}>
-      {isBenchmark && (
-        <div className="fit-benchmark-banner" role="status">
-          <div className="fit-benchmark-meta">
-            <span className="fit-benchmark-icon" aria-hidden="true">⚡</span>
-            <div className="fit-benchmark-details">
-              <strong>CURATED SAMPLE ASSESSMENT (CACHED SNAPSHOT)</strong>
-              <span>
-                Authored development example; this sample is not a live evaluation or calibrated ground truth.
-              </span>
-            </div>
-          </div>
-          {onRerunLive && activePreset && (
-            <button
-              type="button"
-              className="btn-fit-rerun"
-              onClick={onRerunLive}
-              title="Re-run live against Groq LLM and hybrid RAG"
-            >
-              🔄 Re-Run Live Pipeline
-            </button>
-          )}
-        </div>
-      )}
+      <header className="fit-report-header">
+        <p className="fit-report-origin">
+          {isCurated ? "Curated example" : isCached ? "Cached report" : origin === "fresh" ? "Live assessment" : "Fit assessment"}
+        </p>
+        <h3 className="fit-role-title" tabIndex={-1}>{report.role_title}</h3>
+        <p className="fit-headline"><strong>{score.overall_fit}</strong></p>
+        {isCurated && <p className="fit-report-note">Authored development example for illustration. Live evaluation and ground-truth calibration are outside its scope.</p>}
+        {isCached && <p className="fit-report-note">This request reused an earlier report and made no model calls.</p>}
 
-      {origin === "cache" || (!origin && report.cached) ? <p role="status">Cached report — no model calls for this request. The original generation is not re-evaluated.</p> : null}
-      {activePreset?.text && (
+        <p className="metric-name" id={countsLabel}>Must-have results</p>
+        <dl className="fit-score-metrics" aria-labelledby={countsLabel}>
+          <div className="score-metric-box">
+            <dt className="metric-name">Strong</dt>
+            <dd className="metric-number">{score.must_have_strong}/{score.must_have_total}</dd>
+          </div>
+          <div className="score-metric-box">
+            <dt className="metric-name">Partial</dt>
+            <dd className="metric-number">{score.must_have_partial}</dd>
+          </div>
+          <div className="score-metric-box">
+            <dt className="metric-name">Gaps</dt>
+            <dd className="metric-number">{score.must_have_gap}</dd>
+          </div>
+        </dl>
+      </header>
+
+      {mustHaves.length > 0 && (
+        <section className="fit-req-group">
+          <h4 className="fit-group-title">Must-have requirements</h4>
+          {mustHaves.map(item => <RequirementRow key={item.requirement.id} item={item} onAskGap={onAskGap} />)}
+        </section>
+      )}
+      {reviewedDescription && (
         <details className="fit-jd-preview-details">
-          <summary className="fit-jd-preview-summary">
-            📄 View Evaluated Job Description ({activePreset.title})
-          </summary>
+          <summary className="fit-jd-preview-summary">View evaluated job description</summary>
           <div className="fit-jd-preview-body">
-            <pre className="fit-jd-preview-text">{activePreset.text}</pre>
+            <pre className="fit-jd-preview-text">{reviewedDescription}</pre>
           </div>
         </details>
       )}
+      {niceToHaves.length > 0 && (
+        <section className="fit-req-group">
+          <h4 className="fit-group-title">Preferred requirements</h4>
+          {niceToHaves.map(item => <RequirementRow key={item.requirement.id} item={item} onAskGap={onAskGap} />)}
+        </section>
+      )}
 
-      <header className="fit-report-header">
-        <div className="fit-header-meta">
-          <span className="fit-tag">EVALUATION DOSSIER</span>
-          <span className={`fit-overall-badge ${score.overall_fit.toLowerCase().replace(/\s+/g, "-")}`}>
-            {score.overall_fit}
-          </span>
-        </div>
-        <h3 className="fit-role-title">{report.role_title}</h3>
-        <p className="fit-headline">{score.headline}</p>
-
-        <div className="fit-score-metrics">
-          <div className="score-metric-box">
-            <span className="metric-number">{score.must_have_strong}/{score.must_have_total}</span>
-            <span className="metric-name">Must-Haves Evidenced</span>
-          </div>
-          <div className="score-metric-box">
-            <span className="metric-number">{score.must_have_partial}</span>
-            <span className="metric-name">Partial Alignments</span>
-          </div>
-          <div className="score-metric-box">
-            <span className="metric-number">{score.must_have_gap}</span>
-            <span className="metric-name">Identified Gaps</span>
-          </div>
-        </div>
-      </header>
-
-      <section className="fit-summary-callout" aria-label="Executive Summary">
-        <span className="summary-callout-label">EXECUTIVE SYNTHESIS</span>
+      <section className="fit-summary-callout" aria-label="Report summary">
+        <h4 className="fit-group-title">Report summary</h4>
+        <p>{score.headline}</p>
         <p className="summary-callout-text">{report.summary}</p>
       </section>
 
-      <section className="fit-requirements-breakdown">
-        {mustHaves.length > 0 && (
-          <div className="fit-req-group">
-            <h4 className="fit-group-title">Core Requirements ({mustHaves.length})</h4>
-            <div className="fit-req-list">
-              {mustHaves.map(renderRequirementRow)}
-            </div>
-          </div>
-        )}
-
-        {niceToHaves.length > 0 && (
-          <div className="fit-req-group">
-            <h4 className="fit-group-title">Preferred & Nice-To-Have Skills ({niceToHaves.length})</h4>
-            <div className="fit-req-list">
-              {niceToHaves.map(renderRequirementRow)}
-            </div>
-          </div>
-        )}
-      </section>
-
-      <UnderHood telemetry={report.telemetry} browserTiming={report.browserTiming} delivery={!report.telemetry && isBenchmark ? "curated" : undefined} />
+      <UnderHood telemetry={report.telemetry} browserTiming={report.browserTiming} delivery={!report.telemetry && isCurated ? "curated" : undefined} />
       <footer className="fit-report-footer">
-        {onReset && (
-          <button type="button" className="btn btn-secondary" onClick={onReset}>
-            ← Analyze Custom Job Description
-          </button>
+        {onReset && <button type="button" className="btn btn-secondary" onClick={onReset}>Analyze custom job description</button>}
+        {onRerunLive && reviewedDescription && (
+          <div className="fit-rerun">
+            <button type="button" className="btn btn-secondary" onClick={onRerunLive} aria-describedby="fit-live-note">
+              {isCurated ? "Run live analysis" : "Run live again"}
+            </button>
+            <p id="fit-live-note">Live analysis sends this job description to Groq.</p>
+          </div>
         )}
       </footer>
     </article>
