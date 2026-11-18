@@ -1,13 +1,76 @@
-.eval-page { max-width: 76rem; margin-inline: auto; padding: clamp(1rem, 4vw, 3rem); color: var(--text-primary); }
-.eval-page p { max-width: 74ch; line-height: 1.7; }
-.eval-page h1 { font-size: clamp(2rem, 5vw, 3rem); }
-.eval-page h2 { margin-top: 2rem; }
-.eval-page table { width: 100%; border-collapse: collapse; font-size: clamp(.7rem, 2.5vw, .95rem); }
-.eval-page caption { text-align: left; padding-block: .7rem; color: var(--text-secondary); }
-.eval-page th, .eval-page td { padding: .6rem .4rem; text-align: left; border-bottom: 1px solid var(--border-strong); overflow-wrap: anywhere; }
-.eval-page dl { font-family: var(--font-mono); font-size: .8rem; }
-.eval-page dt { margin-top: 1rem; font-weight: 600; }
-.eval-page dd { margin-left: 0; overflow-wrap: anywhere; }
-.eval-page a, .eval-badge { color: var(--accent-cobalt); }
-.eval-page a:focus-visible, .eval-badge:focus-visible { outline: 2px solid var(--accent-cobalt); outline-offset: 4px; }
-.eval-badge { font-size: .8rem; padding: .5rem; }
+/* Hallmark · Field of Evidence · evaluation record */
+/* Scope and result carry the opening. Aligned tables carry the evidence. */
+body:has(.eval-page) { background: var(--portfolio-paper); }
+
+.eval-page {
+  width: min(calc(100% - 2 * var(--portfolio-gutter)), 64rem);
+  margin-inline: auto;
+  padding-block: clamp(1rem, 4vw, 3rem) var(--space-10);
+  color: var(--portfolio-ink);
+}
+
+.eval-page :focus-visible { outline: 2px solid var(--portfolio-focus-paper); outline-offset: 3px; }
+.eval-heading a {
+  min-block-size: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  text-underline-offset: .2em;
+}
+.eval-heading h1 {
+  margin: var(--space-3) 0 var(--space-4);
+  font: var(--font-regular) clamp(2.4rem, 1.6rem + 3.5vw, 4.75rem)/1.03 var(--portfolio-display);
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.eval-page p { max-inline-size: 68ch; overflow-wrap: anywhere; }
+.eval-overview {
+  border-block: 1px solid var(--portfolio-rule);
+  padding-block: var(--space-4);
+}
+.eval-overview > :first-child, .eval-overview > :last-child { margin-block: 0; }
+.eval-overview h2 { font-size: var(--text-lg); overflow-wrap: break-word; }
+.eval-run { color: var(--portfolio-muted); font-size: var(--text-sm); }
+.eval-records { margin-block-start: var(--space-6); }
+.eval-records section {
+  margin-block-start: var(--space-8);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--portfolio-rule);
+}
+.eval-records h2 {
+  margin: 0;
+  font: var(--font-regular) clamp(1.45rem, 1.2rem + .9vw, 2rem)/1.15 var(--portfolio-display);
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+.eval-page table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+.eval-page caption { text-align: start; padding-block: var(--space-2); color: var(--portfolio-muted); }
+.eval-page th, .eval-page td {
+  padding: var(--space-2) clamp(.2rem, 1vw, .75rem);
+  text-align: start;
+  border-block-end: 1px solid var(--portfolio-rule);
+  overflow-wrap: anywhere;
+  vertical-align: top;
+}
+.eval-page thead { background: var(--portfolio-chat-question); }
+.eval-page tbody th { font-weight: var(--font-medium); }
+.eval-retrieval-table :is(th, td):nth-child(n + 3),
+.eval-agreement-table :is(th[scope="row"], th:last-child) { white-space: nowrap; }
+.eval-page ul { padding-inline-start: var(--space-5); overflow-wrap: anywhere; }
+.eval-provenance { border-block: 1px solid var(--portfolio-rule); margin-block-start: var(--space-6); }
+.eval-provenance summary {
+  padding-block: var(--space-3);
+  min-block-size: 44px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.eval-provenance dl { font: var(--text-sm)/1.55 var(--font-mono); }
+.eval-provenance dt { margin-block-start: var(--space-2); font-weight: var(--font-semibold); }
+.eval-provenance dd { margin: 0; overflow-wrap: anywhere; }

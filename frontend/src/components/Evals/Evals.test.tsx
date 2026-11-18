@@ -28,7 +28,7 @@ it("shows the failed validation and five disagreements without accuracy claims",
   expect(await screen.findByRole("heading", { name: body.badge })).toBeInTheDocument();
   expect(screen.getByText("failed", { exact: true })).toBeInTheDocument();
   expect(screen.getByText(/Model accuracy: unavailable/)).toBeInTheDocument();
-  expect(screen.getAllByText(/validation-0[68]:/)).toHaveLength(5);
+  expect(screen.getAllByText(/validation-0[68],/)).toHaveLength(5);
   expect(screen.getByRole("table", { name: /validation agreement/ })).toBeInTheDocument();
   fireEvent.focus(screen.getByRole("link", { name: /Return to portfolio/ }));
 });

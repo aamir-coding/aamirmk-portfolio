@@ -1,4 +1,3 @@
-import "../../styles/evals.css";
 import { useEvalSummary } from "../../lib/evals";
 
 export function EvalBadge() {
