@@ -1,70 +1,43 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect } from "vitest";
+import { createRef } from "react";
+import { render, screen } from "@testing-library/react";
 import { CoverState } from "./CoverState";
+import { CandidateDetails, SelectedWork } from "./SelectedWork";
 
-describe("<CoverState />", () => {
-  it("renders dossier masthead, identity, core focus, and inquiry prompts", () => {
-    const onSelectPrompt = vi.fn();
-    render(<CoverState onSelectPrompt={onSelectPrompt} />);
+describe("Portfolio introduction and proof", () => {
+  it("presents Aamir’s identity as the main heading and a destination for focus", () => {
+    const headingRef = createRef<HTMLHeadingElement>();
+    render(<CoverState headingRef={headingRef} company={null} />);
 
-    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
-    expect(screen.getByText("REF: AMK-PORTFOLIO")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { level: 2, name: /Aamir Mohammed Khan/i })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/AI Systems & Full-Stack Engineer/i)
-    ).toBeInTheDocument();
-    expect(screen.getByText(/CORE FOCUS/i)).toBeInTheDocument();
-    expect(screen.getByText(/PRIMARY STACK/i)).toBeInTheDocument();
-    expect(screen.getByText(/GROUNDING POLICY/i)).toBeInTheDocument();
-    expect(screen.getByText(/Suggested Inquiries/i)).toBeInTheDocument();
+    const heading = screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" });
+    expect(headingRef.current).toBe(heading);
+    expect(heading).toHaveAttribute("tabindex", "-1");
+    expect(screen.getByText(/AI Systems & Full-Stack Engineer/i)).toBeInTheDocument();
   });
 
-  it("renders verified candidate credentials ribbon and external touchpoints", () => {
-    const onSelectPrompt = vi.fn();
-    render(<CoverState onSelectPrompt={onSelectPrompt} />);
+  it("keeps selected project evidence reachable without sending a message", () => {
+    render(<SelectedWork />);
 
-    expect(
-      screen.getByText(/MSRUAS B\.Tech \(CGPA 9\.77\/10\)/i)
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Selected work" })).toHaveAttribute("id", "work");
+    expect(screen.getByRole("link", { name: "Open Entropy Online Judge" }))
+      .toHaveAttribute("href", "https://entropy-oj.vercel.app/");
+    expect(screen.getByRole("link", { name: "Read the assistant’s evaluation record" }))
+      .toHaveAttribute("href", "/evals");
+    expect(screen.getByRole("link", { name: "View HealthTracker source" }))
+      .toHaveAttribute("href", "https://github.com/aamir-coding/health-tracker");
+  });
+
+  it("retains credentials, location, availability, and direct profile links", () => {
+    render(<CandidateDetails />);
+
+    expect(screen.getByText(/MSRUAS B\.Tech \(CGPA 9\.77\/10\)/i)).toBeInTheDocument();
     expect(screen.getByText(/Bengaluru, India/i)).toBeInTheDocument();
     expect(screen.getByText(/Available for Hire/i)).toBeInTheDocument();
-
-    const githubLink = screen.getByRole("link", { name: /GitHub ↗/i });
-    expect(githubLink).toHaveAttribute("href", "https://github.com/aamir-coding");
-
-    const linkedInLink = screen.getByRole("link", { name: /LinkedIn ↗/i });
-    expect(linkedInLink).toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
-
-    const emailLink = screen.getByRole("link", {
-      name: /aamirmkh25@gmail\.com ↗/i,
-    });
-    expect(emailLink).toHaveAttribute("href", "mailto:aamirmkh25@gmail.com");
-  });
-
-  it("calls onSelectPrompt when a starter chip is clicked", () => {
-    const onSelectPrompt = vi.fn();
-    render(<CoverState onSelectPrompt={onSelectPrompt} />);
-
-    const chip = screen.getByRole("button", {
-      name: /What is Aamir's experience with FastAPI and LLM systems\?/i,
-    });
-    fireEvent.click(chip);
-
-    expect(onSelectPrompt).toHaveBeenCalledTimes(1);
-    expect(onSelectPrompt).toHaveBeenCalledWith(
-      "What is Aamir's experience with FastAPI and LLM systems?"
-    );
-  });
-
-  it("disables starter chips when disabled prop is true", () => {
-    const onSelectPrompt = vi.fn();
-    render(<CoverState onSelectPrompt={onSelectPrompt} disabled={true} />);
-
-    const chip = screen.getByRole("button", {
-      name: /What is Aamir's experience with FastAPI and LLM systems\?/i,
-    });
-    expect(chip).toBeDisabled();
+    expect(screen.getByRole("link", { name: "GitHub" }))
+      .toHaveAttribute("href", "https://github.com/aamir-coding");
+    expect(screen.getByRole("link", { name: "LinkedIn" }))
+      .toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
+    expect(screen.getByRole("link", { name: "Email Aamir" }))
+      .toHaveAttribute("href", "mailto:aamirmkh25@gmail.com");
   });
 });

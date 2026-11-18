@@ -3,6 +3,29 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-080: Assistant-first portfolio foundations
+
+**Date:** 2026-11-18. **Scope:** Owner-approved Field of Evidence theme and M1
+layout sequence. The landing pairs Aamir's identity with the real composer and
+one featured question. Selected work follows immediately and is readable with
+no chat or inference. Project entries come from the published résumé. The public
+evaluation record supplies direct evidence for the assistant project.
+
+One composer stays mounted across the landing and conversation views. Initial
+render leaves browser focus alone. Explicit view changes focus the destination
+heading, and keyboard activation of Send or Stop keeps the composer available
+without a scroll jump. The conversation scrolls inside its own log. A new
+conversation starts with the first answer in view. An explicit follow-up brings
+the new turn into view, while scrolling toward older messages pauses automatic
+following. Answer text and citations precede server-summoned project cards.
+
+The AlgoUniversity question uses the existing live path when ready and an
+authored, résumé-backed answer during a cold start, rest, or outage. It uses the
+existing saved-answer provenance and citation rendering. The shell introduces
+Field of Evidence typography and colors with system fonts. Signature artwork
+and the case-study motion have separate review gates. Company routing, role fit,
+sessions, inference, and the SSE contract retain their existing interfaces.
+
 ### DRN-079: Relax local inference byte ceiling to 1M TPM and sanitize tool message content
 
 **Date:** 2026-11-12. Rapid sequential interactions during user and recruiter testing

@@ -11,7 +11,7 @@ describe("<ChatInput />", () => {
     render(<ChatInput onSend={vi.fn()} onStop={vi.fn()} isStreaming={false} />);
 
     expect(
-      screen.getByPlaceholderText(/Ask about Aamir's experience/i)
+      screen.getByRole("textbox", { name: /Ask a question about Aamir/i })
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Send message/i })).toBeInTheDocument();
     expect(screen.getByText("Ctrl+K")).toBeInTheDocument();
@@ -19,13 +19,9 @@ describe("<ChatInput />", () => {
 
   it("focuses textarea when Ctrl+K or Cmd+K is pressed globally", () => {
     render(<ChatInput onSend={vi.fn()} onStop={vi.fn()} isStreaming={false} />);
-    const textarea = screen.getByPlaceholderText(/Ask about Aamir's experience/i);
+    const textarea = screen.getByRole("textbox", { name: /Ask a question about Aamir/i });
 
-    expect(document.activeElement).toBe(textarea);
-
-    // Blur it
-    textarea.blur();
-    expect(document.activeElement).not.toBe(textarea);
+    expect(textarea).not.toHaveFocus();
 
     // Fire Ctrl+K globally on window
     fireEvent.keyDown(window, { key: "k", ctrlKey: true });
@@ -35,7 +31,7 @@ describe("<ChatInput />", () => {
   it("calls onSend with trimmed text when Enter is pressed without Shift", () => {
     const handleSend = vi.fn();
     render(<ChatInput onSend={handleSend} onStop={vi.fn()} isStreaming={false} />);
-    const textarea = screen.getByPlaceholderText(/Ask about Aamir's experience/i);
+    const textarea = screen.getByRole("textbox", { name: /Ask a question about Aamir/i });
 
     fireEvent.change(textarea, { target: { value: "Tell me about Redis" } });
     fireEvent.keyDown(textarea, { key: "Enter", shiftKey: false });
@@ -47,9 +43,33 @@ describe("<ChatInput />", () => {
   it("calls onStop when Escape is pressed while streaming", () => {
     const handleStop = vi.fn();
     render(<ChatInput onSend={vi.fn()} onStop={handleStop} isStreaming={true} />);
-    const textarea = screen.getByPlaceholderText(/Assistant dispatch in progress/i);
+    const textarea = screen.getByRole("textbox");
 
     fireEvent.keyDown(textarea, { key: "Escape" });
     expect(handleStop).toHaveBeenCalled();
+  });
+
+  it("leaves Enter for IME composition and keeps Shift+Enter for a new line", () => {
+    const onSend = vi.fn();
+    render(<ChatInput onSend={onSend} onStop={vi.fn()} isStreaming={false} />);
+    const textarea = screen.getByRole("textbox");
+    fireEvent.change(textarea, { target: { value: "こんにちは" } });
+    fireEvent.keyDown(textarea, { key: "Enter", isComposing: true, keyCode: 229 });
+    fireEvent.keyDown(textarea, { key: "Enter", shiftKey: true });
+    expect(onSend).not.toHaveBeenCalled();
+    expect(textarea).toHaveValue("こんにちは");
+    fireEvent.keyDown(textarea, { key: "Enter" });
+    expect(onSend).toHaveBeenCalledWith("こんにちは");
+  });
+
+  it("leaves focus inside an open modal when Ctrl+K is pressed", () => {
+    render(<>
+      <ChatInput onSend={vi.fn()} onStop={vi.fn()} isStreaming={false} />
+      <div role="dialog" aria-modal="true"><button type="button">Dialog control</button></div>
+    </>);
+    const button = screen.getByRole("button", { name: "Dialog control" });
+    button.focus();
+    fireEvent.keyDown(button, { key: "k", ctrlKey: true });
+    expect(button).toHaveFocus();
   });
 });

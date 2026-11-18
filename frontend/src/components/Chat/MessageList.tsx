@@ -1,51 +1,30 @@
 import { useRef, useEffect } from "react";
 import type { ChatMessage } from "../../hooks/useChat";
-import type { CompanyContext } from "../../lib/api";
 import { MessageItem } from "./MessageItem";
-import { CoverState } from "../Cover/CoverState";
 
-export interface MessageListProps {
-  messages: ChatMessage[];
-  isStreaming: boolean;
-  isCoverState?: boolean;
-  company?: CompanyContext | null;
-  onSelectPrompt: (prompt: string) => void;
-  onOpenFitModal?: () => void;
-}
-
-export function MessageList({
-  messages,
-  isStreaming,
-  isCoverState = false,
-  company,
-  onSelectPrompt,
-  onOpenFitModal,
-}: MessageListProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
+export function MessageList({ messages }: { messages: ChatMessage[] }) {
+  const logRef = useRef<HTMLDivElement>(null);
+  const followsLatest = useRef(messages.length > 2);
+  const previousCount = useRef(messages.length);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView?.({ behavior: "smooth" });
+    const log = logRef.current;
+    if (messages.length > previousCount.current) followsLatest.current = true;
+    previousCount.current = messages.length;
+    if (log && followsLatest.current) log.scrollTop = log.scrollHeight;
   }, [messages]);
-
-  if (isCoverState || messages.length === 0) {
-    return (
-      <div className="chat-empty-state" role="group" aria-label="Welcome and suggestions">
-        <CoverState
-          company={company}
-          onSelectPrompt={onSelectPrompt}
-          onOpenFitModal={onOpenFitModal}
-          disabled={isStreaming}
-        />
-      </div>
-    );
-  }
 
   return (
     <div
+      ref={logRef}
       className="chat-message-list"
       role="log"
       aria-label="Conversation history"
       aria-live="polite"
+      tabIndex={0}
+      onScroll={({ currentTarget: log }) => {
+        followsLatest.current = log.scrollHeight - log.scrollTop - log.clientHeight < 48;
+      }}
     >
       {messages.map((message, index) => {
         const transcript = message.handoffId
@@ -56,7 +35,6 @@ export function MessageList({
           : undefined;
         return <MessageItem key={message.id} message={message} handoffTranscript={transcript} />;
       })}
-      <div ref={bottomRef} aria-hidden="true" />
     </div>
   );
 }

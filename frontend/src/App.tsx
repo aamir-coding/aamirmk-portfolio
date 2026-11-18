@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useLayoutEffect, useRef, useState } from "react";
 import { EvalBadge } from "./components/Evals/EvalBadge";
 import { AssistantFallback } from "./components/AssistantFallback";
 import { useServerHealth } from "./hooks/useServerHealth";
@@ -7,6 +7,9 @@ import { useCompanyContext } from "./hooks/useCompanyContext";
 import { useTheme } from "./hooks/useTheme";
 import { MessageList } from "./components/Chat/MessageList";
 import { ChatInput } from "./components/Chat/ChatInput";
+import { StarterChips } from "./components/Chat/StarterChips";
+import { CoverState } from "./components/Cover/CoverState";
+import { CandidateDetails, SelectedWork } from "./components/Cover/SelectedWork";
 import { ThemeToggle } from "./components/ThemeToggle";
 import {
   StatusIndicator,
@@ -17,8 +20,10 @@ import answersData from "./data/answers.json";
 import type { InstantAnswer } from "./lib/types";
 import { summaryProjectIds } from "./lib/summary";
 import "./styles/chat.css";
+import "./styles/portfolio.css";
 
 const BUNDLED_ANSWERS = answersData as Record<string, InstantAnswer>;
+const FEATURED_PROMPT = "What did Aamir build at AlgoUniversity?";
 
 const EvalPage = lazy(() => import("./components/Evals/EvalPage"));
 const AdminPage = lazy(() => import("./components/Admin/AdminPage"));
@@ -71,6 +76,16 @@ function Portfolio() {
   );
 
   const isCoverState = viewMode === "cover" || messages.length === 0;
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const focusAfterNavigation = useRef(false);
+  const assistantStatus = isResting ? "resting" : serverState;
+
+  useLayoutEffect(() => {
+    if (!focusAfterNavigation.current) return;
+    focusAfterNavigation.current = false;
+    headingRef.current?.focus();
+  }, [isCoverState]);
+
   const completedReplies = isCoverState ? [] : messages.filter(message =>
     message.role === "assistant" && message.status === "done" &&
     message.delivery !== "cancelled" && message.content.trim()
@@ -82,8 +97,23 @@ function Portfolio() {
     ]),
   ) : null;
 
-  const handleSelectPrompt = (prompt: string) => {
+  const showChat = (moveFocus: boolean) => {
+    if (isCoverState) {
+      focusAfterNavigation.current = true;
+    } else if (moveFocus) {
+      headingRef.current?.focus();
+    }
     setViewMode("chat");
+  };
+
+  const showOverview = () => {
+    focusAfterNavigation.current = true;
+    setViewMode("cover");
+  };
+
+  const handleSelectPrompt = (prompt: string) => {
+    if (isStreaming) return;
+    showChat(true);
     // If backend is asleep or still warming, answer instantly from bundled answers.json
     if ((serverState !== "ready" || isResting) && BUNDLED_ANSWERS[prompt]) {
       sendInstantAnswer(prompt, BUNDLED_ANSWERS[prompt]);
@@ -98,13 +128,13 @@ function Portfolio() {
 
   const handleAskGap = (gapText: string) => {
     setIsFitModalOpen(false);
-    setViewMode("chat");
+    showChat(true);
     void sendMessage(`How does Aamir plan to ramp up on: ${gapText}?`);
   };
 
   const handleResetChat = () => {
     resetChat();
-    setViewMode("cover");
+    showOverview();
   };
 
   const handleRefreshHealth = () => {
@@ -113,144 +143,143 @@ function Portfolio() {
   };
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="header-title-group">
-          <h1>Aamir Mohammed Khan</h1>
-          <p>AI Digital Assistant — Conversational Portfolio</p>
-        </div>
-        <div className="header-controls">
-          <EvalBadge />
-          <button
-            type="button"
-            className="btn-header-fit"
-            onClick={handleOpenFitModal}
-            aria-label="Evaluate Job Description Alignment"
-          >
-            ⚡ Role Fit
-          </button>
-          {isCoverState && messages.length > 0 && (
-            <button
-              type="button"
-              className="btn-header-resume"
-              onClick={() => setViewMode("chat")}
-              aria-label="Resume active chat conversation"
-            >
-              Resume Chat ({messages.length}) →
+    <div className="portfolio-page">
+      <a className="portfolio-skip" href="#main-heading">Skip to main content</a>
+      <header className="portfolio-bar">
+        <div className="portfolio-measure portfolio-bar-inner">
+          {isCoverState
+            ? <a className="portfolio-brand" href="#main-heading">Aamir Mohammed Khan</a>
+            : <button className="portfolio-brand" type="button" onClick={showOverview}>Aamir Mohammed Khan</button>}
+          <nav className="portfolio-nav" aria-label="Portfolio">
+            <a href="#assistant">Assistant</a>
+            <a href="#work">Selected work</a>
+            <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">Résumé</a>
+            <button type="button" onClick={handleOpenFitModal} aria-label="Role fit — Evaluate Job Description Alignment">
+              Role fit
             </button>
-          )}
-          {!isCoverState && (
-            <>
-              <button
-                type="button"
-                className="btn-header-dossier"
-                onClick={() => setViewMode("cover")}
-                aria-label="Return to candidate dossier overview"
-              >
-                ← Dossier Overview
-              </button>
-              <button
-                type="button"
-                className="btn-header-reset"
-                onClick={handleResetChat}
-                disabled={isStreaming}
-                aria-label="Clear active conversation and reset"
-                title="Clear conversation"
-              >
-                Clear Chat
-              </button>
-            </>
-          )}
-          <ThemeToggle
-            theme={theme}
-            resolvedTheme={resolvedTheme}
-            onCycle={cycleTheme}
-          />
-          <StatusIndicator state={isResting ? "resting" : serverState} errorMessage={healthError} />
+          </nav>
         </div>
       </header>
 
-      {(serverState === "resting" || isResting) && <div className="banner-notice warning" role="status" aria-live="polite">
-        <div><p>Live answers are resting. Starter inquiries and curated role examples remain available.</p>
-          <AssistantFallback /></div>
-      </div>}
+      <main>
+        <div className={`portfolio-opening ${isCoverState ? "portfolio-cover" : "portfolio-conversation"}`}>
+          <div className="portfolio-measure portfolio-opening-inner">
+            {isCoverState && <CoverState headingRef={headingRef} company={company} />}
+            <section className="portfolio-assistant" id="assistant" tabIndex={-1}>
+              <div className="portfolio-assistant-heading">
+                {isCoverState ? <h2>Ask about Aamir</h2> : (
+                  <h1 id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
+                )}
+                <StatusIndicator state={assistantStatus} errorMessage={healthError} />
+              </div>
+              {isCoverState && (
+                <p className="portfolio-assistant-intro">
+                  I’m an AI assistant trained on Aamir’s verified résumé, projects, and experience.
+                </p>
+              )}
+              {!isCoverState && (
+                <div className="portfolio-transcript-actions">
+                  <button type="button" onClick={showOverview}>
+                    Portfolio overview
+                  </button>
+                  <button type="button" onClick={handleResetChat} disabled={isStreaming}>
+                    Clear chat
+                  </button>
+                </div>
+              )}
 
-      {(serverState === "resting" || isResting || serverState === "error") && <div className="banner-notice warning" role="status">
-        <div>{healthError && <p>{healthError}</p>}
-          {serverState === "error" && <AssistantFallback />}
-          <button type="button" className="btn btn-secondary" onClick={handleRefreshHealth}>Check service status</button>
+              <div className="portfolio-chat">
+                {!isCoverState && <MessageList messages={messages} />}
+                <div className="chat-input-container">
+                  {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
+                  <ChatInput
+                    onSend={(text) => {
+                      showChat(false);
+                      void sendMessage(text);
+                    }}
+                    onStop={stopStreaming}
+                    isStreaming={isStreaming}
+                  />
+                </div>
+              </div>
+
+              {isCoverState && (
+                <div className="portfolio-starter">
+                  <button type="button" onClick={() => handleSelectPrompt(FEATURED_PROMPT)} disabled={isStreaming}>
+                    {FEATURED_PROMPT}<span aria-hidden="true">↗</span>
+                  </button>
+                  {messages.length > 0 && (
+                    <button type="button" onClick={() => showChat(true)}>
+                      Resume chat
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {assistantStatus === "warming" && (
+                <div className="portfolio-notice">
+                  <p role="status">The assistant is waking up. Saved answers are available while it connects.</p>
+                  <AssistantFallback />
+                </div>
+              )}
+              {(assistantStatus === "resting" || assistantStatus === "error") && (
+                <div className="portfolio-notice">
+                  <p role="status">
+                    {assistantStatus === "resting"
+                      ? "Live answers are resting. Saved answers and curated role examples are available."
+                      : healthError}
+                  </p>
+                  <AssistantFallback />
+                  <button type="button" onClick={handleRefreshHealth}>Check service status</button>
+                </div>
+              )}
+              {error && (
+                <div className="portfolio-notice portfolio-chat-error">
+                  <p role="alert">{error}</p>
+                  <button type="button" onClick={clearError}>Dismiss</button>
+                </div>
+              )}
+            </section>
+          </div>
         </div>
-      </div>}
 
-      {serverState === "warming" && (
-        <div
-          className="banner-notice warning"
-          role="status"
-          aria-live="polite"
-        >
-          <span>
-            <strong>The assistant service is waking up.</strong> Saved answers
-            are available while it connects. You can also view Aamir's résumé
-            or contact him directly.
-          </span>
-          <AssistantFallback />
-        </div>
-      )}
-
-      {error && (
-        <div
-          className="banner-notice warning"
-          role="alert"
-          style={{ cursor: "pointer" }}
-          onClick={clearError}
-          title="Click to dismiss"
-        >
-          <span>
-            <strong>Notice:</strong> {error}
-          </span>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={{
-              minHeight: "auto",
-              padding: "0.2rem 0.5rem",
-              fontSize: "0.75rem",
-            }}
-            onClick={clearError}
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-
-      <main
-        className={`chat-shell ${isCoverState ? "mode-cover" : "mode-transcript"}`}
-      >
-        <div className="chat-content">
-          <MessageList
-            messages={messages}
-            isStreaming={isStreaming}
-            isCoverState={isCoverState}
-            company={company}
-            onSelectPrompt={handleSelectPrompt}
-            onOpenFitModal={handleOpenFitModal}
-          />
-        </div>
-
-        <div className="chat-input-container">
-          {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
-          <ChatInput
-            onSend={(text) => {
-              setViewMode("chat");
-              void sendMessage(text);
-            }}
-            onStop={stopStreaming}
-            isStreaming={isStreaming}
-          />
+        <SelectedWork />
+        <div className="portfolio-measure portfolio-more">
+          <section className="portfolio-questions">
+            <h2>More questions to ask</h2>
+            {company && (
+              <div className="starter-chips-container" role="group" aria-label="Highlighted projects">
+                <p>{company.why_us}</p>
+                <div className="starter-chips-grid">
+                  {company.highlighted_projects.map(project => (
+                    <button
+                      key={project.id}
+                      type="button"
+                      className="starter-chip"
+                      disabled={isStreaming}
+                      onClick={() => handleSelectPrompt(`Show me the ${project.title} project.`)}
+                    >
+                      {project.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <StarterChips
+              prompts={company?.suggested_questions}
+              onSelect={handleSelectPrompt}
+              disabled={isStreaming}
+            />
+          </section>
+          <CandidateDetails />
         </div>
       </main>
 
-      <footer className="fit-form-notice">
+      <footer className="portfolio-footer portfolio-measure">
+        <div className="portfolio-utilities">
+          <EvalBadge />
+          <ThemeToggle theme={theme} resolvedTheme={resolvedTheme} onCycle={cycleTheme} />
+        </div>
         <p>AI assistant about Aamir. Groq processes live questions and job descriptions.
           This browser tab stores a copy of the chat. When analytics is enabled, the service
           stores questions, usage, basic visit details, and feedback to improve the portfolio.
@@ -260,7 +289,6 @@ function Portfolio() {
           held in bounded server memory until eviction or restart.
           Service logs record only operational metadata, including request IDs and temporary salted IP hashes.</p>
       </footer>
-
       {isFitModalOpen && (
         <FitReportModal
           isOpen={isFitModalOpen}

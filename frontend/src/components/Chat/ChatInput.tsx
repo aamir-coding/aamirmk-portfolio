@@ -23,19 +23,14 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (!isStreaming && !disabled) {
-      textareaRef.current?.focus();
-    }
-  }, [isStreaming, disabled]);
-
-  // Global Ctrl+K / Cmd+K shortcut to focus input
-  useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        textareaRef.current?.focus();
-        textareaRef.current?.select();
-      }
+      const textarea = textareaRef.current;
+      if (!textarea || textarea.disabled || e.defaultPrevented || e.isComposing) return;
+      if (!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== "k") return;
+      if (document.querySelector('[aria-modal="true"], dialog[open]')) return;
+      e.preventDefault();
+      textarea.focus();
+      textarea.select();
     };
 
     window.addEventListener("keydown", handleGlobalKeyDown);
@@ -56,7 +51,12 @@ export function ChatInput({
     setInput("");
   };
 
+  const keepComposerFocus = (clickCount: number) => {
+    if (clickCount === 0) textareaRef.current?.focus({ preventScroll: true });
+  };
+
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
@@ -81,10 +81,10 @@ export function ChatInput({
           onKeyDown={handleKeyDown}
           placeholder={
             isStreaming
-              ? "Assistant dispatch in progress..."
-              : "Ask about Aamir's experience, stack, or projects (Enter to send, Shift+Enter for newline)..."
+              ? "Draft your next question"
+              : "Ask about Aamir’s work"
           }
-          rows={2}
+          rows={1}
           disabled={disabled}
           aria-disabled={disabled}
         />
@@ -93,7 +93,10 @@ export function ChatInput({
             <button
               type="button"
               className="btn btn-stop"
-              onClick={onStop}
+              onClick={(event) => {
+                keepComposerFocus(event.detail);
+                onStop();
+              }}
               aria-label="Stop generation"
             >
               Stop
@@ -102,6 +105,7 @@ export function ChatInput({
             <button
               type="submit"
               className="btn btn-primary"
+              onClick={(event) => keepComposerFocus(event.detail)}
               disabled={disabled || !input.trim()}
               aria-label="Send message"
             >
@@ -112,7 +116,7 @@ export function ChatInput({
       </div>
       <div className="chat-input-helper">
         <span>
-          Enter to dispatch • Shift+Enter for newline •{" "}
+          Enter to send · Shift+Enter for a new line ·{" "}
           <kbd className="kbd-shortcut" title="Focus composer (Ctrl+K or ⌘K)">
             Ctrl+K
           </kbd>

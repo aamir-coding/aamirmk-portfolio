@@ -1,6 +1,15 @@
 # Progress Tracker
 
 ## Current Phase
+**M1: Field of Evidence foundations — implemented locally and ready for review.**
+Branch `codex/phase-m1-foundations`. The entry screen introduces Aamir and puts the working assistant and one featured question in the first viewport. Selected work follows immediately, with direct access to the résumé and role-fit report. The featured question has a source-backed saved answer during warm-up, capacity rest, or an outage. See [DRN-080](decisions.md) and the [M1 study guide](study-guides/phase-m1-assistant-first-foundations.md).
+
+- Frontend verification: 191 Vitest tests, ESLint, and the Vite/TypeScript build passed. Initial JavaScript measured 171,690 gzip bytes against the 200,000-byte budget.
+- Backend and eval regression suites: 689 passed, 8 skipped. Live chat in browser checks used recorded SSE with no inference provider traffic.
+- Chrome browser review at 320, 375, 768, 1024, and 1440 px verified first-viewport access, first-answer and follow-up scrolling, keyboard interactions, saved-answer sources, company links, role-fit entry, dark mode, reduced motion, and direct proof links without JavaScript.
+- The M2 signature artwork is pending milestone approval. The assistant case study and its scroll chapter remain later milestones.
+
+## Previous Work
 **Improve Interactions & Production Interaction Latency — Complete.**
 Branch: `improve-interactions`. Resolves the production resting-state flip-flops and Groq tool-use API error while keeping 100% of the safety architecture, boot-authorization ledger, database models, and rate limiters intact.
 

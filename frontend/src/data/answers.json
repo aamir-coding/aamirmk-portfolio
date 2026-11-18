@@ -1,4 +1,22 @@
 {
+  "What did Aamir build at AlgoUniversity?": {
+    "reply": "As a software development extern at **AlgoUniversity**, Aamir built a responsive coding workspace for **Entropy Online Judge** with React, TypeScript, and Monaco Editor. It includes compiler diagnostics and submission history.\n\nHe also implemented asynchronous C++ and Python judging with BullMQ and Redis. Each submission runs in its own workspace with Linux resource limits, execution timeouts, and output caps.",
+    "sources": [
+      {
+        "chunk_id": "exp-algouniversity-built",
+        "title": "Aamir Mohammed Khan’s résumé",
+        "type": "experience",
+        "source_section": "Experience",
+        "source_url": "https://aamirmk-portfolio.vercel.app/resume.pdf"
+      },
+      {
+        "chunk_id": "proj-entropy-oj-pitch",
+        "title": "Entropy Online Judge live app",
+        "type": "project",
+        "source_url": "https://entropy-oj.vercel.app/"
+      }
+    ]
+  },
   "What is Aamir's experience with FastAPI and LLM systems?": {
     "reply": "Aamir has practical experience designing and deploying high-performance asynchronous systems with **FastAPI** and modern LLM integrations:\n\n- **Production AI Digital Assistant**: Architected this portfolio assistant using FastAPI (Python 3.13), Uvicorn, and Starlette SSE streaming. Implemented hybrid retrieval (BM25 + FastEmbed ONNX with $k=60$ Reciprocal Rank Fusion) fitting under Render's 512 MB RAM ceiling, paired with a sliding-window rate limiter, daily token quota guard, and server-controlled tool calling.\n- **Entropy-OJ LLM Subsystems**: Integrated three distinct LLM workflows: a Socratic Debug Copilot with hint-level throttling, a Problem-Setting QA Auditor for automated edge-case synthesis, and an asynchronous solution complexity classifier with multi-provider failover across Groq, Gemini Flash, and OpenRouter.\n- **System Design Principles**: Emphasizes strict deterministic boundaries, XML delimiter isolation (`<user_inquiry>`) against prompt injections, off-thread CPU execution (`asyncio.to_thread`), and zero-hallucination server-supplied schemas.",
     "sources": [

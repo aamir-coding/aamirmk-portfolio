@@ -85,19 +85,6 @@ export const MessageItem = React.memo(function MessageItem({
         )}
       </header>
       <div className="chat-message-body">
-        {/* Render generative project cards summoned via tool calls */}
-        {!isUser && message.cards && message.cards.length > 0 && (
-          <div className="message-cards-tray">
-            {message.cards.map((card) => (
-              <ProjectCard
-                key={card.id}
-                card={card}
-                onInspectArchitecture={handleInspectArchitecture}
-              />
-            ))}
-          </div>
-        )}
-
         {message.content ? (
           <FormattedMessage
             content={message.content}
@@ -122,6 +109,17 @@ export const MessageItem = React.memo(function MessageItem({
         )}
         {!isUser && message.sources && message.sources.length > 0 && (
           <SourceChips sources={message.sources} />
+        )}
+        {!isUser && message.cards && message.cards.length > 0 && (
+          <div className="message-cards-tray">
+            {message.cards.map((card) => (
+              <ProjectCard
+                key={card.id}
+                card={card}
+                onInspectArchitecture={handleInspectArchitecture}
+              />
+            ))}
+          </div>
         )}
         {!isUser && message.handoffId && handoffTranscript && (
           <HandoffCard id={message.handoffId} transcript={handoffTranscript} />

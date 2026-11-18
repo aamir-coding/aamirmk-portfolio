@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, within } from "@testing-library/react";
 import App from "./App";
 import * as api from "./lib/api";
 import * as sse from "./lib/sse";
@@ -253,7 +253,11 @@ describe("<App />", () => {
     expect(
       screen.getByRole("heading", { level: 1, name: /Aamir Mohammed Khan/i })
     ).toBeInTheDocument();
-    expect(screen.getByText(/Suggested Inquiries/i)).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).not.toHaveFocus();
+    expect(screen.getByRole("button", { name: "What did Aamir build at AlgoUniversity?" })).toBeEnabled();
+    expect(screen.getByRole("link", { name: "Selected work" })).toHaveAttribute("href", "#work");
+    expect(screen.getByRole("link", { name: "Résumé" })).toHaveAttribute("href", "/resume.pdf");
+    expect(screen.getByRole("heading", { name: "More questions to ask" })).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "Evaluation results unavailable" })).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
@@ -279,9 +283,13 @@ describe("<App />", () => {
     render(<App />);
     expect(await screen.findByText("Live answers resting")).toBeInTheDocument();
     expect(screen.getByRole("link", {name: "View professional profile"})).toBeInTheDocument();
-    const starter = screen.getByRole("button", {name: /What is Aamir's experience with FastAPI and LLM systems/i});
+    const starter = screen.getByRole("button", { name: "What did Aamir build at AlgoUniversity?" });
     fireEvent.click(starter);
     expect(stream).not.toHaveBeenCalled();
+    expect(await screen.findByText(/responsive coding workspace/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Entropy Online Judge live app/ }))
+      .toHaveAttribute("href", "https://entropy-oj.vercel.app/");
+    expect(screen.getByRole("heading", { name: "Conversation" })).toHaveFocus();
   });
 
   it("transitions status pill to 'Offline' when health check fails", async () => {
@@ -303,7 +311,7 @@ describe("<App />", () => {
 
     render(<App />);
 
-    const textarea = screen.getByPlaceholderText(/Ask about Aamir's experience/i);
+    const textarea = screen.getByRole("textbox", { name: /Ask a question about Aamir/i });
     fireEvent.change(textarea, {
       target: { value: "Tell me about his experience" },
     });
@@ -363,7 +371,7 @@ describe("<App />", () => {
     });
   });
 
-  it("shows '← Dossier Overview' button during active chat and resets to CoverState on click", async () => {
+  it("returns to the portfolio overview and keeps the conversation available", async () => {
     vi.spyOn(api, "fetchHealth").mockResolvedValue({ status: "ok", ready: true, assistant_state: "ready" });
     vi.spyOn(sse, "streamChat").mockImplementation(async (opts) => {
       opts.callbacks.onToken("Aamir is specialized in distributed LLM architectures.");
@@ -377,9 +385,9 @@ describe("<App />", () => {
     });
 
     // Initially in Cover State
-    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" })).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /Return to candidate dossier overview/i })
+      screen.queryByRole("button", { name: /Portfolio overview/i })
     ).not.toBeInTheDocument();
 
     // Trigger an inquiry
@@ -391,22 +399,22 @@ describe("<App />", () => {
     // Wait for message to stream in and reset button to appear
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /Return to candidate dossier overview/i })
+        screen.getByRole("button", { name: /Portfolio overview/i })
       ).toBeInTheDocument();
     });
 
     // Click the dossier overview navigation button
     const dossierBtn = screen.getByRole("button", {
-      name: /Return to candidate dossier overview/i,
+      name: /Portfolio overview/i,
     });
     fireEvent.click(dossierBtn);
 
     // Should return to Cover State non-destructively
-    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" })).toBeInTheDocument();
 
     // Resume Chat button is now available to jump back
     const resumeBtn = screen.getByRole("button", {
-      name: /Resume active chat conversation/i,
+      name: /Resume chat/i,
     });
     expect(resumeBtn).toBeInTheDocument();
 
@@ -418,13 +426,13 @@ describe("<App />", () => {
 
     // Now click Clear Chat -> completely wipes session
     const clearBtn = screen.getByRole("button", {
-      name: /Clear active conversation and reset/i,
+      name: /Clear chat/i,
     });
     fireEvent.click(clearBtn);
 
-    expect(screen.getByText("CANDIDATE DOSSIER")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" })).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /Resume active chat conversation/i })
+      screen.queryByRole("button", { name: /Resume chat/i })
     ).not.toBeInTheDocument();
   });
 
@@ -455,14 +463,12 @@ describe("<App />", () => {
       expect(screen.getByText("Ready")).toBeInTheDocument();
     });
 
-    const textarea = screen.getByPlaceholderText(/Ask about Aamir's experience/i);
+    const textarea = screen.getByRole("textbox", { name: /Ask a question about Aamir/i });
     fireEvent.change(textarea, { target: { value: "Tell me about Entropy-OJ" } });
     fireEvent.click(screen.getByRole("button", { name: /Send message/i }));
 
-    // Wait for ProjectCard to render
-    await waitFor(() => {
-      expect(screen.getByText("Entropy Online Judge")).toBeInTheDocument();
-    });
+    const history = await screen.findByRole("log", { name: "Conversation history" });
+    expect(await within(history).findByRole("heading", { name: "Entropy Online Judge" })).toBeInTheDocument();
 
     // Click Inspect Architecture Blueprint button
     const inspectBtn = screen.getByRole("button", {
@@ -494,7 +500,7 @@ describe("<App />", () => {
     });
   });
 
-  it("opens Job Description Fit Report modal when '⚡ Role Fit' is clicked", async () => {
+  it("opens the job description fit report from the primary navigation", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     vi.spyOn(api, "fetchFitPresets").mockResolvedValue([]);
     render(<App />);
