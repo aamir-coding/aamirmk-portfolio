@@ -7,7 +7,7 @@ type ViewState =
   | { status: "ready"; data: SharedSummary };
 
 function ResumeSource({ section }: { section: string }) {
-  return <a className="summary-source" href="/resume.pdf" referrerPolicy="no-referrer">Résumé · {section}</a>;
+  return <a className="summary-source" href="/resume.pdf" referrerPolicy="no-referrer">Résumé: {section}</a>;
 }
 
 export default function SummaryPage({ token }: { token: string }) {
@@ -34,7 +34,8 @@ export default function SummaryPage({ token }: { token: string }) {
     };
   }, [attempt, token, validToken]);
 
-  const summary = view.status === "ready" ? view.data.summary : null;
+  const shared = view.status === "ready" ? view.data : null;
+  const summary = shared?.summary;
   return (
     <main className="summary-page">
       <nav className="summary-toolbar" aria-label="Summary actions">
@@ -45,15 +46,22 @@ export default function SummaryPage({ token }: { token: string }) {
           </button>
         )}
       </nav>
-      {summary ? (
+      {shared && summary ? (
         <article className="summary-sheet" aria-labelledby="summary-name">
           <header className="summary-heading">
             <h1 id="summary-name">{summary.name}</h1>
             <p>{summary.headline}</p>
+            <p className="summary-expiry">
+              Link expires <time dateTime={shared.expires_at}>
+                {new Date(shared.expires_at).toLocaleString("en", {
+                  dateStyle: "medium", timeStyle: "short", timeZone: "UTC",
+                })}
+              </time> UTC.
+            </p>
           </header>
           <section aria-labelledby="summary-strengths">
             <h2 id="summary-strengths">Strengths</h2>
-            <ul>
+            <ul className="summary-evidence-list" role="list">
               {summary.strengths.map((strength) => (
                 <li key={strength.title}>
                   <h3>{strength.title}</h3>
@@ -65,7 +73,7 @@ export default function SummaryPage({ token }: { token: string }) {
           </section>
           <section aria-labelledby="summary-projects">
             <h2 id="summary-projects">Relevant projects</h2>
-            <ul>
+            <ul className="summary-evidence-list" role="list">
               {summary.projects.map((project) => (
                 <li key={project.id}>
                   <h3>{project.title}</h3>
@@ -87,17 +95,24 @@ export default function SummaryPage({ token }: { token: string }) {
           <footer>Prepared by Aamir’s AI assistant using his published résumé.</footer>
         </article>
       ) : !validToken || view.status === "unavailable" ? (
-        <p role="status">This summary link is unavailable or expired.</p>
+        <section className="summary-sheet summary-state">
+          <h1>Team summary</h1>
+          <p role="status">This summary link is unavailable or expired.</p>
+        </section>
       ) : view.status === "error" ? (
-        <div>
+        <section className="summary-sheet summary-state">
+          <h1>Team summary</h1>
           <p role="alert">The summary could not be loaded.</p>
           <button type="button" className="btn btn-secondary" onClick={() => {
             setView({ status: "loading" });
             setAttempt(previous => previous + 1);
           }}>Try again</button>
-        </div>
+        </section>
       ) : (
-        <p role="status">Loading team summary…</p>
+        <section className="summary-sheet summary-state">
+          <h1>Team summary</h1>
+          <p role="status">Loading team summary…</p>
+        </section>
       )}
     </main>
   );
