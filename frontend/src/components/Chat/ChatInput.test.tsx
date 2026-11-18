@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, createEvent, fireEvent } from "@testing-library/react";
 import { ChatInput } from "./ChatInput";
 
 describe("<ChatInput />", () => {
@@ -47,6 +47,26 @@ describe("<ChatInput />", () => {
 
     fireEvent.keyDown(textarea, { key: "Escape" });
     expect(handleStop).toHaveBeenCalled();
+  });
+
+  it("keeps a drafted follow-up when Enter is pressed during an answer", () => {
+    const onSend = vi.fn();
+    const onStop = vi.fn();
+    render(<ChatInput onSend={onSend} onStop={onStop} isStreaming={true} />);
+    const textarea = screen.getByRole("textbox");
+    fireEvent.change(textarea, { target: { value: "A drafted follow-up" } });
+    fireEvent.keyDown(textarea, { key: "Enter" });
+    expect(onSend).not.toHaveBeenCalled();
+    expect(onStop).not.toHaveBeenCalled();
+    expect(textarea).toHaveValue("A drafted follow-up");
+
+    const stop = screen.getByRole("button", { name: "Stop generation" });
+    const click = createEvent.click(stop);
+    fireEvent(stop, click);
+    expect(click.defaultPrevented).toBe(true);
+    expect(onStop).toHaveBeenCalledOnce();
+    expect(onSend).not.toHaveBeenCalled();
+    expect(textarea).toHaveValue("A drafted follow-up");
   });
 
   it("leaves Enter for IME composition and keeps Shift+Enter for a new line", () => {

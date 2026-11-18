@@ -41,10 +41,7 @@ export function ChatInput({
 
   const handleSubmit = (e?: FormEvent) => {
     if (e) e.preventDefault();
-    if (isStreaming) {
-      onStop();
-      return;
-    }
+    if (isStreaming) return;
     const trimmed = input.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
@@ -94,6 +91,8 @@ export function ChatInput({
               type="button"
               className="btn btn-stop"
               onClick={(event) => {
+                // The same control becomes a submit button when the stream stops.
+                event.preventDefault();
                 keepComposerFocus(event.detail);
                 onStop();
               }}
@@ -115,14 +114,15 @@ export function ChatInput({
         </div>
       </div>
       <div className="chat-input-helper">
-        <span>
-          Enter to send · Shift+Enter for a new line ·{" "}
+        <span className="chat-input-keys">
+          <span>Enter to send</span>
+          <span>Shift+Enter for a new line</span>
           <kbd className="kbd-shortcut" title="Focus composer (Ctrl+K or ⌘K)">
             Ctrl+K
           </kbd>
         </span>
         {isStreaming && (
-          <span className="helper-active">Streaming active • Esc to stop</span>
+          <span className="helper-active">Esc to stop</span>
         )}
       </div>
     </form>
