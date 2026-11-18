@@ -377,6 +377,7 @@ describe("<App />", () => {
 
   it("delivers instant offline answer when starter chip is clicked while warming", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {})); // Never resolves (simulating cold start)
+    const stream = vi.spyOn(sse, "streamChat");
     render(<App />);
 
     const chip = screen.getByRole("button", {
@@ -384,11 +385,11 @@ describe("<App />", () => {
     });
     fireEvent.click(chip);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Aamir's technical strengths center on pragmatic full-stack/i)
-      ).toBeInTheDocument();
-    });
+    const answer = await screen.findByRole("article", { name: "Assistant message" });
+    expect(within(answer).getByText("Python and FastAPI")).toBeInTheDocument();
+    expect(within(answer).getByRole("link", { name: /Aamir’s résumé/ }))
+      .toHaveAttribute("href", "https://aamirmk-portfolio.vercel.app/resume.pdf");
+    expect(stream).not.toHaveBeenCalled();
   });
 
   it("returns to the portfolio overview and keeps the conversation available", async () => {

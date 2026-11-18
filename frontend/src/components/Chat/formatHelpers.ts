@@ -38,10 +38,10 @@ export function formatSafeHref(rawHref?: string): string | undefined {
  * Handles Unicode whitespace, non-breaking hyphens, glued list numerals,
  * and repairs unclosed bold contact headers without mutating domain names.
  */
-// Anonymous GETs returned 404 on 2026-11-10; retain receipts without dead links.
+// Retain receipts for known unavailable sources without attaching dead links.
 const UNAVAILABLE_PUBLIC_SOURCES = new Set([
-  "https://github.com/aamir-coding/aamirmk-portfolio",
   "https://github.com/aamirmkh",
+  "https://github.com/aamir-coding/portfolio-ai",
   "https://github.com/aamir-coding/portfolio-assistant",
 ]);
 

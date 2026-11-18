@@ -5,7 +5,7 @@ import type { SourceCitation } from "../../lib/types";
 
 describe("SourceChips", () => {
   it("preserves an inaccessible source as a receipt without a broken link", () => {
-    render(<SourceChips sources={[{chunk_id:"private-source",title:"Portfolio source",type:"project",source_url:"https://github.com/aamir-coding/aamirmk-portfolio"}]} />);
+    render(<SourceChips sources={[{chunk_id:"retired-source",title:"Portfolio source",type:"project",source_url:"https://github.com/aamir-coding/portfolio-ai"}]} />);
     expect(screen.getByText("Portfolio source")).toBeInTheDocument();
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.getByText("Reference only")).toBeInTheDocument();
@@ -46,16 +46,16 @@ describe("SourceChips", () => {
     const mockSources: SourceCitation[] = [
       {
         chunk_id: "c1",
-        title: "Live App Receipt",
+        title: "Portfolio source",
         type: "project",
-        source_url: "https://entropy-oj.vercel.app",
+        source_url: "https://github.com/aamir-coding/aamirmk-portfolio",
       },
     ];
 
     render(<SourceChips sources={mockSources} />);
 
-    const link = screen.getByRole("link", { name: /Live App Receipt/i });
-    expect(link).toHaveAttribute("href", "https://entropy-oj.vercel.app");
+    const link = screen.getByRole("link", { name: /Portfolio source/i });
+    expect(link).toHaveAttribute("href", "https://github.com/aamir-coding/aamirmk-portfolio");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
