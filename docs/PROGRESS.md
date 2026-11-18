@@ -1,16 +1,25 @@
 # Progress Tracker
 
 ## Current Phase
-**M2: Field of Evidence signature hero — implemented locally and ready for review.**
+**M3: Field of Evidence work and credibility — implemented locally and ready for review.**
+Branch `codex/phase-m3-work-credibility`. Selected work features the assistant's saved-answer example, evaluation record, and public repository. Entropy Online Judge and HealthTracker each link to a live demo and source code. The no-script entry includes both demos, all three repositories, and the résumé. See [DRN-082](decisions.md) and the [M3 study guide](study-guides/phase-m3-work-credibility.md).
+
+- Chrome checked six widths from 320 to 1920 px, keyboard order and visible focus, all six project links by touch while offline, the direct evaluation route, image failure, narrow text, long-title reflow, and the no-script entry. Recorded recruiter flows passed separately.
+- The desktop screenshot is 15,274 bytes and uses an aspect-ratio reservation. The 320, 375, and 768 px checks loaded the text excerpt without requesting the screenshot. Initial JavaScript measured 172,293 gzip bytes against the 200,000-byte budget.
+- 191 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and eval regression suite passed 689 tests with 8 skipped.
+- The published résumé's older `portfolio-ai` repository URL returned HTTP 404. The work section uses the verified current public repository. A future revision of the published résumé should correct its source link.
+- M4 Assistant UX is pending owner approval. Local tag `phase-m2-done` is the rollback point for the work section.
+
+## Previous Work
+**M2: Field of Evidence signature hero — approved for M3.**
 Branch `codex/phase-m2-signature-hero`. Dithered ASCII ridges and a pale river reflection carry the original Field of Evidence landscape into the working cover. The assistant's first-viewport layout and the Selected work section keep their M1 geometry. See [DRN-081](decisions.md) and the [M2 study guide](study-guides/phase-m2-signature-hero.md).
 
 - Chrome requested one WebP at each tested width. The phone, tablet, and wide files are 17,862, 21,752, and 30,674 bytes respectively. Initial JavaScript measured 171,917 gzip bytes against the 200,000-byte budget. The artwork adds no font download or runtime drawing library.
 - Browser verification covered nine widths from 320 to 1920 px, blocked assets and source recovery, keyboard access, dark and forced colors, reduced motion, and the one-shot 640 ms wide-screen reveal. Pixel sampling under hero text measured at least 4.52:1. The layout checks found no shift attributable to the artwork.
 - A local 375 px run with 4× CPU slowdown and 150 ms network latency measured 2.632 s LCP with the artwork and with its request blocked. Both exceeded the 2.5 s target on this profile. Field performance is a release check.
 - 191 frontend tests, ESLint, and Vite/TypeScript build passed. The offline backend and evaluator regression run passed 689 tests with 8 skipped. Browser flow replay used local fixtures and recorded SSE.
-- M3 work and credibility is pending owner approval. Local M1 tag `phase-m1-done` is the rollback point for the hero.
+- Local M1 tag `phase-m1-done` is the rollback point for the hero.
 
-## Previous Work
 **M1: Field of Evidence foundations — approved for M2.**
 Branch `codex/phase-m1-foundations`. The entry screen introduces Aamir and puts the working assistant and one featured question in the first viewport. Selected work follows immediately, with direct access to the résumé and role-fit report. The featured question has a source-backed saved answer during warm-up, capacity rest, or an outage. See [DRN-080](decisions.md) and the [M1 study guide](study-guides/phase-m1-assistant-first-foundations.md).
 

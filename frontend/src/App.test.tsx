@@ -292,13 +292,25 @@ describe("<App />", () => {
     expect(screen.getByRole("heading", { name: "Conversation" })).toHaveFocus();
   });
 
-  it("transitions status pill to 'Offline' when health check fails", async () => {
+  it("keeps direct project evidence available when the assistant is offline", async () => {
     vi.spyOn(api, "fetchHealth").mockRejectedValue(new Error("Connection refused"));
     render(<App />);
 
     await waitFor(() => {
       expect(screen.getByText("Offline")).toBeInTheDocument();
     });
+
+    const work = within(screen.getByRole("region", { name: "Selected work" }));
+    const links = work.getAllByRole("link");
+    expect(links.map(link => link.getAttribute("href"))).toEqual([
+      "/evals",
+      "https://github.com/aamir-coding/aamirmk-portfolio",
+      "https://entropy-oj.vercel.app/",
+      "https://github.com/aamir-coding/entropy-oj",
+      "https://health-tracker-alpha-one.vercel.app/",
+      "https://github.com/aamir-coding/health-tracker",
+    ]);
+    expect(screen.queryByRole("log", { name: "Conversation history" })).not.toBeInTheDocument();
   });
 
   it("allows user to type a question and stream assistant answer", async () => {

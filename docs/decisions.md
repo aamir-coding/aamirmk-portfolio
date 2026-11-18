@@ -3,6 +3,27 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-082: Direct access to selected work and project evidence
+
+**Date:** 2026-11-18. **Scope:** Field of Evidence M3. Selected work opens with
+the assistant as a project. A real saved AlgoUniversity answer shows how it
+presents sources. The example came from the existing instant-answer path using
+a local resting-state fixture. At narrower widths, a readable text excerpt
+takes the screenshot's place. The same equivalent text and caption cover the
+example when the image is unavailable or a visitor uses assistive technology.
+
+The section links straight to the assistant evaluation record and public source.
+Entropy Online Judge and HealthTracker each link to the live demo and public
+repository. Project claims come from the published résumé. Its old
+`portfolio-ai` link returned HTTP 404, so Selected work uses the verified
+`aamirmk-portfolio` public repository. The résumé asset itself is a separate
+publishing artifact.
+
+Native links, a lazy image with reserved proportions, and the no-script entry preserve
+the reading order and give recruiters direct access during an outage. Selected
+work has no dependency on the assistant's readiness or conversation state.
+Evaluation claims and limitations stay on the existing evaluation route.
+
 ### DRN-081: Signature hero as responsive, decorative artwork
 
 **Date:** 2026-11-18. **Scope:** Field of Evidence M2. The approved night

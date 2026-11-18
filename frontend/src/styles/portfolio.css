@@ -150,7 +150,7 @@
 .portfolio-brand,
 .portfolio-details nav a,
 .portfolio-utilities > *,
-.portfolio-work li a,
+.portfolio-work-links a,
 .portfolio-starter button,
 .portfolio-transcript-actions button,
 .portfolio-notice button {
@@ -360,28 +360,99 @@ button.portfolio-brand { cursor: pointer; }
 .portfolio-work h2 { margin-block-end: var(--space-5); }
 .portfolio-work h2[id] { scroll-margin-block-start: var(--space-4); }
 
-.portfolio-work ul {
+.portfolio-work-feature {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, .84fr) minmax(0, 1.16fr);
+  align-items: center;
+  gap: clamp(1.25rem, 4.5vw, 4.5rem);
+  padding-block: clamp(1.5rem, 3.5vw, 3rem);
+  border-block-start: 1px solid var(--portfolio-rule);
+}
+
+.portfolio-work h3 {
+  font: var(--font-regular) clamp(1.42rem, 1.1rem + .65vw, 2rem)/1.15 var(--portfolio-display);
+  min-inline-size: 0;
+  overflow-wrap: break-word;
+}
+
+.portfolio-work-feature h3 {
+  font-size: clamp(2.45rem, 1.65rem + 2.5vw, 4.5rem);
+  line-height: .98;
+  letter-spacing: -.045em;
+}
+
+.portfolio-work article p {
+  margin-block: var(--space-3);
+  color: var(--portfolio-muted);
+}
+
+.portfolio-work-feature-copy > p { max-inline-size: 45ch; }
+
+.portfolio-work-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-6);
+}
+
+.portfolio-work-links a {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+
+.portfolio-work-feature .portfolio-work-links a:first-child {
+  font-weight: var(--font-semibold);
+}
+
+.portfolio-work-figure { margin: 0; }
+
+.portfolio-work-example {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 698 / 480;
+  border: 1px solid var(--portfolio-rule);
+}
+
+.portfolio-work-example-copy {
+  max-inline-size: 36ch;
+  padding-inline: var(--space-4);
+}
+
+.portfolio-work-example img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  background: var(--portfolio-paper);
+}
+
+.portfolio-work-example img[hidden] { display: none; }
+
+.portfolio-work-figure figcaption {
+  margin-block-start: var(--space-2);
+  color: var(--portfolio-muted);
+  font-size: var(--text-sm);
+}
+
+.portfolio-work-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   padding: 0;
   margin: 0;
   list-style: none;
   border-block: 1px solid var(--portfolio-rule);
 }
 
-.portfolio-work li { padding: var(--space-5) var(--space-6) var(--space-3) 0; }
-.portfolio-work li + li {
+.portfolio-work-list li { padding: var(--space-5) var(--space-6) var(--space-3) 0; }
+.portfolio-work-list li + li {
   border-inline-start: 1px solid var(--portfolio-rule);
   padding-inline-start: var(--space-6);
 }
 
-.portfolio-work li article { height: 100%; display: flex; flex-direction: column; }
-.portfolio-work h3 {
-  font: var(--font-regular) clamp(1.42rem, 1.1rem + .65vw, 2rem)/1.15 var(--portfolio-display);
-  overflow-wrap: break-word;
-}
-.portfolio-work li p { margin-block: var(--space-3); color: var(--portfolio-muted); }
-.portfolio-work li a { margin-block-start: auto; width: fit-content; }
+.portfolio-work-list article { block-size: 100%; display: flex; flex-direction: column; }
+.portfolio-work-list .portfolio-work-links { margin-block-start: auto; }
 
 .portfolio-work a,
 .portfolio-details nav a { color: inherit; text-underline-offset: .2em; }
@@ -408,13 +479,19 @@ button.portfolio-brand { cursor: pointer; }
 .portfolio-footer p { color: var(--portfolio-muted); max-width: 82ch; margin-block-start: var(--space-3); }
 .portfolio-utilities .eval-badge { padding-inline: 0; text-underline-offset: .2em; color: inherit; }
 
+@media (max-width: 59.99rem) {
+  .portfolio-work-example { aspect-ratio: auto; }
+  .portfolio-work-example img { display: none; }
+}
+
 @media (max-width: 47.99rem) {
-  .portfolio-work ul,
+  .portfolio-work-feature,
+  .portfolio-work-list,
   .portfolio-more { grid-template-columns: minmax(0, 1fr); }
 
-  .portfolio-work li + li { border-inline-start: 0; border-top: 1px solid var(--portfolio-rule); }
-  .portfolio-work li,
-  .portfolio-work li + li { padding-inline: 0; }
+  .portfolio-work-list li + li { border-inline-start: 0; border-block-start: 1px solid var(--portfolio-rule); }
+  .portfolio-work-list li,
+  .portfolio-work-list li + li { padding-inline: 0; }
   .portfolio-chat .chat-input-helper { display: none; }
 }
 
