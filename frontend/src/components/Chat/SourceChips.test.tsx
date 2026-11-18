@@ -8,7 +8,7 @@ describe("SourceChips", () => {
     render(<SourceChips sources={[{chunk_id:"private-source",title:"Portfolio source",type:"project",source_url:"https://github.com/aamir-coding/aamirmk-portfolio"}]} />);
     expect(screen.getByText("Portfolio source")).toBeInTheDocument();
     expect(screen.queryByRole("link")).toBeNull();
-    expect(screen.getByTitle(/Source not publicly accessible/)).toBeInTheDocument();
+    expect(screen.getByText("Reference only")).toBeInTheDocument();
   });
   it("renders nothing when sources array is empty", () => {
     const { container } = render(<SourceChips sources={[]} />);
@@ -35,7 +35,7 @@ describe("SourceChips", () => {
 
     render(<SourceChips sources={mockSources} />);
 
-    expect(screen.getByText("RECEIPTS:")).toBeInTheDocument();
+    expect(screen.getByText("Sources")).toBeInTheDocument();
     expect(screen.getByText("Entropy Online Judge")).toBeInTheDocument();
     expect(screen.getByText("[J1, J2]")).toBeInTheDocument();
     expect(screen.getByText("AlgoUniversity Role")).toBeInTheDocument();

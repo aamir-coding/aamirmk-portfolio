@@ -17,10 +17,10 @@ export const SourceChips = React.memo(function SourceChips({
     <div
       className="source-chips-container"
       role="group"
-      aria-label="Verified Source Receipts"
+      aria-label="Answer sources"
     >
-      <span className="source-chips-label">RECEIPTS:</span>
-      <ul className="source-chips-list">
+      <span className="source-chips-label">Sources</span>
+      <ul className="source-chips-list" role="list">
         {sources.map((src) => {
           const sectionBadge = src.source_section ? `[${src.source_section}]` : "";
           const safeUrl = formatPublicSourceHref(src.source_url ?? undefined);
@@ -34,28 +34,20 @@ export const SourceChips = React.memo(function SourceChips({
                   target="_blank"
                   rel="noopener noreferrer"
                   className="source-chip source-chip-link"
-                  title={`View verified receipt: ${src.title}`}
                   aria-label={`${src.title} ${sectionBadge} (opens external link)`}
                 >
+                  <span className="source-chip-title">{src.title}</span>
                   {sectionBadge && (
                     <span className="source-chip-section">{sectionBadge}</span>
                   )}
-                  <span className="source-chip-title">{src.title}</span>
-                  <span className="source-chip-icon" aria-hidden="true">
-                    ↗
-                  </span>
                 </a>
               ) : (
-                <span
-                  className="source-chip"
-                  role="group"
-                  title={src.source_url ? `Source not publicly accessible. Receipt: ${src.title}` : `Grounded in questionnaire receipt: ${src.title}`}
-                  aria-label={`${src.title} ${sectionBadge}`}
-                >
+                <span className="source-chip">
+                  <span className="source-chip-title">{src.title}</span>
                   {sectionBadge && (
                     <span className="source-chip-section">{sectionBadge}</span>
                   )}
-                  <span className="source-chip-title">{src.title}</span>
+                  <span className="source-chip-section">Reference only</span>
                 </span>
               )}
             </li>

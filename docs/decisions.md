@@ -3,6 +3,28 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-083: Reader-controlled transcript and focused recovery
+
+**Date:** 2026-11-18. **Scope:** Field of Evidence M4. The first reply starts
+at the top. Later explicit submissions follow the latest turn. Scrolling away
+pauses following, and Jump to latest restores it with a local scroll and
+keyboard focus in the history region. Enter keeps a draft during an active
+request. Stop and Escape deliberately cancel it. Stop also cancels the
+native click default because the same DOM control changes back to a submit
+button during that event.
+
+The transcript is a named region. A separate polite status reports completion,
+saved delivery, and cancellation. Each completed reply has its own status
+element, including consecutive saved answers. Error alerts sit beside recovery
+actions. Explicit recovery controls return keyboard focus to the assistant
+when the focused control may disappear.
+
+Source titles wrap at narrow widths and preserve their section identifiers.
+Titles without an eligible public URL remain references. The single recovery
+panel offers the verified AlgoUniversity saved answer, service recheck when
+relevant, and direct contact and résumé access. The composer and transcript
+consume the existing message and streaming interfaces.
+
 ### DRN-082: Direct access to selected work and project evidence
 
 **Date:** 2026-11-18. **Scope:** Field of Evidence M3. Selected work opens with

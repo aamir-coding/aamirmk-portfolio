@@ -310,7 +310,7 @@ describe("<App />", () => {
       "https://health-tracker-alpha-one.vercel.app/",
       "https://github.com/aamir-coding/health-tracker",
     ]);
-    expect(screen.queryByRole("log", { name: "Conversation history" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Conversation history" })).not.toBeInTheDocument();
   });
 
   it("allows user to type a question and stream assistant answer", async () => {
@@ -479,7 +479,7 @@ describe("<App />", () => {
     fireEvent.change(textarea, { target: { value: "Tell me about Entropy-OJ" } });
     fireEvent.click(screen.getByRole("button", { name: /Send message/i }));
 
-    const history = await screen.findByRole("log", { name: "Conversation history" });
+    const history = await screen.findByRole("region", { name: "Conversation history" });
     expect(await within(history).findByRole("heading", { name: "Entropy Online Judge" })).toBeInTheDocument();
 
     // Click Inspect Architecture Blueprint button

@@ -19,8 +19,7 @@ describe("<MessageItem />", () => {
 
     render(<MessageItem message={userMsg} />);
 
-    expect(screen.getByText("INQUIRY")).toBeInTheDocument();
-    expect(screen.getByText("Recruiter")).toBeInTheDocument();
+    expect(screen.getByText("You")).toBeInTheDocument();
     expect(screen.getByText("What is Aamir's primary stack?")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Copy/i })).not.toBeInTheDocument();
   });
@@ -43,8 +42,7 @@ describe("<MessageItem />", () => {
 
     render(<MessageItem message={assistantMsg} />);
 
-    expect(screen.getByText("DISPATCH")).toBeInTheDocument();
-    expect(screen.getByText("Aamir.AI")).toBeInTheDocument();
+    expect(screen.getByText("AI assistant")).toBeInTheDocument();
 
     const copyBtn = screen.getByRole("button", { name: /Copy response text/i });
     expect(copyBtn).toBeInTheDocument();

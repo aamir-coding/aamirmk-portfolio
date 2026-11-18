@@ -1,16 +1,25 @@
 # Progress Tracker
 
 ## Current Phase
-**M3: Field of Evidence work and credibility — implemented locally and ready for review.**
+**M4: Field of Evidence assistant UX — implemented locally and ready for review.**
+Branch `codex/phase-m4-assistant-ux`. The conversation follows explicit reading intent, keeps drafts during streaming and cancellation, and presents full source titles and one recovery panel. See [DRN-083](decisions.md) and the [M4 study guide](study-guides/phase-m4-assistant-ux.md).
+
+- Local Chrome replay passed at 320, 375, 768, 1024, and 1440 px. It covered full sources, the project architecture dialog, keyboard and IME, long replies, earlier-message reading, Jump to latest, cancellation and tab restoration, refusal, HTTP 429, stream errors, warming, resting, and offline states. Earlier-message reading and explicit catch-up both kept the document offset unchanged in the controlled replay.
+- The composer boundary measured 3.56:1 in the light transcript. Initial JavaScript measured 172,629 gzip bytes against the 200,000-byte limit. M4 adds no visual asset.
+- 192 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and evaluator suite passed 689 tests with 8 skipped. The browser checked announcement markup and keyboard focus. Physical mobile keyboards and screen-reader speech remain release checks.
+- The new recovery button uses the résumé-backed AlgoUniversity answer. Older bundled answers contain claims that need a separate factual review against the résumé before wider use.
+- M5 Fit and recruiter actions is pending owner approval. Local tag `phase-m3-done` is the rollback point for M4.
+
+## Previous Work
+**M3: Field of Evidence work and credibility — approved for M4.**
 Branch `codex/phase-m3-work-credibility`. Selected work features the assistant's saved-answer example, evaluation record, and public repository. Entropy Online Judge and HealthTracker each link to a live demo and source code. The no-script entry includes both demos, all three repositories, and the résumé. See [DRN-082](decisions.md) and the [M3 study guide](study-guides/phase-m3-work-credibility.md).
 
 - Chrome checked six widths from 320 to 1920 px, keyboard order and visible focus, all six project links by touch while offline, the direct evaluation route, image failure, narrow text, long-title reflow, and the no-script entry. Recorded recruiter flows passed separately.
 - The desktop screenshot is 15,274 bytes and uses an aspect-ratio reservation. The 320, 375, and 768 px checks loaded the text excerpt without requesting the screenshot. Initial JavaScript measured 172,293 gzip bytes against the 200,000-byte budget.
 - 191 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and eval regression suite passed 689 tests with 8 skipped.
 - The published résumé's older `portfolio-ai` repository URL returned HTTP 404. The work section uses the verified current public repository. A future revision of the published résumé should correct its source link.
-- M4 Assistant UX is pending owner approval. Local tag `phase-m2-done` is the rollback point for the work section.
+- Local tag `phase-m2-done` is the rollback point for the work section.
 
-## Previous Work
 **M2: Field of Evidence signature hero — approved for M3.**
 Branch `codex/phase-m2-signature-hero`. Dithered ASCII ridges and a pale river reflection carry the original Field of Evidence landscape into the working cover. The assistant's first-viewport layout and the Selected work section keep their M1 geometry. See [DRN-081](decisions.md) and the [M2 study guide](study-guides/phase-m2-signature-hero.md).
 

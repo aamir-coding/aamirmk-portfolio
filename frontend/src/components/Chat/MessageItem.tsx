@@ -65,12 +65,12 @@ export const MessageItem = React.memo(function MessageItem({
       aria-label={`${isUser ? "User" : "Assistant"} message`}
     >
       <header className="chat-message-header">
-        <span className="chat-message-badge">
-          {isUser ? "INQUIRY" : "DISPATCH"}
-        </span>
         <span className="chat-message-author">
-          {isUser ? "Recruiter" : "Aamir.AI"}
+          {isUser ? "You" : "AI assistant"}
         </span>
+        {message.delivery === "instant" && <span className="chat-message-state">Saved answer</span>}
+        {message.delivery === "cancelled" && <span className="chat-message-state">Stopped</span>}
+        {message.status === "error" && <span className="chat-message-state">Interrupted</span>}
         <time className="chat-message-time">{message.timestamp}</time>
         {!isUser && message.content && (
           <button
@@ -93,7 +93,7 @@ export const MessageItem = React.memo(function MessageItem({
         ) : message.status === "streaming" &&
           (!message.cards || message.cards.length === 0) ? (
           <div className="chat-message-text">
-            <span
+            Preparing an answer…{" "}<span
               className="streaming-cursor"
               aria-hidden="true"
               data-testid="streaming-cursor"
@@ -103,7 +103,7 @@ export const MessageItem = React.memo(function MessageItem({
           </div>
         ) : null}
         {message.status === "error" && !message.content && (
-          <p className="chat-message-error" role="alert">
+          <p className="chat-message-error">
             Generation interrupted or failed.
           </p>
         )}

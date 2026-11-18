@@ -1,4 +1,4 @@
-import { lazy, Suspense, useLayoutEffect, useRef, useState } from "react";
+import { lazy, Suspense, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
 import { EvalBadge } from "./components/Evals/EvalBadge";
 import { AssistantFallback } from "./components/AssistantFallback";
 import { useServerHealth } from "./hooks/useServerHealth";
@@ -78,8 +78,22 @@ function Portfolio() {
 
   const isCoverState = viewMode === "cover" || messages.length === 0;
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const assistantRef = useRef<HTMLElement>(null);
   const focusAfterNavigation = useRef(false);
   const assistantStatus = isResting ? "resting" : serverState;
+  const reply = messages.at(-1);
+  let announcement = "";
+  if (reply?.role === "assistant" && reply.status === "done") {
+    if (reply.delivery === "cancelled") announcement = "Response stopped.";
+    else if (reply.delivery === "instant") announcement = "Saved answer ready in conversation history.";
+    else announcement = "Answer ready in conversation history.";
+  }
+  const healthNotice = assistantStatus === "warming"
+    ? "The assistant is waking up. You can read a saved answer while it connects."
+    : assistantStatus === "resting"
+      ? "Live capacity is temporarily unavailable. Saved answers and curated role examples are available."
+      : assistantStatus === "error" ? healthError : null;
+  const showRecovery = Boolean(healthNotice || error);
 
   useLayoutEffect(() => {
     if (!focusAfterNavigation.current) return;
@@ -100,7 +114,7 @@ function Portfolio() {
 
   const showChat = (moveFocus: boolean) => {
     if (isCoverState) {
-      focusAfterNavigation.current = true;
+      focusAfterNavigation.current = moveFocus;
     } else if (moveFocus) {
       headingRef.current?.focus();
     }
@@ -112,11 +126,11 @@ function Portfolio() {
     setViewMode("cover");
   };
 
-  const handleSelectPrompt = (prompt: string) => {
+  const handleSelectPrompt = (prompt: string, useSaved = false) => {
     if (isStreaming) return;
     showChat(true);
     // If backend is asleep or still warming, answer instantly from bundled answers.json
-    if ((serverState !== "ready" || isResting) && BUNDLED_ANSWERS[prompt]) {
+    if ((useSaved || serverState !== "ready" || isResting) && BUNDLED_ANSWERS[prompt]) {
       sendInstantAnswer(prompt, BUNDLED_ANSWERS[prompt]);
       return;
     }
@@ -138,7 +152,12 @@ function Portfolio() {
     showOverview();
   };
 
-  const handleRefreshHealth = () => {
+  const restoreRecoveryFocus = (event: MouseEvent<HTMLButtonElement>) => {
+    if (event.detail === 0) assistantRef.current?.focus({ preventScroll: true });
+  };
+
+  const handleRefreshHealth = (event: MouseEvent<HTMLButtonElement>) => {
+    restoreRecoveryFocus(event);
     clearResting();
     refreshHealth();
   };
@@ -146,6 +165,7 @@ function Portfolio() {
   return (
     <div className="portfolio-page">
       <a className="portfolio-skip" href="#main-heading">Skip to main content</a>
+      <p className="sr-only" role="status">{announcement && <span key={reply?.id}>{announcement}</span>}</p>
       <header className="portfolio-bar">
         <div className="portfolio-measure portfolio-bar-inner">
           {isCoverState
@@ -167,9 +187,15 @@ function Portfolio() {
           {isCoverState && <HeroArt />}
           <div className="portfolio-measure portfolio-opening-inner">
             {isCoverState && <CoverState headingRef={headingRef} company={company} />}
-            <section className="portfolio-assistant" id="assistant" tabIndex={-1}>
+            <section
+              ref={assistantRef}
+              className="portfolio-assistant"
+              id="assistant"
+              aria-labelledby={isCoverState ? "assistant-heading" : "main-heading"}
+              tabIndex={-1}
+            >
               <div className="portfolio-assistant-heading">
-                {isCoverState ? <h2>Ask about Aamir</h2> : (
+                {isCoverState ? <h2 id="assistant-heading">Ask about Aamir</h2> : (
                   <h1 id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
                 )}
                 <StatusIndicator state={assistantStatus} errorMessage={healthError} />
@@ -179,19 +205,10 @@ function Portfolio() {
                   I’m an AI assistant trained on Aamir’s verified résumé, projects, and experience.
                 </p>
               )}
-              {!isCoverState && (
-                <div className="portfolio-transcript-actions">
-                  <button type="button" onClick={showOverview}>
-                    Portfolio overview
-                  </button>
-                  <button type="button" onClick={handleResetChat} disabled={isStreaming}>
-                    Clear chat
-                  </button>
-                </div>
-              )}
-
               <div className="portfolio-chat">
-                {!isCoverState && <MessageList messages={messages} />}
+                {!isCoverState && (
+                  <MessageList messages={messages} isStreaming={isStreaming} onOverview={showOverview} onClear={handleResetChat} />
+                )}
                 <div className="chat-input-container">
                   {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
                   <ChatInput
@@ -218,27 +235,21 @@ function Portfolio() {
                 </div>
               )}
 
-              {assistantStatus === "warming" && (
+              {showRecovery && (
                 <div className="portfolio-notice">
-                  <p role="status">The assistant is waking up. Saved answers are available while it connects.</p>
+                  <p role={error ? "alert" : undefined}>{error || healthNotice}</p>
+                  <div className="portfolio-recovery-actions">
+                    <button type="button" disabled={isStreaming} onClick={() => handleSelectPrompt(FEATURED_PROMPT, true)}>
+                      Read a saved answer
+                    </button>
+                    {(assistantStatus === "resting" || assistantStatus === "error") &&
+                      <button type="button" onClick={handleRefreshHealth}>Check service status</button>}
+                    {error && <button type="button" onClick={event => {
+                      restoreRecoveryFocus(event);
+                      clearError();
+                    }}>Dismiss</button>}
+                  </div>
                   <AssistantFallback />
-                </div>
-              )}
-              {(assistantStatus === "resting" || assistantStatus === "error") && (
-                <div className="portfolio-notice">
-                  <p role="status">
-                    {assistantStatus === "resting"
-                      ? "Live answers are resting. Saved answers and curated role examples are available."
-                      : healthError}
-                  </p>
-                  <AssistantFallback />
-                  <button type="button" onClick={handleRefreshHealth}>Check service status</button>
-                </div>
-              )}
-              {error && (
-                <div className="portfolio-notice portfolio-chat-error">
-                  <p role="alert">{error}</p>
-                  <button type="button" onClick={clearError}>Dismiss</button>
                 </div>
               )}
             </section>
