@@ -3,6 +3,23 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-081: Signature hero as responsive, decorative artwork
+
+**Date:** 2026-11-18. **Scope:** Field of Evidence M2. The approved night
+landscape and river return as an original ASCII-stipple drawing. Comparing
+round-dot and dithered glyph studies in the working M1 cover favored the glyphs.
+They kept the silhouette legible and brought the type-based texture from the
+concept into the portfolio. The original procedural composition was refined
+with a fixed mark lattice, distinct near and far ridges, and a separately
+graded phone crop. No reference images or upstream runtime code ship.
+
+The cover selects one of three WebP compositions with `picture`. An absolute
+decorative layer gives the art no control over text flow, focus, or hit testing.
+The painting has separate space for the assistant, and the navy cover is its
+fallback. Forced-colors mode uses the system canvas. At wide widths, a
+640 ms CSS opacity reveal runs only with motion permitted.
+This keeps artwork and motion out of the assistant's state and request path.
+
 ### DRN-080: Assistant-first portfolio foundations
 
 **Date:** 2026-11-18. **Scope:** Owner-approved Field of Evidence theme and M1

@@ -9,6 +9,7 @@ import { MessageList } from "./components/Chat/MessageList";
 import { ChatInput } from "./components/Chat/ChatInput";
 import { StarterChips } from "./components/Chat/StarterChips";
 import { CoverState } from "./components/Cover/CoverState";
+import { HeroArt } from "./components/Cover/HeroArt";
 import { CandidateDetails, SelectedWork } from "./components/Cover/SelectedWork";
 import { ThemeToggle } from "./components/ThemeToggle";
 import {
@@ -163,6 +164,7 @@ function Portfolio() {
 
       <main>
         <div className={`portfolio-opening ${isCoverState ? "portfolio-cover" : "portfolio-conversation"}`}>
+          {isCoverState && <HeroArt />}
           <div className="portfolio-measure portfolio-opening-inner">
             {isCoverState && <CoverState headingRef={headingRef} company={company} />}
             <section className="portfolio-assistant" id="assistant" tabIndex={-1}>

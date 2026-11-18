@@ -1,15 +1,24 @@
 # Progress Tracker
 
 ## Current Phase
-**M1: Field of Evidence foundations — implemented locally and ready for review.**
+**M2: Field of Evidence signature hero — implemented locally and ready for review.**
+Branch `codex/phase-m2-signature-hero`. Dithered ASCII ridges and a pale river reflection carry the original Field of Evidence landscape into the working cover. The assistant's first-viewport layout and the Selected work section keep their M1 geometry. See [DRN-081](decisions.md) and the [M2 study guide](study-guides/phase-m2-signature-hero.md).
+
+- Chrome requested one WebP at each tested width. The phone, tablet, and wide files are 17,862, 21,752, and 30,674 bytes respectively. Initial JavaScript measured 171,917 gzip bytes against the 200,000-byte budget. The artwork adds no font download or runtime drawing library.
+- Browser verification covered nine widths from 320 to 1920 px, blocked assets and source recovery, keyboard access, dark and forced colors, reduced motion, and the one-shot 640 ms wide-screen reveal. Pixel sampling under hero text measured at least 4.52:1. The layout checks found no shift attributable to the artwork.
+- A local 375 px run with 4× CPU slowdown and 150 ms network latency measured 2.632 s LCP with the artwork and with its request blocked. Both exceeded the 2.5 s target on this profile. Field performance is a release check.
+- 191 frontend tests, ESLint, and Vite/TypeScript build passed. The offline backend and evaluator regression run passed 689 tests with 8 skipped. Browser flow replay used local fixtures and recorded SSE.
+- M3 work and credibility is pending owner approval. Local M1 tag `phase-m1-done` is the rollback point for the hero.
+
+## Previous Work
+**M1: Field of Evidence foundations — approved for M2.**
 Branch `codex/phase-m1-foundations`. The entry screen introduces Aamir and puts the working assistant and one featured question in the first viewport. Selected work follows immediately, with direct access to the résumé and role-fit report. The featured question has a source-backed saved answer during warm-up, capacity rest, or an outage. See [DRN-080](decisions.md) and the [M1 study guide](study-guides/phase-m1-assistant-first-foundations.md).
 
 - Frontend verification: 191 Vitest tests, ESLint, and the Vite/TypeScript build passed. Initial JavaScript measured 171,690 gzip bytes against the 200,000-byte budget.
 - Backend and eval regression suites: 689 passed, 8 skipped. Live chat in browser checks used recorded SSE with no inference provider traffic.
 - Chrome browser review at 320, 375, 768, 1024, and 1440 px verified first-viewport access, first-answer and follow-up scrolling, keyboard interactions, saved-answer sources, company links, role-fit entry, dark mode, reduced motion, and direct proof links without JavaScript.
-- The M2 signature artwork is pending milestone approval. The assistant case study and its scroll chapter remain later milestones.
+- The assistant case study and its scroll chapter remain later milestones.
 
-## Previous Work
 **Improve Interactions & Production Interaction Latency — Complete.**
 Branch: `improve-interactions`. Resolves the production resting-state flip-flops and Groq tool-use API error while keeping 100% of the safety architecture, boot-authorization ledger, database models, and rate limiters intact.
 

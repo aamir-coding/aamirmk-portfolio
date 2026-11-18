@@ -87,6 +87,44 @@
   outline-color: var(--portfolio-focus);
 }
 
+.portfolio-cover {
+  position: relative;
+  isolation: isolate;
+}
+
+.portfolio-hero-art {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(transparent, black 15%);
+}
+
+.portfolio-hero-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right bottom;
+}
+
+.portfolio-hero-art img[hidden] { display: none; }
+
+@media (forced-colors: active) {
+  .portfolio-hero-art { display: none; }
+}
+
+@media (min-width: 70rem) and (prefers-reduced-motion: no-preference) {
+  .portfolio-hero-art img {
+    animation: portfolio-art-reveal 640ms ease-out;
+  }
+
+  @keyframes portfolio-art-reveal {
+    from { opacity: .7; }
+  }
+}
+
 .portfolio-bar-inner {
   display: flex;
   flex-wrap: wrap;
