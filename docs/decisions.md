@@ -3,6 +3,28 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-085: Secondary route typography, print, and tabular records
+
+**Date:** 2026-11-18. **Scope:** Field of Evidence M6. The footer collects
+direct contact links before the evaluation record, theme control, and native
+privacy disclosure. The disclosure retains the existing data categories,
+retention periods, and third-party processing details.
+
+The shared team summary uses two editorial columns at wide widths and a
+single reading order on phones. The screen shows the exact UTC expiry.
+Print omits the toolbar and expiry notice. The existing zero page margin
+leaves Chromium no room for a URL-bearing browser footer. The document adds
+its own inner padding. The capability path, server expiry, résumé source links,
+and no-referrer, no-index, and no-store behavior retain their existing interfaces.
+
+The evaluation record places the offline scope and evidence limitations before
+the tables. The exact backend badge, source hashes, and judge-validation
+results remain inspectable. Admin tables keep native row and column headers.
+Wide records scroll in a named, keyboard-focusable area, and focus follows
+the signed-in heading or token field as access changes. Bearer authentication,
+request abort behavior, and in-memory credential handling stay in the existing
+admin modules. Each secondary route loads its CSS with the existing lazy route.
+
 ### DRN-084: Native fit dialog and recruiter evidence flow
 
 **Date:** 2026-11-18. **Scope:** Field of Evidence M5. A native modal dialog

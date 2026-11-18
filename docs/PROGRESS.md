@@ -1,16 +1,25 @@
 # Progress Tracker
 
 ## Current Phase
-**M5: Field of Evidence fit and recruiter actions — implemented locally and ready for review.**
+**M6: Field of Evidence secondary screens and footer — implemented locally and ready for review.**
+Branch `codex/phase-m6-secondary-screens`. The footer makes direct contact and the full privacy disclosure easy to find. The team summary, evaluation record, admin dashboard, and response receipt use the Field of Evidence visual system. See [DRN-085](decisions.md) and the [M6 study guide](study-guides/phase-m6-secondary-screens.md).
+
+- Chrome tested all four surfaces at 320, 375, 768, 1024, and 1440 px without document-width overflow. The replay covered direct contact and disclosure by keyboard, summary availability, expiry and retry, stale and current evaluation evidence, admin rejection and sign-out, and keyboard scrolling of wide tables. Existing recruiter flows passed and the technical receipt opened by keyboard.
+- A4 and Letter each produced one page. With browser headers and footers requested, neither PDF contained the fixture share token in the text, metadata, or link annotations. The fixtures verified the configured summary privacy headers and actual referrer behavior. Print from other browsers and physical printers remains unverified.
+- Measured text pairings ran from 5.82:1 to 13.96:1. Initial JavaScript was 172,366 gzip bytes against a 200,000-byte budget. The secondary styles load with their respective routes. M6 adds no artwork, font download, or animation.
+- 192 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and eval suite passed 689 tests with 8 skipped. Browser verification ran in Chrome with local fixtures.
+- M7 Regression and polish is pending owner approval. Local tag `phase-m5-done` is the rollback point for all of M6. The secondary routes and footer have separate commits.
+
+## Previous Work
+**M5: Field of Evidence fit and recruiter actions — approved for M6.**
 Branch `codex/phase-m5-fit-recruiter`. The dialog focuses the heading on entry, brings requirements and evidence into view early, and restores focus on dismissal. The recruiter actions disclose what gets analyzed, sent, or shared before the request. See [DRN-084](decisions.md) and the [M5 study guide](study-guides/phase-m5-fit-recruiter.md).
 
 - Chrome passed five viewport sizes from 320 to 1440 px. At 375 × 812 px the first full must-have row ended at y716. The replay covered keyboard focus, background wheel containment, Escape, cancellation, recovery, curated and cached reports, forced live analysis, and the return to chat. The earlier recruiter flow replay also passed.
 - The consent replay verified zero handoff writes before submit, the same handoff payload on retry, explicit feedback submission, and a team-summary request limited to project IDs. The replays used local fixtures.
 - The light and dark fit text colors measured at least 6.23:1 against their default report surfaces. Initial JavaScript measured 172,290 gzip bytes against the 200,000-byte budget. M5 adds no visual assets or animation.
 - 192 Vitest tests, ESLint, and the Vite/TypeScript build passed. The offline backend and evaluator suite passed 689 tests with 8 skipped. Physical mobile keyboards, Safari scroll containment, and screen-reader speech remain unverified.
-- M6 Secondary screens and footer is pending owner approval. Local tag `phase-m4-done` is the rollback point for M5.
+- Local tag `phase-m4-done` is the rollback point for M5.
 
-## Previous Work
 **M4: Field of Evidence assistant UX — approved for M5.**
 Branch `codex/phase-m4-assistant-ux`. The conversation follows explicit reading intent, keeps drafts during streaming and cancellation, and presents full source titles and one recovery panel. See [DRN-083](decisions.md) and the [M4 study guide](study-guides/phase-m4-assistant-ux.md).
 

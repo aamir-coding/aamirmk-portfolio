@@ -1,9 +1,29 @@
-.under-hood { margin-block: 1rem; border-top: 1px solid var(--border-strong); padding-top: .6rem; font-size: .8rem; }
-.under-hood summary { cursor: pointer; font-family: var(--font-mono, monospace); width: fit-content; }
-.under-hood summary:focus-visible { outline: 2px solid var(--accent-cobalt); outline-offset: 4px; }
-.under-hood p { max-width: 72ch; line-height: 1.6; }
-.under-hood dl { font-family: var(--font-mono, monospace); }
-.under-hood dt { font-weight: 600; margin-top: .6rem; }
-.under-hood dd { margin-left: 0; overflow-wrap: anywhere; }
-.under-hood ol { padding-left: 1.4rem; overflow-wrap: anywhere; }
-.under-hood li { margin-block: .4rem; }
+/* Hallmark · Field of Evidence · response receipt */
+/* Labels stay in body type. Values and identifiers keep their technical voice. */
+.under-hood {
+  margin-block: var(--space-3);
+  border-block-start: 1px solid var(--portfolio-rule);
+  font-size: var(--text-sm);
+}
+.under-hood summary {
+  align-content: center;
+  min-block-size: 44px;
+  width: fit-content;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+.under-hood summary:focus-visible { outline: 2px solid var(--portfolio-focus-paper); outline-offset: 3px; }
+.under-hood p { max-inline-size: 68ch; color: var(--portfolio-muted); line-height: 1.55; }
+.under-hood dl { margin-block: var(--space-3); }
+.under-hood dl:has(> dt), .under-hood dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr);
+  gap: var(--space-1) var(--space-3);
+}
+.under-hood dl > div:not(:last-child) { margin-block-end: var(--space-1); }
+.under-hood dt { font-weight: var(--font-semibold); overflow-wrap: anywhere; }
+.under-hood dd { margin: 0; font-family: var(--font-mono); overflow-wrap: anywhere; }
+.under-hood h4 { margin-block: var(--space-4) var(--space-2); }
+.under-hood ol { padding-inline-start: var(--space-5); overflow-wrap: anywhere; }
+.under-hood li { margin-block: var(--space-1); }
