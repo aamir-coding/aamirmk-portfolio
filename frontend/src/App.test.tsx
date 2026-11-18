@@ -175,7 +175,8 @@ describe("<App />", () => {
     fireEvent.change(input, { target: { value: token } });
     fireEvent.click(screen.getByRole("button", { name: "Open dashboard" }));
     await screen.findByRole("heading", { name: "Candidate eval cases" });
-    expect(screen.getByRole("cell", { name: "Where did the claim come from?" })).toBeInTheDocument();
+    expect(screen.getByRole("rowheader", { name: "Where did the claim come from?" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Recruiter analytics" })).toHaveFocus();
     expect(fetch).toHaveBeenCalledWith(
       expect.stringContaining("/api/admin/dashboard"),
       expect.objectContaining({
@@ -188,6 +189,7 @@ describe("<App />", () => {
     expect(JSON.stringify(sessionStorage)).not.toContain(token);
     fireEvent.click(screen.getByRole("button", { name: "Sign out" }));
     expect(screen.getByLabelText("Admin token")).toHaveValue("");
+    expect(screen.getByLabelText("Admin token")).toHaveFocus();
     expect(screen.queryByRole("heading", { name: "Candidate eval cases" })).not.toBeInTheDocument();
   });
 

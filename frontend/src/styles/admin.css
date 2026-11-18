@@ -1,139 +1,137 @@
+/* Hallmark · Field of Evidence · recruiter analytics */
+/* A ruled register gives counts a shared baseline and keeps records easy to scan. */
+body:has(.admin-page) { background: var(--portfolio-paper); }
+
 .admin-page {
-  width: min(100% - 2rem, 76rem);
+  width: min(calc(100% - 2 * var(--portfolio-gutter)), var(--portfolio-width));
   margin-inline: auto;
-  padding-block: var(--space-8);
-  color: var(--text-primary);
+  padding-block: clamp(1rem, 4vw, 3rem) var(--space-10);
+  color: var(--portfolio-ink);
 }
 
-.admin-header,
-.admin-actions {
+.admin-header, .admin-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  align-items: center;
+  align-items: end;
+  gap: var(--space-3) var(--space-4);
 }
-
 .admin-header {
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-strong);
-  padding-bottom: var(--space-4);
+  border-block-end: 1px solid var(--portfolio-rule);
+  padding-block-end: var(--space-4);
 }
-
 .admin-header h1 {
-  margin: var(--space-2) 0 0;
-  font-size: var(--text-3xl);
+  margin: var(--space-3) 0 0;
+  font: var(--font-regular) clamp(2.4rem, 1.6rem + 3.5vw, 4.75rem)/1.03 var(--portfolio-display);
+  min-width: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
 }
-
 .admin-header a {
-  color: var(--accent-cobalt);
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  color: inherit;
+  text-underline-offset: .2em;
 }
-
+.admin-page :focus-visible { outline: 2px solid var(--portfolio-focus-paper); outline-offset: 3px; }
+.admin-page .btn { min-block-size: 44px; }
+.admin-page .btn-primary:enabled {
+  background: var(--portfolio-ink);
+  border-color: var(--portfolio-ink);
+  color: var(--portfolio-paper);
+}
+.admin-page .btn-secondary, .admin-page .btn-primary:disabled {
+  background: var(--portfolio-chat-sheet);
+  border-color: var(--portfolio-field-rule);
+  color: var(--portfolio-ink);
+}
+.admin-page .btn:enabled:active { box-shadow: inset 0 0 0 1px currentColor; }
 .admin-login {
   display: grid;
   justify-items: start;
   gap: var(--space-4);
-  width: min(100%, 30rem);
-  margin-top: var(--space-6);
+  width: min(100%, 28rem);
+  margin-block-start: var(--space-5);
   padding: var(--space-4);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
+  border: 1px solid var(--portfolio-rule);
+  background: var(--portfolio-chat-sheet);
 }
-
-.admin-login label {
-  display: grid;
-  gap: var(--space-1);
-  width: 100%;
-}
-
+.admin-login label { display: grid; gap: var(--space-1); width: 100%; }
 .admin-login input {
   min-width: 0;
-  min-height: 44px;
+  min-block-size: 44px;
   padding-inline: var(--space-3);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--portfolio-field-rule);
   border-radius: var(--radius-sm);
-  background: var(--bg-page);
-  color: var(--text-primary);
+  background: var(--portfolio-paper);
+  color: inherit;
   font: inherit;
 }
-
+.admin-error {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--portfolio-field-rule);
+  background: var(--portfolio-chat-sheet);
+  inline-size: fit-content;
+}
 .admin-date-range {
-  color: var(--text-secondary);
-  margin-block: var(--space-4);
+  color: var(--portfolio-muted);
+  margin-block: var(--space-4) var(--space-2);
   font-variant-numeric: tabular-nums;
 }
-
 .admin-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
-  gap: var(--space-3);
-  margin: 0 0 var(--space-6);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--portfolio-rule);
 }
-
-.admin-metrics div {
-  padding: var(--space-3);
-  border-block-start: 2px solid var(--border-active);
-  background: var(--bg-surface);
-}
-
-.admin-metrics dt,
-.admin-metrics small,
-.admin-records > p {
-  color: var(--text-secondary);
+.admin-metrics div { padding: var(--space-3); border-block-end: 1px solid var(--portfolio-rule); }
+.admin-metrics dt, .admin-metrics small, .admin-records > p {
+  color: var(--portfolio-muted);
   font-size: var(--text-sm);
 }
-
 .admin-metrics dd {
   margin: var(--space-1) 0 0;
-  font-size: var(--text-2xl);
+  font: var(--font-regular) clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem)/1.12 var(--portfolio-display);
   font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
-
-.admin-metrics small {
-  display: block;
-}
-
-.admin-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
-  gap: var(--space-5);
-}
-
-.admin-records {
-  min-width: 0;
-  padding: var(--space-4);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-}
-
+.admin-metrics small { display: block; margin-block-start: var(--space-1); font: var(--text-sm)/1.35 var(--font-sans); }
+.admin-grid { display: grid; gap: var(--space-6); margin-block-start: var(--space-8); }
+.admin-records { min-width: 0; }
 .admin-records h2 {
-  margin: 0 0 var(--space-3);
-  font-size: var(--text-lg);
+  margin: 0 0 var(--space-2);
+  font: var(--font-regular) clamp(1.4rem, 1.2rem + .8vw, 1.9rem)/1.16 var(--portfolio-display);
+  overflow-wrap: break-word;
 }
-
-.admin-table-scroll {
-  overflow-x: auto;
-}
-
+.admin-table-scroll { overflow-x: auto; }
+.admin-table-wide table { min-inline-size: 34rem; }
+.admin-table-hint { display: none; margin: 0 0 var(--space-2); }
 .admin-records table {
   width: 100%;
   border-collapse: collapse;
   font-size: var(--text-sm);
-  text-align: start;
   overflow-wrap: anywhere;
   font-variant-numeric: tabular-nums;
 }
-
-.admin-records th,
-.admin-records td {
+.admin-records th, .admin-records td {
   padding: var(--space-2);
-  border-bottom: 1px solid var(--border-subtle);
+  border-block-end: 1px solid var(--portfolio-rule);
   text-align: start;
   vertical-align: top;
 }
+.admin-records thead { background: var(--portfolio-chat-question); }
+.admin-records tbody th { font-weight: var(--font-medium); }
+.admin-table-wide tbody th { max-inline-size: 34ch; }
 
-.admin-records th {
-  color: var(--text-secondary);
-  background: var(--bg-subtle);
+@media (min-width: 66rem) {
+  .admin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-10); }
+  .admin-records-wide { grid-column: 1 / -1; }
+}
+@media (max-width: 59rem) {
+  .admin-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 38rem) {
+  .admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-table-hint { display: block; }
 }

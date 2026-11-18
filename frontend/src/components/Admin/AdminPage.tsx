@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { AdminRequestError, fetchDashboard, type Dashboard } from "../../lib/admin";
 import "../../styles/admin.css";
 
@@ -18,20 +18,30 @@ interface RecordsProps {
 
 function Records({ title, columns, rows, empty }: RecordsProps) {
   const heading = useId();
+  const wide = columns.length > 3;
   return (
-    <section className="admin-records" aria-labelledby={heading}>
+    <section className={wide ? "admin-records admin-records-wide" : "admin-records"}>
       <h2 id={heading}>{title}</h2>
       {rows.length === 0 ? <p>{empty}</p> : (
-        <div className="admin-table-scroll" role="region" aria-labelledby={heading} tabIndex={0}>
-          <table>
-            <thead><tr>{columns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead>
-            <tbody>{rows.map(row => (
-              <tr key={row.key}>
-                {row.cells.map((cell, index) => <td key={columns[index]}>{cell}</td>)}
-              </tr>
-            ))}</tbody>
-          </table>
-        </div>
+        <>
+          {wide && <p className="admin-table-hint">Scroll across to see every column.</p>}
+          <div
+            className={wide ? "admin-table-scroll admin-table-wide" : "admin-table-scroll"}
+            role={wide ? "region" : undefined}
+            aria-labelledby={wide ? heading : undefined}
+            tabIndex={wide ? 0 : undefined}
+          >
+            <table aria-labelledby={heading}>
+              <thead><tr>{columns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead>
+              <tbody>{rows.map(row => (
+                <tr key={row.key}>
+                  <th scope="row">{row.cells[0]}</th>
+                  {row.cells.slice(1).map((cell, index) => <td key={columns[index + 1]}>{cell}</td>)}
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </>
       )}
     </section>
   );
@@ -85,6 +95,13 @@ function RecruiterActivity({ data }: { data: Dashboard }) {
           empty="No handoff offers recorded."
         />
         <Records
+          title="Candidate eval cases" columns={["Question", "Downvote reason", "Time (UTC)"]}
+          rows={data.candidates.map(row => ({
+            key: row.id, cells: [row.question, row.reason ?? "—", formatTime(row.created_at)],
+          }))}
+          empty="No downvotes to review."
+        />
+        <Records
           title="Handoffs" columns={["Latest visitor question", "Reply email", "Delivery", "Time (UTC)"]}
           rows={data.handoffs.map(row => ({
             key: row.id, cells: [row.question ?? "—", row.reply_email ?? "—", row.delivery_status, formatTime(row.created_at)],
@@ -98,13 +115,6 @@ function RecruiterActivity({ data }: { data: Dashboard }) {
           }))}
           empty="No feedback submitted."
         />
-        <Records
-          title="Candidate eval cases" columns={["Question", "Downvote reason", "Time (UTC)"]}
-          rows={data.candidates.map(row => ({
-            key: row.id, cells: [row.question, row.reason ?? "—", formatTime(row.created_at)],
-          }))}
-          empty="No downvotes to review."
-        />
       </div>
     </>
   );
@@ -112,10 +122,20 @@ function RecruiterActivity({ data }: { data: Dashboard }) {
 
 export default function AdminPage() {
   const request = useRef<AbortController | null>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const tokenInput = useRef<HTMLInputElement>(null);
+  const hadAccess = useRef(false);
   const [token, setToken] = useState<string | null>(null);
   const [data, setData] = useState<Dashboard | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const hasAccess = token !== null;
+
+  useLayoutEffect(() => {
+    if (hadAccess.current === hasAccess) return;
+    hadAccess.current = hasAccess;
+    (hasAccess ? heading : tokenInput).current?.focus();
+  }, [hasAccess]);
 
   useEffect(() => () => {
     request.current?.abort();
@@ -140,6 +160,7 @@ export default function AdminPage() {
         if (cause instanceof AdminRequestError && [401, 404].includes(cause.status)) {
           setToken(null);
           setData(null);
+          tokenInput.current?.focus();
         }
         setError(controller.signal.aborted || !(cause instanceof Error)
           ? "The dashboard could not be loaded."
@@ -174,7 +195,7 @@ export default function AdminPage() {
   return (
     <main className="admin-page">
       <header className="admin-header">
-        <div><a href="/">Portfolio</a><h1>Recruiter analytics</h1></div>
+        <div><a href="/">Return to portfolio</a><h1 ref={heading} tabIndex={-1}>Recruiter analytics</h1></div>
         {token && (
           <div className="admin-actions">
             <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => void load(token)}>Refresh</button>
@@ -184,13 +205,24 @@ export default function AdminPage() {
       </header>
       {!token && (
         <form className="admin-login" onSubmit={signIn}>
-          <label>Admin token <input type="password" name="token" maxLength={128} autoComplete="off" required /></label>
+          <label>
+            Admin token
+            <input
+              ref={tokenInput}
+              type="password"
+              name="token"
+              maxLength={128}
+              autoComplete="off"
+              aria-describedby={error ? "admin-load-error" : undefined}
+              required
+            />
+          </label>
           <button type="submit" className="btn btn-primary" disabled={busy}>
             {busy ? "Opening…" : "Open dashboard"}
           </button>
         </form>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && <p id="admin-load-error" className="admin-error" role="alert">{error}</p>}
       {data && <RecruiterActivity data={data} />}
     </main>
   );
