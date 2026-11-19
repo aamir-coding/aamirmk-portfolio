@@ -1,14 +1,14 @@
 {
-  "artifact_sha256": "809e94d35f5df5633d74b7efb444594b747bd06d0703b58cb6e2020e9b7ec91e",
+  "artifact_sha256": "b1a5b1c85e885822f70a55eb1509dc19ed04b10b516396d5c1297784e02e366b",
   "manifest": {
     "schema_version": 1,
     "input_format": "title-tags-content-v1",
     "model_name": "BAAI/bge-small-en-v1.5",
     "fastembed_version": "0.9.1",
     "model_assets_sha256": "d9e46143a9cabd7abdbe181fd67443a66089fd55d721db87b7b2964085ed0bff",
-    "corpus_sha256": "b0591c2cc14d3f0f77386d12cae72299e8ea1dcdd3d40ce4e167a9ed9641f423",
-    "inputs_sha256": "919eeda1f188f04020ebbfe05b263b7a1293a518477335f4c7ebf1da65a934bb",
-    "matrix_sha256": "c1753541ede1aab2f7e2b6ccb3ac1dbc3d043a01496d5668eb6805b4b7fc2900",
+    "corpus_sha256": "fc34200d35a49287a7ec5431f1260c64b06f328d51497f49783f23fbb67dc0b5",
+    "inputs_sha256": "7641efe9fb94019161c12ec7c42f49dcccf34175bf1d43f4dba37061421d9a6a",
+    "matrix_sha256": "a9f42039240963e27f8b1a8e88a762a73c1347969ae24dbff8e234f776ccc074",
     "chunk_ids": [
       "achieve-graph-contest",
       "achieve-google-cloud-hackathon",
@@ -88,8 +88,8 @@
       "skill-ramp-up-narratives"
     ],
     "dimensions": 384,
-    "built_at": "2026-11-04T08:48:15.421979Z",
-    "source_commit": "88fae8ccee83a9de1528bc66f6092b4c98a602b8",
+    "built_at": "2026-11-19T12:29:28.708887Z",
+    "source_commit": "2516dad97ebdf8728d283cc47d26f8a1a95a7385",
     "source_dirty": true
   }
 }

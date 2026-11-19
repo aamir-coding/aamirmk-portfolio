@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "review_reference": "P7 Increment 4: preserve authored examples from phase-8-done 440e81d; not calibrated ground truth",
-  "facts_sha256": "3c52b2c5c66c733724304bbb81d4b13ded2175a70ab4d4b1548947eb8474a390",
-  "reports_sha256": "5b20c7e17f9af3f009b5a84b4ed09b38e4cdc20203a90da72d0cdf941294c470",
+  "review_reference": "docs/decisions.md#drn-089-refresh-resume-and-fact-provenance",
+  "facts_sha256": "01f5ecc1fd1b2634a8abfeca8704ab178587a4cdef8ee5272f24f9eedc2a297b",
+  "reports_sha256": "356c83e804c983d5b3e1c6b9052d8a56e4ae41d40435fb99a285bb38bcdd4770",
   "samples": {
     "01-fullstack-ai-engineer": "4cd05826910ac09c631e32a03f0ceb8187de2d3429e7822c3f6828fd472d2ffb",
     "02-backend-python-engineer": "992c67504f15361225175f51f996f3f46ef2aa4814ea874e72a5cc1893116e88",

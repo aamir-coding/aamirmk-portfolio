@@ -37,7 +37,7 @@ from evals.dataset import (  # noqa: E402
     verify_dataset,
 )
 
-DEFAULT_RECORDINGS = DEFAULT_ROOT / "recordings" / "endpoints-v1.json"
+DEFAULT_RECORDINGS = DEFAULT_ROOT / "recordings" / "endpoints-v3-safety.json"
 
 
 class UnavailableComparison(ReplayModel):

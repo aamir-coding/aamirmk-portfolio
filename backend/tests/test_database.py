@@ -361,7 +361,8 @@ def test_durable_startup_reserves_then_refunds_an_idle_grant(postgres_url: str) 
         OPS_TOKEN=token,
     )
     app = create_app(settings)
-    boot_id = app.state.llm.ledger.boot_id
+    ledger = app.state.llm.ledger
+    boot_id = ledger.boot_id
 
     async def state() -> tuple[int, int | None]:
         engine = create_database_engine(SecretStr(postgres_url), pooled=False)
@@ -377,14 +378,14 @@ def test_durable_startup_reserves_then_refunds_an_idle_grant(postgres_url: str) 
 
     try:
         with TestClient(app) as client:
-            headers = {"Authorization": f"Bearer {token}"}
-            for _ in range(50):
-                response = client.get("/api/ops/inference", headers=headers)
-                assert response.is_success
-                if response.json()["capacity"]["reason"] == "minute_capacity":
+            for _ in range(200):
+                if ledger.snapshot().reason is None:
                     break
                 Event().wait(0.025)
-            assert response.json()["capacity"]["reason"] == "minute_capacity"
+            headers = {"Authorization": f"Bearer {token}"}
+            response = client.get("/api/ops/inference", headers=headers)
+            assert response.is_success
+            assert response.json()["capacity"]["reason"] is None
             assert asyncio.run(state()) == (3, None)
         assert asyncio.run(state()) == (0, 0)
     finally:

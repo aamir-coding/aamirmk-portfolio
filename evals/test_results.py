@@ -38,8 +38,9 @@ def test_changed_inputs_require_review(result: OfflineResult) -> None:
 
 def test_more_than_two_points_blocks(result: OfflineResult) -> None:
     base = baseline(result)
-    scores = {**base.scores, "legacy_development.hit_at_3": 0.94}
-    assert "regression:legacy_development.hit_at_3" in gate(
+    metric = "legacy_development.hit_at_3"
+    scores = {**base.scores, metric: base.scores[metric] + 0.03}
+    assert f"regression:{metric}" in gate(
         result, base.model_copy(update={"scores": scores})
     )
 

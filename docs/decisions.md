@@ -3,6 +3,23 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-089: Refresh resume and fact provenance
+
+**Date:** 2026-11-19. **Scope:** Maintenance after the M8 release.
+
+Publish the owner's updated PDF byte for byte at `/resume.pdf`. Remove the
+retired draft and keep the social image generation in the launch script. Use
+the new résumé and the implementation to describe the shipped assistant in
+the fact corpus, fallback prompt, saved answer, project card, and fit examples.
+The updated résumé is the source for the final hackathon placement.
+
+Rebuild the embedding artifact with the existing cached model. Refresh the
+current evaluation corpus and index fingerprints and recapture the fake and
+curated endpoint records. Keep the existing fact IDs, draft flags, frozen case
+labels and splits, historical captures, human annotations, and regression
+thresholds. Offline retrieval and contract checks provide evidence for the
+refreshed corpus. The earlier independent judge validation remains historical.
+
 ### DRN-088: Integrate the moving cover around the live assistant
 
 **Date:** 2026-11-19. **Scope:** M8 visual integration.

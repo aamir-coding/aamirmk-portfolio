@@ -1,72 +1,11 @@
-"""Author launch files with bundled ReportLab/Pillow, not application dependencies."""
+"""Build the social preview image with bundled Pillow."""
 
-import re
-from html import escape
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
-from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.platypus import Paragraph, SimpleDocTemplate
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "frontend/public"
-
-
-def markup(text: str) -> str:
-    return re.sub(
-        r"\[([^]]+)\]\((https?://[^)]+|mailto:[^)]+)\)",
-        r'<a href="\2" color="#18375b">\1</a>',
-        escape(text),
-    )
-
-
-def resume() -> None:
-    styles = {
-        "title": ParagraphStyle(
-            "title",
-            fontName="Helvetica-Bold",
-            fontSize=21,
-            leading=25,
-            textColor=colors.HexColor("#18375b"),
-            spaceAfter=8,
-        ),
-        "heading": ParagraphStyle(
-            "heading",
-            fontName="Helvetica-Bold",
-            fontSize=11,
-            leading=14,
-            spaceBefore=8,
-            spaceAfter=3,
-            textColor=colors.HexColor("#18375b"),
-        ),
-        "body": ParagraphStyle(
-            "body", fontName="Helvetica", fontSize=9, leading=12, spaceAfter=5
-        ),
-    }
-    story = []
-    for line in (PUBLIC / "resume-draft.md").read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        key = (
-            "title"
-            if line.startswith("# ")
-            else "heading"
-            if line.startswith("## ")
-            else "body"
-        )
-        story.append(Paragraph(markup(line.lstrip("# ")), styles[key]))
-    SimpleDocTemplate(
-        str(PUBLIC / "resume-draft.pdf"),
-        pagesize=A4,
-        rightMargin=40,
-        leftMargin=40,
-        topMargin=35,
-        bottomMargin=35,
-        title="Aamir Mohammed Khan - Resume Draft",
-        author="Aamir Mohammed Khan",
-    ).build(story)
 
 
 def social() -> None:
@@ -100,6 +39,5 @@ def social() -> None:
 
 
 if __name__ == "__main__":
-    resume()
     social()
-    print("Built one draft resume PDF and one 1200x630 social PNG.")
+    print("Built one 1200x630 social PNG.")

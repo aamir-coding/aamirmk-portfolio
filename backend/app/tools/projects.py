@@ -125,25 +125,27 @@ backed by Redis on an Azure VM.
     "ai-digital-assistant": ProjectCardData(
         id="ai-digital-assistant",
         title="AI Digital Assistant Portfolio",
-        subtitle="Grounded Recruiter Agent with Hybrid RAG & Generative Dossier UI",
+        subtitle="Recruiter Portfolio with Hybrid Retrieval and Job Fit Reports",
         summary=(
-            "A production-grade, zero-hallucination portfolio system where "
-            "recruiters chat with an AI assistant grounded strictly in "
-            "verified facts about Aamir, featuring hybrid retrieval, SSE "
-            "streaming, and server-supplied UI cards."
+            "A shipped recruiter assistant that retrieves curated facts about Aamir, "
+            "streams cited answers, and shows interactive project cards. Recruiters "
+            "can also submit a job description for an evidence-based fit report."
         ),
         role="Solo Author & Architect",
         tech_stack=[
             "Python 3.13",
             "FastAPI",
-            "React",
+            "React 19",
             "TypeScript",
             "BM25",
             "FastEmbed ONNX",
             "Reciprocal Rank Fusion",
-            "SSE over POST",
+            "Starlette SSE over POST",
             "Groq API",
             "Vite",
+            "Supabase PostgreSQL",
+            "SQLAlchemy 2.0",
+            "Alembic",
         ],
         highlights=[
             (
@@ -151,24 +153,22 @@ backed by Redis on an Azure VM.
                 "BAAI/bge-small-en-v1.5 embeddings using Reciprocal Rank Fusion."
             ),
             (
-                "Passed 512MB RAM Gate: Total container footprint is 227MB with "
-                "sub-10ms retrieval latency running completely on CPU."
+                "Starlette streams answer tokens and citations as server-sent "
+                "events. A validated model tool call selects a card from the "
+                "backend project catalog."
             ),
             (
-                "Server-Supplied Generative UI: Model triggers function calls; backend "
-                "supplies immutable verified schemas to guarantee zero hallucination."
+                "Five-stage JD fit reports extract requirements, retrieve evidence, "
+                "judge alignment, score the fit, and summarize strengths and gaps."
             ),
             (
-                "Deterministic Safety Seams: Pre-call regex guardrails block "
-                "injections at 0 token cost; sliding-window rate limiter "
-                "prevents abuse."
+                "Supabase PostgreSQL stores recruiter handoffs, analytics, and "
+                "shared summaries. SQLAlchemy manages connections and Alembic "
+                "tracks schema migrations."
             ),
         ],
         metrics={
-            "Retrieval Hit Rate@5": "100.0% (45/45 queries)",
-            "Mean Reciprocal Rank": "0.8778 MRR",
-            "CPU Retrieval Latency": "9.39 ms average",
-            "Container Footprint": "227 MB (<50% of 512MB limit)",
+            "JD fit pipeline": "5 stages",
         },
         github_url="https://github.com/aamir-coding/aamirmk-portfolio",
         live_url="https://aamirmk-portfolio.vercel.app",
@@ -198,9 +198,11 @@ The application separates conversational intelligence from data authority:
 1. **Hybrid Fusion over Vector-Only:** Dense vectors alone struggle with
    exact technical tokens (e.g. 'ETIMEDOUT', 'BullMQ'); BM25 provides
    exact keyword precision.
-2. **Protocol Seams:** LLM and Retriever live behind abstract protocols
-   (`LLMClient`, `Retriever`), enabling sub-second unit tests in CI
-   with zero API cost.""",
+2. **Protocol Seams:** The LLM and retriever interfaces allow offline tests
+   to inject fakes without making provider calls.
+3. **Separate Recruiter Workflows:** The fit pipeline assesses job requirements
+   against retrieved evidence. Supabase PostgreSQL holds consented handoffs,
+   analytics, and shared summaries.""",
     ),
     "health-premium-predictor": ProjectCardData(
         id="health-premium-predictor",

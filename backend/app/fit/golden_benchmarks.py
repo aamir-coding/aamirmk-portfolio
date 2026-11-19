@@ -86,8 +86,9 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     "skill-ai-llm-engineering",
                 ],
                 explanation=(
-                    "Hybrid retrieval is documented; RAG and embeddings "
-                    "proficiency is learning/working."
+                    "Aamir implemented BM25, FastEmbed ONNX embeddings, and "
+                    "rank fusion in the shipped portfolio. The evidence covers "
+                    "one portfolio project."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -111,8 +112,9 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     "skill-ai-llm-engineering",
                 ],
                 explanation=(
-                    "SSE and structured tool calling are documented; exact "
-                    "shipped tools require verification."
+                    "The portfolio ships Starlette SSE, a validated project-card "
+                    "tool, and structured JD fit outputs. The streaming "
+                    "implementation uses SSE."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -145,14 +147,14 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     importance="nice_to_have",
                     type="skill",
                 ),
-                verdict="gap",
+                verdict="partial",
                 evidence_chunk_ids=[
                     "skill-ai-llm-engineering",
                     "proj-ai-assistant-status",
                 ],
                 explanation=(
-                    "Comprehensive LLM evaluation results are not established in "
-                    "the current facts."
+                    "The portfolio has automated retrieval metrics and contract "
+                    "replay. Independent response accuracy remains unverified."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -184,11 +186,10 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
             ),
         ],
         (
-            "Aamir has documented React/TypeScript and Docker project "
-            "experience, with working FastAPI exposure. RAG and "
-            "tool-calling depth is described cautiously in the current "
-            "facts. Evaluation and accessibility requirements need "
-            "further verification."
+            "Aamir shipped React/TypeScript, FastAPI, hybrid RAG, and an "
+            "interactive project-card tool. His portfolio has automated "
+            "retrieval and replay checks. Independent answer accuracy and "
+            "WCAG audit results need further verification."
         ),
     ),
     "02-backend-python-engineer": _report(
@@ -229,8 +230,9 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                 verdict="partial",
                 evidence_chunk_ids=["skill-databases"],
                 explanation=(
-                    "PostgreSQL is used in the Django auction project; "
-                    "query-performance expertise is not established."
+                    "Aamir used PostgreSQL in the Django auction project and "
+                    "modeled recruiter data with SQLAlchemy and Alembic. "
+                    "Query-performance expertise needs further evidence."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -336,8 +338,9 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     "proj-ai-assistant-architecture",
                 ],
                 explanation=(
-                    "Defensive portfolio design is documented; specific proxy and"
-                    " rate-limiting controls require verification."
+                    "The portfolio implements request limits and trusted-proxy "
+                    "configuration. The deployed proxy topology needs further "
+                    "verification."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -395,8 +398,8 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     "proj-ai-assistant-architecture",
                 ],
                 explanation=(
-                    "LLM integration and tool-calling exposure are documented; "
-                    "strict structured-output depth requires verification."
+                    "The shipped assistant validates model tool arguments for "
+                    "project cards and structured outputs for JD fit reports."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -420,8 +423,8 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     "skill-ai-llm-engineering",
                 ],
                 explanation=(
-                    "Hybrid BM25/embedding retrieval is documented, with "
-                    "learning/working proficiency."
+                    "The shipped assistant indexes curated Markdown and YAML "
+                    "chunks with BM25 and FastEmbed ONNX embeddings."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -482,14 +485,14 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
                     importance="nice_to_have",
                     type="experience",
                 ),
-                verdict="gap",
+                verdict="partial",
                 evidence_chunk_ids=[
                     "skill-ai-llm-engineering",
                     "proj-ai-assistant-status",
                 ],
                 explanation=(
-                    "Comprehensive LLM eval results and LLM-as-judge experience "
-                    "are not established."
+                    "The portfolio measures retrieval and replays recorded "
+                    "answers. Independent judge validation remains incomplete."
                 ),
                 ramp_up=(
                     "A proposed next step is a scoped exercise using official "
@@ -499,11 +502,10 @@ GOLDEN_BENCHMARK_REPORTS: dict[str, FitReport] = {
             ),
         ],
         (
-            "Aamir has documented application-development and "
-            "LLM-integration exposure. Hybrid retrieval and "
-            "structured-output depth require further verification. AWS, "
-            "Kubernetes and comprehensive LLM evaluation experience "
-            "remain gaps."
+            "Aamir shipped hybrid retrieval, validated model tool calls, and "
+            "structured job-fit outputs. The portfolio has offline retrieval "
+            "and replay evaluation. AWS and Kubernetes experience and "
+            "independent LLM evaluation remain gaps."
         ),
     ),
     "04-embedded-firmware-engineer": _report(

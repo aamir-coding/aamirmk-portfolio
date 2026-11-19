@@ -915,6 +915,16 @@ def inject_clock(monkeypatch: pytest.MonkeyPatch) -> None:
     )
 
 
+@pytest.fixture
+def historical_judge_packet(monkeypatch: pytest.MonkeyPatch) -> None:
+    import evals.live as live
+    from evals.calibration import load_packet
+
+    packet = load_packet(require_current_corpus=False)
+    monkeypatch.setattr(live, "load_packet", lambda: packet)
+
+
+@pytest.mark.usefixtures("historical_judge_packet")
 @pytest.mark.asyncio
 async def test_judge_run_uses_explicit_settings_without_human_labels(
     monkeypatch: pytest.MonkeyPatch,
@@ -966,6 +976,7 @@ async def test_judge_run_uses_explicit_settings_without_human_labels(
     assert report["effective_prompt_sha256"] == effective_judge_prompt_sha256()
 
 
+@pytest.mark.usefixtures("historical_judge_packet")
 @pytest.mark.asyncio
 @pytest.mark.parametrize("failure_kind", ["contract", "transient", "auth"])
 async def test_explicit_judge_recovery_preserves_budget_and_attempts(
@@ -1039,6 +1050,7 @@ async def test_explicit_judge_recovery_preserves_budget_and_attempts(
         assert all(x["reserved_input"] > 0 for x in result["attempts"][:2])
 
 
+@pytest.mark.usefixtures("historical_judge_packet")
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "payload",
@@ -1088,6 +1100,7 @@ async def test_bad_judge_contract_retains_diagnostics(
     assert result["reviews"] == []
 
 
+@pytest.mark.usefixtures("historical_judge_packet")
 def test_validation_cannot_mix_judge_output_settings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1103,7 +1116,7 @@ def test_validation_cannot_mix_judge_output_settings(
         packet_fingerprint,
     )
 
-    packet = load_packet()
+    packet = load_packet(require_current_corpus=False)
     rows = [
         Review(
             item_id=x.id,
@@ -1395,7 +1408,8 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
     from evals.calibration import load_packet
     from evals.live import GroqProvider, judge_messages, judge_response_format
 
-    messages = judge_messages(load_packet(), "calibration-20") if item20 else []
+    packet = load_packet(require_current_corpus=False) if item20 else None
+    messages = judge_messages(packet, "calibration-20") if packet else []
 
     calls = 0
 
@@ -1414,7 +1428,8 @@ async def test_actual_sdk_adapter_uses_mock_transport_without_hidden_retries(
             assert schema["schema"]["additionalProperties"] is False
             assert body["model"] == "openai/gpt-oss-20b"
             assert "reasoning_format" not in body and "tools" not in body
-            item = next(i for i in load_packet().items if i.id == "calibration-20")
+            assert packet is not None
+            item = next(i for i in packet.items if i.id == "calibration-20")
             data = json.loads(body["messages"][1]["content"])
             assert data["answer"] == item.answer
             assert data["evidence"] == [e.model_dump() for e in item.evidence]

@@ -15,8 +15,10 @@ ENV/
 
 # Environment variables — NEVER commit .env
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+.envrc
+.direnv/
 
 # IDE
 .vscode/
@@ -30,6 +32,7 @@ ENV/
 .DS_Store
 Thumbs.db
 desktop.ini
+._*
 
 # Node
 node_modules/
@@ -48,7 +51,6 @@ backend/index/
 backend/release.json
 backend/release.tmp
 .cache/
-backend/.cache/
 
 # Test / coverage
 .coverage
@@ -65,4 +67,6 @@ coverage/
 
 # Agent workspace files (skills, locks)
 .agents/
+.codex/
+.aws/
 skills-lock.json
