@@ -1,7 +1,15 @@
 # Progress Tracker
 
 ## Current Phase
-**M7: Field of Evidence regression and polish — local release review complete.**
+**M8: Answer-first chat and Field of Evidence visual concept.**
+Branch `codex/phase-m8-answer-first`. The waiting state and streamed answer appear before their supporting sources and project cards. A completed long answer keeps its place as evidence arrives. The isolated HTML concept covers the motion, typography, theme, chat and work layouts. The owner reviews the concept before integration. See [DRN-087](decisions.md) and the [M8 study guide](study-guides/phase-m8-answer-first.md).
+
+- A recorded Chrome stream verified the event sequence at 375 and 1440 px. At 375 px, the long follow-up's last line retained its exact position on completion, and Jump to latest reached the evidence by keyboard.
+- ESLint, TypeScript/Vite and all 193 Vitest tests passed. The offline backend and evaluation suite reported 689 passed with 8 skipped. The loopback build's initial JavaScript measured 171,205 gzip bytes against a 200,000-byte budget.
+- Chrome checked the concept at seven widths from 320 to 1920 px, plus keyboard focus, reduced motion, the no-script view, and the portable file in offline use. The cover wave painted 163 frames in 2.7 seconds at desktop size and then stopped. Tested color pairings ranged from 6.26:1 to 9.42:1. The independent prototype uses 2,769 gzip bytes of JavaScript. Physical mobile performance, other browsers, and screen-reader speech remain open.
+
+## Previous Work
+**M7: Field of Evidence regression and polish — released.**
 Branch `codex/phase-m7-regression-polish`. Long fit-report text wraps within the dialog. The mobile masthead keeps the complete keyboard focus outline visible. The validation entry skips Zod’s optional eval probe under the existing CSP. See [DRN-086](decisions.md) and the [M7 study guide](study-guides/phase-m7-regression-polish.md).
 
 - Chrome checked the cover and keyboard flow at 375, 768, 1024, and 1440 px, reflow down to 320 CSS px, and 200% root text. At 320 px the expanded long-report fixture went from a 2,859 px scroll width to the available 318 px. The browser replays passed for chat, role fit, recruiter actions, summary, evaluations, and admin. The A4 and Letter summary exports omit the fixture share token.
@@ -10,7 +18,6 @@ Branch `codex/phase-m7-regression-polish`. Long fit-report text wraps within the
 - Initial JavaScript was 171,290 gzip bytes against the 200,000-byte budget. In the paired throttled Chrome lab, median mobile LCP improved from 3.33 s to 2.77 s against the deployed build. The 2.50 s target remains open. Layout shift measured 0.00033. A diagnostic run with artwork blocked measured 2.60 s. No candidate animation was running in the idle samples.
 - Physical mobile keyboards, Firefox/WebKit, and screen-reader speech remain unverified. The existing draft-corpus review remains open, including the discrepancy between the public résumé’s Top 10 hackathon placement and the existing draft placement claim. M7 corrected the saved frontend answer. Local tag `phase-m6-done` is the M7 rollback point. Release requires owner approval.
 
-## Previous Work
 **M6: Field of Evidence secondary screens and footer — approved for M7.**
 Branch `codex/phase-m6-secondary-screens`. The footer makes direct contact and the full privacy disclosure easy to find. The team summary, evaluation record, admin dashboard, and response receipt use the Field of Evidence visual system. See [DRN-085](decisions.md) and the [M6 study guide](study-guides/phase-m6-secondary-screens.md).
 

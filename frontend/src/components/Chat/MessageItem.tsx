@@ -18,6 +18,8 @@ export const MessageItem = React.memo(function MessageItem({
   handoffTranscript,
 }: MessageItemProps) {
   const isUser = message.role === "user";
+  const isStreaming = message.status === "streaming";
+  const hasAnswerSources = message.status === "done" && message.delivery !== "cancelled";
   const [activeModalCard, setActiveModalCard] =
     useState<ProjectCardData | null>(null);
   const [copied, setCopied] = useState(false);
@@ -88,10 +90,9 @@ export const MessageItem = React.memo(function MessageItem({
         {message.content ? (
           <FormattedMessage
             content={message.content}
-            isStreaming={message.status === "streaming"}
+            isStreaming={isStreaming}
           />
-        ) : message.status === "streaming" &&
-          (!message.cards || message.cards.length === 0) ? (
+        ) : isStreaming ? (
           <div className="chat-message-text">
             Preparing an answer…{" "}<span
               className="streaming-cursor"
@@ -107,10 +108,10 @@ export const MessageItem = React.memo(function MessageItem({
             Generation interrupted or failed.
           </p>
         )}
-        {!isUser && message.sources && message.sources.length > 0 && (
+        {!isUser && hasAnswerSources && message.sources && message.sources.length > 0 && (
           <SourceChips sources={message.sources} />
         )}
-        {!isUser && message.cards && message.cards.length > 0 && (
+        {!isUser && !isStreaming && message.cards && message.cards.length > 0 && (
           <div className="message-cards-tray">
             {message.cards.map((card) => (
               <ProjectCard
@@ -127,7 +128,7 @@ export const MessageItem = React.memo(function MessageItem({
         {!isUser && message.status === "done" && message.feedbackId && (
           <AnswerFeedback answerId={message.feedbackId} />
         )}
-        {!isUser && message.status !== "streaming" ? <UnderHood telemetry={message.telemetry} browserTiming={message.browserTiming} delivery={message.delivery} /> : null}
+        {!isUser && !isStreaming ? <UnderHood telemetry={message.telemetry} browserTiming={message.browserTiming} delivery={message.delivery} /> : null}
       </div>
 
       {!isUser && (

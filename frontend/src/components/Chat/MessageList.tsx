@@ -18,15 +18,25 @@ export function MessageList({ messages, isStreaming, onOverview, onClear }: Mess
   const jumpRef = useRef<HTMLButtonElement>(null);
   const followsLatest = useRef(messages.length > 2);
   const previousCount = useRef(messages.length);
+  const previousLatest = useRef(messages.at(-1));
   const [showJump, setShowJump] = useState(false);
 
   useLayoutEffect(() => {
     const log = logRef.current;
     if (!log) return;
+    const latest = messages.at(-1);
+    const previous = previousLatest.current;
+    // Evidence can expand the last turn at completion. Keep the answer in view.
+    const settledWithText = previous?.status === "streaming"
+      && latest?.id === previous.id
+      && latest.status !== "streaming"
+      && Boolean(latest.content.trim());
+    previousLatest.current = latest;
     if (messages.length > previousCount.current) followsLatest.current = true;
     previousCount.current = messages.length;
-    if (followsLatest.current) log.scrollTop = log.scrollHeight;
+    if (followsLatest.current && !settledWithText) log.scrollTop = log.scrollHeight;
     const atLatest = isNearLatest(log);
+    if (settledWithText) followsLatest.current = atLatest;
     if (atLatest && jumpRef.current === document.activeElement) log.focus({ preventScroll: true });
     setShowJump(!atLatest);
   }, [messages]);

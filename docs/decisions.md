@@ -3,6 +3,27 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-087: Keep the streamed answer in view when evidence arrives
+
+**Date:** 2026-11-19. **Scope:** M8 chat rendering and isolated visual concept.
+
+The stream can deliver sources and a project card before the first token. Keep
+receiving those events through the existing API and hook. Render waiting and
+streaming text in the answer slot. Show citations beneath completed answers
+and saved answers. Project cards can appear when the stream settles, including
+tool-only responses. Stopped or interrupted text stays readable.
+
+The transcript follows incoming text when the reader is following the latest turn.
+When that turn settles with text, keep its scroll position as the supporting
+content appears. The existing Jump to latest button can reach the new evidence.
+The announcement of answer completion keeps its separate status region.
+
+The isolated prototype explores a white reading surface, Instrument Sans body
+type, a moving ASCII cover and real project screenshots. Its conversation uses
+a recorded sample. Mobile layouts use closer screenshots and keep the short
+conversation in page flow. Integration with the live assistant and release
+require separate review.
+
 ### DRN-086: Browser regression fixes and release evidence
 
 **Date:** 2026-11-18. **Scope:** Field of Evidence M7. The browser entry configures
