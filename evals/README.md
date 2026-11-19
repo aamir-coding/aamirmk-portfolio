@@ -171,9 +171,11 @@ project; its installed version is now explicitly pinned as a direct dependency.
 npm test -- --run src/lib/backendEventFixtures.test.ts
 ```
 
-`replay` parses committed bodies only: no application startup, model loading or
-provider calls. `capture` exercises actual backend endpoints with isolated fake
-dependencies and compares their bodies to `recordings/endpoints-v1.json`.
+`replay` defaults to the current v3 safety capture. The v1 and v2 files retain
+their original corpus bindings. `replay` parses committed bodies without app
+startup, model loading, or provider calls. `capture` exercises endpoints with
+isolated fake dependencies and compares their bodies to
+`recordings/endpoints-v3-safety.json`.
 `capture --write` explicitly regenerates that file after review. It has no live
 mode. TestClient intentionally skips production lifespan, since every request
 dependency is injected; this does not verify deployment startup. On this Windows
@@ -231,6 +233,11 @@ or badge, and do not authorize Groq evaluation.
 - [Starlette TestClient lifecycle](https://www.starlette.io/testclient/)
 
 ## Increment 4 — human calibration and a gated runner
+
+The v1 packet and its reviews refer to the corpus before the résumé refresh.
+Use `python -m evals.calibration --historical` with the archived annotations and
+judge files to reproduce that agreement. Live judging requires a reviewed packet
+that matches the current corpus.
 
 Start with [human grading instructions](annotations/README.md), the frozen
 20-answer calibration/eight-answer validation packet, and its blank annotation

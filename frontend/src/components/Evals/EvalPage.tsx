@@ -67,10 +67,10 @@ export default function EvalPage() {
 
         <section aria-labelledby="eval-agreement">
           <h2 id="eval-agreement">Human and judge agreement</h2>
-          <p>Independent validation gate <strong>{report.judge_validation.status}</strong>.
+          <p>Historical independent validation gate <strong>{report.judge_validation.status}</strong>.
             {" "}The utility model ({report.judge_validation.model}) graded eight authored validation
             answers against Aamir’s frozen grades after twenty calibration examples. The models share a family.
-            This small sample measures how consistently the judge agrees with Aamir.</p>
+            This small sample measured agreement on the corpus before the résumé refresh.</p>
           <table className="eval-agreement-table">
             <caption>Independent validation agreement (80% floor per axis)</caption>
             <thead><tr><th scope="col">Axis</th><th scope="col">Agreement</th><th scope="col">Disagreements</th></tr></thead>

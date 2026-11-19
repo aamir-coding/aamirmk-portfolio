@@ -2,16 +2,16 @@
 id: "proj-ai-assistant-overview"
 type: "project"
 title: "AI Digital Assistant Portfolio — Overview"
-source_section: "J1, J2 (Project D)"
+source_section: "Résumé: Technical Projects; J1, J2 (Project D)"
 source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "portfolio", "rag", "chatbot", "recruiter", "fastapi", "react"]
 draft: true
 private: false
 ---
 
-The AI Digital Assistant Portfolio is a RAG-based recruiter chatbot — an AI portfolio assistant intended to answer recruiter questions about Aamir's education, engineering experience, projects, skills, and interests using a curated knowledge base and retrieval-augmented generation.
+The AI Digital Assistant Portfolio is Aamir's completed and shipped recruiter chatbot. It uses retrieval-augmented generation (RAG) over a curated knowledge base to answer questions about his education, engineering experience, projects, skills, and interests.
 
-Recruiters may have limited time to read a resume or navigate multiple links. The assistant is designed to make verified information about Aamir's background easy to explore conversationally, answer technical project questions with evidence, and avoid inventing information missing from the approved knowledge base.
+Recruiters can explore his background through streamed, cited answers and interactive project cards, or paste a job description to get a structured fit report with evidence and skill gaps. The assistant can abstain when its sources do not support an answer.
 
 This is Aamir's portfolio project, developed with help from AI coding agents (Claude/Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity). Aamir sets requirements, steers implementation, reviews generated changes, debugs integrations, and verifies actual behaviour. The AI assistance accelerates the workflow; it does not transfer responsibility for correctness or security to the tools.
 
@@ -19,23 +19,24 @@ This is Aamir's portfolio project, developed with help from AI coding agents (Cl
 id: "proj-ai-assistant-architecture"
 type: "project"
 title: "AI Digital Assistant Portfolio — Architecture and Stack"
-source_section: "J4, J5 (Project D)"
+source_section: "Résumé: Technical Projects; J4, J5 (Project D)"
 source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
 tags: ["ai-assistant", "fastapi", "react", "typescript", "rag", "sse", "hybrid-retrieval", "bm25", "embeddings"]
 draft: true
 private: false
 ---
 
-The intended and documented stack includes:
+The shipped system includes:
 
-- **Backend:** FastAPI (Python) with Pydantic v2.
-- **Frontend:** React with TypeScript and Vite.
-- **Retrieval:** Hybrid retrieval combining BM25 (lexical) and ONNX embeddings (semantic), with curated Markdown/YAML knowledge-base files.
-- **Streaming:** Server-sent events (SSE) for real-time response streaming.
-- **LLM:** Groq API with provider configuration.
-- **Features:** Source citations, structured tool calling, and a human/contact handoff path.
+- **Backend:** FastAPI (Python), Pydantic v2, and the Groq API for LLM inference.
+- **Frontend:** React 19 with TypeScript and Vite.
+- **Retrieval:** Hybrid BM25 and precomputed FastEmbed ONNX embeddings over curated Markdown and YAML chunks. Reciprocal Rank Fusion (RRF) combines lexical and semantic ranks.
+- **Streaming:** Starlette `StreamingResponse` sends server-sent events (SSE) over POST for answer tokens, citations, and project cards.
+- **Tool calling:** The LLM can call `show_project_card`. The backend validates the arguments and returns a card from the server-owned project catalog.
+- **Persistence:** Supabase PostgreSQL with SQLAlchemy 2.0, connection pooling, and Alembic migrations for recruiter handoffs, analytics, and shared summaries.
+- **Job-description fit:** A five-stage pipeline extracts requirements, retrieves evidence, judges alignment, calculates the score, and summarizes strengths and gaps.
 
-**Architecture:** The portfolio UI sends a recruiter's question to a backend API. The backend retrieves relevant approved knowledge-base chunks using a hybrid retrieval pipeline, then passes grounded context to an LLM to generate a response. The response identifies the source evidence so a visitor can trace claims back to approved profile and project material. Streaming and a human/contact handoff are part of the intended user experience.
+The portfolio UI posts a recruiter's question to FastAPI. The backend retrieves relevant chunks and passes them to the LLM as context. Visitors can follow citations back to the source material, inspect project cards, and use the consent-based recruiter handoff.
 
 ---
 id: "proj-ai-assistant-design"
@@ -50,30 +51,32 @@ private: false
 
 Key design decisions for the AI Digital Assistant Portfolio:
 
-1. **RAG instead of relying on model memory:** Answers are grounded in approved information and can be updated without retraining. Aamir's profile and project details change, and RAG lets him update source documents, retrieve evidence, and generate answers using relevant chunks. Trade-off: retrieval can miss relevant evidence or select noisy chunks.
+1. **Why Aamir chose RAG:** Recruiter answers need current, citable facts about Aamir's work. Retrieval-augmented generation grounds answers in relevant chunks from the curated knowledge base. Aamir can update his profile and project details, then rebuild the search index without retraining the LLM. The trade-off is that retrieval can miss relevant evidence or select noisy chunks.
 
-2. **Hybrid retrieval (BM25 plus embeddings):** Lexical search helps with exact technologies and project names, while embeddings can find semantically related questions. Trade-off: adds indexing, fusion, and tuning complexity.
+2. **Hybrid retrieval (BM25 plus embeddings):** Lexical search helps with exact technologies and project names, while embeddings can find semantically related questions. The trade-off is added indexing, fusion, and tuning complexity.
 
 3. **Citations and an abstention/handoff path:** Citations support verification of claims, and abstention is safer than guessing when the knowledge base cannot support an answer. Quality depends on correct source metadata and links from answers to retrieved chunks.
 
 4. **AI-assisted development:** Agents accelerate coding, but generated code must be reviewed, run, tested, and understood. Aamir remains responsible for the behaviour and claims of the shipped system.
 
+5. **Release verification:** Before publishing, check retrieval scores, verify that citations resolve, and replay cases that exercise abstention, rate limiting, and safety controls. End-to-end checks also cover streamed chat, project cards, and job-description fit reports.
+
 ---
 id: "proj-ai-assistant-status"
 type: "project"
 title: "AI Digital Assistant Portfolio — Current Status"
-source_section: "J11, V2, V7 (Project D)"
+source_section: "Résumé: Technical Projects; portfolio release record"
 source_url: "https://github.com/aamir-coding/aamirmk-portfolio"
-tags: ["ai-assistant", "status", "development", "knowledge-base"]
+tags: ["ai-assistant", "status", "shipped", "deployment", "knowledge-base"]
 draft: true
 private: false
 ---
 
-The AI Digital Assistant Portfolio is under active development. It has a live deployment URL and a repository URL. The knowledge-base and RAG content is currently being prepared through a structured questionnaire process.
+The AI Digital Assistant Portfolio is complete and shipped. The React 19 frontend is deployed on Vercel and the FastAPI backend on Render. Recruiters can open the public app without logging in.
 
-No login is required to use the application. No verified retrieval-quality, answer-quality, latency, cost, or evaluation results are available yet. The system should not be described as complete until it has passed end-to-end verification.
+The release includes cited chat over Starlette SSE, hybrid BM25 and FastEmbed ONNX retrieval, tool-called project cards, the Supabase PostgreSQL data layer, and a job-description fit report workflow.
 
-Current development is ongoing as of November 2026.
+Automated checks cover retrieval and recorded chat and fit workflows. These checks measure retrieval and replay behavior. Independent generation accuracy has not been established.
 
 ---
 id: "proj-ai-assistant-links"

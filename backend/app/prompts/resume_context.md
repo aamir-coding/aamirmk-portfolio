@@ -8,7 +8,7 @@ Location: Bengaluru, Karnataka, India
 
 ## Profile
 
-Fourth-year CSE undergraduate (CGPA 9.77/10) with hands-on AI-assisted development using Claude, Claude Code, and GitHub Copilot. Builds full-stack and LLM-powered applications; uses AI tools for implementation, debugging, testing, and code review while validating generated changes.
+Fourth-year CSE undergraduate (CGPA 9.77/10) with hands-on experience building full-stack applications, LLM-powered features, and database-backed services. Uses Claude Code, Codex, and GitHub Copilot for development and validates generated changes with tests and runtime evidence.
 
 ## Education
 
@@ -38,11 +38,11 @@ Live App: https://entropy-oj.vercel.app
 ## Technical Projects
 
 ### AI Digital Assistant Portfolio — RAG-Powered Recruiter Chatbot
-Live App: https://aamirmk-portfolio.vercel.app/ | Source Code: https://github.com/aamir-coding/portfolio-ai
+Live App: https://aamirmk-portfolio.vercel.app/ | Source Code: https://github.com/aamir-coding/aamirmk-portfolio
 
-- Built a full-stack recruiter assistant with FastAPI, React, TypeScript, and PostgreSQL, using hybrid retrieval-augmented generation (RAG) with BM25 and embeddings over curated profile facts to ground responses.
-- Implemented server-sent events (SSE) for streaming answers with source citations, human handoff for unsupported questions, and LLM tool calling with server-side argument validation for structured job-fit and skill-gap reports.
-- Added prompt-injection defences, rate limiting, token-budget controls, model-provider failover, and a GitHub Actions evaluation workflow to assess retrieval and response quality.
+- Shipped the recruiter assistant with FastAPI, React 19, and TypeScript. Hybrid retrieval combines BM25 and FastEmbed ONNX embeddings with Reciprocal Rank Fusion over curated profile facts.
+- Streamed cited answers via Starlette server-sent events (SSE) over POST. Added validated LLM tool calls for interactive project cards and a five-stage job-description fit workflow with evidence and skill gaps.
+- Implemented Supabase PostgreSQL persistence with SQLAlchemy 2.0, connection pooling, and Alembic migrations for recruiter workflows. Added company-specific context, request and token-budget controls, and offline retrieval and replay checks in GitHub Actions.
 
 ### HealthTracker — Health and Activity Tracking PWA
 Live App: https://health-tracker-alpha-one.vercel.app | Source Code: https://github.com/aamir-coding/health-tracker
@@ -56,5 +56,5 @@ Live App: https://health-prem-prediction.streamlit.app/ | Source Code: https://g
 
 ## Honours and Achievements
 
-- **Top 10 Team — Google Cloud Build with AI: Code for Communities, Second Edition:** Shortlisted among the top 10 teams in Track 2: CleanAir & Clear Streets.
+- **2nd Runner-Up Team — Google Cloud Build with AI: Code for Communities, Second Edition:** Achieved 2nd Runner-Up in Track 2: CleanAir & Clear Streets.
 - **University-wide First Place — Graph Algorithm Contest (2025):** Earned first rank in a graph-algorithm contest led by a Codeforces Master and received a 50% scholarship to AlgoUniversity's Accelerator Program.

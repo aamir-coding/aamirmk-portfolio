@@ -135,7 +135,10 @@ def packet_fingerprint(packet: GradingPacket) -> str:
     return canonical_sha256(packet.model_dump(mode="json"))
 
 
-def load_packet(path: Path = DEFAULT_PACKET) -> GradingPacket:
+def load_packet(
+    path: Path = DEFAULT_PACKET, *, require_current_corpus: bool = True
+) -> GradingPacket:
+    """Validate frozen grades against current evidence by default for live judging."""
     verify_dataset()
     packet = GradingPacket.model_validate_json(path.read_text(encoding="utf-8"))
     lock = path.with_suffix(".lock.json")
@@ -145,10 +148,15 @@ def load_packet(path: Path = DEFAULT_PACKET) -> GradingPacket:
         "packet_sha256": packet_fingerprint(packet)
     }:
         raise ValueError("Grading packet changed; version and review a new packet")
-    facts = {f.id: f for f in FactLoader().load_all()}
+    facts = (
+        {f.id: f for f in FactLoader().load_all()} if require_current_corpus else None
+    )
     cases = {c.id: c for c in load_cases()}
     if (
-        packet.corpus_sha256 != corpus_sha256(list(facts.values()))
+        (
+            facts is not None
+            and packet.corpus_sha256 != corpus_sha256(list(facts.values()))
+        )
         or packet.rubric_sha256 != text_sha(RUBRIC)
         or packet.judge_prompt_sha256 != text_sha(JUDGE_PROMPT)
     ):
@@ -177,7 +185,7 @@ def load_packet(path: Path = DEFAULT_PACKET) -> GradingPacket:
             raise ValueError("Calibration/validation group leakage")
         groups[item.group_id] = item.slice
         for evidence in item.evidence:
-            if (
+            if facts is not None and (
                 evidence.id not in facts
                 or evidence.content != facts[evidence.id].content
                 or evidence.draft != facts[evidence.id].draft
@@ -435,9 +443,12 @@ def main() -> int:
         default=DEFAULT_ROOT / "annotations/human-v1.template.json",
     )
     parser.add_argument("--judge", type=Path)
+    parser.add_argument(
+        "--historical", action="store_true", help="Report on the historical corpus"
+    )
     args = parser.parse_args()
     try:
-        packet = load_packet()
+        packet = load_packet(require_current_corpus=not args.historical)
         human = AnnotationSet.model_validate_json(
             args.annotations.read_text(encoding="utf-8")
         )

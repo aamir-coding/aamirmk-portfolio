@@ -44,7 +44,8 @@ def project(result: OfflineResult) -> PublicArtifact:
         raise ValueError("Incompatible artifact/baseline")
     if any(result.fingerprints[k] != v for k, v in input_fingerprints().items()):
         raise ValueError("Stale result inputs")
-    packet = load_packet()
+    # Reproduce the historical agreement from its locked evidence and reviews.
+    packet = load_packet(require_current_corpus=False)
     human = AnnotationSet.model_validate_json(
         (DEFAULT_ROOT / "annotations/human-v1-aamir-2026-11-05.json").read_text(
             encoding="utf-8"

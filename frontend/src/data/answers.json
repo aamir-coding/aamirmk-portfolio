@@ -18,7 +18,7 @@
     ]
   },
   "What is Aamir's experience with FastAPI and LLM systems?": {
-    "reply": "Aamir built this recruiter assistant with **FastAPI, React, TypeScript, and PostgreSQL**. It combines BM25 and embeddings over curated profile facts, streams answers with citations, and validates tool arguments on the server for job-fit and skill-gap reports.\n\nAt AlgoUniversity, he integrated three LLM workflows into **Entropy Online Judge**: progressive debugging hints, problem-setting QA, and complexity classification after acceptance.",
+    "reply": "Aamir shipped this recruiter assistant with **FastAPI, React 19, TypeScript, and Supabase PostgreSQL**. It combines BM25 and FastEmbed ONNX embeddings over curated facts and streams cited answers using Starlette SSE. Validated tool calls open project cards, and a five-stage workflow produces evidence-based job-fit reports.\n\nAt AlgoUniversity, he integrated three LLM workflows into **Entropy Online Judge**: progressive debugging hints, problem-setting QA, and complexity classification after acceptance.",
     "sources": [
       {
         "chunk_id": "proj-ai-assistant-overview",

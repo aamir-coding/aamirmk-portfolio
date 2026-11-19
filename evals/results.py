@@ -142,8 +142,7 @@ def input_fingerprints() -> dict[str, str]:
 
 async def offline_result() -> OfflineResult:
     retrieval = await build_report("all")
-    # Keep historical v1/v2 replay inputs frozen; the current safety contract is v3.
-    replay = replay_report(DEFAULT_ROOT / "recordings/endpoints-v3-safety.json")
+    replay = replay_report()
     manifest = load_manifest()
     fingerprints = input_fingerprints()
     fingerprints.update(

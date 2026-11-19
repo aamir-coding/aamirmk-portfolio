@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "report_sha256": "39e6125a1f60dd2e030bb124ebd08e1338fd6b1938d20ef223de5c1fc70c6e49",
+  "report_sha256": "a6cee4c8935eb78ae4338ba3dabd1194e4c66c689e66527b4d7de73a0e866591",
   "report": {
     "kind": "offline_engineering_checks",
-    "generated_at": "2026-11-12T15:43:06.397990Z",
-    "source_commit": "8c0eca1ea24e4042acfa07b60e0bdf2702edf13a",
+    "generated_at": "2026-11-19T12:32:38.059712Z",
+    "source_commit": "2516dad97ebdf8728d283cc47d26f8a1a95a7385",
     "source_dirty": true,
-    "source_result_sha256": "e322690bbd6176b7c8fe543f2087f1cd47d84c33a4e5a8838f93e85830055518",
-    "runtime_sha256": "99df6b227f677b571930954a406827288392f6f5aa1ae7828519b07041d64e4b",
+    "source_result_sha256": "03846a2b8a929b952d034749d9e9ac12d6bbb0bc7854bcde417e7c4366f4ef84",
+    "runtime_sha256": "28ad7f22df8e64024478715cb7eeb332f92b7072fd96a6884834f443511a53ec",
     "replay": {
       "passed": 8,
       "total": 8
@@ -48,7 +48,7 @@
       {
         "suite": "legacy_development",
         "metric": "hit_at_3",
-        "numerator": 41.0,
+        "numerator": 42.0,
         "denominator": 45
       },
       {
@@ -60,7 +60,7 @@
       {
         "suite": "legacy_development",
         "metric": "mrr_at_5",
-        "numerator": 40.0,
+        "numerator": 40.75,
         "denominator": 45
       },
       {
@@ -90,7 +90,7 @@
       {
         "suite": "versioned_development",
         "metric": "mrr_at_5",
-        "numerator": 30.25,
+        "numerator": 30.75,
         "denominator": 34
       },
       {

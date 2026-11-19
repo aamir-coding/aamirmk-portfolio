@@ -88,7 +88,7 @@ private: false
 
 Aamir was part of his university's coding club called Cynergy as a Project Team Member from April 2025 to April 2026. This was a member role — do not upgrade it to a leadership position.
 
-Aamir also participated with a team in Build with AI: Code for Communities — Second Edition, a Google Cloud hackathon. The team was shortlisted among the Top 10 in Track 2. Event page: https://hack2skill.com/event/codeforcommunities2. Current supporting evidence consists of the shortlist email from the hackathon hosts and the authenticated Hack2Skill event page showing the team name and registration.
+Aamir also participated with a team in Build with AI: Code for Communities — Second Edition, a Google Cloud hackathon. His updated résumé lists the team's final placement as 2nd Runner-Up in Track 2: CleanAir & Clear Streets. Event page: https://hack2skill.com/event/codeforcommunities2.
 
 ---
 id: "education-no-backlogs"

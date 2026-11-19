@@ -6,6 +6,7 @@ import pytest
 
 from evals.calibration import (
     AnnotationSet,
+    GradingPacket,
     JudgeConfiguration,
     JudgeSet,
     Labels,
@@ -18,8 +19,12 @@ from evals.calibration import (
 )
 
 
+def historical_packet() -> GradingPacket:
+    return load_packet(require_current_corpus=False)
+
+
 def test_frozen_packet_is_development_only_group_disjoint_and_ungraded() -> None:
-    packet = load_packet()
+    packet = historical_packet()
     assert len([x for x in packet.items if x.slice == "calibration"]) >= 20
     assert len([x for x in packet.items if x.slice == "validation"]) >= 8
     groups = {
@@ -38,7 +43,7 @@ def test_frozen_packet_is_development_only_group_disjoint_and_ungraded() -> None
 
 
 def reviews(*, judge: bool = False, wrong: bool = False) -> AnnotationSet | JudgeSet:
-    packet = load_packet()
+    packet = historical_packet()
     rows = [
         Review(
             item_id=x.id,
@@ -87,7 +92,7 @@ def reviews(*, judge: bool = False, wrong: bool = False) -> AnnotationSet | Judg
 
 
 def test_fake_agreement_never_calibrates_a_live_judge() -> None:
-    packet = load_packet()
+    packet = historical_packet()
     report = agreement_report(packet, reviews(), reviews(judge=True))
     assert report.status == "diagnostic_only"
     assert report.agreement_floor_met
@@ -104,7 +109,9 @@ def test_legacy_judge_result_cannot_guess_unrecorded_settings() -> None:
 
 
 def test_uncertain_judge_counts_as_disagreement_and_humans_override() -> None:
-    report = agreement_report(load_packet(), reviews(), reviews(judge=True, wrong=True))
+    report = agreement_report(
+        historical_packet(), reviews(), reviews(judge=True, wrong=True)
+    )
     assert not report.agreement_floor_met
     assert report.per_label["support"].numerator == 0
     assert report.per_label["support"].denominator == 8
@@ -117,7 +124,7 @@ def test_uncertain_judge_counts_as_disagreement_and_humans_override() -> None:
     ["item_hash", "packet_hash", "rubric_hash", "duplicate", "unknown", "reviewer"],
 )
 def test_stale_or_unattributed_human_grades_fail_closed(change: str) -> None:
-    packet = load_packet()
+    packet = historical_packet()
     data = reviews().model_dump(mode="json")
     if change == "item_hash":
         data["reviews"][0]["item_sha256"] = "0" * 64
@@ -136,7 +143,7 @@ def test_stale_or_unattributed_human_grades_fail_closed(change: str) -> None:
 
 
 def test_validation_is_not_reported_without_twenty_calibration_grades() -> None:
-    packet = load_packet()
+    packet = historical_packet()
     human = reviews()
     human = human.model_copy(
         update={
@@ -154,7 +161,7 @@ def test_validation_is_not_reported_without_twenty_calibration_grades() -> None:
 
 
 def test_human_abstention_is_excluded_and_coverage_remains_visible() -> None:
-    packet = load_packet()
+    packet = historical_packet()
     human = reviews()
     val = next(x for x in packet.items if x.slice == "validation")
     human = human.model_copy(
@@ -185,7 +192,7 @@ def test_human_abstention_is_excluded_and_coverage_remains_visible() -> None:
 def test_validation_only_judge_cannot_claim_calibrated_without_calibration_slice() -> (
     None
 ):
-    packet = load_packet()
+    packet = historical_packet()
     judged = reviews(judge=True)
     val_ids = {x.id for x in packet.items if x.slice == "validation"}
     judged = judged.model_copy(
@@ -205,7 +212,17 @@ def test_validation_only_judge_cannot_claim_calibrated_without_calibration_slice
 def test_authored_packet_builder_still_matches_immutable_frozen_examples() -> None:
     from evals.prepare_grading import build_packet
 
-    assert build_packet() == load_packet()
+    refreshed = build_packet()
+    frozen = historical_packet()
+    exclude = {"evidence", "sha256"}
+    assert [item.model_dump(exclude=exclude) for item in refreshed.items] == [
+        item.model_dump(exclude=exclude) for item in frozen.items
+    ]
+
+
+def test_historical_packet_cannot_be_loaded_for_live_judging() -> None:
+    with pytest.raises(ValueError, match="Grading evidence/rubric/prompt changed"):
+        load_packet()
 
 
 def test_compact_judge_prompt_keeps_all_evidence_and_fits_recorded_limit_policy() -> (
@@ -216,7 +233,7 @@ def test_compact_judge_prompt_keeps_all_evidence_and_fits_recorded_limit_policy(
     from evals.budget import input_reservation_bound, request_payload
     from evals.live import judge_messages, judge_response_format
 
-    packet = load_packet()
+    packet = historical_packet()
     bounds = []
     for item in packet.items:
         messages = judge_messages(packet, item.id)
@@ -241,7 +258,7 @@ def test_changed_effective_prompt_invalidates_prior(
 ) -> None:
     import evals.calibration as calibration
 
-    packet, judged = load_packet(), reviews(judge=True)
+    packet, judged = historical_packet(), reviews(judge=True)
     original = calibration.judge_system_prompt()
     monkeypatch.setattr(
         calibration, "judge_system_prompt", lambda: original + "changed recipe"
@@ -253,7 +270,7 @@ def test_changed_effective_prompt_invalidates_prior(
 def test_changed_wire_schema_invalidates_prior(monkeypatch: pytest.MonkeyPatch) -> None:
     import evals.calibration as calibration
 
-    packet, judged = load_packet(), reviews(judge=True)
+    packet, judged = historical_packet(), reviews(judge=True)
     original = calibration.judge_response_format()
     changed = {
         **original,
@@ -270,10 +287,10 @@ def test_runtime_prefix_change_invalidates_judge(
 ) -> None:
     import evals.calibration as calibration
 
-    packet, judged = load_packet(), reviews(judge=True)
+    packet, judged = historical_packet(), reviews(judge=True)
     changed = tmp_path / "runtime-prefix.txt"
     changed.write_text("Different runtime instructions.", encoding="utf-8")
     monkeypatch.setattr(calibration, "JUDGE_RUNTIME_PROMPT", changed)
-    assert load_packet() == packet
+    assert historical_packet() == packet
     with pytest.raises(ValueError, match="Judge prompt changed"):
         validate_reviews(packet, judged)

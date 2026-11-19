@@ -9,35 +9,35 @@ chunks:
   - id: skill-ai-assisted-dev
     type: skill
     title: "AI-Assisted Development Tools"
-    source_section: "S5, A4, J15"
-    tags: ["ai-tools", "development-workflow", "claude", "copilot", "chatgpt", "gemini", "antigravity"]
+    source_section: "Résumé: Technical Skills; S5, A4, J15"
+    tags: ["ai-tools", "development-workflow", "claude", "codex", "copilot", "chatgpt", "gemini", "antigravity"]
     draft: true
     private: false
     content: |
-      Aamir uses the following AI coding assistants in his development workflow: Claude, Claude Code, GitHub Copilot, ChatGPT, Gemini, and Antigravity. He has NOT used Cursor — do not list it.
+      Aamir uses AI coding assistants such as Claude Code, Codex, and GitHub Copilot. He also has experience with Claude, ChatGPT, Gemini, and Antigravity. He has NOT used Cursor — do not list it.
 
       Typical AI-assisted tasks include exploring unfamiliar codebases, implementing features, debugging, generating tests, refactoring, and reviewing code alternatives. His workflow principle is to use agents to accelerate work while inspecting changes, understanding the approach, running the application and relevant tests, reproducing bugs, and verifying results before accepting a change.
 
       Aamir does not treat AI output as automatically correct. He inspects diffs, reasons about the approach, runs code, reproduces failures, checks edge cases and security, and consults documentation when uncertain. He remains responsible for understanding and validating what ships. He does not claim that he independently understands every generated line by default; he keeps working until he can explain and verify the code relevant to a feature.
 
-      The AI Digital Assistant portfolio project is being developed with help from AI coding agents. Aamir's role involves setting requirements, steering implementation, reviewing generated changes, debugging integrations, and verifying actual behaviour.
+      Aamir built and shipped the AI Digital Assistant portfolio with help from AI coding agents. He set requirements, steered implementation, reviewed generated changes, debugged integrations, and verified the application's behavior.
 
   # ---------- AI/LLM Engineering ----------
   - id: skill-ai-llm-engineering
     type: skill
     title: "AI/LLM Engineering Skills"
-    source_section: "A1, A2, A3, A5"
+    source_section: "Résumé: Technical Skills and Technical Projects; A1, A2, A3, A5"
     tags: ["rag", "embeddings", "tool-calling", "prompt-injection", "evaluations", "llm"]
     draft: true
     private: false
     content: |
       Aamir's AI/LLM engineering skill levels (honestly assessed):
 
-      - RAG: learning/working. Currently preparing the portfolio knowledge base and retrieval workflow. Not production-expert level.
-      - Embeddings: learning/working. Intended as part of hybrid retrieval for the portfolio assistant. Embedding model and evaluation details are pending.
-      - Tool calling: working exposure through LLM application design in Entropy-OJ and the portfolio assistant plan. Exact tools currently shipped must be verified.
-      - Prompt-injection defence: working/learning. Defensive design is part of the assistant plan. Concrete controls should be described only if implemented and tested.
-      - Evaluations: learning/working. The assistant needs a labelled retrieval/answer question set. Entropy-OJ has test files/output handling, but comprehensive LLM evals with results are not claimed.
+      - RAG: working. Aamir built and shipped the portfolio assistant's retrieval workflow over curated Markdown and YAML facts, with source attribution and abstention.
+      - Embeddings: working. The assistant uses precomputed FastEmbed ONNX embeddings (BAAI/bge-small-en-v1.5) and combines semantic search with BM25 using Reciprocal Rank Fusion.
+      - Tool calling: working. The portfolio assistant's `show_project_card` function has server-validated arguments and returns allowlisted project cards. The five-stage JD fit workflow uses validated structured outputs.
+      - Prompt-injection defence: working/learning. The portfolio assistant uses input screening, structured separation of instructions and user data, and constrained tool arguments.
+      - Evaluations: working. Aamir built offline retrieval evaluation and chat/fit contract replay into GitHub Actions. Replay uses recorded fake and curated outputs. Independent answer accuracy has not been established.
       - Fine-tuning: no hands-on evidence available.
       - Agents: learning/working exposure to coding agents and tool-calling workflows. Using an AI coding agent is not the same as having built a general-purpose autonomous-agent system.
 
@@ -56,8 +56,8 @@ chunks:
     content: |
       Aamir's programming language proficiency (self-assessed levels from S1):
 
-      - Python: working. Used in Django project, ML projects (Health Premium Predictor), and general development work.
-      - TypeScript: working. Used in Entropy-OJ React/TypeScript frontend.
+      - Python: working. Used in the FastAPI portfolio backend, the Django auction project, and the Health Premium Predictor.
+      - TypeScript: working. Used in the Entropy-OJ and AI Digital Assistant React frontends.
       - JavaScript: working. Used in browser games and full-stack web development.
       - C++: working for DSA practice. Used for data structures and algorithms practice. Do not call him a professional C++ developer or claim a C++ application project.
       - Java: basic. College coursework only; coded in Java for OOP concepts. No substantial independent Java application.
@@ -77,7 +77,7 @@ chunks:
     content: |
       Aamir's framework and library proficiency:
 
-      - React: working. Used in Entropy-OJ and AI portfolio frontend work.
+      - React 19: working. Used in the shipped Entropy-OJ and AI Digital Assistant frontends.
       - Node.js: working. Used in Entropy-OJ backend.
       - Express: working. Used in Entropy-OJ API server.
       - FastAPI: working. Used in the AI Digital Assistant portfolio project.
@@ -102,7 +102,7 @@ chunks:
       Aamir's database proficiency:
 
       - MongoDB: working. Used in Entropy-OJ (MongoDB Atlas) and HealthTracker projects.
-      - PostgreSQL: working. Used in the Django auction project and possibly assistant persistence.
+      - PostgreSQL: working. Used in the Django auction project and the portfolio assistant's Supabase data layer for recruiter handoffs, analytics, and shared summaries. The assistant uses SQLAlchemy 2.0, connection pooling, and Alembic migrations.
       - MySQL: basic to working. Studied extensively in college coursework and hands-on assignments, and used for interview preparation.
       - Redis: working. Used in Entropy-OJ for job queue (with BullMQ) and was central to the connection/debugging investigation involving TCP keep-alive and Azure idle timeout configuration.
 
@@ -120,7 +120,7 @@ chunks:
       - Docker: working. Used in Entropy-OJ worker deployment configuration.
       - Linux: basic to working exposure. Linux-based runner/process limits and cloud debugging, but not Linux administration expertise.
       - Azure: working. Entropy-OJ execution layer (sandboxed worker and broker) runs on an Azure Virtual Machine.
-      - GitHub Actions: working. CI workflow associated with HealthTracker; actual jobs and current results should be verified.
+      - GitHub Actions: working. Used for HealthTracker builds, testing, and deployment and for the portfolio assistant's lint, build, tests, and offline evaluation checks.
       - Git/GitHub: working. Used for source control, staging, committing, and pushing updates (including the Entropy-OJ Redis connection fix).
       - REST APIs: working. Entropy-OJ backend/API and application integrations.
       - Microservices: basic/working exposure. Separate frontend/API/worker components in Entropy-OJ; do not overstate distributed-systems depth.
@@ -178,7 +178,7 @@ chunks:
       - Building Customized LLMs with OpenAI (Columbia University/Columbia Plus) — in progress.
       - AI Cybersecurity & Governance (Columbia University/Columbia Plus) — in progress.
       - Prompt Engineering & Programming with OpenAI (Columbia University/Columbia Plus) — in progress.
-      - RAG and knowledge-base engineering — currently preparing the portfolio assistant's knowledge base and retrieval workflow, learning chunking, metadata, hybrid retrieval, evaluation, source attribution, and abstention.
+      - RAG and knowledge-base engineering — continuing to deepen chunking, metadata, hybrid retrieval, evaluation, source attribution, and abstention after shipping the portfolio assistant's retrieval workflow.
       - AI application engineering — continuing to practise tool calling, structured outputs, safe prompting, evaluation, and provider fallbacks through Entropy-OJ and the portfolio assistant.
 
       Future learning goals include: RAG design/evaluation, hybrid retrieval/reranking, reliable tool calling, prompt-injection testing, structured-output validation, latency/cost management, tracing/observability, and deployment. He also wants to deepen core CS/software engineering fundamentals.

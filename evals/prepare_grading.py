@@ -351,7 +351,7 @@ def main() -> None:
             template.model_dump_json(indent=2) + "\n", encoding="utf-8", newline="\n"
         )
         render(packet, directory)
-    packet = load_packet()
+    packet = load_packet(require_current_corpus=False)
     print(
         f"Frozen grading packet: {len(packet.items)} authored development answers; "
         "zero human grades inferred, zero model calls."

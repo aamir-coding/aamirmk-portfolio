@@ -7,15 +7,15 @@ chunks:
   - id: "profile-identity"
     type: "profile"
     title: "Identity and Professional Summary"
-    source_section: "P1, P2, P3, P11"
+    source_section: "Résumé: Profile and Education; P1, P2, P3, P11"
     source_url: "https://github.com/aamir-coding"
     tags: ["identity", "introduction", "status"]
     draft: true
     private: false
     content: |
-      Aamir Mohammed Khan is a B.Tech Computer Science and Engineering student at M. S. Ramaiah University of Applied Sciences (MSRUAS) in Bengaluru, India. He is currently in his 4th year as of October 2026, with an expected graduation in June 2027.
+      Aamir Mohammed Khan is a fourth-year B.Tech Computer Science and Engineering student at M. S. Ramaiah University of Applied Sciences (MSRUAS) in Bengaluru, India. He has a CGPA of 9.77/10.0 and expects to graduate in June 2027.
 
-      Aamir builds full-stack applications and AI-enabled software tools, combining practical product engineering with LLM integration, debugging, testing, and deployment.
+      Aamir builds full-stack applications, LLM-powered features, and database-backed services. He shipped this recruiter assistant and uses tests and runtime evidence to validate the software he develops.
 
       Recruiters should call him Aamir. Pronouns: he/him.
 

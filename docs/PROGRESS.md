@@ -9,6 +9,13 @@ Branch `codex/phase-m8-answer-first`. The owner approved the M8 release. The cov
 - ESLint, TypeScript/Vite and all 193 Vitest tests passed. Ruff lint and formatting passed. The offline backend and evaluation suite reported 689 passed with 8 skipped. The offline gate passed 8 of 8 recordings with zero provider calls and no retrieval regressions. The browser replays passed for chat, fit, recruiter actions, summaries, evaluations and admin. The A4 and Letter summary exports each fit on one page and omit the fixture share token. Initial JavaScript was 172,277 gzip bytes against a 200,000-byte budget. The motion module adds about 2.1 KB gzip when loaded.
 - In a paired 375 px Chrome lab run with 4× CPU slowdown and 150 ms latency, median LCP was 2.704 s for M8 and 2.696 s for the rebuilt M7 reference. M8 layout shift measured 0.00102. The 2.50 s LCP target, physical mobile performance, other browsers, and screen-reader speech remain open.
 
+### Résumé and knowledge refresh
+
+- Replaced the public `/resume.pdf` with the owner's updated PDF and retired the draft Markdown. Updated the portfolio facts and related app content to describe the shipped assistant. The new résumé records 2nd Runner-Up as the hackathon team's final placement.
+- Rebuilt the index with the same FastEmbed ONNX assets and all 76 original chunk IDs. The offline gate passed eight recordings with zero provider calls. Hit@5 was 45/45 for the legacy queries and 34/34 for the scored development queries. The regression thresholds and historical human reviews remain intact. See [DRN-089](decisions.md#drn-089-refresh-resume-and-fact-provenance).
+- The production build, ESLint, Ruff, and backend release-asset check passed. Vitest passed 193 tests. Pytest passed 698 tests, including all eight disposable PostgreSQL integration tests, with two existing deprecation warnings. Initial JavaScript was 172,502 gzip bytes against the 200,000-byte budget.
+- The Git audit verified environment, cache, and machine-local exclusions while keeping `.env.example` and documentation tracked. The frontend and backend refresh is verified locally and awaits deployment.
+
 ## Previous Work
 **M7: Field of Evidence regression and polish — released.**
 Branch `codex/phase-m7-regression-polish`. Long fit-report text wraps within the dialog. The mobile masthead keeps the complete keyboard focus outline visible. The validation entry skips Zod’s optional eval probe under the existing CSP. See [DRN-086](decisions.md) and the [M7 study guide](study-guides/phase-m7-regression-polish.md).
