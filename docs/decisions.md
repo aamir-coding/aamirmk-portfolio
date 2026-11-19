@@ -3,6 +3,31 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-088: Integrate the moving cover around the live assistant
+
+**Date:** 2026-11-19. **Scope:** M8 visual integration.
+
+Use a responsive WebP poster for the cover. Load the canvas module after the
+page load and an idle callback when available. Sample the landscape only while
+the cover can animate. The renderer reuses a cached glyph layer, targets 24
+frames per second for the ambient loop, and redraws only the glyphs changed by
+the sweep or pointer. The pointer radius is defined in viewport coordinates,
+so the pull feels consistent as the artwork scales. The pointer changes
+positions while the landscape supplies glyph colors.
+
+Keyboard pause survives a trip through the conversation. Reduced motion uses
+the poster, and forced colors keeps the interface readable. The renderer
+suspends when the cover leaves the viewport or the document is hidden. Scroll
+drift follows a CSS view timeline where supported.
+
+Keep the existing composer and recruiter controls on the editorial cover and
+conversation. Completed answers disclose sources through native details.
+Opening a disclosure updates Jump to latest while preserving the reader’s
+scroll position and focus. The Selected work sample opens the existing bundled
+answer. The portfolio loads its own Instrument Sans font and chooses responsive
+screenshots from captured product views. Text and project links stay available
+if an image fails.
+
 ### DRN-087: Keep the streamed answer in view when evidence arrives
 
 **Date:** 2026-11-19. **Scope:** M8 chat rendering and isolated visual concept.

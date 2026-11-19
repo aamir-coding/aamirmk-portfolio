@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { SourceChips } from "./SourceChips";
 import type { SourceCitation } from "../../lib/types";
@@ -35,7 +35,11 @@ describe("SourceChips", () => {
 
     render(<SourceChips sources={mockSources} />);
 
-    expect(screen.getByText("Sources")).toBeInTheDocument();
+    const summary = screen.getByText("Sources");
+    expect(summary).toHaveTextContent("Sources 2");
+    expect(summary.closest("details")).not.toHaveAttribute("open");
+    fireEvent.click(summary);
+    expect(summary.closest("details")).toHaveAttribute("open");
     expect(screen.getByText("Entropy Online Judge")).toBeInTheDocument();
     expect(screen.getByText("[J1, J2]")).toBeInTheDocument();
     expect(screen.getByText("AlgoUniversity Role")).toBeInTheDocument();
@@ -54,6 +58,7 @@ describe("SourceChips", () => {
 
     render(<SourceChips sources={mockSources} />);
 
+    fireEvent.click(screen.getByText("Sources"));
     const link = screen.getByRole("link", { name: /Portfolio source/i });
     expect(link).toHaveAttribute("href", "https://github.com/aamir-coding/aamirmk-portfolio");
     expect(link).toHaveAttribute("target", "_blank");

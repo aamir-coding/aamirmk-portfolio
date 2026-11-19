@@ -79,6 +79,7 @@ function Portfolio() {
 
   const isCoverState = viewMode === "cover" || messages.length === 0;
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const artPaused = useRef(false);
   const assistantRef = useRef<HTMLElement>(null);
   const focusAfterNavigation = useRef(false);
   const assistantStatus = isResting ? "resting" : serverState;
@@ -186,7 +187,6 @@ function Portfolio() {
 
       <main>
         <div className={`portfolio-opening ${isCoverState ? "portfolio-cover" : "portfolio-conversation"}`}>
-          {isCoverState && <HeroArt />}
           <div className="portfolio-measure portfolio-opening-inner">
             {isCoverState && <CoverState headingRef={headingRef} company={company} />}
             <section
@@ -197,16 +197,11 @@ function Portfolio() {
               tabIndex={-1}
             >
               <div className="portfolio-assistant-heading">
-                {isCoverState ? <h2 id="assistant-heading">Ask about Aamir</h2> : (
+                {isCoverState ? <h2 className="sr-only" id="assistant-heading">Ask about Aamir</h2> : (
                   <h1 id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
                 )}
                 <StatusIndicator state={assistantStatus} errorMessage={healthError} />
               </div>
-              {isCoverState && (
-                <p className="portfolio-assistant-intro">
-                  I’m an AI assistant trained on Aamir’s verified résumé, projects, and experience.
-                </p>
-              )}
               <div className="portfolio-chat">
                 {!isCoverState && (
                   <MessageList messages={messages} isStreaming={isStreaming} onOverview={showOverview} onClear={handleResetChat} />
@@ -227,7 +222,7 @@ function Portfolio() {
               {isCoverState && (
                 <div className="portfolio-starter">
                   <button type="button" onClick={() => handleSelectPrompt(FEATURED_PROMPT)} disabled={isStreaming}>
-                    {FEATURED_PROMPT}<span aria-hidden="true">↗</span>
+                    {FEATURED_PROMPT}
                   </button>
                   {messages.length > 0 && (
                     <button type="button" onClick={() => showChat(true)}>
@@ -256,9 +251,10 @@ function Portfolio() {
               )}
             </section>
           </div>
+          {isCoverState && <HeroArt pausedPreference={artPaused} />}
         </div>
 
-        <SelectedWork />
+        <SelectedWork onTrySample={() => handleSelectPrompt(FEATURED_PROMPT, true)} sampleDisabled={isStreaming} />
         <div className="portfolio-measure portfolio-more">
           <section className="portfolio-questions">
             <h2>More questions to ask</h2>

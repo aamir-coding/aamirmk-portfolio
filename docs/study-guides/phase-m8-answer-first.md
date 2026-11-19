@@ -6,28 +6,37 @@ The recorded stream can send source metadata and tool cards before text. The
 parser and `useChat` keep those events on the message as they arrive.
 `MessageItem.tsx` uses the message status to control when each part is visible.
 A live message can show the waiting copy, then the formatted text. Once complete,
-the text is followed by source links and any project cards. A saved answer
-arrives already complete. A stopped or interrupted answer retains partial text.
+the text is followed by a native source disclosure and any project cards. A saved
+answer arrives already complete. A stopped or interrupted answer retains partial text.
 
 `MessageList.tsx` keeps track of the previous last message. The ID links its
 streaming and settled states. For incoming tokens the transcript still follows
 the last turn when the reader is at the bottom. When that same turn settles
 with text, the layout effect preserves the transcript's position and computes
 whether Jump to latest is needed. Its button scrolls and focuses the conversation
-history. The completion status stays separate from the text that updates with
-each token.
+history. Opening the disclosure can change the scrollable height without a scroll
+event. The transcript handles the native toggle event during capture and updates
+the button without moving the reader. The completion status stays separate from
+the text that updates with each token.
 
 - [React useLayoutEffect](https://react.dev/reference/react/useLayoutEffect)
 - [W3C status messages](https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html)
+- [HTML details element](https://html.spec.whatwg.org/multipage/interactive-elements.html#the-details-element)
 
 ## Motion and image strategy
 
-The concept's hero paints a static WebP first. A small canvas draws a short
-wave over the river glyphs. The canvas stops after the animation, or when
-reduced motion becomes active. The page can show the still with scripts disabled.
-It uses a CSS view timeline for a subtle independent movement as the cover
-leaves the viewport. Mobile images use a different crop when it helps
-a reader see the actual UI.
+`HeroArt.tsx` provides a responsive WebP first and defers the optional
+`fieldMotion.ts` import until after page load. The renderer samples the landscape
+into a lattice and caches the static glyph layer. Each frame copies that layer
+and redraws the glyphs affected by the timed sweep or pointer. Pointer coordinates
+convert from the viewport to the scaled artwork, including the crop caused by
+`object-fit: cover`. The pull falls smoothly to zero at its edge.
+
+The canvas suspends when the artwork leaves the viewport or the document is
+hidden. Reduced motion and keyboard pause show the poster. The no-script entry
+provides direct résumé and project links. A CSS view timeline shifts the
+decorative layer slightly as the cover leaves the viewport. Mobile project images
+use closer crops where they make product details easier to see.
 
 - [CSS Scroll-driven Animations specification](https://www.w3.org/TR/scroll-animations-1/)
 - [HTML picture element](https://html.spec.whatwg.org/multipage/embedded-content.html#the-picture-element)
@@ -47,6 +56,6 @@ follow-up, compare the last line's position within the transcript on either
 side of completion and activate Jump to latest by keyboard.
 
 **What are the layers of the motion fallback?**
-The static poster covers reduced motion, disabled scripts and older browsers.
-The glyph wave is an optional, short enhancement. CSS drives the scroll-linked
-transform when the browser supports it.
+The poster provides the cover while motion loads, when it is paused, and when
+reduced motion is requested. The canvas draws only while its cover can animate.
+The document keeps direct links usable with JavaScript disabled.

@@ -9,7 +9,7 @@
   inline-size: min(calc(100% - 2rem), 48rem);
   max-inline-size: 100%;
   max-block-size: 90dvh;
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
   color: var(--portfolio-ink);
   border: 1px solid var(--portfolio-rule);
   border-radius: var(--radius-md);
@@ -74,7 +74,7 @@
 .fit-input, .fit-textarea {
   width: 100%;
   min-block-size: 44px;
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
   color: var(--portfolio-ink);
   font: inherit;
   border: 1px solid var(--portfolio-field-rule);
@@ -100,7 +100,7 @@
 }
 
 .fit-modal-dialog .btn-primary:disabled {
-  background: var(--portfolio-chat-question);
+  background: var(--portfolio-sheet);
   border-color: var(--portfolio-rule);
   color: var(--portfolio-muted);
   opacity: 1;
@@ -129,7 +129,7 @@
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--portfolio-field-rule);
   border-radius: var(--radius-sm);
-  background: var(--portfolio-chat-question);
+  background: var(--portfolio-sheet);
   color: inherit;
   cursor: pointer;
   overflow-wrap: anywhere;
@@ -184,7 +184,7 @@
 .fit-modal-body details summary { cursor: pointer; text-decoration: underline; text-underline-offset: .18em; align-content: center; }
 .fit-evidence ul { margin: 0; padding-inline-start: var(--space-5); }
 .fit-evidence a { color: var(--portfolio-ink); margin-inline-end: var(--space-2); }
-.fit-jd-preview-text { padding: var(--space-3); margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--portfolio-chat-question); font: inherit; }
+.fit-jd-preview-text { padding: var(--space-3); margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--portfolio-sheet); font: inherit; }
 .fit-report-footer { align-items: flex-start; padding-block-start: var(--space-3); border-block-start: 1px solid var(--portfolio-rule); }
 .fit-rerun { display: grid; justify-items: start; gap: var(--space-2); }
 .btn-ask-gap { color: var(--portfolio-ink); background: transparent; border: 1px solid var(--portfolio-field-rule); }

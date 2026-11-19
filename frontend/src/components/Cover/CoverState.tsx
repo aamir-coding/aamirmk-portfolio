@@ -13,6 +13,7 @@ export function CoverState({ headingRef, company }: CoverStateProps) {
         <span>Aamir</span>{" "}<span>Mohammed Khan</span>
       </h1>
       <p className="portfolio-role">AI Systems &amp; Full-Stack Engineer</p>
+      <p className="portfolio-pitch">Explore Aamir’s projects, or ask his AI assistant for an answer with sources.</p>
       {company && <p className="portfolio-greeting">{company.greeting}</p>}
     </div>
   );

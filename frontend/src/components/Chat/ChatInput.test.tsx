@@ -13,7 +13,7 @@ describe("<ChatInput />", () => {
     expect(
       screen.getByRole("textbox", { name: /Ask a question about Aamir/i })
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Send message/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ask a question" })).toBeInTheDocument();
     expect(screen.getByText("Ctrl+K")).toBeInTheDocument();
   });
 

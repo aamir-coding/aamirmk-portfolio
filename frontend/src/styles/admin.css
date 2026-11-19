@@ -42,7 +42,7 @@ body:has(.admin-page) { background: var(--portfolio-paper); }
   color: var(--portfolio-paper);
 }
 .admin-page .btn-secondary, .admin-page .btn-primary:disabled {
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
   border-color: var(--portfolio-field-rule);
   color: var(--portfolio-ink);
 }
@@ -55,7 +55,7 @@ body:has(.admin-page) { background: var(--portfolio-paper); }
   margin-block-start: var(--space-5);
   padding: var(--space-4);
   border: 1px solid var(--portfolio-rule);
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
 }
 .admin-login label { display: grid; gap: var(--space-1); width: 100%; }
 .admin-login input {
@@ -71,7 +71,7 @@ body:has(.admin-page) { background: var(--portfolio-paper); }
 .admin-error {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--portfolio-field-rule);
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
   inline-size: fit-content;
 }
 .admin-date-range {
@@ -120,7 +120,7 @@ body:has(.admin-page) { background: var(--portfolio-paper); }
   text-align: start;
   vertical-align: top;
 }
-.admin-records thead { background: var(--portfolio-chat-question); }
+.admin-records thead { background: var(--portfolio-sheet); }
 .admin-records tbody th { font-weight: var(--font-medium); }
 .admin-table-wide tbody th { max-inline-size: 34ch; }
 

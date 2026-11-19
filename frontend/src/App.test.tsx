@@ -14,7 +14,7 @@ describe("<App />", () => {
     render(<App />);
     await screen.findByText("Ready");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "A custom inquiry" } });
-    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
     await screen.findByLabelText("Server status: live answers resting");
     fireEvent.click(screen.getByRole("button", { name: "Check service status" }));
     await screen.findByText("Ready");
@@ -109,7 +109,7 @@ describe("<App />", () => {
     render(<App />);
     await screen.findByText("Ready");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "A question for Aamir" } });
-    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
     const send = await screen.findByRole("button", { name: "Send to Aamir" });
     expect(send).toBeDisabled();
     expect(screen.getByText("Preview messages to share")).toBeInTheDocument();
@@ -144,7 +144,7 @@ describe("<App />", () => {
     render(<App />);
     await screen.findByText("Ready");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "A question for Aamir" } });
-    fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+    fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
     fireEvent.click(await screen.findByRole("button", { name: "Not helpful" }));
     expect(writes).toHaveLength(0);
     fireEvent.change(screen.getByLabelText("Reason (optional)"), { target: { value: "Needs an example" } });
@@ -214,7 +214,7 @@ describe("<App />", () => {
     expect(screen.queryByRole("button", { name: "Summarize for my team" })).not.toBeInTheDocument();
     for (const query of ["PRIVATE RECRUITER QUESTION", "PRIVATE RECRUITER FOLLOW-UP"]) {
       fireEvent.change(screen.getByRole("textbox"), { target: { value: query } });
-      fireEvent.click(screen.getByRole("button", { name: "Send message" }));
+      fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
     }
     fireEvent.click(await screen.findByRole("button", { name: "Summarize for my team" }));
     const link = await screen.findByRole("link", { name: "Open team summary" });
@@ -311,6 +311,7 @@ describe("<App />", () => {
     const work = within(screen.getByRole("region", { name: "Selected work" }));
     const links = work.getAllByRole("link");
     expect(links.map(link => link.getAttribute("href"))).toEqual([
+      "https://github.com/aamir-coding",
       "/evals",
       "https://github.com/aamir-coding/aamirmk-portfolio",
       "https://entropy-oj.vercel.app/",
@@ -336,7 +337,7 @@ describe("<App />", () => {
       target: { value: "Tell me about his experience" },
     });
 
-    const sendBtn = screen.getByRole("button", { name: /Send message/i });
+    const sendBtn = screen.getByRole("button", { name: "Ask a question" });
     fireEvent.click(sendBtn);
 
     // Verify user message appears in list
@@ -486,7 +487,7 @@ describe("<App />", () => {
 
     const textarea = screen.getByRole("textbox", { name: /Ask a question about Aamir/i });
     fireEvent.change(textarea, { target: { value: "Tell me about Entropy-OJ" } });
-    fireEvent.click(screen.getByRole("button", { name: /Send message/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
 
     const history = await screen.findByRole("region", { name: "Conversation history" });
     expect(await within(history).findByRole("heading", { name: "Entropy Online Judge" })).toBeInTheDocument();

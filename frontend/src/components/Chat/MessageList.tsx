@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ChatMessage } from "../../hooks/useChat";
 import { MessageItem } from "./MessageItem";
 
@@ -20,6 +20,23 @@ export function MessageList({ messages, isStreaming, onOverview, onClear }: Mess
   const previousCount = useRef(messages.length);
   const previousLatest = useRef(messages.at(-1));
   const [showJump, setShowJump] = useState(false);
+
+  const syncScrollPosition = useCallback((log: HTMLDivElement) => {
+    followsLatest.current = isNearLatest(log);
+    if (followsLatest.current && jumpRef.current === document.activeElement) {
+      log.focus({ preventScroll: true });
+    }
+    setShowJump(!followsLatest.current);
+  }, []);
+
+  useEffect(() => {
+    const log = logRef.current;
+    if (!log) return;
+    // A disclosure changes the transcript height without a scroll event.
+    const onToggle = () => syncScrollPosition(log);
+    log.addEventListener("toggle", onToggle, true);
+    return () => log.removeEventListener("toggle", onToggle, true);
+  }, [syncScrollPosition]);
 
   useLayoutEffect(() => {
     const log = logRef.current;
@@ -68,13 +85,7 @@ export function MessageList({ messages, isStreaming, onOverview, onClear }: Mess
         role="region"
         aria-label="Conversation history"
         tabIndex={0}
-        onScroll={({ currentTarget: log }) => {
-          followsLatest.current = isNearLatest(log);
-          if (followsLatest.current && jumpRef.current === document.activeElement) {
-            log.focus({ preventScroll: true });
-          }
-          setShowJump(!followsLatest.current);
-        }}
+        onScroll={({ currentTarget: log }) => syncScrollPosition(log)}
       >
         {messages.map((message, index) => {
           const transcript = message.handoffId

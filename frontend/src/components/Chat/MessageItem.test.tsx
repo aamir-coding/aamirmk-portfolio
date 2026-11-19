@@ -95,6 +95,9 @@ describe("<MessageItem />", () => {
     expect(screen.queryByText("Sources")).not.toBeInTheDocument();
 
     rerender(<MessageItem message={{ ...answered, status: "done" }} />);
+    const sources = screen.getByRole("group", { name: "Answer sources" });
+    expect(sources).toBeVisible();
+    fireEvent.click(screen.getByText("Sources"));
     const source = screen.getByRole("link", { name: /Entropy project/ });
     const answer = screen.getByText(answered.content);
     expect(source).toBeVisible();
@@ -110,6 +113,7 @@ describe("<MessageItem />", () => {
 
     rerender(<MessageItem message={{ ...answered, status: "done", delivery: "instant" }} />);
     expect(screen.getByText("Saved answer")).toBeVisible();
+    fireEvent.click(screen.getByText("Sources"));
     expect(screen.getByRole("link", { name: /Entropy project/ })).toBeVisible();
   });
 });

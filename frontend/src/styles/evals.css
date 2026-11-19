@@ -58,7 +58,7 @@ body:has(.eval-page) { background: var(--portfolio-paper); }
   overflow-wrap: anywhere;
   vertical-align: top;
 }
-.eval-page thead { background: var(--portfolio-chat-question); }
+.eval-page thead { background: var(--portfolio-sheet); }
 .eval-page tbody th { font-weight: var(--font-medium); }
 .eval-retrieval-table :is(th, td):nth-child(n + 3),
 .eval-agreement-table :is(th[scope="row"], th:last-child) { white-space: nowrap; }

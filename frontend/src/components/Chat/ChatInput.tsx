@@ -106,9 +106,9 @@ export function ChatInput({
               className="btn btn-primary"
               onClick={(event) => keepComposerFocus(event.detail)}
               disabled={disabled || !input.trim()}
-              aria-label="Send message"
+              aria-label="Ask a question"
             >
-              Send
+              Ask <span aria-hidden="true">↑</span>
             </button>
           )}
         </div>

@@ -1,12 +1,13 @@
 # Progress Tracker
 
 ## Current Phase
-**M8: Answer-first chat and Field of Evidence visual concept.**
-Branch `codex/phase-m8-answer-first`. The waiting state and streamed answer appear before their supporting sources and project cards. A completed long answer keeps its place as evidence arrives. The isolated HTML concept covers the motion, typography, theme, chat and work layouts. The owner reviews the concept before integration. See [DRN-087](decisions.md) and the [M8 study guide](study-guides/phase-m8-answer-first.md).
+**M8: Answer-first chat and Field of Evidence integration.**
+Branch `codex/phase-m8-answer-first`. The approved cover, project screenshots, and white and navy themes are integrated locally. The live composer is on the cover, and Selected work can open a bundled answer. The waiting state and streamed answer appear before their supporting sources and project cards. A completed long answer keeps its place as evidence arrives. See [DRN-087 and DRN-088](decisions.md) and the [M8 study guide](study-guides/phase-m8-answer-first.md). Release requires owner approval.
 
-- A recorded Chrome stream verified the event sequence at 375 and 1440 px. At 375 px, the long follow-up's last line retained its exact position on completion, and Jump to latest reached the evidence by keyboard.
-- ESLint, TypeScript/Vite and all 193 Vitest tests passed. The offline backend and evaluation suite reported 689 passed with 8 skipped. The loopback build's initial JavaScript measured 171,205 gzip bytes against a 200,000-byte budget.
-- Chrome checked the concept at seven widths from 320 to 1920 px, plus keyboard focus, reduced motion, the no-script view, and the portable file in offline use. The cover wave painted 163 frames in 2.7 seconds at desktop size and then stopped. Tested color pairings ranged from 6.26:1 to 9.42:1. The independent prototype uses 2,769 gzip bytes of JavaScript. Physical mobile performance, other browsers, and screen-reader speech remain open.
+- A recorded Chrome stream verified the event sequence at 375 and 1440 px. At 375 px, the long follow-up's last line retained its exact position on completion. The sources disclosure supports keyboard focus and refreshes Jump to latest when it expands.
+- Chrome checked the integrated cover at seven widths from 320 to 1920 px, including responsive image selection, keyboard focus, no-script links and reduced motion. The canvas loaded after the poster, cleared the 14-second loop boundary, preserved the explicit pause across chat navigation and suspended offscreen. The desktop animation callback took 7.4 ms at the 95th percentile. The selected screenshots are from the integrated assistant, the public Entropy workspace, and the HealthTracker public demo.
+- ESLint, TypeScript/Vite and all 193 Vitest tests passed. Ruff lint and formatting passed. The offline backend and evaluation suite reported 689 passed with 8 skipped. The browser replays passed for chat, fit, recruiter actions, summaries, evaluations and admin. Initial JavaScript was 172,277 gzip bytes against a 200,000-byte budget. The motion module adds about 2.1 KB gzip when loaded.
+- In a paired 375 px Chrome lab run with 4× CPU slowdown and 150 ms latency, median LCP was 2.704 s for M8 and 2.696 s for the rebuilt M7 reference. M8 layout shift measured 0.00102. The 2.50 s LCP target, physical mobile performance, other browsers, and screen-reader speech remain open.
 
 ## Previous Work
 **M7: Field of Evidence regression and polish — released.**

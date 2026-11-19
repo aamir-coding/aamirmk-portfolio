@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { createRef } from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { CoverState } from "./CoverState";
 import { CandidateDetails, SelectedWork } from "./SelectedWork";
 
@@ -16,7 +16,8 @@ describe("Portfolio introduction and proof", () => {
   });
 
   it("keeps selected project evidence reachable without sending a message", () => {
-    render(<SelectedWork />);
+    const onTrySample = vi.fn();
+    render(<SelectedWork onTrySample={onTrySample} sampleDisabled={false} />);
 
     expect(screen.getByRole("heading", { name: "Selected work" })).toHaveAttribute("id", "work");
     expect(screen.getByRole("link", { name: "Open Entropy Online Judge" }))
@@ -25,6 +26,11 @@ describe("Portfolio introduction and proof", () => {
       .toHaveAttribute("href", "/evals");
     expect(screen.getByRole("link", { name: "View HealthTracker source" }))
       .toHaveAttribute("href", "https://github.com/aamir-coding/health-tracker");
+    expect(screen.getAllByRole("img")).toHaveLength(3);
+    fireEvent.error(screen.getByRole("img", { name: /Assistant answer about Entropy/ }));
+    expect(screen.getByText(/Aamir built Entropy’s coding workspace with compiler diagnostics/)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Try the sample answer" }));
+    expect(onTrySample).toHaveBeenCalledOnce();
   });
 
   it("retains credentials, location, and availability", () => {

@@ -27,7 +27,7 @@ body:has(.summary-page) { background: var(--portfolio-paper); }
 .summary-toolbar a { min-block-size: 44px; display: inline-flex; align-items: center; }
 .summary-page .btn-secondary {
   min-block-size: 44px;
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
   border-color: var(--portfolio-field-rule);
   color: var(--portfolio-ink);
 }
@@ -39,7 +39,7 @@ body:has(.summary-page) { background: var(--portfolio-paper); }
   gap: var(--space-6) clamp(1.25rem, 4vw, 3rem);
   padding: clamp(1.25rem, 4vw, 3rem);
   border: 1px solid var(--portfolio-rule);
-  background: var(--portfolio-chat-sheet);
+  background: var(--portfolio-paper);
   line-height: 1.5;
 }
 

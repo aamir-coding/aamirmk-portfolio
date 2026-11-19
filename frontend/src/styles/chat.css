@@ -1202,23 +1202,21 @@ body {
 
 .source-chips-container {
   margin-top: var(--space-3);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  border-top: 1px solid var(--portfolio-rule);
 }
 
 .source-chips-label {
+  min-block-size: 44px;
+  align-content: center;
+  color: var(--portfolio-ink);
   font-size: var(--text-sm);
-  color: var(--text-muted);
-  font-weight: var(--font-semibold);
+  cursor: pointer;
 }
+
+.source-chips-label > span { color: var(--portfolio-muted); margin-inline-start: .3rem; }
 
 .source-chips-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1230,24 +1228,20 @@ body {
 
 .source-chip {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: start;
+  flex-wrap: wrap;
+  align-items: baseline;
+  align-content: center;
   min-block-size: 44px;
-  height: 100%;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-1) var(--space-2);
+  padding-block: var(--space-2);
+  border-block-start: 1px solid var(--portfolio-rule);
   font-size: var(--text-sm);
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
+  color: var(--portfolio-muted);
   text-decoration: none;
 }
 
 .source-chip-link {
-  color: var(--text-primary);
-  border-color: var(--border-subtle);
+  color: var(--portfolio-ink);
 }
 
 .source-chip-link .source-chip-title {
@@ -1256,15 +1250,13 @@ body {
 }
 
 .source-chip-link:hover {
-  background-color: var(--bg-hover);
-  border-color: var(--accent-cobalt);
-  color: var(--accent-cobalt);
+  color: var(--portfolio-focus-paper);
 }
 
 .source-chip-section {
   font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--text-muted);
+  font-size: var(--text-xs);
+  color: var(--portfolio-muted);
   font-weight: var(--font-semibold);
   max-inline-size: 100%;
   overflow-wrap: anywhere;
