@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type Preference = "paused" | "reflectionOnly" | "sound";
-function initialPreferences() {
-  const defaults = { paused: false, reflectionOnly: false, sound: false };
+export type Artwork = "metal" | "reflection" | "still";
+interface Preferences { artwork: Artwork; sound: boolean }
+function initialPreferences(): Preferences {
+  const defaults: Preferences = { artwork: "metal", sound: false };
   try {
     const saved = JSON.parse(localStorage.getItem("amk_art_preferences") ?? "{}");
-    return { paused: saved.paused === true, reflectionOnly: saved.reflectionOnly === true, sound: saved.sound === true };
+    // Retain the previous pause and river choices for returning visitors.
+    const artwork = saved.artwork === "still" || saved.paused === true ? "still"
+      : saved.artwork === "reflection" || saved.reflectionOnly === true ? "reflection" : "metal";
+    return { artwork, sound: saved.sound === true };
   } catch { return defaults; }
 }
 
@@ -16,7 +20,7 @@ export function useArtPreferences() {
     try { localStorage.setItem("amk_art_preferences", JSON.stringify(preferences)); } catch { /* In-memory preferences still work. */ }
   }, [preferences]);
   useEffect(() => () => { void audio.current?.close().catch(() => {}); audio.current = null; }, []);
-  const set = (key: Preference, value: boolean) => setPreferences(old => ({ ...old, [key]: value }));
+  const set = <K extends keyof Preferences>(key: K, value: Preferences[K]) => setPreferences(old => ({ ...old, [key]: value }));
   const cue = useCallback((kind: "send" | "evidence") => {
     if (!preferences.sound || typeof AudioContext === "undefined") return;
     try {

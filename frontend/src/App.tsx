@@ -248,10 +248,16 @@ function Portfolio() {
                       showChat(false);
                       void sendMessage(text);
                     }}
-                    onRoleFit={handleOpenFitModal}
                     onStop={stopStreaming}
                     isStreaming={isStreaming}
                   />
+                  <button type="button" className="role-fit-action" onClick={handleOpenFitModal} aria-haspopup="dialog">
+                    <svg aria-hidden="true" viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="2" y="6" width="16" height="11" rx="2" />
+                      <path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6M2 10q8 4 16 0" />
+                    </svg>
+                    Check role fit
+                  </button>
                 </div>
               </div>
 
@@ -260,11 +266,11 @@ function Portfolio() {
                 <div className="portfolio-notice">
                   <p role={error ? "alert" : undefined}>{error || healthNotice}</p>
                   <div className="portfolio-recovery-actions">
-                    <button type="button" disabled={isStreaming} onClick={() => handleSelectPrompt(FEATURED_PROMPT, true)}>
+                    <button className="saved-answer-action" type="button" disabled={isStreaming} onClick={() => handleSelectPrompt(FEATURED_PROMPT, true)}>
                       Read a saved answer
                     </button>
                     {(assistantStatus === "resting" || assistantStatus === "error") &&
-                      <button type="button" onClick={handleRefreshHealth}>Check service status</button>}
+                      <button className="service-action" type="button" onClick={handleRefreshHealth}>Check service status</button>}
                     {error && <button type="button" onClick={event => {
                       restoreRecoveryFocus(event);
                       clearError();
@@ -274,7 +280,7 @@ function Portfolio() {
                 </div>
               )}
             </section>
-            {isCoverState && <HeroArt paused={preferences.paused} reflectionOnly={preferences.reflectionOnly} onPause={() => set("paused", !preferences.paused)} />}
+            {isCoverState && <HeroArt artwork={preferences.artwork} />}
           </div>
         </div>
 
@@ -341,9 +347,11 @@ function Portfolio() {
       {panel && <SidePanel title={selectedProject?.title ?? (panel === "preferences" ? "Preferences" : "Project index")} onClose={closePanel}>
         {panel === "preferences" ? <div className="art-settings">
           <label>Interaction sounds<input type="checkbox" checked={preferences.sound} onChange={e => set("sound", e.target.checked)} /></label>
-          <label>Pause artwork<input type="checkbox" checked={preferences.paused} onChange={e => set("paused", e.target.checked)} /></label>
-          <label>River material<select value={preferences.reflectionOnly ? "still" : "metal"} onChange={e => set("reflectionOnly", e.target.value === "still")}>
-            <option value="metal">Liquid metal</option><option value="still">Still reflection</option>
+          <label>Landscape<select value={preferences.artwork} onChange={e => {
+            const value = e.currentTarget.value;
+            if (value === "metal" || value === "reflection" || value === "still") set("artwork", value);
+          }}>
+            <option value="metal">Liquid metal river</option><option value="reflection">Still river reflection</option><option value="still">Still landscape</option>
           </select></label>
         </div> : <>
           {selectedProject && <button className="text-action" onClick={() => setPanel("index")}>Back to project index</button>}

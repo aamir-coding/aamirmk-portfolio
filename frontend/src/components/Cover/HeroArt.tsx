@@ -2,27 +2,15 @@ import { useEffect, useRef } from "react";
 import terrain from "./art/terrain.webp";
 import reflection from "./art/silver.webp";
 import type { ReliefPlayer } from "./fieldMotion";
+import type { Artwork } from "../../hooks/useArtPreferences";
 
-interface ArtProps {
-  paused: boolean;
-  reflectionOnly: boolean;
-  onPause: () => void;
-}
-
-export function HeroArt({ paused, reflectionOnly, onPause }: ArtProps) {
+export function HeroArt({ artwork }: { artwork: Artwork }) {
   const scene = useRef<HTMLDivElement>(null);
-  const player = useRef<ReliefPlayer | null>(null);
-  const pausedRef = useRef(paused);
-
-  const syncPlayback = useRef<() => void>(() => {});
-  useEffect(() => {
-    pausedRef.current = paused;
-    syncPlayback.current();
-  }, [paused]);
 
   useEffect(() => {
     const element = scene.current;
-    if (!element || !window.matchMedia || !window.IntersectionObserver) return;
+    if (!element || artwork === "still" || !window.matchMedia || !window.IntersectionObserver) return;
+    let player: ReliefPlayer | undefined;
     const media = matchMedia("(prefers-reduced-motion: no-preference) and (forced-colors: none)");
     let disposed = false;
     let visible = false;
@@ -30,20 +18,20 @@ export function HeroArt({ paused, reflectionOnly, onPause }: ArtProps) {
     let failed = false;
     const sync = () => {
       const active = visible && media.matches && !document.hidden;
-      if (player.current) {
-        player.current.play(active && !pausedRef.current);
+      if (player) {
+        player.play(active);
         return;
       }
-      if (disposed || pending || failed || !active || pausedRef.current || document.readyState !== "complete") return;
+      if (disposed || pending || failed || !active || document.readyState !== "complete") return;
       pending = true;
       void import("./fieldMotion").then(async ({ mountRelief }) => {
         if (disposed || !media.matches) return;
-        const mounted = await mountRelief(element, reflectionOnly, () => !disposed);
+        const mounted = await mountRelief(element, artwork === "reflection", () => !disposed);
         if (!mounted) return;
         if (disposed) mounted.dispose();
         else {
-          player.current = mounted;
-          mounted.play(visible && media.matches && !document.hidden && !pausedRef.current);
+          player = mounted;
+          mounted.play(visible && media.matches && !document.hidden);
         }
       }).catch(() => { failed = true; }).finally(() => { pending = false; });
     };
@@ -52,19 +40,15 @@ export function HeroArt({ paused, reflectionOnly, onPause }: ArtProps) {
     media.addEventListener("change", sync);
     document.addEventListener("visibilitychange", sync);
     window.addEventListener("load", sync);
-    // A pause before the first load can be lifted without remounting the scene.
-    syncPlayback.current = sync;
     return () => {
       disposed = true;
       observer.disconnect();
       media.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
       window.removeEventListener("load", sync);
-      syncPlayback.current = () => {};
-      player.current?.dispose();
-      player.current = null;
+      player?.dispose();
     };
-  }, [reflectionOnly]);
+  }, [artwork]);
 
   return <div className="relief">
     <div className="relief-scene" aria-hidden="true" ref={scene}>
@@ -76,8 +60,5 @@ export function HeroArt({ paused, reflectionOnly, onPause }: ArtProps) {
         <div className="relief-metal" />
       </div>
     </div>
-    <button type="button" className="relief-pause" aria-pressed={paused} onClick={onPause}>
-      {paused ? "Resume artwork" : "Pause artwork"}
-    </button>
   </div>;
 }

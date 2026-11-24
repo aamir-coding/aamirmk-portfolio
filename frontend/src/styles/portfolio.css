@@ -10,6 +10,7 @@
   --portfolio-display: Georgia, 'Times New Roman', serif;
   --portfolio-width: 88rem;
   --portfolio-gutter: clamp(1.15rem, 5vw, 5.5rem);
+  --liquid-silver: linear-gradient(146deg, #f6f7f8 5%, #afb5bb 26%, #fdfefe 45%, #a3abb3 51%, #e1e4e7 71%, #b5bbc0 92%);
 }
 .portfolio-page { min-height: 100dvh; display: flex; flex-direction: column; background: var(--portfolio-paper); color: var(--portfolio-ink); }
 .portfolio-page main { flex: 1; }
@@ -17,12 +18,12 @@
 .portfolio-page :focus-visible { outline: 2px solid var(--portfolio-focus-paper); outline-offset: 3px; }
 .portfolio-page button { font-family: inherit; cursor: pointer; }
 .portfolio-page button:disabled { cursor: not-allowed; }
-.portfolio-page a, .text-action, .role-fit-link { text-underline-offset: .2em; }
+.portfolio-page a, .text-action { text-underline-offset: .2em; }
 .portfolio-skip { position: absolute; z-index: 4; left: 1rem; top: .4rem; transform: translateY(-150%); padding: .75rem; background: var(--bg-surface); }
 .portfolio-skip:focus { transform: none; }
 .portfolio-bar-inner, .portfolio-nav, .portfolio-brand, .portfolio-contact-links, .portfolio-footer-inner, .portfolio-footer-notes { display: flex; align-items: center; }
 .portfolio-bar-inner { min-height: 5.4rem; justify-content: space-between; gap: .75rem; border-bottom: 1px solid var(--portfolio-rule); }
-.portfolio-brand, .portfolio-nav button, .text-action, .portfolio-transcript-actions button, .role-fit-link, .portfolio-notice button {
+.portfolio-brand, .portfolio-nav button, .text-action, .portfolio-transcript-actions button, .portfolio-notice button {
   color: inherit; background: none; border: 0; padding: 0; font: inherit;
 }
 .portfolio-brand { gap: .7rem; text-align: left; line-height: 1.2; }
@@ -31,7 +32,7 @@
 .portfolio-nav { gap: clamp(.6rem, 2vw, 2rem); font-size: .875rem; }
 .portfolio-nav a { color: inherit; text-decoration: none; }
 .portfolio-nav :is(button,a) { min-height: 40px; display: inline-flex; align-items: center; }
-.portfolio-nav :is(button,a):hover, .text-action, .role-fit-link, .portfolio-notice button { text-decoration: underline; }
+.portfolio-nav :is(button,a):hover, .text-action { text-decoration: underline; }
 .portfolio-nav .theme-toggle-text { display: none; }
 .portfolio-nav .btn-theme-toggle, .preferences-trigger { min-width: 32px; justify-content: center; }
 .preferences-trigger svg { width: 19px; height: 19px; }
@@ -55,18 +56,44 @@
 .relief-land, .relief-engraving, .relief-type { filter: invert(var(--relief-invert,0)); }
 .relief-river { position: absolute; left: 14.405%; top: 35.738%; width: 53.81%; height: 38.033%; }
 .relief-metal { filter: grayscale(1); }
-.relief-pause { position: absolute; bottom: 4%; right: 3%; padding: .35rem .7rem; border-radius: 2rem; border: 1px solid var(--portfolio-rule); color: var(--portfolio-muted); background: var(--portfolio-paper); font-size: .75rem; }
 .portfolio-chat .chat-input-container { padding: 0; border: 0; background: transparent; }
-.portfolio-chat .chat-input-row { display: block; border: 1px solid var(--portfolio-field-rule); padding: .8rem 1rem .55rem; border-radius: .7rem; background: var(--bg-surface); }
+.portfolio-chat .chat-input-row { display: flex; align-items: center; border: 1px solid var(--portfolio-field-rule); padding: .5rem .55rem .5rem 1rem; border-radius: .7rem; background: var(--bg-surface); }
 .portfolio-chat .chat-input-row:focus-within { border-color: var(--portfolio-ink); }
-.portfolio-chat .chat-textarea { width: 100%; min-width: 0; min-height: 2.4rem; padding: 0; border: 0; box-shadow: none; color: var(--portfolio-ink); background: transparent; font-size: 1rem; }
-.portfolio-chat .chat-input-actions { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.role-fit-link, .text-action { font-size: .875rem; min-height: 32px; color: var(--portfolio-muted); }
-.portfolio-chat .chat-input-actions .btn-primary { width: 2.45rem; height: 2.45rem; padding: 0; border-radius: 50%; border: 0; background: var(--portfolio-ink); color: var(--portfolio-paper); font-size: 1.25rem; }
+.portfolio-chat .chat-textarea { width: 100%; min-width: 0; min-height: 2.4rem; padding: .4rem 0; border: 0; box-shadow: none; color: var(--portfolio-ink); background: transparent; font-size: 1rem; }
+@supports (field-sizing: content) {
+  .portfolio-chat .chat-textarea { field-sizing: content; resize: none; }
+}
+.portfolio-chat .chat-input-actions { flex: none; }
+.text-action { font-size: .875rem; min-height: 32px; color: var(--portfolio-muted); }
+.send-control {
+  position: relative; isolation: isolate; overflow: hidden; flex: none; width: 44px; min-height: 44px; padding: 0;
+  border-radius: 50%; border: 1px solid #747b82; background: #cbd0d4 var(--liquid-silver); color: #202427;
+  box-shadow: inset 0 1px 1px #fff, inset 0 -1px 2px #626971, 0 1px 3px #171b2029;
+}
+.send-control:disabled { opacity: 1; background: var(--portfolio-sheet); color: var(--portfolio-muted); border-color: var(--portfolio-rule); box-shadow: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .send-control:not(:disabled)::before {
+    content: ""; position: absolute; inset: -40%; z-index: -1; pointer-events: none;
+    background: linear-gradient(110deg, transparent 33%, #ffffffe0 47%, transparent 61%);
+    transform: translateX(-85%); transition: transform .42s ease-out;
+  }
+  .send-control:is(:hover,:focus-visible):not(:disabled)::before { transform: translateX(85%); }
+}
+.role-fit-action, .portfolio-notice :is(.saved-answer-action,.service-action) {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 38px;
+  padding: .4rem .8rem; border: 1px solid var(--portfolio-field-rule); border-radius: .45rem;
+  background: var(--bg-surface); color: var(--portfolio-ink); font: 500 .85rem/1.3 var(--font-sans);
+}
+.role-fit-action { margin-top: .55rem; }
+.role-fit-action:hover, .portfolio-notice .service-action:hover { background: var(--portfolio-sheet); border-color: var(--portfolio-ink); }
+.portfolio-notice .saved-answer-action { color: var(--portfolio-paper); background: var(--portfolio-ink); border-color: var(--portfolio-ink); }
+.portfolio-notice .saved-answer-action:not(:disabled):hover { box-shadow: 0 0 0 1px var(--portfolio-ink); }
+.portfolio-notice .saved-answer-action:disabled { opacity: .6; }
 .portfolio-cover .chat-input-helper { display: none; }
 .portfolio-notice { padding: .75rem 0; font-size: .875rem; color: var(--text-secondary); }
 .portfolio-notice p { margin: .3rem 0; }
-.portfolio-notice :is(.assistant-fallback,.portfolio-recovery-actions) { display: flex; flex-wrap: wrap; gap: .2rem 1rem; }
+.portfolio-notice :is(.assistant-fallback,.portfolio-recovery-actions) { display: flex; flex-wrap: wrap; gap: .45rem .65rem; margin-top: .55rem; }
+.portfolio-notice .assistant-fallback { column-gap: 1rem; color: var(--portfolio-muted); }
 .portfolio-notice :is(a,button) { min-height: 28px; align-content: center; }
 .starting-questions { padding: 1.2rem 0; border-top: 1px solid var(--portfolio-rule); }
 .starting-questions h2 { margin: 0 0 1rem; font: 600 .94rem/1.4 var(--font-sans); }
@@ -98,8 +125,12 @@
 .portfolio-conversation .chat-message-assistant .chat-message-body { padding: .4rem 0; color: inherit; border: 0; background: transparent; box-shadow: none; line-height: 1.65; }
 .portfolio-conversation .chat-prose { max-width: 66ch; }
 .portfolio-conversation .chat-input-container { margin-top: .65rem; }
-.portfolio-conversation .chat-textarea { min-height: 2rem; }
-.project-evidence { border: 1px solid var(--portfolio-rule); border-radius: .35rem; background: var(--bg-surface); color: inherit; padding: .5rem .8rem; margin: .4rem .4rem .4rem 0; }
+.project-evidence { display: inline-flex; align-items: center; gap: .55rem; text-align: start; border: 1px solid var(--portfolio-rule); border-radius: .35rem; background: var(--bg-surface); color: inherit; padding: .5rem .8rem; margin: .4rem .4rem .4rem 0; }
+.project-evidence::before {
+  content: ""; flex: none; width: .8rem; height: 1rem; border: 1px solid #767e85; border-radius: 2px;
+  background: linear-gradient(45deg, #7c858e 50%, transparent 51%) top right / .32rem .32rem no-repeat, var(--liquid-silver);
+  clip-path: polygon(0 0, 62% 0, 100% 30%, 100% 100%, 0 100%);
+}
 .portfolio-panel { position: fixed; inset: 0 0 0 auto; margin: 0; height: 100dvh; max-height: 100dvh; width: min(34rem,96vw); max-width: 100vw; padding: 2rem; box-sizing: border-box; overflow: auto; overscroll-behavior: contain; border: 0; border-left: 1px solid var(--portfolio-rule); background: var(--portfolio-paper); color: var(--portfolio-ink); }
 body:has(.portfolio-panel[open]) { overflow: hidden; }
 .portfolio-panel::backdrop { background: #17171755; }
@@ -128,7 +159,6 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
   .portfolio-identity h1 { font-size: clamp(3.5rem,14vw,5.8rem); }
   .portfolio-pitch { margin-top: clamp(2.4rem,9vw,4.3rem); max-width: 36ch; }
   .relief { position: absolute; width: min(49%,16rem); right: -.4rem; top: clamp(6rem,24vw,9rem); pointer-events: none; }
-  .relief-pause { display: none; }
   .portfolio-cover .portfolio-assistant { margin-top: .7rem; }
   .project-questions { grid-template-columns: 1fr; gap: 0; }
   .project-questions button, .project-questions button + button { padding: .55rem 0; border: 0; }
@@ -140,13 +170,11 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
   .portfolio-panel { inset: auto 0 0; width: 100vw; height: auto; max-height: 88dvh; border-radius: .85rem .85rem 0 0; padding: 1.1rem 1.2rem 2rem; }
   .portfolio-panel h2 { margin-top: 1.5rem; }
 }
-@media (prefers-reduced-motion: reduce), (forced-colors: active) { .relief-pause { display: none; } }
 @media (forced-colors: active) { .relief { visibility: hidden; } }
 
 
 .nav-project-short { display: none; }
 .portfolio-chat .chat-textarea::placeholder { color: var(--portfolio-muted); opacity: 1; }
-.portfolio-chat .chat-input-actions .btn-primary { min-height: 2.45rem; }
 .portfolio-chat .chat-message-list { min-height: clamp(13rem, 44dvh, 32rem); }
 .portfolio-conversation .chat-message-header, .portfolio-conversation .chat-message-author { font-family: var(--font-sans); }
 .project-architecture { padding: .8rem 0; border-block: 1px solid var(--portfolio-rule); margin: 1rem 0; }

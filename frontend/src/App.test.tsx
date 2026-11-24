@@ -293,7 +293,8 @@ describe("<App />", () => {
     const stream = vi.spyOn(sse, "streamChat");
     render(<App />);
     expect(await screen.findByText("Live answers resting")).toBeInTheDocument();
-    expect(screen.getByRole("link", {name: "View professional profile"})).toBeInTheDocument();
+    const alternatives = within(screen.getByRole("group", { name: "Alternatives to live answers" }));
+    expect(alternatives.getByRole("link", {name: "LinkedIn"})).toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
     const starter = screen.getByRole("button", { name: "What did Aamir build at AlgoUniversity?" });
     fireEvent.click(starter);
     expect(stream).not.toHaveBeenCalled();
@@ -499,19 +500,21 @@ describe("<App />", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("opens the job description fit report from the primary navigation", async () => {
+  it("opens role fit outside the question form and preserves the draft", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     vi.spyOn(api, "fetchFitPresets").mockResolvedValue([]);
     render(<App />);
 
-    const fitBtn = screen.getByRole("button", {
-      name: /Evaluate Job Description Alignment/i,
-    });
+    const question = screen.getByRole("textbox", { name: /Ask a question about Aamir/ });
+    fireEvent.change(question, { target: { value: "What did Aamir build?" } });
+    const fitBtn = screen.getByRole("button", { name: "Check role fit" });
+    expect(fitBtn.closest("form")).toBeNull();
     fireEvent.click(fitBtn);
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
       expect(screen.getByText("Job Description Fit Report")).toBeInTheDocument();
     });
+    expect(question).toHaveValue("What did Aamir build?");
   });
 });

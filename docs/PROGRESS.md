@@ -15,7 +15,10 @@ the [study guide](study-guides/silver-assistant.md).
   dismissal and navigation, the fit dialog, project browsing and saved answers.
   A long recorded follow-up retained its final line's position on completion at
   both 375 and 1440 px. Graphite project links reached 14.66:1 contrast.
-- The initial JavaScript weighs 118,152 gzip bytes. The transcript loads on
+- The control refinement moved role fit below the question field, distinguished
+  recovery buttons from destination links, and added a silver Send control.
+  Landscape preferences include a fully still option and retain older choices.
+- The initial JavaScript weighs 118,227 gzip bytes. The transcript loads on
   demand. The optional glyph and shader modules weigh 3.32 and 8.80 kB gzip.
   Three cold 390 px Chrome runs with 4x CPU slowdown, 150 ms latency and
   1.6 Mbps downstream measured LCP at 2.768, 2.340 and 2.344 seconds.

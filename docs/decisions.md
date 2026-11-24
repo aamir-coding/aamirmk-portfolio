@@ -27,6 +27,14 @@ are opt-in. The transcript and its Markdown dependencies load on composer focus
 or conversation entry. This keeps the reading experience out of the startup cost
 of an unopened conversation.
 
+The standalone role-fit button opens the job-description workflow below the
+question form and preserves a typed draft. During service recovery, the saved
+answer is the primary action and retry is secondary. Résumé, LinkedIn, and email
+use ordinary destination links. The Send control and project-evidence icon use
+a CSS silver finish so opening the transcript requires no additional WebGL surface.
+Preferences combines the river choices with a still landscape, preserving the
+previous pause choice while removing the artwork overlay.
+
 ### DRN-089: Refresh resume and fact provenance
 
 **Date:** 2026-11-19. **Scope:** Maintenance after the M8 release.

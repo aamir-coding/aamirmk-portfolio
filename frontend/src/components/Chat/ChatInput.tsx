@@ -3,7 +3,6 @@ import {
   useRef,
   useEffect,
   type FormEvent,
-  type MouseEvent,
   type KeyboardEvent,
 } from "react";
 
@@ -12,7 +11,6 @@ export interface ChatInputProps {
   onStop: () => void;
   isStreaming: boolean;
   disabled?: boolean;
-  onRoleFit?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
 export function ChatInput({
@@ -20,7 +18,6 @@ export function ChatInput({
   onStop,
   isStreaming,
   disabled = false,
-  onRoleFit,
 }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -89,7 +86,6 @@ export function ChatInput({
           aria-disabled={disabled}
         />
         <div className="chat-input-actions">
-          {onRoleFit && <button type="button" className="role-fit-link" onClick={onRoleFit} aria-haspopup="dialog" aria-label="Role fit — Evaluate Job Description Alignment">Explore role fit</button>}
           {isStreaming ? (
             <button
               type="button"
@@ -107,12 +103,14 @@ export function ChatInput({
           ) : (
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn send-control"
               onClick={(event) => keepComposerFocus(event.detail)}
               disabled={disabled || !input.trim()}
               aria-label="Ask a question"
             >
-              <span aria-hidden="true">↑</span>
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 19V5m-6.5 6.5L12 5l6.5 6.5" />
+              </svg>
             </button>
           )}
         </div>
