@@ -3,6 +3,30 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-090: Make the conversation the primary portfolio view
+
+**Date** 2026-11-24. The silver and graphite integration runs on the existing
+React and FastAPI application. The home screen accepts a question and offers
+three concrete examples. Loaded conversations retain the same SSE subscription,
+draft input and answer-first completion behavior. Project browsing, the public
+résumé, and role fit each have a direct entry point.
+
+The evidence panel joins a completed answer's server-provided project IDs and
+source chunk IDs to the local showcase catalog. Screenshots and public project
+links work independently of inference. A returned card for a showcased project
+adds its architecture inside the panel. Other returned cards use the existing
+inline card renderer. Escape returns focus to the opener. Asking a new question
+from the panel focuses the conversation after the dialog has closed.
+
+The homepage initially ships the terrain engraving and still river. A visible
+cover may load the glyph renderer after page load, then the pinned Paper
+Liquid Metal shader. A preprocessed texture keeps river-mask preparation out of
+the browser. Reduced motion on entry skips both animation modules. The renderer
+pauses offscreen and disposes GPU resources when entering chat. Interaction sounds
+are opt-in. The transcript and its Markdown dependencies load on composer focus
+or conversation entry. This keeps the reading experience out of the startup cost
+of an unopened conversation.
+
 ### DRN-089: Refresh resume and fact provenance
 
 **Date:** 2026-11-19. **Scope:** Maintenance after the M8 release.

@@ -8,7 +8,11 @@ import { FormattedMessage } from "./FormattedMessage";
 import { HandoffCard } from "./HandoffCard";
 import { AnswerFeedback } from "./AnswerFeedback";
 
+import { projects, type ShowcaseId } from "../Cover/projects";
+import { summaryProjectIds } from "../../lib/summary";
+
 export interface MessageItemProps {
+  onInspectProject?: (id: ShowcaseId, card?: ProjectCardData) => void;
   message: ChatMessage;
   handoffTranscript?: readonly ChatHistoryMessage[];
 }
@@ -16,10 +20,16 @@ export interface MessageItemProps {
 export const MessageItem = React.memo(function MessageItem({
   message,
   handoffTranscript,
+  onInspectProject,
 }: MessageItemProps) {
   const isUser = message.role === "user";
   const isStreaming = message.status === "streaming";
   const hasAnswerSources = message.status === "done" && message.delivery !== "cancelled";
+  const evidence = !isUser && hasAnswerSources && onInspectProject
+    ? summaryProjectIds([...(message.sources ?? []).map(s => s.chunk_id), ...(message.cards ?? []).map(c => c.id)])
+    : [];
+  const shownProjects = projects.filter(project => evidence.includes(project.id));
+  const inlineCards = message.cards?.filter(card => !shownProjects.some(project => project.id === card.id));
   const [activeModalCard, setActiveModalCard] =
     useState<ProjectCardData | null>(null);
   const [copied, setCopied] = useState(false);
@@ -111,9 +121,14 @@ export const MessageItem = React.memo(function MessageItem({
         {!isUser && hasAnswerSources && message.sources && message.sources.length > 0 && (
           <SourceChips sources={message.sources} />
         )}
-        {!isUser && !isStreaming && message.cards && message.cards.length > 0 && (
+        {shownProjects.map(project =>
+          <button key={project.id} className="project-evidence" onClick={() => onInspectProject?.(project.id, message.cards?.find(card => card.id === project.id))}>
+            View {project.title} evidence
+          </button>
+        )}
+        {!isUser && !isStreaming && inlineCards && inlineCards.length > 0 && (
           <div className="message-cards-tray">
-            {message.cards.map((card) => (
+            {inlineCards.map((card) => (
               <ProjectCard
                 key={card.id}
                 card={card}

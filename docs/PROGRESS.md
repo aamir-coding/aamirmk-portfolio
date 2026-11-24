@@ -1,6 +1,33 @@
 # Progress Tracker
 
 ## Current Phase
+**Silver assistant integration, verified locally on 24 November 2026.** Branch
+`codex/silver-assistant` is ready for release review. The home composer uses
+the existing chat flow. Projects open in an evidence panel from a completed
+answer or the project index. The role-fit form, saved answers, recruiting
+actions and direct links remain available. See [DRN-090](decisions.md) and
+the [study guide](study-guides/silver-assistant.md).
+
+- The production build, ESLint and 193 frontend tests passed. The offline backend
+  and evaluation suite passed 690 tests with 8 skipped and two deprecation
+  warnings. The offline retrieval and replay gate reported zero failures.
+- Chrome checked 320, 390, 768 and 1440 px, including both themes, keyboard
+  dismissal and navigation, the fit dialog, project browsing and saved answers.
+  A long recorded follow-up retained its final line's position on completion at
+  both 375 and 1440 px. Graphite project links reached 14.66:1 contrast.
+- The initial JavaScript weighs 118,152 gzip bytes. The transcript loads on
+  demand. The optional glyph and shader modules weigh 3.32 and 8.80 kB gzip.
+  Three cold 390 px Chrome runs with 4x CPU slowdown, 150 ms latency and
+  1.6 Mbps downstream measured LCP at 2.768, 2.340 and 2.344 seconds.
+  Median LCP was 2.344 seconds. Peak layout shift was 0.00145 or less.
+- The desktop frame interval with the shader was 16.7 ms median and 16.9 ms
+  at the 95th percentile in a 90-frame software-WebGL sample. Reduced motion
+  skipped the renderer requests on entry. The still river and project index
+  worked when WebGL was unavailable. Physical-device GPU and battery costs,
+  WebKit and spoken screen-reader output remain unverified.
+
+### M8 release and maintenance history
+
 **M8: Answer-first chat and Field of Evidence integration.**
 Branch `codex/phase-m8-answer-first`. The owner approved the M8 release. The cover, project screenshots, and white and navy themes are integrated. The live composer is on the cover, and Selected work can open a bundled answer. The waiting state and streamed answer appear before their supporting sources and project cards. A completed long answer keeps its place as evidence arrives. See [DRN-087 and DRN-088](decisions.md), the [M8 study guide](study-guides/phase-m8-answer-first.md), and the [production release receipt](https://aamirmk-portfolio.vercel.app/release.json).
 

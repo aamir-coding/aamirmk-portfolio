@@ -104,5 +104,27 @@
         "source_url": "https://aamirmk-portfolio.vercel.app/resume.pdf"
       }
     ]
+  },
+  "How does this assistant find evidence?": {
+    "reply": "Aamir’s assistant combines BM25 keyword search with FastEmbed semantic retrieval over curated facts. Reciprocal Rank Fusion combines the rankings. The backend supplies the selected evidence to the model, streams its answer, and returns citations.",
+    "sources": [
+      {
+        "chunk_id": "proj-ai-assistant-architecture",
+        "title": "AI Digital Assistant architecture",
+        "type": "project",
+        "source_url": "https://github.com/aamir-coding/aamirmk-portfolio"
+      }
+    ]
+  },
+  "What went into HealthTracker?": {
+    "reply": "Aamir built HealthTracker as a solo university project. The progressive web app lets people record and review nutrition, workouts, and health metrics. Its implementation includes cache-first data access, MongoDB compound indexes, and a GitHub Actions workflow.",
+    "sources": [
+      {
+        "chunk_id": "proj-healthtracker-overview",
+        "title": "HealthTracker project source",
+        "type": "project",
+        "source_url": "https://github.com/aamir-coding/health-tracker"
+      }
+    ]
   }
 }

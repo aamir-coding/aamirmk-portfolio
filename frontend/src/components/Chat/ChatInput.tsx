@@ -3,6 +3,7 @@ import {
   useRef,
   useEffect,
   type FormEvent,
+  type MouseEvent,
   type KeyboardEvent,
 } from "react";
 
@@ -11,6 +12,7 @@ export interface ChatInputProps {
   onStop: () => void;
   isStreaming: boolean;
   disabled?: boolean;
+  onRoleFit?: (event: MouseEvent<HTMLButtonElement>) => void;
 }
 
 export function ChatInput({
@@ -18,6 +20,7 @@ export function ChatInput({
   onStop,
   isStreaming,
   disabled = false,
+  onRoleFit,
 }: ChatInputProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -86,6 +89,7 @@ export function ChatInput({
           aria-disabled={disabled}
         />
         <div className="chat-input-actions">
+          {onRoleFit && <button type="button" className="role-fit-link" onClick={onRoleFit} aria-haspopup="dialog" aria-label="Role fit — Evaluate Job Description Alignment">Explore role fit</button>}
           {isStreaming ? (
             <button
               type="button"
@@ -108,7 +112,7 @@ export function ChatInput({
               disabled={disabled || !input.trim()}
               aria-label="Ask a question"
             >
-              Ask <span aria-hidden="true">↑</span>
+              <span aria-hidden="true">↑</span>
             </button>
           )}
         </div>
