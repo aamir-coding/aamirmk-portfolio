@@ -5,7 +5,7 @@ import { SourceChips } from "./SourceChips";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectModal } from "./ProjectModal";
 import { FormattedMessage } from "./FormattedMessage";
-import { DecodeSignal } from "./DecodeSignal";
+import { DecodeSignal, DecryptedOpening } from "./DecodeSignal";
 import { HandoffCard } from "./HandoffCard";
 import { AnswerFeedback } from "./AnswerFeedback";
 
@@ -105,7 +105,8 @@ export const MessageItem = React.memo(function MessageItem({
               isStreaming={isStreaming}
               questionHeading={isUser && message.content.length <= 220 && !message.content.includes("\n")}
             />
-            {!isUser && isStreaming && <DecodeSignal phase="reveal" />}
+            {!isUser && message.status !== "error" && message.delivery !== "cancelled"
+              && /[A-Za-z0-9]/.test(message.content) && <DecryptedOpening />}
           </div>
         ) : isStreaming ? (
           <div className="answer-waiting">

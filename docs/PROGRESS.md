@@ -1,7 +1,17 @@
 # Progress Tracker
 
 ## Current Phase
-**Chat reading refinement, ready for local review on `codex/chat-reading`.**
+**Chat text scramble.** Waiting and writing now cycle uppercase and lowercase
+letters alongside punctuation. The first ten letters or digits of a live or
+saved answer resolve in place over 600 ms. A mouse can replay the effect near
+the opening. Reduced motion and Still artwork show the answer immediately.
+Chrome verified a bold opening in a controlled stream at 390 and 937 px,
+stable reading position, hover replay and the static treatments at 320 and
+390 px. Build, lint and 198 frontend tests passed.
+
+### Chat reading release
+
+The chat reading refinement shipped in PR #18.
 Each new answer opens at its beginning. Reading position is preserved while
 tokens and citations arrive, including after a manual scroll. The silver ribbon
 stands alone, and the waiting and writing states use a small ASCII signal.
