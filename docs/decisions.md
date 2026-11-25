@@ -3,6 +3,24 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-093: Anchor each new answer once and keep chat tools within reach
+
+The recruiter starts at the question and opening lines. A pasted prompt that would
+occupy most of the transcript scrolls directly to the answer. Only a new message
+ID positions the scroll area. Native scroll anchoring is disabled there so later
+tokens, source cards and completion leave the reader in control.
+
+The conversation ribbon retains its Paper Liquid Metal material. Six columns of
+ASCII type mark the wait for text. A brief wipe uncovers the opening characters,
+then two glyphs mark the active stream. The Markdown and copy path use the
+original response throughout. Reduced motion and still artwork use static glyphs.
+
+Chat tools groups navigation, role fit, team summaries and contact links in
+the existing dialog pattern. Its contents mount on first open and retain generated
+summary links when dismissed. An active request error stays beside the composer.
+Sound defaults on when no boolean preference exists. Earlier releases wrote
+their default to storage, so a saved mute is honored regardless of its origin.
+
 ### DRN-092: Use the river shader for continuous chat flow
 
 The owner’s rendered review identified an unreadable etched edge and banded

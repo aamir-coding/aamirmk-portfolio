@@ -1019,18 +1019,6 @@ body {
   color: var(--status-error);
 }
 
-.streaming-cursor {
-  display: inline-block;
-  margin-left: 2px;
-  color: var(--accent-cobalt);
-  animation: blink-cursor 0.9s infinite;
-}
-
-@keyframes blink-cursor {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
 /* ==========================================================================
    Input Form & Controls
    ========================================================================== */

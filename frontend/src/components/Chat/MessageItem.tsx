@@ -5,6 +5,7 @@ import { SourceChips } from "./SourceChips";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectModal } from "./ProjectModal";
 import { FormattedMessage } from "./FormattedMessage";
+import { DecodeSignal } from "./DecodeSignal";
 import { HandoffCard } from "./HandoffCard";
 import { AnswerFeedback } from "./AnswerFeedback";
 
@@ -98,20 +99,18 @@ export const MessageItem = React.memo(function MessageItem({
       </header>
       <div className="chat-message-body">
         {message.content ? (
-          <FormattedMessage
-            content={message.content}
-            isStreaming={isStreaming}
-            questionHeading={isUser && message.content.length <= 220 && !message.content.includes("\n")}
-          />
+          <div className="answer-typeset">
+            <FormattedMessage
+              content={message.content}
+              isStreaming={isStreaming}
+              questionHeading={isUser && message.content.length <= 220 && !message.content.includes("\n")}
+            />
+            {!isUser && isStreaming && <DecodeSignal phase="reveal" />}
+          </div>
         ) : isStreaming ? (
-          <div className="chat-message-text">
-            Preparing an answer…{" "}<span
-              className="streaming-cursor"
-              aria-hidden="true"
-              data-testid="streaming-cursor"
-            >
-              ▍
-            </span>
+          <div className="answer-waiting">
+            <span className="sr-only" role="status">Preparing an answer…</span>
+            <DecodeSignal />
           </div>
         ) : null}
         {message.status === "error" && !message.content && (

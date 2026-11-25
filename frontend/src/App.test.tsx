@@ -218,6 +218,7 @@ describe("<App />", () => {
       fireEvent.change(screen.getByRole("textbox"), { target: { value: query } });
       fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
     }
+    fireEvent.click(screen.getByRole("button", { name: "Chat tools" }));
     fireEvent.click(await screen.findByRole("button", { name: "Summarize for my team" }));
     const link = await screen.findByRole("link", { name: "Open team summary" });
     expect(link).toHaveAttribute("href", `/s/${token}`);
@@ -416,7 +417,7 @@ describe("<App />", () => {
     });
     fireEvent.click(chip);
 
-    // Wait for message to stream in and reset button to appear
+    fireEvent.click(await screen.findByRole("button", { name: "Chat tools" }));
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /Portfolio overview/i })
@@ -445,11 +446,13 @@ describe("<App />", () => {
     ).toBeInTheDocument();
 
     // Now click Clear Chat -> completely wipes session
+    fireEvent.click(screen.getByRole("button", { name: "Chat tools" }));
     const clearBtn = screen.getByRole("button", {
       name: /Clear chat/i,
     });
     fireEvent.click(clearBtn);
 
+    await within(screen.getByRole("contentinfo")).findByRole("link", { name: "Evaluation results unavailable" });
     expect(screen.getByRole("heading", { level: 1, name: /Ask about Aamir/i })).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Resume chat/i })

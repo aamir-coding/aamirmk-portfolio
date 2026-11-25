@@ -1,6 +1,27 @@
 # Progress Tracker
 
 ## Current Phase
+**Chat reading refinement, ready for local review on `codex/chat-reading`.**
+Each new answer opens at its beginning. Reading position is preserved while
+tokens and citations arrive, including after a manual scroll. The silver ribbon
+stands alone, and the waiting and writing states use a small ASCII signal.
+Chat tools gathers the secondary actions on desktop and mobile. Interaction
+sounds default on and preserve a stored mute. See [DRN-093](decisions.md).
+
+- Chrome checked 320, 390, 768 and 1440 px with controlled SSE, long follow-ups
+  and a pasted multi-screen prompt. All four kept the first lines visible, the
+  composer within the viewport and the page free from horizontal overflow.
+  The checks also covered the role-fit dialog, keyboard dismissal, saved mute,
+  restored conversations and the system reduced-motion setting.
+- The waiting glyphs measured 5.94:1 in light mode and 8.18:1 in dark mode.
+  Across 90 frames per viewport, median frame intervals were 16.7 ms in
+  desktop Chrome. Physical phone rendering and virtual keyboards were not measured.
+- Build and ESLint passed. Vitest reported 198 tests passed. The offline backend
+  and evaluation suites reported 690 passed, 8 skipped and two deprecation
+  warnings. Initial JavaScript is 119.88 kB gzipped.
+
+### Previous silver assistant release
+
 **Silver assistant and conversation ribbon, verified locally on 25 November 2026.** Branch
 `codex/silver-assistant` is approved for release. The deployed frontend revision
 is available in the [production release receipt](https://aamirmk-portfolio.vercel.app/release.json). The home composer uses

@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
 import { formatSafeHref, sanitizeMarkdown } from "./formatHelpers";
+import { DecodeSignal } from "./DecodeSignal";
 
 export interface FormattedMessageProps {
   content: string;
@@ -141,13 +142,7 @@ export const FormattedMessage = React.memo(function FormattedMessage({
   const sanitized = useMemo(() => sanitizeMarkdown(content), [content]);
 
   const cursorNode = (
-    <span
-      className="streaming-cursor"
-      aria-hidden="true"
-      data-testid="streaming-cursor"
-    >
-      ▍
-    </span>
+    <span aria-hidden="true" data-testid="streaming-cursor"><DecodeSignal phase="cursor" /></span>
   );
 
   if (!sanitized) {

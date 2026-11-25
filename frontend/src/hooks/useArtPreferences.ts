@@ -3,13 +3,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 export type Artwork = "metal" | "reflection" | "still";
 interface Preferences { artwork: Artwork; sound: boolean }
 function initialPreferences(): Preferences {
-  const defaults: Preferences = { artwork: "metal", sound: false };
+  const defaults: Preferences = { artwork: "metal", sound: true };
   try {
     const saved = JSON.parse(localStorage.getItem("amk_art_preferences") ?? "{}");
     // Retain the previous pause and river choices for returning visitors.
     const artwork = saved.artwork === "still" || saved.paused === true ? "still"
       : saved.artwork === "reflection" || saved.reflectionOnly === true ? "reflection" : "metal";
-    return { artwork, sound: saved.sound === true };
+    return { artwork, sound: typeof saved.sound === "boolean" ? saved.sound : defaults.sound };
   } catch { return defaults; }
 }
 
