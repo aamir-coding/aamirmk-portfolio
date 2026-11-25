@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from "react";
-import { EvalBadge } from "./components/Evals/EvalBadge";
+import { PortfolioLinks } from "./components/Cover/PortfolioLinks";
 import { AssistantFallback } from "./components/AssistantFallback";
 import { useServerHealth } from "./hooks/useServerHealth";
 import { useChat } from "./hooks/useChat";
@@ -61,6 +61,7 @@ export function App() {
 function Portfolio() {
   const company = useCompanyContext(new URLSearchParams(window.location.search).get("for"));
   const { state: serverState, error: healthError, refresh: refreshHealth } = useServerHealth();
+  const [chatToolsOpen, setChatToolsOpen] = useState(false);
   const [isFitModalOpen, setIsFitModalOpen] = useState(false);
   const { theme, resolvedTheme, cycleTheme } = useTheme();
 
@@ -143,7 +144,7 @@ function Portfolio() {
     if (!focusAfterNavigation.current) return;
     focusAfterNavigation.current = false;
     headingRef.current?.focus();
-  }, [isCoverState, panel]);
+  }, [isCoverState, panel, chatToolsOpen]);
 
   const completedReplies = isCoverState ? [] : messages.filter(message =>
     message.role === "assistant" && message.status === "done" &&
@@ -158,16 +159,18 @@ function Portfolio() {
 
   const warmTranscript = () => { void loadTranscript().catch(() => {}); };
   const showChat = (moveFocus: boolean) => {
-    if (isCoverState || panel) {
+    if (isCoverState || panel || chatToolsOpen) {
       focusAfterNavigation.current = moveFocus;
     } else if (moveFocus) {
       headingRef.current?.focus();
     }
+    setChatToolsOpen(false);
     setViewMode("chat");
   };
 
   const showOverview = () => {
     focusAfterNavigation.current = true;
+    setChatToolsOpen(false);
     setViewMode("cover");
   };
 
@@ -201,7 +204,9 @@ function Portfolio() {
   };
 
   const restoreRecoveryFocus = (event: MouseEvent<HTMLButtonElement>) => {
-    if (event.detail === 0) assistantRef.current?.focus({ preventScroll: true });
+    if (event.detail !== 0) return;
+    const target = event.currentTarget.closest("dialog")?.querySelector("h2") ?? assistantRef.current;
+    target?.focus({ preventScroll: true });
   };
 
   const handleRefreshHealth = (event: MouseEvent<HTMLButtonElement>) => {
@@ -210,8 +215,49 @@ function Portfolio() {
     refreshHealth();
   };
 
+  const roleFitAction = (
+    <button type="button" className="role-fit-action" onClick={handleOpenFitModal} aria-haspopup="dialog">
+      <svg aria-hidden="true" viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="2" y="6" width="16" height="11" rx="2" />
+        <path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6M2 10q8 4 16 0" />
+      </svg>
+      Check role fit
+    </button>
+  );
+  const recoveryNotice = showRecovery && (
+    <div className="portfolio-notice">
+      <p role={error ? "alert" : undefined}>{error || healthNotice}</p>
+      <div className="portfolio-recovery-actions">
+        <button className="saved-answer-action" type="button" disabled={isStreaming} onClick={() => handleSelectPrompt(FEATURED_PROMPT, true)}>
+          Read a saved answer
+        </button>
+        {(assistantStatus === "resting" || assistantStatus === "error") &&
+          <button className="service-action" type="button" onClick={handleRefreshHealth}>Check service status</button>}
+        {error && <button type="button" onClick={event => {
+          restoreRecoveryFocus(event);
+          clearError();
+        }}>Dismiss</button>}
+      </div>
+      {isCoverState && <AssistantFallback />}
+    </div>
+  );
+
+  const jumpToLatest = () => {
+    setChatToolsOpen(false);
+    requestAnimationFrame(() => {
+      const log = document.getElementById("chat-history");
+      const body = log?.lastElementChild?.querySelector(".chat-message-body");
+      if (!log || !body) return;
+      const bounds = log.getBoundingClientRect();
+      const question = log.lastElementChild?.previousElementSibling;
+      log.scrollTop += Math.max((question ?? body).getBoundingClientRect().top - bounds.top,
+        body.getBoundingClientRect().bottom - bounds.bottom);
+      log.focus({ preventScroll: true });
+    });
+  };
+
   return (
-    <div className="portfolio-page">
+    <div className="portfolio-page" data-artwork={preferences.artwork}>
       <a className="portfolio-skip" href="#main-heading">Skip to main content</a>
       <p className="sr-only" role="status">{announcement && <span key={reply?.id}>{announcement}</span>}</p>
       <header className="portfolio-bar">
@@ -250,15 +296,15 @@ function Portfolio() {
                   <h1 className="sr-only" id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
                 )}
                 <StatusIndicator state={assistantStatus} errorMessage={healthError} />
+                {!isCoverState && <button type="button" className="chat-tools-trigger" aria-haspopup="dialog" onClick={() => setChatToolsOpen(true)}>Chat tools <span aria-hidden="true">···</span></button>}
               </div>
               <div className="portfolio-chat" onFocusCapture={isCoverState ? warmTranscript : undefined}>
                 {!isCoverState && (
                   <Suspense fallback={<p role="status">Opening conversation…</p>}>
-                    <MessageList messages={messages} isStreaming={isStreaming} onOverview={showOverview} onClear={handleResetChat} onInspectProject={inspectProject} />
+                    <MessageList messages={messages} onInspectProject={inspectProject} />
                   </Suspense>
                 )}
                 <div className="chat-input-container">
-                  {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
                   <ChatInput
                     onSend={(text) => {
                       markSend();
@@ -268,34 +314,12 @@ function Portfolio() {
                     onStop={stopStreaming}
                     isStreaming={isStreaming}
                   />
-                  <button type="button" className="role-fit-action" onClick={handleOpenFitModal} aria-haspopup="dialog">
-                    <svg aria-hidden="true" viewBox="0 0 20 20" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <rect x="2" y="6" width="16" height="11" rx="2" />
-                      <path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6M2 10q8 4 16 0" />
-                    </svg>
-                    Check role fit
-                  </button>
+                  {isCoverState && roleFitAction}
                 </div>
               </div>
 
               {isCoverState && messages.length > 0 && <button className="text-action" onClick={() => showChat(true)}>Resume chat</button>}
-              {showRecovery && (
-                <div className="portfolio-notice">
-                  <p role={error ? "alert" : undefined}>{error || healthNotice}</p>
-                  <div className="portfolio-recovery-actions">
-                    <button className="saved-answer-action" type="button" disabled={isStreaming} onClick={() => handleSelectPrompt(FEATURED_PROMPT, true)}>
-                      Read a saved answer
-                    </button>
-                    {(assistantStatus === "resting" || assistantStatus === "error") &&
-                      <button className="service-action" type="button" onClick={handleRefreshHealth}>Check service status</button>}
-                    {error && <button type="button" onClick={event => {
-                      restoreRecoveryFocus(event);
-                      clearError();
-                    }}>Dismiss</button>}
-                  </div>
-                  <AssistantFallback />
-                </div>
-              )}
+              {(isCoverState || error) && recoveryNotice}
             </section>
             {isCoverState && <HeroArt artwork={preferences.artwork} />}
           </div>
@@ -338,29 +362,19 @@ function Portfolio() {
         </section>}
       </main>
 
-      <footer className="portfolio-footer">
-        <div className="portfolio-measure portfolio-footer-inner">
-          <section aria-labelledby="portfolio-contact">
-            <h2 id="portfolio-contact">Contact Aamir</h2>
-            <nav className="portfolio-contact-links" aria-label="Direct candidate links">
-              <a href="mailto:aamirmkh25@gmail.com">Email Aamir</a>
-              <a href="https://www.linkedin.com/in/aamir-mk/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-              <a href="https://github.com/aamir-coding" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </nav>
-          </section>
-          <div className="portfolio-footer-notes">
-            <div className="portfolio-utilities">
-              <EvalBadge />
-            </div>
-            <details>
-              <summary>Privacy and data use</summary>
-              <p>Groq processes live questions and job descriptions. This browser tab stores a copy of the chat. Fit reports are reused for up to 15 minutes and held in bounded server memory until eviction or restart.</p>
-              <p>When analytics is enabled, the service stores questions, usage, basic visit details, and feedback to improve the portfolio. Analytics and handoff records are removed in daily cleanup after 90 days. Service logs record only operational metadata, including request IDs and temporary salted IP hashes.</p>
-              <p>Handoffs you approve are sent to Aamir on Telegram, which keeps its own copy. Summary links expire after 30 days.</p>
-            </details>
-          </div>
+      {isCoverState ? <footer className="portfolio-footer">
+        <div className="portfolio-measure portfolio-footer-inner"><PortfolioLinks /></div>
+      </footer> : <SidePanel open={chatToolsOpen} title="Chat tools" onClose={() => setChatToolsOpen(false)}>
+        <div className="chat-tools-actions">
+          <button type="button" onClick={showOverview}>Portfolio overview</button>
+          <button type="button" aria-controls="chat-history" onClick={jumpToLatest}>Jump to latest</button>
+          {roleFitAction}
+          <button type="button" onClick={handleResetChat} disabled={isStreaming}>Clear chat</button>
         </div>
-      </footer>
+        {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
+        {!error && recoveryNotice}
+        <div className="portfolio-footer chat-tools-links"><PortfolioLinks /></div>
+      </SidePanel>}
       {panel && <SidePanel title={selectedProject?.title ?? (panel === "preferences" ? "Preferences" : "Project index")} onClose={closePanel}>
         {panel === "preferences" ? <div className="art-settings">
           <label>Interaction sounds<input type="checkbox" checked={preferences.sound} onChange={e => set("sound", e.target.checked)} /></label>

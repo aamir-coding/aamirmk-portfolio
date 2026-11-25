@@ -1,6 +1,4 @@
 import { memo, useEffect, useRef } from "react";
-import etchedEdge from "./etch.webp";
-import compactEdge from "./etch-compact.webp";
 import poster from "./ribbon.webp";
 import mask from "./ribbon-texture.png";
 import type { ShaderMount } from "@paper-design/shaders";
@@ -83,9 +81,5 @@ export const ConversationRibbon = memo(function ConversationRibbon({ send, stage
   }, [send, live]);
   return <div className="conversation-ribbon" aria-hidden="true">
     <div className="ribbon-surface" ref={host} style={{ backgroundImage: `url(${poster})` }} />
-    <picture>
-      <source media="(max-width: 700px)" srcSet={compactEdge} />
-      <img src={etchedEdge} alt="" width="720" height="900" />
-    </picture>
   </div>;
 });
