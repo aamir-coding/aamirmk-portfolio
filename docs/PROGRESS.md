@@ -3,7 +3,8 @@
 ## Current Phase
 **Chat text scramble.** Waiting and writing now cycle uppercase and lowercase
 letters alongside punctuation. The first ten letters or digits of a live or
-saved answer resolve in place over 600 ms. A mouse can replay the effect near
+saved answer resolve in place at 60 ms intervals. Desktop Chrome retained all
+ten steps after a simulated 750 ms cold-load stall. A mouse can replay the effect near
 the opening. Reduced motion and Still artwork show the answer immediately.
 Chrome verified a bold opening in a controlled stream at 390 and 937 px,
 stable reading position, hover replay and the static treatments at 320 and
