@@ -296,7 +296,11 @@ function Portfolio() {
                   <h1 className="sr-only" id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
                 )}
                 <StatusIndicator state={assistantStatus} errorMessage={healthError} />
-                {!isCoverState && <button type="button" className="chat-tools-trigger" aria-haspopup="dialog" onClick={() => setChatToolsOpen(true)}>Chat tools <span aria-hidden="true">···</span></button>}
+                {!isCoverState && (
+                  <button type="button" className="chat-tools-trigger" aria-haspopup="dialog" onClick={() => setChatToolsOpen(true)}>
+                    Chat tools
+                  </button>
+                )}
               </div>
               <div className="portfolio-chat" onFocusCapture={isCoverState ? warmTranscript : undefined}>
                 {!isCoverState && (
