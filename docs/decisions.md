@@ -3,6 +3,20 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-091: Carry the river material into a readable conversation
+
+The chat uses the approved study's WebGL ribbon and an ASCII engraving. Each
+send and first text event can run a short reflection across the fold. Source
+and card events do not restart the effect. The default resting frame, the
+Send surface and the evidence icon use images sampled from the actual shader.
+A still landscape preference, reduced motion or missing WebGL leaves the same
+fold visible. The transcript can render immediately while the GPU code loads.
+
+Short single-line questions use the existing Markdown renderer with an editorial
+heading. Longer inputs retain their ordinary reading size. With interaction
+sounds enabled, live replies taking at least five seconds can play a completion
+cue. Opening evidence plays a short filtered brush, and tokens remain silent.
+
 ### DRN-090: Make the conversation the primary portfolio view
 
 **Date** 2026-11-24. The silver and graphite integration runs on the existing

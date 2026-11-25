@@ -6,6 +6,7 @@ import { useChat } from "./hooks/useChat";
 import { useCompanyContext } from "./hooks/useCompanyContext";
 import { useTheme } from "./hooks/useTheme";
 import { ChatInput } from "./components/Chat/ChatInput";
+import { ConversationRibbon, type RibbonSend } from "./components/Chat/ConversationRibbon";
 import { StarterChips } from "./components/Chat/StarterChips";
 import { CoverState } from "./components/Cover/CoverState";
 import { HeroArt } from "./components/Cover/HeroArt";
@@ -111,6 +112,20 @@ function Portfolio() {
   const focusAfterNavigation = useRef(false);
   const assistantStatus = isResting ? "resting" : serverState;
   const reply = messages.at(-1);
+  const [ribbonSend, setRibbonSend] = useState<RibbonSend | null>(null);
+  const markSend = () => {
+    cue("send");
+    setRibbonSend({ at: performance.now(), river: document.querySelector(".relief-river")?.getBoundingClientRect() });
+  };
+  const stage = reply?.delivery === "cancelled" || reply?.status === "error" ? "stopped"
+    : isStreaming ? (reply?.content ? "writing" : "waiting") : "settled";
+  const soundedReply = useRef<string | null>(null);
+  useEffect(() => {
+    if (!ribbonSend || isCoverState || reply?.status !== "done" || reply.delivery ||
+        !reply.content || (reply.browserTiming?.total_ms ?? 0) < 5000 || soundedReply.current === reply.id) return;
+    soundedReply.current = reply.id;
+    cue("ready");
+  }, [reply, cue, ribbonSend, isCoverState]);
   let announcement = "";
   if (reply?.role === "assistant" && reply.status === "done") {
     if (reply.delivery === "cancelled") announcement = "Response stopped.";
@@ -158,7 +173,7 @@ function Portfolio() {
 
   const handleSelectPrompt = (prompt: string, useSaved = false) => {
     if (isStreaming) return;
-    cue("send");
+    markSend();
     showChat(true);
     // If backend is asleep or still warming, answer instantly from bundled answers.json
     if ((useSaved || serverState !== "ready" || isResting) && BUNDLED_ANSWERS[prompt]) {
@@ -174,6 +189,7 @@ function Portfolio() {
   };
 
   const handleAskGap = (gapText: string) => {
+    markSend();
     setIsFitModalOpen(false);
     showChat(true);
     void sendMessage(`How does Aamir plan to ramp up on: ${gapText}?`);
@@ -221,6 +237,7 @@ function Portfolio() {
         <div className={`portfolio-opening ${isCoverState ? "portfolio-cover" : "portfolio-conversation"}`}>
           <div className="portfolio-measure portfolio-opening-inner">
             {isCoverState && <CoverState headingRef={headingRef} company={company} />}
+            {!isCoverState && <ConversationRibbon send={ribbonSend} stage={stage} graphite={resolvedTheme === "dark"} live={preferences.artwork === "metal"} />}
             <section
               ref={assistantRef}
               className="portfolio-assistant"
@@ -230,7 +247,7 @@ function Portfolio() {
             >
               <div className="portfolio-assistant-heading">
                 {isCoverState ? <h2 className="sr-only" id="assistant-heading">Ask about Aamir</h2> : (
-                  <h1 id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
+                  <h1 className="sr-only" id="main-heading" ref={headingRef} tabIndex={-1}>Conversation</h1>
                 )}
                 <StatusIndicator state={assistantStatus} errorMessage={healthError} />
               </div>
@@ -244,7 +261,7 @@ function Portfolio() {
                   {summaryTopics && <SummaryAction projectIds={summaryTopics} />}
                   <ChatInput
                     onSend={(text) => {
-                      cue("send");
+                      markSend();
                       showChat(false);
                       void sendMessage(text);
                     }}

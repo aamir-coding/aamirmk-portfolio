@@ -1,7 +1,7 @@
 # Progress Tracker
 
 ## Current Phase
-**Silver assistant integration, verified locally on 24 November 2026.** Branch
+**Silver assistant and conversation ribbon, verified locally on 25 November 2026.** Branch
 `codex/silver-assistant` is ready for release review. The home composer uses
 the existing chat flow. Projects open in an evidence panel from a completed
 answer or the project index. The role-fit form, saved answers, recruiting
@@ -18,7 +18,12 @@ the [study guide](study-guides/silver-assistant.md).
 - The control refinement moved role fit below the question field, distinguished
   recovery buttons from destination links, and added a silver Send control.
   Landscape preferences include a fully still option and retain older choices.
-- The initial JavaScript weighs 118,227 gzip bytes. The transcript loads on
+- The conversation includes the WebGL ribbon, still and reduced-motion treatments,
+  question headings, and opt-in interaction audio ([DRN-091](decisions.md)).
+  Chrome replayed two turns with zero final-line displacement at 375 and 1440 px.
+  Browser checks exercised the shader, sound events, focus return and restored
+  sessions at 320, 390 and 1440 px. The timings below are from the earlier cover benchmark.
+- The initial JavaScript weighs approximately 120 kB gzipped. The transcript loads on
   demand. The optional glyph and shader modules weigh 3.32 and 8.80 kB gzip.
   Three cold 390 px Chrome runs with 4x CPU slowdown, 150 ms latency and
   1.6 Mbps downstream measured LCP at 2.768, 2.340 and 2.344 seconds.

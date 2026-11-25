@@ -7,6 +7,7 @@ import { formatSafeHref, sanitizeMarkdown } from "./formatHelpers";
 export interface FormattedMessageProps {
   content: string;
   isStreaming?: boolean;
+  questionHeading?: boolean;
 }
 
 function renderWithBreaks(child: React.ReactNode): React.ReactNode {
@@ -125,9 +126,17 @@ const markdownComponents: Components = {
   },
 };
 
+const questionComponents: Components = {
+  ...markdownComponents,
+  p: ({ children, node }) => node?.position?.start.offset === 0
+    ? <h2 className="turn-question">{renderWithBreaks(children)}</h2>
+    : <p className="prose-paragraph">{children}</p>,
+};
+
 export const FormattedMessage = React.memo(function FormattedMessage({
   content,
   isStreaming = false,
+  questionHeading = false,
 }: FormattedMessageProps) {
   const sanitized = useMemo(() => sanitizeMarkdown(content), [content]);
 
@@ -151,7 +160,7 @@ export const FormattedMessage = React.memo(function FormattedMessage({
     <div className="chat-prose">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        components={markdownComponents}
+        components={questionHeading ? questionComponents : markdownComponents}
       >
         {sanitized}
       </ReactMarkdown>

@@ -20,7 +20,7 @@ describe("<MessageItem />", () => {
     render(<MessageItem message={userMsg} />);
 
     expect(screen.getByText("You")).toBeInTheDocument();
-    expect(screen.getByText("What is Aamir's primary stack?")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "What is Aamir's primary stack?" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Copy/i })).not.toBeInTheDocument();
   });
 

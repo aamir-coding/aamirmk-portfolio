@@ -101,6 +101,7 @@ export const MessageItem = React.memo(function MessageItem({
           <FormattedMessage
             content={message.content}
             isStreaming={isStreaming}
+            questionHeading={isUser && message.content.length <= 220 && !message.content.includes("\n")}
           />
         ) : isStreaming ? (
           <div className="chat-message-text">
