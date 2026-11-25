@@ -2,11 +2,15 @@ import { liquidMetalFragmentShader, ShaderMount } from "@paper-design/shaders";
 import texture from "./art/river-texture.png";
 
 export async function mountRiver(host: HTMLElement, current: () => boolean) {
+  return mountLiquidMetal(host, texture, current);
+}
+
+export async function mountLiquidMetal(host: HTMLElement, mask: string, current: () => boolean) {
   const image = new Image();
-  image.src = texture;
+  image.src = mask;
   await image.decode();
   if (!current()) return;
-  // The mask has already been processed with Paper's image tool, offline.
+  // Each silhouette carries the edge field baked by Paper's image processor.
   const mount = new ShaderMount(host, liquidMetalFragmentShader, {
     u_image: image, u_isImage: true, u_shape: 0, u_colorBack: [0, 0, 0, 0],
     u_colorTint: [1, 1, 1, 0], u_repetition: 2.5, u_shiftRed: 0, u_shiftBlue: 0,

@@ -3,6 +3,17 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-092: Use the river shader for continuous chat flow
+
+The owner’s rendered review identified an unreadable etched edge and banded
+highlights on the folded ribbon. Both faces now follow a new silhouette. The
+left face uses a high-contrast glyph engraving, with a coarser cut for phones.
+The right uses a separately baked mask in the homepage river’s Paper Liquid
+Metal renderer. Both surfaces share the shader parameters and idle speed.
+Chat increases the speed while waiting and writing, and returns to continuous
+idle flow when an answer finishes, including saved answers. The artwork setting,
+reduced motion, and WebGL fallback use a still frame sampled from this mask.
+
 ### DRN-091: Carry the river material into a readable conversation
 
 The chat uses the approved study's WebGL ribbon and an ASCII engraving. Each

@@ -237,7 +237,7 @@ function Portfolio() {
         <div className={`portfolio-opening ${isCoverState ? "portfolio-cover" : "portfolio-conversation"}`}>
           <div className="portfolio-measure portfolio-opening-inner">
             {isCoverState && <CoverState headingRef={headingRef} company={company} />}
-            {!isCoverState && <ConversationRibbon send={ribbonSend} stage={stage} graphite={resolvedTheme === "dark"} live={preferences.artwork === "metal"} />}
+            {!isCoverState && <ConversationRibbon send={ribbonSend} stage={stage} live={preferences.artwork === "metal"} />}
             <section
               ref={assistantRef}
               className="portfolio-assistant"
@@ -364,11 +364,11 @@ function Portfolio() {
       {panel && <SidePanel title={selectedProject?.title ?? (panel === "preferences" ? "Preferences" : "Project index")} onClose={closePanel}>
         {panel === "preferences" ? <div className="art-settings">
           <label>Interaction sounds<input type="checkbox" checked={preferences.sound} onChange={e => set("sound", e.target.checked)} /></label>
-          <label>Landscape<select value={preferences.artwork} onChange={e => {
+          <label>Artwork<select value={preferences.artwork} onChange={e => {
             const value = e.currentTarget.value;
             if (value === "metal" || value === "reflection" || value === "still") set("artwork", value);
           }}>
-            <option value="metal">Liquid metal river</option><option value="reflection">Still river reflection</option><option value="still">Still landscape</option>
+            <option value="metal">Flowing liquid metal</option><option value="reflection">Still metal</option><option value="still">Still artwork</option>
           </select></label>
         </div> : <>
           {selectedProject && <button className="text-action" onClick={() => setPanel("index")}>Back to project index</button>}

@@ -18,6 +18,10 @@ the [study guide](study-guides/silver-assistant.md).
 - The control refinement moved role fit below the question field, distinguished
   recovery buttons from destination links, and added a silver Send control.
   Landscape preferences include a fully still option and retain older choices.
+- The revised ribbon uses the same Paper shader as the river, with continuous
+  flow and a larger ASCII engraving ([DRN-092](decisions.md)). Chrome verified
+  ongoing motion after a saved answer at 1207, 390 and 320 px, both color themes,
+  the still option, reduced motion, and fallback with WebGL unavailable.
 - The conversation includes the WebGL ribbon, still and reduced-motion treatments,
   question headings, and opt-in interaction audio ([DRN-091](decisions.md)).
   Chrome replayed two turns with zero final-line displacement at 375 and 1440 px.

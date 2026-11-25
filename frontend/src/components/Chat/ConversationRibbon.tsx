@@ -1,6 +1,9 @@
 import { memo, useEffect, useRef } from "react";
 import etchedEdge from "./etch.webp";
+import compactEdge from "./etch-compact.webp";
 import poster from "./ribbon.webp";
+import mask from "./ribbon-texture.png";
+import type { ShaderMount } from "@paper-design/shaders";
 import water from "../Cover/art/silver.webp";
 
 export interface RibbonSend {
@@ -8,37 +11,28 @@ export interface RibbonSend {
   river?: DOMRect;
 }
 type Stage = "waiting" | "writing" | "settled" | "stopped";
-type Player = ReturnType<typeof import("./ribbonRenderer").mountRibbon>;
 
-export const ConversationRibbon = memo(function ConversationRibbon({ send, stage, graphite, live }: {
-  send: RibbonSend | null; stage: Stage; graphite: boolean; live: boolean;
+export const ConversationRibbon = memo(function ConversationRibbon({ send, stage, live }: {
+  send: RibbonSend | null; stage: Stage; live: boolean;
 }) {
   const host = useRef<HTMLDivElement>(null);
-  const player = useRef<Player>(undefined);
-  const dark = useRef(graphite);
-  const sweep = useRef({ start: 0, distance: 0, duration: 0 });
+  const player = useRef<ShaderMount | undefined>(undefined);
+  const flowSpeed = stage === "waiting" ? .4 : stage === "writing" ? .3 : .23;
+  const speed = useRef(flowSpeed);
   useEffect(() => {
-    dark.current = graphite;
-    player.current?.theme(graphite);
-  }, [graphite]);
-  useEffect(() => {
-    const now = performance.now();
-    const recentSend = send && now - send.at < 900;
-    const duration = stage === "waiting" ? 820 : 460;
-    const distance = !send || stage === "stopped" ? 0 : stage === "writing" ? .48 : recentSend ? 1.4 : 0;
-    sweep.current = { start: now, distance, duration };
-    player.current?.stop();
-    if (distance && !document.hidden) player.current?.sweep(distance, duration);
-  }, [send, stage]);
+    speed.current = flowSpeed;
+    player.current?.setSpeed(flowSpeed);
+  }, [flowSpeed]);
   useEffect(() => {
     const element = host.current;
     if (!element || !live || !window.matchMedia || !window.IntersectionObserver) return;
     const media = matchMedia("(prefers-reduced-motion: no-preference) and (forced-colors: none)");
     let visible = false, disposed = false, pending = false, failed = false;
     const container = element;
+    const active = () => !disposed && visible && media.matches && !document.hidden;
     function onContextLost() { failed = true; clear(); }
     function clear() {
-      container.firstChild?.removeEventListener("webglcontextlost", onContextLost);
+      player.current?.canvasElement.removeEventListener("webglcontextlost", onContextLost);
       player.current?.dispose();
       player.current = undefined;
       container.replaceChildren();
@@ -47,29 +41,23 @@ export const ConversationRibbon = memo(function ConversationRibbon({ send, stage
       if (!media.matches || !visible || document.hidden) { clear(); return; }
       if (pending || failed || player.current) return;
       pending = true;
-      void import("./ribbonRenderer").then(({ mountRibbon }) => {
-        if (disposed || !media.matches || !visible || document.hidden) return;
-        const canvas = document.createElement("canvas");
-        player.current = mountRibbon(canvas);
-        if (!player.current) { failed = true; return; }
-        container.append(canvas);
-        canvas.addEventListener("webglcontextlost", onContextLost, { once: true });
-        player.current.theme(dark.current);
-        const { start, distance, duration } = sweep.current;
-        const remaining = duration - (performance.now() - start);
-        if (remaining > 0 && distance) player.current.sweep(distance * remaining / duration, remaining);
-      }).catch(() => { failed = true; }).finally(() => { pending = false; });
+      void import("../Cover/liquidRiver").then(async ({ mountLiquidMetal }) => {
+        if (!active()) return;
+        const mount = await mountLiquidMetal(container, mask, active);
+        if (!mount) return;
+        if (!active()) { mount.dispose(); return; }
+        player.current = mount;
+        mount.canvasElement.addEventListener("webglcontextlost", onContextLost, { once: true });
+        mount.setSpeed(speed.current);
+      }).catch(() => { failed = true; if (!disposed) clear(); }).finally(() => { pending = false; });
     }
     const observer = new IntersectionObserver(([entry]) => { visible = Boolean(entry?.isIntersecting); sync(); });
     observer.observe(element);
-    const resize = new ResizeObserver(() => player.current?.theme(dark.current));
-    resize.observe(element);
     media.addEventListener("change", sync);
     document.addEventListener("visibilitychange", sync);
     return () => {
       disposed = true;
       observer.disconnect();
-      resize.disconnect();
       media.removeEventListener("change", sync);
       document.removeEventListener("visibilitychange", sync);
       clear();
@@ -95,6 +83,9 @@ export const ConversationRibbon = memo(function ConversationRibbon({ send, stage
   }, [send, live]);
   return <div className="conversation-ribbon" aria-hidden="true">
     <div className="ribbon-surface" ref={host} style={{ backgroundImage: `url(${poster})` }} />
-    <img src={etchedEdge} alt="" width="320" height="400" />
+    <picture>
+      <source media="(max-width: 700px)" srcSet={compactEdge} />
+      <img src={etchedEdge} alt="" width="720" height="900" />
+    </picture>
   </div>;
 });

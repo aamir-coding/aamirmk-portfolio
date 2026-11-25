@@ -187,7 +187,7 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
 }
 .conversation-ribbon { position: sticky; top: 2rem; align-self: start; margin-top: 2.6rem; width: 100%; aspect-ratio: 4 / 5; pointer-events: none; }
 .ribbon-surface, .conversation-ribbon img, .ribbon-surface canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ribbon-surface { background-size: contain; background-repeat: no-repeat; }
+.ribbon-surface { background-size: contain; background-repeat: no-repeat; filter: grayscale(1); }
 .ribbon-surface:has(canvas) { background-size: 0; }
 .conversation-ribbon img { filter: invert(var(--relief-invert,0)); }
 .river-handoff { position: fixed; pointer-events: none; z-index: 2; transform-origin: top left; }
