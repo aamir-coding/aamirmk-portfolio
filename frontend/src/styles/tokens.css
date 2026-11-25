@@ -13,27 +13,27 @@
 
 :root,
 :root[data-theme="light"] {
-  /* Surfaces & Backgrounds - Light Dossier (Technical Paper) */
-  --bg-page: #f8fafc;
+  /* Surfaces & Backgrounds - Silver */
+  --bg-page: #f8f8f7;
   --bg-surface: #ffffff;
-  --bg-subtle: #f1f5f9;
-  --bg-muted: #e2e8f0;
+  --bg-subtle: #eeeeeb;
+  --bg-muted: #e3e3df;
   
   /* Text & Inks */
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #526279;
-  --text-inverse: #f8fafc;
+  --text-primary: #242422;
+  --text-secondary: #50504d;
+  --text-muted: #60605c;
+  --text-inverse: #ffffff;
   
   /* Hairline Dossier Borders */
-  --border-subtle: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --border-active: #94a3b8;
+  --border-subtle: #deded9;
+  --border-strong: #c7c7c1;
+  --border-active: #84847c;
   
-  /* Accents - Restrained Technical Cobalt */
-  --accent-cobalt: #2563eb;
-  --accent-cobalt-hover: #1d4ed8;
-  --accent-cobalt-subtle: #eff6ff;
+  /* Accents - Neutral controls */
+  --accent-cobalt: #42423f;
+  --accent-cobalt-hover: #1d1d1b;
+  --accent-cobalt-subtle: #e9e9e5;
   
   /* Code & Syntax Surfaces */
   --bg-code-inline: #f1f5f9;
@@ -97,7 +97,7 @@
   --space-10: 2.5rem;
   --space-12: 3rem;
 
-  /* Crisp Dossier Radii */
+  /* Control radii */
   --radius-sm: 3px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -115,27 +115,28 @@
 /* System Dark Preference (when no explicit light theme override is active) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    /* Surfaces & Backgrounds - Dark Dossier (Obsidian Slate) */
-    --bg-page: #090d16;
-    --bg-surface: #111827;
-    --bg-subtle: #1e293b;
-    --bg-muted: #334155;
+    /* Surfaces & Backgrounds - Graphite */
+    --relief-invert: 1;
+  --bg-page: #20201f;
+    --bg-surface: #2a2a29;
+    --bg-subtle: #30302e;
+    --bg-muted: #40403d;
     
     /* Text & Inks */
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --text-inverse: #0f172a;
+    --text-primary: #f3f3ef;
+    --text-secondary: #d3d3cd;
+    --text-muted: #b8b8b2;
+    --text-inverse: #20201f;
     
     /* Hairline Dossier Borders */
-    --border-subtle: #1e293b;
-    --border-strong: #334155;
-    --border-active: #475569;
+    --border-subtle: #484845;
+    --border-strong: #565653;
+    --border-active: #959590;
     
-    /* Accents - Restrained Technical Cobalt */
-    --accent-cobalt: #60a5fa;
-    --accent-cobalt-hover: #60a5fa;
-    --accent-cobalt-subtle: #1e293b;
+    /* Accents - Neutral controls */
+    --accent-cobalt: #d4d4cf;
+    --accent-cobalt-hover: #ffffff;
+    --accent-cobalt-subtle: #363633;
     
     /* Code & Syntax Surfaces */
     --bg-code-inline: #1e293b;
@@ -170,27 +171,28 @@
 
 /* Explicit Dark Theme Selector (overrides light and system) */
 :root[data-theme="dark"] {
-  /* Surfaces & Backgrounds - Dark Dossier (Obsidian Slate) */
-  --bg-page: #090d16;
-  --bg-surface: #111827;
-  --bg-subtle: #1e293b;
-  --bg-muted: #334155;
+  /* Surfaces & Backgrounds - Graphite */
+  --relief-invert: 1;
+  --bg-page: #20201f;
+  --bg-surface: #2a2a29;
+  --bg-subtle: #30302e;
+  --bg-muted: #40403d;
   
   /* Text & Inks */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-inverse: #0f172a;
+  --text-primary: #f3f3ef;
+  --text-secondary: #d3d3cd;
+  --text-muted: #b8b8b2;
+  --text-inverse: #20201f;
   
   /* Hairline Dossier Borders */
-  --border-subtle: #1e293b;
-  --border-strong: #334155;
-  --border-active: #475569;
+  --border-subtle: #484845;
+  --border-strong: #565653;
+  --border-active: #959590;
   
-  /* Accents - Restrained Technical Cobalt */
-  --accent-cobalt: #60a5fa;
-  --accent-cobalt-hover: #60a5fa;
-  --accent-cobalt-subtle: #1e293b;
+  /* Accents - Neutral controls */
+  --accent-cobalt: #d4d4cf;
+  --accent-cobalt-hover: #ffffff;
+  --accent-cobalt-subtle: #363633;
   
   /* Code & Syntax Surfaces */
   --bg-code-inline: #1e293b;

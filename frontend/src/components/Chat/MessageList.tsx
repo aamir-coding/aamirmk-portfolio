@@ -2,7 +2,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import type { ChatMessage } from "../../hooks/useChat";
 import { MessageItem } from "./MessageItem";
 
+import type { ProjectCardData } from "../../lib/types";
+import type { ShowcaseId } from "../Cover/projects";
+
 interface MessageListProps {
+  onInspectProject?: (id: ShowcaseId, card?: ProjectCardData) => void;
   messages: ChatMessage[];
   isStreaming: boolean;
   onOverview: () => void;
@@ -13,7 +17,7 @@ function isNearLatest(log: HTMLDivElement) {
   return log.scrollHeight - log.scrollTop - log.clientHeight < 48;
 }
 
-export function MessageList({ messages, isStreaming, onOverview, onClear }: MessageListProps) {
+export function MessageList({ messages, isStreaming, onOverview, onClear, onInspectProject }: MessageListProps) {
   const logRef = useRef<HTMLDivElement>(null);
   const jumpRef = useRef<HTMLButtonElement>(null);
   const followsLatest = useRef(messages.length > 2);
@@ -94,7 +98,7 @@ export function MessageList({ messages, isStreaming, onOverview, onClear }: Mess
               .slice(-10)
               .map(({ role, content }) => ({ role, content }))
             : undefined;
-          return <MessageItem key={message.id} message={message} handoffTranscript={transcript} />;
+          return <MessageItem key={message.id} message={message} onInspectProject={onInspectProject} handoffTranscript={transcript} />;
         })}
       </div>
     </>

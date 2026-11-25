@@ -1,6 +1,46 @@
 # Progress Tracker
 
 ## Current Phase
+**Silver assistant and conversation ribbon, verified locally on 25 November 2026.** Branch
+`codex/silver-assistant` is approved for release. The deployed frontend revision
+is available in the [production release receipt](https://aamirmk-portfolio.vercel.app/release.json). The home composer uses
+the existing chat flow. Projects open in an evidence panel from a completed
+answer or the project index. The role-fit form, saved answers, recruiting
+actions and direct links remain available. See [DRN-090](decisions.md) and
+the [study guide](study-guides/silver-assistant.md).
+
+- The production build, ESLint and 193 frontend tests passed. The offline backend
+  and evaluation suite passed 690 tests with 8 skipped and two deprecation
+  warnings. The offline retrieval and replay gate reported zero failures.
+- Chrome checked 320, 390, 768 and 1440 px, including both themes, keyboard
+  dismissal and navigation, the fit dialog, project browsing and saved answers.
+  A long recorded follow-up retained its final line's position on completion at
+  both 375 and 1440 px. Graphite project links reached 14.66:1 contrast.
+- The control refinement moved role fit below the question field, distinguished
+  recovery buttons from destination links, and added a silver Send control.
+  Landscape preferences include a fully still option and retain older choices.
+- The revised ribbon uses the same Paper shader as the river, with continuous
+  flow and a larger ASCII engraving ([DRN-092](decisions.md)). Chrome verified
+  ongoing motion after a saved answer at 1207, 390 and 320 px, both color themes,
+  the still option, reduced motion, and fallback with WebGL unavailable.
+- The conversation includes the WebGL ribbon, still and reduced-motion treatments,
+  question headings, and opt-in interaction audio ([DRN-091](decisions.md)).
+  Chrome replayed two turns with zero final-line displacement at 375 and 1440 px.
+  Browser checks exercised the shader, sound events, focus return and restored
+  sessions at 320, 390 and 1440 px. The timings below are from the earlier cover benchmark.
+- The initial JavaScript weighs approximately 120 kB gzipped. The transcript loads on
+  demand. The optional glyph and shader modules weigh 3.32 and 8.80 kB gzip.
+  Three cold 390 px Chrome runs with 4x CPU slowdown, 150 ms latency and
+  1.6 Mbps downstream measured LCP at 2.768, 2.340 and 2.344 seconds.
+  Median LCP was 2.344 seconds. Peak layout shift was 0.00145 or less.
+- The desktop frame interval with the shader was 16.7 ms median and 16.9 ms
+  at the 95th percentile in a 90-frame software-WebGL sample. Reduced motion
+  skipped the renderer requests on entry. The still river and project index
+  worked when WebGL was unavailable. Physical-device GPU and battery costs,
+  WebKit and spoken screen-reader output remain unverified.
+
+### M8 release and maintenance history
+
 **M8: Answer-first chat and Field of Evidence integration.**
 Branch `codex/phase-m8-answer-first`. The owner approved the M8 release. The cover, project screenshots, and white and navy themes are integrated. The live composer is on the cover, and Selected work can open a bundled answer. The waiting state and streamed answer appear before their supporting sources and project cards. A completed long answer keeps its place as evidence arrives. See [DRN-087 and DRN-088](decisions.md), the [M8 study guide](study-guides/phase-m8-answer-first.md), and the [production release receipt](https://aamirmk-portfolio.vercel.app/release.json).
 

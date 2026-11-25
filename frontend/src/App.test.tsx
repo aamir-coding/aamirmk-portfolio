@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor, fireEvent, within } from "@testing-library/react";
+import { act, render, screen, waitFor, fireEvent, within } from "@testing-library/react";
 import App from "./App";
 import * as api from "./lib/api";
 import * as sse from "./lib/sse";
@@ -110,6 +110,8 @@ describe("<App />", () => {
     await screen.findByText("Ready");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "A question for Aamir" } });
     fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
+    // The first conversation loads the transcript and its Markdown renderer.
+    await act(() => vi.dynamicImportSettled());
     const send = await screen.findByRole("button", { name: "Send to Aamir" });
     expect(send).toBeDisabled();
     expect(screen.getByText("Preview messages to share")).toBeInTheDocument();
@@ -259,13 +261,14 @@ describe("<App />", () => {
     render(<App />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: /Aamir Mohammed Khan/i })
+      screen.getByRole("heading", { level: 1, name: /Ask about Aamir/i })
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox")).not.toHaveFocus();
     expect(screen.getByRole("button", { name: "What did Aamir build at AlgoUniversity?" })).toBeEnabled();
-    expect(screen.getByRole("link", { name: "Selected work" })).toHaveAttribute("href", "#work");
+    expect(screen.getByRole("button", { name: "Project index" })).toHaveAttribute("aria-haspopup", "dialog");
     expect(screen.getByRole("link", { name: "Résumé" })).toHaveAttribute("href", "/resume.pdf");
-    expect(screen.getByRole("heading", { name: "More questions to ask" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Start with a question" })).toBeInTheDocument();
+    fireEvent.click(screen.getByText("More questions to ask"));
     expect(await screen.findByRole("link", { name: "Evaluation results unavailable" })).toBeInTheDocument();
     expect(
       screen.getByRole("button", {
@@ -290,7 +293,8 @@ describe("<App />", () => {
     const stream = vi.spyOn(sse, "streamChat");
     render(<App />);
     expect(await screen.findByText("Live answers resting")).toBeInTheDocument();
-    expect(screen.getByRole("link", {name: "View professional profile"})).toBeInTheDocument();
+    const alternatives = within(screen.getByRole("group", { name: "Alternatives to live answers" }));
+    expect(alternatives.getByRole("link", {name: "LinkedIn"})).toHaveAttribute("href", "https://www.linkedin.com/in/aamir-mk/");
     const starter = screen.getByRole("button", { name: "What did Aamir build at AlgoUniversity?" });
     fireEvent.click(starter);
     expect(stream).not.toHaveBeenCalled();
@@ -308,17 +312,11 @@ describe("<App />", () => {
       expect(screen.getByText("Offline")).toBeInTheDocument();
     });
 
-    const work = within(screen.getByRole("region", { name: "Selected work" }));
-    const links = work.getAllByRole("link");
-    expect(links.map(link => link.getAttribute("href"))).toEqual([
-      "https://github.com/aamir-coding",
-      "/evals",
-      "https://github.com/aamir-coding/aamirmk-portfolio",
-      "https://entropy-oj.vercel.app/",
-      "https://github.com/aamir-coding/entropy-oj",
-      "https://health-tracker-alpha-one.vercel.app/",
-      "https://github.com/aamir-coding/health-tracker",
-    ]);
+    fireEvent.click(screen.getByRole("button", { name: "Project index" }));
+    fireEvent.click(screen.getByRole("button", { name: "Entropy Online Judge" }));
+    const detail = within(screen.getByRole("dialog", { name: "Entropy Online Judge" }));
+    expect(detail.getByRole("link", { name: "Open Entropy Online Judge" })).toHaveAttribute("href", "https://entropy-oj.vercel.app/");
+    fireEvent.click(detail.getByRole("button", { name: "Close panel" }));
     expect(screen.queryByRole("region", { name: "Conversation history" })).not.toBeInTheDocument();
   });
 
@@ -407,7 +405,7 @@ describe("<App />", () => {
     });
 
     // Initially in Cover State
-    expect(screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /Ask about Aamir/i })).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Portfolio overview/i })
     ).not.toBeInTheDocument();
@@ -432,7 +430,7 @@ describe("<App />", () => {
     fireEvent.click(dossierBtn);
 
     // Should return to Cover State non-destructively
-    expect(screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /Ask about Aamir/i })).toBeInTheDocument();
 
     // Resume Chat button is now available to jump back
     const resumeBtn = screen.getByRole("button", {
@@ -452,7 +450,7 @@ describe("<App />", () => {
     });
     fireEvent.click(clearBtn);
 
-    expect(screen.getByRole("heading", { level: 1, name: "Aamir Mohammed Khan" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /Ask about Aamir/i })).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /Resume chat/i })
     ).not.toBeInTheDocument();
@@ -490,51 +488,33 @@ describe("<App />", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ask a question" }));
 
     const history = await screen.findByRole("region", { name: "Conversation history" });
-    expect(await within(history).findByRole("heading", { name: "Entropy Online Judge" })).toBeInTheDocument();
-
-    // Click Inspect Architecture Blueprint button
-    const inspectBtn = screen.getByRole("button", {
-      name: /Inspect Architecture/i,
-    });
-    fireEvent.click(inspectBtn);
-
-    // Verify modal is open and shows architecture details
-    await waitFor(() => {
-      expect(
-        screen.getByRole("dialog", { name: /Entropy Online Judge/i })
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText("System uses Redis queue and Linux runner.")
-      ).toBeInTheDocument();
-    });
-
-    // Close modal via Close button
-    const closeBtn = screen.getByRole("button", {
-      name: /Close architecture modal/i,
-    });
-    fireEvent.click(closeBtn);
-
-    // Verify modal is dismissed
-    await waitFor(() => {
-      expect(
-        screen.queryByRole("dialog", { name: /Entropy Online Judge/i })
-      ).not.toBeInTheDocument();
-    });
+    const evidence = await within(history).findByRole("button", { name: "View Entropy Online Judge evidence" });
+    expect(within(history).queryByRole("heading", { name: "Entropy Online Judge" })).not.toBeInTheDocument();
+    fireEvent.click(evidence);
+    const panel = within(screen.getByRole("dialog", { name: "Entropy Online Judge" }));
+    fireEvent.click(panel.getByText("Inspect architecture"));
+    expect(panel.getByText("System uses Redis queue and Linux runner.")).toBeVisible();
+    fireEvent.click(panel.getByRole("button", { name: "Ask about this project" }));
+    await waitFor(() => expect(within(history).getAllByRole("article", { name: "User message" })).toHaveLength(2));
+    expect(screen.getByRole("heading", { name: "Conversation" })).toHaveFocus();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("opens the job description fit report from the primary navigation", async () => {
+  it("opens role fit outside the question form and preserves the draft", async () => {
     vi.spyOn(api, "fetchHealth").mockReturnValue(new Promise(() => {}));
     vi.spyOn(api, "fetchFitPresets").mockResolvedValue([]);
     render(<App />);
 
-    const fitBtn = screen.getByRole("button", {
-      name: /Evaluate Job Description Alignment/i,
-    });
+    const question = screen.getByRole("textbox", { name: /Ask a question about Aamir/ });
+    fireEvent.change(question, { target: { value: "What did Aamir build?" } });
+    const fitBtn = screen.getByRole("button", { name: "Check role fit" });
+    expect(fitBtn.closest("form")).toBeNull();
     fireEvent.click(fitBtn);
 
     await waitFor(() => {
       expect(screen.getByRole("dialog")).toBeInTheDocument();
       expect(screen.getByText("Job Description Fit Report")).toBeInTheDocument();
     });
+    expect(question).toHaveValue("What did Aamir build?");
   });
 });

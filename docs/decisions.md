@@ -3,6 +3,63 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-092: Use the river shader for continuous chat flow
+
+The owner’s rendered review identified an unreadable etched edge and banded
+highlights on the folded ribbon. Both faces now follow a new silhouette. The
+left face uses a high-contrast glyph engraving, with a coarser cut for phones.
+The right uses a separately baked mask in the homepage river’s Paper Liquid
+Metal renderer. Both surfaces share the shader parameters and idle speed.
+Chat increases the speed while waiting and writing, and returns to continuous
+idle flow when an answer finishes, including saved answers. The artwork setting,
+reduced motion, and WebGL fallback use a still frame sampled from this mask.
+
+### DRN-091: Carry the river material into a readable conversation
+
+The chat uses the approved study's WebGL ribbon and an ASCII engraving. Each
+send and first text event can run a short reflection across the fold. Source
+and card events do not restart the effect. The default resting frame, the
+Send surface and the evidence icon use images sampled from the actual shader.
+A still landscape preference, reduced motion or missing WebGL leaves the same
+fold visible. The transcript can render immediately while the GPU code loads.
+
+Short single-line questions use the existing Markdown renderer with an editorial
+heading. Longer inputs retain their ordinary reading size. With interaction
+sounds enabled, live replies taking at least five seconds can play a completion
+cue. Opening evidence plays a short filtered brush, and tokens remain silent.
+
+### DRN-090: Make the conversation the primary portfolio view
+
+**Date** 2026-11-24. The silver and graphite integration runs on the existing
+React and FastAPI application. The home screen accepts a question and offers
+three concrete examples. Loaded conversations retain the same SSE subscription,
+draft input and answer-first completion behavior. Project browsing, the public
+résumé, and role fit each have a direct entry point.
+
+The evidence panel joins a completed answer's server-provided project IDs and
+source chunk IDs to the local showcase catalog. Screenshots and public project
+links work independently of inference. A returned card for a showcased project
+adds its architecture inside the panel. Other returned cards use the existing
+inline card renderer. Escape returns focus to the opener. Asking a new question
+from the panel focuses the conversation after the dialog has closed.
+
+The homepage initially ships the terrain engraving and still river. A visible
+cover may load the glyph renderer after page load, then the pinned Paper
+Liquid Metal shader. A preprocessed texture keeps river-mask preparation out of
+the browser. Reduced motion on entry skips both animation modules. The renderer
+pauses offscreen and disposes GPU resources when entering chat. Interaction sounds
+are opt-in. The transcript and its Markdown dependencies load on composer focus
+or conversation entry. This keeps the reading experience out of the startup cost
+of an unopened conversation.
+
+The standalone role-fit button opens the job-description workflow below the
+question form and preserves a typed draft. During service recovery, the saved
+answer is the primary action and retry is secondary. Résumé, LinkedIn, and email
+use ordinary destination links. The Send control and project-evidence icon use
+a CSS silver finish so opening the transcript requires no additional WebGL surface.
+Preferences combines the river choices with a still landscape, preserving the
+previous pause choice while removing the artwork overlay.
+
 ### DRN-089: Refresh resume and fact provenance
 
 **Date:** 2026-11-19. **Scope:** Maintenance after the M8 release.
