@@ -51,16 +51,16 @@ export function DecryptedOpening() {
     let nearOpening = false;
 
     const stop = () => {
-      window.clearInterval(timer);
+      window.clearTimeout(timer);
       timer = undefined;
       layer.replaceChildren();
     };
 
     const play = () => {
       if (timer !== undefined || document.hidden || !layer.getClientRects().length) return;
-      const start = performance.now();
+      // A busy frame on first open should stretch the reveal, never skip its letters.
+      let revealed = 0;
       const draw = () => {
-        const revealed = Math.floor((performance.now() - start) / stepMs);
         if (revealed >= steps || document.hidden || !layer.getClientRects().length) {
           stop();
           return;
@@ -78,8 +78,9 @@ export function DecryptedOpening() {
           return glyph;
         });
         layer.replaceChildren(...glyphs);
+        revealed++;
+        timer = window.setTimeout(draw, stepMs);
       };
-      timer = window.setInterval(draw, stepMs);
       draw();
     };
 
