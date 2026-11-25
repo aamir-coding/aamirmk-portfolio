@@ -55,6 +55,7 @@
   
   /* Status Semantics */
   --status-ready: #047857;
+  --decode-ink: #176e47;
   --status-ready-bg: #ecfdf5;
   --status-warming: #d97706;
   --status-warming-bg: #fffbeb;
@@ -157,6 +158,7 @@
     
     /* Status Semantics */
     --status-ready: #34d399;
+    --decode-ink: #2bb673;
     --status-ready-bg: #064e3b;
     --status-warming: #f59e0b;
     --status-warming-bg: #451a03;
@@ -213,6 +215,7 @@
   
   /* Status Semantics */
   --status-ready: #34d399;
+  --decode-ink: #2bb673;
   --status-ready-bg: #064e3b;
   --status-warming: #f59e0b;
   --status-warming-bg: #451a03;
