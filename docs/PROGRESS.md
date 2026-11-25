@@ -2,7 +2,8 @@
 
 ## Current Phase
 **Silver assistant and conversation ribbon, verified locally on 25 November 2026.** Branch
-`codex/silver-assistant` is ready for release review. The home composer uses
+`codex/silver-assistant` is approved for release. The deployed frontend revision
+is available in the [production release receipt](https://aamirmk-portfolio.vercel.app/release.json). The home composer uses
 the existing chat flow. Projects open in an evidence panel from a completed
 answer or the project index. The role-fit form, saved answers, recruiting
 actions and direct links remain available. See [DRN-090](decisions.md) and
