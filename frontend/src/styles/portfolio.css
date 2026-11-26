@@ -55,10 +55,14 @@
 .relief-scene [hidden] { display: none; }
 .relief-land, .relief-engraving, .relief-type { filter: invert(var(--relief-invert,0)); }
 .relief-river { position: absolute; left: 14.405%; top: 35.738%; width: 53.81%; height: 38.033%; }
-.relief-metal { filter: grayscale(1); }
 .portfolio-chat .chat-input-container { padding: 0; border: 0; background: transparent; }
-.portfolio-chat .chat-input-row { display: flex; align-items: center; border: 1px solid var(--portfolio-field-rule); padding: .5rem .55rem .5rem 1rem; border-radius: .7rem; background: var(--bg-surface); }
+.portfolio-chat .chat-input-row { position: relative; display: flex; align-items: center; border: 1px solid var(--portfolio-field-rule); padding: .5rem .55rem .5rem 1rem; border-radius: .7rem; background: var(--bg-surface); }
 .portfolio-chat .chat-input-row:focus-within { border-color: var(--portfolio-ink); }
+.portfolio-chat .chat-input-row:focus-within::after {
+  content: ""; position: absolute; right: 1.65rem; bottom: -1px; width: clamp(3rem, 22%, 7rem); height: 2px;
+  pointer-events: none; border-radius: 100%;
+  background: linear-gradient(90deg, transparent, #de766e 12%, #edaa65 25%, #e9cc78 37%, #8acda8 49%, #78b7e0 63%, #8b87d0 76%, #be8abd 87%, transparent);
+}
 .portfolio-chat .chat-textarea { width: 100%; min-width: 0; min-height: 2.4rem; padding: .4rem 0; border: 0; box-shadow: none; color: var(--portfolio-ink); background: transparent; font-size: 1rem; }
 @supports (field-sizing: content) {
   .portfolio-chat .chat-textarea { field-sizing: content; resize: none; }
@@ -125,7 +129,7 @@
 .project-evidence { display: inline-flex; align-items: center; gap: .55rem; text-align: start; border: 1px solid var(--portfolio-rule); border-radius: .35rem; background: var(--bg-surface); color: inherit; padding: .5rem .8rem; margin: .4rem .4rem .4rem 0; }
 .project-evidence::before {
   content: ""; flex: none; width: .8rem; height: 1rem; border: 1px solid #767e85; border-radius: 2px;
-  background: linear-gradient(45deg, #7c858e 50%, transparent 51%) top right / .32rem .32rem no-repeat, var(--liquid-silver);
+  background: linear-gradient(45deg, #7c858e 50%, transparent 51%) top right / .32rem .32rem no-repeat, var(--liquid-silver) center / cover;
   clip-path: polygon(0 0, 62% 0, 100% 30%, 100% 100%, 0 100%);
 }
 .portfolio-panel { position: fixed; inset: 0 0 0 auto; margin: 0; height: 100dvh; max-height: 100dvh; width: min(34rem,96vw); max-width: 100vw; padding: 2rem; box-sizing: border-box; overflow: auto; overscroll-behavior: contain; border: 0; border-left: 1px solid var(--portfolio-rule); background: var(--portfolio-paper); color: var(--portfolio-ink); }
@@ -181,10 +185,15 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
   position: relative; display: grid; grid-template-columns: minmax(0,.62fr) minmax(0,1.38fr);
   gap: clamp(1.5rem,4vw,4rem); max-width: 72rem; padding-block: clamp(1rem,3.6vh,2.8rem);
 }
-.conversation-ribbon { position: sticky; top: 2rem; align-self: start; margin-top: 2.6rem; width: 100%; aspect-ratio: 4 / 5; pointer-events: none; }
-.ribbon-surface, .ribbon-surface canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ribbon-surface { background-size: contain; background-repeat: no-repeat; filter: grayscale(1); }
-.ribbon-surface:has(canvas) { background-size: 0; }
+.portfolio-page .conversation-metal {
+  position: sticky; top: 2rem; align-self: start; margin-top: 2.6rem; width: 100%; aspect-ratio: 1;
+  border: 0; padding: 0; border-radius: .7rem; background: transparent; cursor: grab; touch-action: pan-y; user-select: none;
+}
+.portfolio-page .conversation-metal:active { cursor: grabbing; }
+.portfolio-page .conversation-metal:disabled { cursor: default; opacity: 1; }
+.metaball-surface, .metaball-surface canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.metaball-surface { background: center / contain no-repeat; }
+.metaball-surface:has(canvas) { background-size: 0; }
 .river-handoff { position: fixed; pointer-events: none; z-index: 2; transform-origin: top left; }
 .portfolio-conversation .portfolio-assistant { min-width: 0; }
 .portfolio-page:has(.portfolio-conversation) { height: 100dvh; }
@@ -215,11 +224,11 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
 .chat-tools-links .portfolio-footer-notes { justify-content: flex-start; margin-top: 1rem; font-size: .85rem; }
 .chat-tools-links .portfolio-contact-links a { min-height: 44px; align-content: center; }
 .answer-typeset { position: relative; }
-.decode-signal { display: inline-flex; gap: .06em; vertical-align: middle; color: var(--decode-ink); font: 500 1em/1.4 var(--font-mono); user-select: none; pointer-events: none; }
+.decode-signal { display: inline-flex; gap: .06em; vertical-align: middle; padding-inline: .2em; border-radius: .15em; background: var(--decode-ground); color: #fff; font: 500 1em/1.4 var(--font-mono); user-select: none; pointer-events: none; }
 .decode-column { display: block; overflow: hidden; height: 1.4em; width: 1ch; }
 .decode-column::before { content: attr(data-frames); display: block; white-space: pre; }
 .decode-opening { display: none; position: absolute; inset: 0 auto auto 0; width: 1px; height: 1px; pointer-events: none; user-select: none; }
-.decode-opening > span { position: absolute; display: grid; place-items: center; overflow: hidden; background: var(--portfolio-paper); color: var(--decode-ink); font: 500 1em/1 var(--font-mono); }
+.decode-opening > span { position: absolute; display: grid; place-items: center; overflow: hidden; background: var(--decode-ground); color: #fff; font: 500 1em/1 var(--font-mono); }
 .decode-opening > span::before { content: attr(data-glyph); }
 .decode-cursor { font-size: .78em; }
 @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
@@ -239,10 +248,10 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
 @media (max-width: 700px) {
   .portfolio-conversation .portfolio-opening-inner { display: flex; padding-block: .4rem max(.75rem, env(safe-area-inset-bottom)); }
   .portfolio-conversation .portfolio-assistant { flex: 1; }
-  .conversation-ribbon { position: absolute; width: 2.15rem; margin: 0; top: .4rem; left: 0; }
-  .portfolio-conversation .portfolio-assistant-heading { padding-left: 2.6rem; }
+  .portfolio-page .conversation-metal { position: absolute; width: 3.5rem; height: 2.8rem; margin: 0; top: .4rem; left: 0; }
+  .portfolio-conversation .portfolio-assistant-heading { padding-left: 3.7rem; }
 }
-@media (forced-colors: active) { .conversation-ribbon { visibility: hidden; } }
+@media (forced-colors: active) { .conversation-metal, .chat-input-row::after { visibility: hidden; } }
 @media (max-width: 700px) {
   .nav-project-label { display: none; }
   .nav-project-short { display: inline; }

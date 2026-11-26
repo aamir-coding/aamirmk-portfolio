@@ -3,6 +3,24 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-094: Let color follow metal reflections and keep the answer legible
+
+The river and chat drops use the red and blue dispersion controls in
+[Paper's Liquid Metal shader](https://shaders.paper.design/liquid-metal).
+The enabled Send button and project evidence icon use a small crop of the
+same material. A short spectrum appears along the focused composer's lower
+edge. The high-contrast field border continues to indicate focus on its own.
+Every animated scramble glyph is white. In light mode, graphite behind each
+glyph preserves contrast while the revealed text takes the regular ink color.
+
+The chat uses Paper's five metaball orbits. A small extension to their
+positions lets a visitor drag a drop or scatter and reunite all five through
+touch, a click or the keyboard. The shader clock drives both the deformation
+and the reflections. Successive activations let a pulse finish before replay.
+The mobile artwork shares the existing status row and supports vertical panning.
+Still artwork, reduced motion and unavailable WebGL use a frame sampled from
+the same shader and remove the artwork from the tab order.
+
 ### DRN-093: Anchor each new answer once and keep chat tools within reach
 
 The recruiter starts at the question and opening lines. A pasted prompt that would

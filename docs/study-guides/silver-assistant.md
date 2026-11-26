@@ -24,6 +24,13 @@ a project directly, or reuse one of the bundled answers when capacity is resting
    Paper's shader with the preprocessed mask and caps the drawing resolution.
    Enter a conversation to see why cleanup must cover both a rendered frame and
    an import or image decode that may still be pending.
+6. In `components/Chat/metaballShader.ts`, five moving centers contribute to
+   one field. Where the contributions overlap, a single contour encloses the
+   drops and makes them look joined. Dragging changes one center. Activating
+   the artwork briefly moves all five apart and then together. Both use
+   Paper's shader clock, so neither needs a React render on every frame.
+   In `ConversationMetal.tsx`, follow a pointer cancellation or a lost WebGL
+   context to see how the interaction ends and when the sampled poster returns.
 
 ## Three interview questions
 
