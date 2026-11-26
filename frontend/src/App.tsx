@@ -114,19 +114,22 @@ function Portfolio() {
   const assistantStatus = isResting ? "resting" : serverState;
   const reply = messages.at(-1);
   const [metalSend, setMetalSend] = useState<MetalSend | null>(null);
+  const hasSentThisSession = useRef(false);
   const markSend = () => {
+    hasSentThisSession.current = true;
     cue("send");
-    setMetalSend({ at: performance.now(), river: document.querySelector(".relief-river")?.getBoundingClientRect() });
+    const at = performance.now(), river = document.querySelector(".relief-river")?.getBoundingClientRect();
+    setMetalSend(previous => ({ at, river, count: (previous?.count ?? 0) + 1 }));
   };
   const stage = reply?.delivery === "cancelled" || reply?.status === "error" ? "stopped"
     : isStreaming ? (reply?.content ? "writing" : "waiting") : "settled";
   const soundedReply = useRef<string | null>(null);
   useEffect(() => {
-    if (!metalSend || isCoverState || reply?.status !== "done" || reply.delivery ||
+    if (!hasSentThisSession.current || isCoverState || reply?.status !== "done" || reply.delivery ||
         !reply.content || (reply.browserTiming?.total_ms ?? 0) < 5000 || soundedReply.current === reply.id) return;
     soundedReply.current = reply.id;
     cue("ready");
-  }, [reply, cue, metalSend, isCoverState]);
+  }, [reply, cue, isCoverState]);
   let announcement = "";
   if (reply?.role === "assistant" && reply.status === "done") {
     if (reply.delivery === "cancelled") announcement = "Response stopped.";
@@ -171,6 +174,7 @@ function Portfolio() {
   const showOverview = () => {
     focusAfterNavigation.current = true;
     setChatToolsOpen(false);
+    setMetalSend(null);
     setViewMode("cover");
   };
 

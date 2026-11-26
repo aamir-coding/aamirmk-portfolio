@@ -224,11 +224,11 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
 .chat-tools-links .portfolio-footer-notes { justify-content: flex-start; margin-top: 1rem; font-size: .85rem; }
 .chat-tools-links .portfolio-contact-links a { min-height: 44px; align-content: center; }
 .answer-typeset { position: relative; }
-.decode-signal { display: inline-flex; gap: .06em; vertical-align: middle; padding-inline: .2em; border-radius: .15em; background: var(--decode-ground); color: #fff; font: 500 1em/1.4 var(--font-mono); user-select: none; pointer-events: none; }
+.decode-signal { display: inline-flex; gap: .06em; vertical-align: middle; color: var(--decode-ink); font: 500 1em/1.4 var(--font-mono); user-select: none; pointer-events: none; }
 .decode-column { display: block; overflow: hidden; height: 1.4em; width: 1ch; }
 .decode-column::before { content: attr(data-frames); display: block; white-space: pre; }
 .decode-opening { display: none; position: absolute; inset: 0 auto auto 0; width: 1px; height: 1px; pointer-events: none; user-select: none; }
-.decode-opening > span { position: absolute; display: grid; place-items: center; overflow: hidden; background: var(--decode-ground); color: #fff; font: 500 1em/1 var(--font-mono); }
+.decode-opening > span { position: absolute; display: grid; place-items: center; overflow: hidden; background: var(--portfolio-paper); color: var(--decode-ink); font: 500 1em/1 var(--font-mono); }
 .decode-opening > span::before { content: attr(data-glyph); }
 .decode-cursor { font-size: .78em; }
 @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
