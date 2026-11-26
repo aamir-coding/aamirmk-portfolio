@@ -1,6 +1,27 @@
 # Progress Tracker
 
 ## Current Phase
+
+**Prismatic metal, local preview.** The cover river now splits its highlights
+into color. Chat replaces the folded ribbon with five interactive liquid-metal
+drops. Drag one to move it, or tap, click, or use the keyboard to scatter them
+and watch them rejoin. The waiting glyphs, streaming cursor, and opening
+scramble are white in both themes. See [DRN-094](decisions.md).
+
+- Chrome verified the drops at 390, 937, and 1440 px. Pixel sampling counted
+  five shapes after activation and one at the point of reunion. Repeated
+  activation let the first pulse finish. Static artwork, reduced motion, and
+  missing WebGL rendered the poster. White glyph contrast measured 11.22:1
+  in light mode and 16.31:1 in dark mode.
+- The chat poster is 21.8 kB and initial JavaScript is 120.32 kB gzipped.
+  Across 90 frames in desktop Chrome, frame intervals measured 16.7 ms at the
+  median and 16.8 ms at the 95th percentile. Mobile checks used touch emulation.
+- The production build and lint passed. Vitest passed 199 tests. The offline
+  backend and evaluation suites passed 690 tests with eight skips and two
+  deprecation warnings.
+
+### Chat text scramble release
+
 **Chat text scramble.** Waiting and writing now cycle uppercase and lowercase
 letters alongside punctuation. The first ten letters or digits of a live or
 saved answer resolve in place at 60 ms intervals. Desktop Chrome retained all

@@ -6,7 +6,7 @@ import { useChat } from "./hooks/useChat";
 import { useCompanyContext } from "./hooks/useCompanyContext";
 import { useTheme } from "./hooks/useTheme";
 import { ChatInput } from "./components/Chat/ChatInput";
-import { ConversationRibbon, type RibbonSend } from "./components/Chat/ConversationRibbon";
+import { ConversationMetal, type MetalSend } from "./components/Chat/ConversationMetal";
 import { StarterChips } from "./components/Chat/StarterChips";
 import { CoverState } from "./components/Cover/CoverState";
 import { HeroArt } from "./components/Cover/HeroArt";
@@ -113,20 +113,20 @@ function Portfolio() {
   const focusAfterNavigation = useRef(false);
   const assistantStatus = isResting ? "resting" : serverState;
   const reply = messages.at(-1);
-  const [ribbonSend, setRibbonSend] = useState<RibbonSend | null>(null);
+  const [metalSend, setMetalSend] = useState<MetalSend | null>(null);
   const markSend = () => {
     cue("send");
-    setRibbonSend({ at: performance.now(), river: document.querySelector(".relief-river")?.getBoundingClientRect() });
+    setMetalSend({ at: performance.now(), river: document.querySelector(".relief-river")?.getBoundingClientRect() });
   };
   const stage = reply?.delivery === "cancelled" || reply?.status === "error" ? "stopped"
     : isStreaming ? (reply?.content ? "writing" : "waiting") : "settled";
   const soundedReply = useRef<string | null>(null);
   useEffect(() => {
-    if (!ribbonSend || isCoverState || reply?.status !== "done" || reply.delivery ||
+    if (!metalSend || isCoverState || reply?.status !== "done" || reply.delivery ||
         !reply.content || (reply.browserTiming?.total_ms ?? 0) < 5000 || soundedReply.current === reply.id) return;
     soundedReply.current = reply.id;
     cue("ready");
-  }, [reply, cue, ribbonSend, isCoverState]);
+  }, [reply, cue, metalSend, isCoverState]);
   let announcement = "";
   if (reply?.role === "assistant" && reply.status === "done") {
     if (reply.delivery === "cancelled") announcement = "Response stopped.";
@@ -283,7 +283,7 @@ function Portfolio() {
         <div className={`portfolio-opening ${isCoverState ? "portfolio-cover" : "portfolio-conversation"}`}>
           <div className="portfolio-measure portfolio-opening-inner">
             {isCoverState && <CoverState headingRef={headingRef} company={company} />}
-            {!isCoverState && <ConversationRibbon send={ribbonSend} stage={stage} live={preferences.artwork === "metal"} />}
+            {!isCoverState && <ConversationMetal send={metalSend} stage={stage} live={preferences.artwork === "metal"} />}
             <section
               ref={assistantRef}
               className="portfolio-assistant"
