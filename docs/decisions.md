@@ -3,6 +3,24 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-095: Connect the drops to sends and soften pointer-driven fusion
+
+Each accepted send counts once, including a starter question or a follow-up
+while an earlier pulse is finishing. The shader finishes one cycle before
+playing the next. A restored conversation opens in its idle orbit. Still
+artwork and reduced motion show the poster throughout.
+
+A drag gives the selected drop a target. A critically damped spring carries
+its current position and velocity into each pointer update. On release the
+drop keeps its momentum as its center eases back to its orbit. Each drop has
+its own release state, so picking up another lets the first finish moving.
+Paper's clock advances the spring between pointer events. The GPU uses
+high-precision timestamps to resolve short intervals even late in a chat.
+
+Waiting, streaming, and opening glyphs use black ink on light paper and white
+ink on dark paper. The opening briefly covers each original letter with the
+page color as its replacement glyph resolves.
+
 ### DRN-094: Let color follow metal reflections and keep the answer legible
 
 The river and chat drops use the red and blue dispersion controls in

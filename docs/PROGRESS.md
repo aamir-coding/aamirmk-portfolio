@@ -2,7 +2,24 @@
 
 ## Current Phase
 
-**Prismatic metal, local preview.** The cover river now splits its highlights
+**Chat drop motion and theme-aware scramble, local preview.** Each send gives
+the five drops one scatter-and-rejoin cycle. Quick follow-ups queue behind
+the current cycle. Dragged drops ease toward the pointer and carry their
+velocity into release. The scramble uses black ink in light mode and white
+ink in dark mode. See [DRN-095](decisions.md).
+
+- Chrome verified first sends, follow-ups, manual activation and resume at
+  390 and 937 px. Pixel sampling counted five separate drops and then one.
+  A fast drag covered 16% of the pointer displacement after 100 ms of shader
+  time. Reduced motion, Still artwork, and missing WebGL rendered the poster.
+- Desktop Chrome measured 16.7 ms median and 17.0 ms at the 95th percentile
+  over 90 frames. Mobile checks used touch emulation. Build, lint and 200
+  frontend tests passed. The initial JavaScript budget check measured
+  120,587 gzipped bytes against the 200,000-byte limit.
+
+### Prismatic metal release
+
+**Released in [PR #21](https://github.com/aamir-coding/aamirmk-portfolio/pull/21).** The cover river now splits its highlights
 into color. Chat replaces the folded ribbon with five interactive liquid-metal
 drops. Drag one to move it, or tap, click, or use the keyboard to scatter them
 and watch them rejoin. The waiting glyphs, streaming cursor, and opening

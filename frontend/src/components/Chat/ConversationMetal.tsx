@@ -4,6 +4,7 @@ import type { mountMetaballs } from "./metaballShader";
 import water from "../Cover/art/silver.webp";
 
 export interface MetalSend {
+  count: number;
   at: number;
   river?: DOMRect;
 }
@@ -15,6 +16,7 @@ export const ConversationMetal = memo(function ConversationMetal({ send, stage, 
   const host = useRef<HTMLSpanElement>(null);
   const player = useRef<ReturnType<typeof mountMetaballs> | undefined>(undefined);
   const [ready, setReady] = useState(false);
+  const consumedSends = useRef(0);
   const drag = useRef<{ id: number; x: number; y: number } | null>(null);
   const dragged = useRef(false);
   const flowSpeed = stage === "waiting" ? .78 : stage === "writing" ? .63 : .52;
@@ -65,6 +67,14 @@ export const ConversationMetal = memo(function ConversationMetal({ send, stage, 
     };
   }, [live]);
   useEffect(() => {
+    if (!send || consumedSends.current >= send.count) return;
+    if (live && !document.hidden && window.matchMedia?.("(prefers-reduced-motion: no-preference) and (forced-colors: none)").matches) {
+      if (!ready || !player.current) return;
+      player.current.scatterOnSend(send.count - consumedSends.current);
+    }
+    consumedSends.current = send.count;
+  }, [live, ready, send]);
+  useEffect(() => {
     const river = send?.river, target = host.current;
     if (!live || !river || !target || performance.now() - send.at > 350 || !target.animate ||
         !window.matchMedia?.("(prefers-reduced-motion: no-preference) and (forced-colors: none)").matches) return;
@@ -91,7 +101,7 @@ export const ConversationMetal = memo(function ConversationMetal({ send, stage, 
     aria-hidden={!ready || undefined} aria-label="Scatter the liquid metal drops"
     title={ready ? "Drag a drop, or tap to scatter" : undefined}
     onPointerDown={event => {
-      if (!event.isPrimary || event.button !== 0 || !player.current) return;
+      if (drag.current || !event.isPrimary || event.button !== 0 || !player.current) return;
       drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
       dragged.current = false;
       event.currentTarget.setPointerCapture(event.pointerId);
