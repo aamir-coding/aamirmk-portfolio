@@ -32,6 +32,7 @@ from app.llm import (
 from app.models import ChatRequest, ChatResponse, SourceCitation, TokenUsage
 from app.prompt_loader import build_system_prompt
 from app.retrieval.models import RetrievedChunk
+from app.retrieval.overview import Overview, overview_for
 from app.retrieval.retriever import Retriever, get_retriever
 from app.retrieval.rewriter import rewrite_follow_up_query
 from app.safety.guardrails import (
@@ -163,6 +164,41 @@ def extract_citations(chunks: list[RetrievedChunk]) -> list[SourceCitation]:
     return citations
 
 
+def answer_messages(
+    request: ChatRequest, chunks: list[RetrievedChunk], company: CompanyContext | None
+) -> list[Message]:
+    prompt = build_system_prompt(
+        chunks, company_note=company.why_us if company else None
+    )
+    topic = overview_for(request.message)
+    if topic is Overview.ACHIEVEMENTS:
+        prompt += (
+            "\nFor an achievements overview, cover each distinct documented "
+            "achievement, including team competition placements. "
+            "Preserve the scope of each award."
+        )
+    elif topic:
+        prompt += (
+            "\nThe recruiter is asking for education details. Cover each requested "
+            "stage in the retrieved records, including the documented school results."
+        )
+    messages = [Message(role="system", content=prompt)]
+    # An explicit overview starts a new subject. Earlier assistant summaries can
+    # otherwise crowd out the current school or award records.
+    if topic is None:
+        for turn in request.history[-6:]:
+            content = (
+                format_safe_user_message(turn.content)
+                if turn.role == "user"
+                else data_block("assistant_history", turn.content)
+            )
+            messages.append(Message(role=turn.role, content=content))
+    messages.append(
+        Message(role="user", content=format_safe_user_message(request.message))
+    )
+    return messages
+
+
 @router.post(
     "/chat",
     response_model=ChatResponse,
@@ -243,33 +279,7 @@ async def chat(
             ),
         )
     citations = extract_citations(retrieved_chunks)
-    system_prompt = build_system_prompt(
-        retrieved_chunks, company_note=company.why_us if company else None
-    )
-
-    # 4. Format user query with XML boundary fencing and assemble conversation messages
-    safe_user_content = format_safe_user_message(request.message)
-
-    history_messages: list[Message] = []
-    if request.history:
-        for h in request.history[-6:]:
-            if h.role == "user":
-                history_messages.append(
-                    Message(role="user", content=format_safe_user_message(h.content))
-                )
-            elif h.role == "assistant":
-                history_messages.append(
-                    Message(
-                        role="assistant",
-                        content=data_block("assistant_history", h.content),
-                    )
-                )
-
-    messages = [
-        Message(role="system", content=system_prompt),
-        *history_messages,
-        Message(role="user", content=safe_user_content),
-    ]
+    messages = answer_messages(request, retrieved_chunks, company)
 
     tool_schemas = tool_registry.get_schemas(handoff=can_handoff)
     summoned_cards: list[ProjectCardData] = []
@@ -486,33 +496,7 @@ async def chat_stream(
             handoff_generator(), media_type="text/event-stream", headers=headers
         )
     citations = extract_citations(retrieved_chunks)
-    system_prompt = build_system_prompt(
-        retrieved_chunks, company_note=company.why_us if company else None
-    )
-
-    # 4. Format user query with XML boundary fencing and assemble conversation messages
-    safe_user_content = format_safe_user_message(request.message)
-
-    history_messages: list[Message] = []
-    if request.history:
-        for h in request.history[-6:]:
-            if h.role == "user":
-                history_messages.append(
-                    Message(role="user", content=format_safe_user_message(h.content))
-                )
-            elif h.role == "assistant":
-                history_messages.append(
-                    Message(
-                        role="assistant",
-                        content=data_block("assistant_history", h.content),
-                    )
-                )
-
-    messages = [
-        Message(role="system", content=system_prompt),
-        *history_messages,
-        Message(role="user", content=safe_user_content),
-    ]
+    messages = answer_messages(request, retrieved_chunks, company)
 
     tool_schemas = tool_registry.get_schemas(handoff=can_handoff)
 

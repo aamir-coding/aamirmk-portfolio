@@ -24,14 +24,14 @@ describe("useChat hook", () => {
         {
           id: "u-1",
           role: "user",
-          content: "Previous query",
+          content: "What does 【Detailed Overview】 mean?",
           status: "done",
           timestamp: "12:00 PM",
         },
         {
           id: "a-1",
           role: "assistant",
-          content: "Previous answer",
+          content: "Previous answer 【Detailed Overview】.",
           status: "done",
           timestamp: "12:00 PM",
         },
@@ -42,7 +42,8 @@ describe("useChat hook", () => {
 
     const { result } = renderHook(() => useChat());
     expect(result.current.messages).toHaveLength(2);
-    expect(result.current.messages[0]?.content).toBe("Previous query");
+    expect(result.current.messages[0]?.content).toBe("What does 【Detailed Overview】 mean?");
+    expect(result.current.messages[1]?.content).toBe("Previous answer.");
     expect(result.current.conversationId).toBe("saved-conv-456");
   });
 
@@ -50,7 +51,8 @@ describe("useChat hook", () => {
     vi.spyOn(sseModule, "streamChat").mockImplementation(async (opts) => {
       opts.callbacks.onToken("Aamir ");
       opts.callbacks.onToken("built ");
-      opts.callbacks.onToken("this.");
+      opts.callbacks.onToken("this 【Det");
+      opts.callbacks.onToken("ailed Overview】.");
       opts.callbacks.onDone({ conversation_id: "conv-123" });
     });
 
@@ -76,6 +78,7 @@ describe("useChat hook", () => {
       sessionStorage.getItem(CHAT_SESSION_STORAGE_KEY) || "{}"
     );
     expect(stored.messages).toHaveLength(2);
+    expect(stored.messages[1].content).toBe("Aamir built this.");
     expect(stored.conversationId).toBe("conv-123");
   });
 

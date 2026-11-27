@@ -19,6 +19,8 @@ from app.llm import (
     get_llm_client,
 )
 from app.main import create_app
+from app.retrieval.hybrid import HybridRetriever
+from app.retrieval.loader import FactLoader
 from app.retrieval.models import FactChunk, RetrievedChunk
 from app.retrieval.retriever import FakeRetriever, get_retriever
 from app.settings import Settings
@@ -91,6 +93,72 @@ def chat_client(
 
 
 # ── Non-streaming /chat tests ─────────────────────────────────────────
+
+
+@pytest.fixture(scope="module")
+def public_index() -> HybridRetriever:
+    return HybridRetriever(
+        chunks=FactLoader().load_all(include_private=False, include_unindexed=False)
+    )
+
+
+@pytest.mark.parametrize("path", ["/api/chat", "/api/chat/stream"])
+def test_overviews_supply_current_evidence_across_topic_switches(
+    chat_client: tuple[TestClient, FakeLLM, FakeRetriever],
+    public_index: HybridRetriever,
+    path: str,
+) -> None:
+    client, generator, _ = chat_client
+    client.app.dependency_overrides[get_retriever] = lambda: public_index
+    history = []
+    cases = [
+        (
+            "achievements",
+            {
+                "achieve-google-cloud-hackathon",
+                "achieve-graph-contest",
+                "achieve-academic-excellence",
+            },
+            ["VayuSetu", "2nd Runner-Up"],
+        ),
+        (
+            "schooling?",
+            {"education-school-background"},
+            ["Indian School Al Wadi Al Kabir", "94.8%", "Sindhi High School", "89.4%"],
+        ),
+        (
+            "achievements?",
+            {
+                "achieve-google-cloud-hackathon",
+                "achieve-graph-contest",
+                "achieve-academic-excellence",
+            },
+            ["VayuSetu", "2nd Runner-Up"],
+        ),
+        (
+            "education history?",
+            {"education-school-background", "education-degree"},
+            ["94.8%", "89.4%", "9.77"],
+        ),
+    ]
+    for question, ids, details in cases:
+        response = client.post(path, json={"message": question, "history": history})
+        assert response.status_code == 200
+        if path.endswith("/stream"):
+            sources = next(
+                payload["sources"]
+                for event, payload in parse_sse_events(response.text)
+                if event == "done"
+            )
+        else:
+            sources = response.json()["sources"]
+        assert {item["chunk_id"] for item in sources} == ids
+        assert [m.role for m in generator.last_messages] == ["system", "user"]
+        assert all(detail in generator.last_messages[0].content for detail in details)
+        history += [
+            {"role": "user", "content": question},
+            {"role": "assistant", "content": "Only university details were available."},
+        ]
 
 
 @pytest.mark.parametrize("path", ["/api/chat", "/api/chat/stream"])

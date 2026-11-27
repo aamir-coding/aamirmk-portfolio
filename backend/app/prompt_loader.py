@@ -42,15 +42,10 @@ def format_retrieved_context(chunks: list[RetrievedChunk]) -> str:
     sections: list[str] = []
     for item in chunks:
         c = item.chunk
-        source_label = f"Source: {c.title}"
-        if c.source_section:
-            source_label += f" ({c.source_section})"
+        text = f"### {c.title}\n{c.content.strip()}"
         if c.source_url:
-            source_label += f" | {c.source_url}"
-
-        sections.append(
-            sanitize_user_input(f"### [{source_label}]\n{c.content.strip()}")
-        )
+            text += f"\nPublic link: {c.source_url}"
+        sections.append(sanitize_user_input(text))
 
     return "\n\n".join(sections)
 

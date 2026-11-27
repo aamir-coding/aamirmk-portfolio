@@ -11,6 +11,7 @@ import re
 from typing import TYPE_CHECKING
 
 from app.llm import LLMClient, Message
+from app.retrieval.overview import overview_for
 from app.safety.guardrails import data_block
 
 if TYPE_CHECKING:
@@ -41,7 +42,7 @@ REWRITE_SYSTEM_PROMPT = (
 
 def is_likely_follow_up(query: str, history: list[ChatHistoryMessage]) -> bool:
     """Determine whether an inbound query needs conversational context rewriting."""
-    if not history:
+    if not history or overview_for(query):
         return False
     trimmed = query.strip()
     words = trimmed.split()

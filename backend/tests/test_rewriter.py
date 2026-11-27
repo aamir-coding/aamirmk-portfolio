@@ -33,6 +33,19 @@ class TestIsLikelyFollowUp:
         assert is_likely_follow_up("What tech stack did he use for it?", history)
         assert is_likely_follow_up("What was the hardest bug in that project?", history)
 
+    def test_named_overviews_switch_topic_but_scoped_follow_ups_keep_history(
+        self,
+    ) -> None:
+        history = [ChatHistoryMessage(role="user", content="Tell me about VayuSetu")]
+        for question in (
+            "schooling?",
+            "Education history?",
+            "What are his achievements?",
+        ):
+            assert not is_likely_follow_up(question, history)
+        for question in ("its awards?", "what about that project?", "tell me more"):
+            assert is_likely_follow_up(question, history)
+
     def test_self_contained_query_is_not_follow_up(self) -> None:
         history = [
             ChatHistoryMessage(role="user", content="Hi"),

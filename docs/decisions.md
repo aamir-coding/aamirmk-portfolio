@@ -3,6 +3,28 @@
 Each record captures a decision with context, options, choice, and reasoning.
 Format: `### DRN-XXX: Title`
 
+### DRN-096: Keep the transcript bounded and retrieve evidence for the current question
+
+The transcript owns the positioning context for its visually hidden message headings.
+Opening glyphs use the computed type of each letter they cover, including emphasis.
+Waiting and writing glyphs inherit the answer type. No font or animation dependency was added.
+
+A standalone schooling, education or achievements overview selects the matching public
+fact types and tags. Both chat endpoints use that evidence for the new subject. Relative
+questions and questions scoped to a project continue to use conversation history.
+The incoming conversation still goes through the existing request checks.
+
+The provider sees fact titles and content. The Sources disclosure receives the original
+structured receipts, including section IDs. When a provider nevertheless writes an
+annotation, the web client withholds it during streaming and uses the same prose for
+copy, chat history and restored conversations. Inline code and ordinary Markdown links
+remain readable.
+
+The offline candidate reproduced the previous release's seven scores. All eight replay
+checks passed. The expected fact was in the first three results for 42/45 legacy and
+31/34 versioned development questions, and in the first five for both full sets.
+The reviewed baseline keeps its numerical floors and updates the changed fingerprints.
+
 ### DRN-095: Connect the drops to sends and soften pointer-driven fusion
 
 Each accepted send counts once, including a starter question or a follow-up

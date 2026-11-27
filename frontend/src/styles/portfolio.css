@@ -117,7 +117,7 @@
 .portfolio-footer a { color: inherit; }
 .portfolio-conversation .portfolio-opening-inner { max-width: 56rem; padding: 1.4rem 0; }
 .portfolio-assistant-heading h1 { font: 400 clamp(1.8rem,4vw,3.2rem)/1.1 var(--portfolio-display); letter-spacing: -.055em; margin: 0; }
-.portfolio-chat .chat-message-list { overflow-y: auto; overscroll-behavior: contain; overflow-anchor: none; scroll-behavior: auto; scrollbar-gutter: stable; }
+.portfolio-chat .chat-message-list { position: relative; overflow-y: auto; overscroll-behavior: contain; overflow-anchor: none; scroll-behavior: auto; scrollbar-gutter: stable; }
 .portfolio-chat .chat-message-list:focus-visible { outline-offset: -3px; }
 .portfolio-conversation .chat-message-assistant { align-self: center; width: min(100%,68ch); }
 .portfolio-conversation .chat-message-user { max-width: min(92%,55ch); }
@@ -224,13 +224,12 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
 .chat-tools-links .portfolio-footer-notes { justify-content: flex-start; margin-top: 1rem; font-size: .85rem; }
 .chat-tools-links .portfolio-contact-links a { min-height: 44px; align-content: center; }
 .answer-typeset { position: relative; }
-.decode-signal { display: inline-flex; gap: .06em; vertical-align: middle; color: var(--decode-ink); font: 500 1em/1.4 var(--font-mono); user-select: none; pointer-events: none; }
-.decode-column { display: block; overflow: hidden; height: 1.4em; width: 1ch; }
+.decode-signal { display: inline-flex; vertical-align: middle; color: var(--decode-ink); font: inherit; line-height: 1.4; user-select: none; pointer-events: none; }
+.decode-column { display: block; overflow: hidden; height: 1.4em; width: 1em; text-align: center; }
 .decode-column::before { content: attr(data-frames); display: block; white-space: pre; }
 .decode-opening { display: none; position: absolute; inset: 0 auto auto 0; width: 1px; height: 1px; pointer-events: none; user-select: none; }
-.decode-opening > span { position: absolute; display: grid; place-items: center; overflow: hidden; background: var(--portfolio-paper); color: var(--decode-ink); font: 500 1em/1 var(--font-mono); }
+.decode-opening > span { position: absolute; display: grid; place-items: center; overflow: hidden; background: var(--portfolio-paper); color: var(--decode-ink); }
 .decode-opening > span::before { content: attr(data-glyph); }
-.decode-cursor { font-size: .78em; }
 @media (prefers-reduced-motion: no-preference) and (forced-colors: none) {
   .portfolio-page:not([data-artwork="still"]) .decode-column::before {
     animation: decode-scramble 600ms steps(10, end) infinite;
@@ -241,7 +240,7 @@ body:has(.portfolio-panel[open]) { overflow: hidden; }
 .portfolio-conversation .chat-message-assistant, .portfolio-conversation .chat-message-user { align-self: start; width: 100%; max-width: 100%; }
 .portfolio-conversation .chat-message-user .chat-message-header { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .portfolio-conversation .chat-message-user .chat-message-body { padding: .5rem 0 .1rem; border: 0; background: transparent; }
-.portfolio-conversation .chat-prose { max-width: 61ch; font-size: clamp(1rem,1.3vw,1.15rem); }
+.portfolio-conversation .chat-prose, .portfolio-conversation .answer-waiting { max-width: 61ch; font-size: clamp(1rem,1.3vw,1.15rem); }
 .portfolio-conversation .chat-message-user .chat-prose { max-width: 100%; }
 .turn-question { margin: 0; font: 400 clamp(1.4rem,2.7vw,2.3rem)/1.12 var(--portfolio-display); letter-spacing: -.035em; white-space: pre-wrap; overflow-wrap: anywhere; }
 .chat-message-user:first-child .turn-question { max-width: 22ch; font-size: clamp(2rem,4.2vw,4rem); line-height: 1.04; letter-spacing: -.05em; }

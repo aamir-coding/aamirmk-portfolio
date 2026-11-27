@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "report_sha256": "a6cee4c8935eb78ae4338ba3dabd1194e4c66c689e66527b4d7de73a0e866591",
+  "report_sha256": "ab7265cab6d425369e4ebf9788f348d27186e808ca7277aabc93df39820f0b0e",
   "report": {
     "kind": "offline_engineering_checks",
-    "generated_at": "2026-11-19T12:32:38.059712Z",
-    "source_commit": "2516dad97ebdf8728d283cc47d26f8a1a95a7385",
+    "generated_at": "2026-11-27T12:21:15.216070Z",
+    "source_commit": "04ebe1d7ed8d8be26e27501400f51248f5f6b1ae",
     "source_dirty": true,
-    "source_result_sha256": "03846a2b8a929b952d034749d9e9ac12d6bbb0bc7854bcde417e7c4366f4ef84",
-    "runtime_sha256": "28ad7f22df8e64024478715cb7eeb332f92b7072fd96a6884834f443511a53ec",
+    "source_result_sha256": "15492cdbcedb3a156e935872ff2c1b6be06872d806f541a3fc73c9476e088042",
+    "runtime_sha256": "443b6034b8fc4b3ef1c5ee67deb8a554f11df72fda1b528904502081d3b835f3",
     "replay": {
       "passed": 8,
       "total": 8

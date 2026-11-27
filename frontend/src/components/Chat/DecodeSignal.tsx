@@ -20,20 +20,24 @@ export function DecodeSignal({ phase = "waiting" }: { phase?: "waiting" | "curso
 }
 
 // Use the rendered glyph boxes so a wrapped line or a bold opening keeps its exact typography.
-function openingBoxes(prose: Element): DOMRect[] {
+type GlyphBox = { rect: DOMRect; style: CSSStyleDeclaration };
+
+function openingBoxes(prose: Element): GlyphBox[] {
   const block = prose.querySelector("p, h1, h2, h3, h4, li");
   if (!block) return [];
   const nodes = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
   const range = document.createRange();
-  const boxes: DOMRect[] = [];
+  const boxes: GlyphBox[] = [];
   for (let node = nodes.nextNode(); node && boxes.length < steps; node = nodes.nextNode()) {
-    if (node.parentElement?.closest("code, pre, [aria-hidden=true]")) continue;
+    const parent = node.parentElement;
+    if (!parent || parent.closest("code, pre, [aria-hidden=true]")) continue;
+    const style = getComputedStyle(parent);
     const text = node.nodeValue ?? "";
     for (const match of text.matchAll(/[A-Za-z0-9]/g)) {
       range.setStart(node, match.index);
       range.setEnd(node, match.index + 1);
       const box = range.getBoundingClientRect();
-      if (box.width > 0) boxes.push(box);
+      if (box.width > 0) boxes.push({ rect: box, style });
       if (boxes.length === steps) break;
     }
   }
@@ -49,6 +53,8 @@ export function DecryptedOpening() {
     if (!layer || !host || !prose || !window.IntersectionObserver) return;
     let timer: number | undefined;
     let nearOpening = false;
+    const widths = new Map<string, number[]>();
+    let measure: CanvasRenderingContext2D | null = null;
 
     const stop = () => {
       window.clearTimeout(timer);
@@ -67,13 +73,23 @@ export function DecryptedOpening() {
         }
         const origin = layer.getBoundingClientRect();
         const boxes = openingBoxes(prose);
-        const glyphs = boxes.slice(revealed).map(box => {
+        const glyphs = boxes.slice(revealed).map(({ rect: box, style }) => {
           const glyph = document.createElement("span");
-          glyph.dataset.glyph = randomGlyph();
+          const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+          // Choose a glyph that fits the original letter without shrinking the face.
+          let advances = widths.get(font);
+          if (!advances) {
+            measure ??= document.createElement("canvas").getContext("2d");
+            if (measure) measure.font = font;
+            advances = Array.from(alphabet, char => measure?.measureText(char).width ?? 0);
+            widths.set(font, advances);
+          }
+          const pool = Array.from(alphabet).filter((_, i) => advances[i]! <= box.width + .5);
+          glyph.dataset.glyph = pool[Math.floor(Math.random() * pool.length)] ?? "i";
           Object.assign(glyph.style, {
             left: `${box.left - origin.left}px`, top: `${box.top - origin.top}px`,
             width: `${box.width}px`, height: `${box.height}px`,
-            fontSize: `${Math.min(box.height * .82, box.width * 1.6)}px`,
+            font, letterSpacing: style.letterSpacing,
           });
           return glyph;
         });
