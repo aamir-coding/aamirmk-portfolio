@@ -2,7 +2,29 @@
 
 ## Current Phase
 
-**Chat drop motion and theme-aware scramble, local preview.** Each send gives
+**Chat reading and evidence fixes, local feature branch.** Eight turns in Chrome
+previously added 2,815 px of page scroll at 937 px wide and 3,620 px at 390 px.
+Both now add zero. The transcript scrolls and the composer holds its position.
+Waiting and writing glyphs match the answer's Instrument Sans. Opening glyphs
+also pick up the weight of the individual letters they cover.
+
+The Sources disclosure opens by keyboard after completion. Browser tests streamed
+the reported citation shapes in fragments and checked the visible text before and
+after completion, including at 320 px with reduced motion.
+
+Both chat endpoints now retrieve the school record for “schooling?”, the degree and
+school records for “education history?”, and all three achievement records for
+“achievements?”. Offline tests switch between those topics with misleading prior
+answers. They use the public index and inspect the evidence passed to a fake
+generator. Eight offline replay checks passed. See [DRN-096](decisions.md#drn-096-keep-the-transcript-bounded-and-retrieve-evidence-for-the-current-question).
+
+Verification on November 27 passed 209 frontend tests and 693 backend/evaluation
+tests, with 8 skipped. Ruff, ESLint and the production build passed. The initial
+JavaScript measured 121,250 gzipped bytes against the 200,000-byte limit.
+
+### Previous chat motion release
+
+**Chat drop motion and theme-aware scramble.** Each send gives
 the five drops one scatter-and-rejoin cycle. Quick follow-ups queue behind
 the current cycle. Dragged drops ease toward the pointer and carry their
 velocity into release. The scramble uses black ink in light mode and white

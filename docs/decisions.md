@@ -20,10 +20,10 @@ annotation, the web client withholds it during streaming and uses the same prose
 copy, chat history and restored conversations. Inline code and ordinary Markdown links
 remain readable.
 
-The offline candidate passed eight of eight replay checks. Legacy development hit@3
-rose from 41/45 to 42/45. Versioned development hit@3 held at 31/34, and both hit@5
-scores held at 100%. Reciprocal rank rose on both suites. The reviewed baseline keeps
-its seven numerical floors and updates the fingerprints for the changed inputs.
+The offline candidate reproduced the previous release's seven scores. All eight replay
+checks passed. The expected fact was in the first three results for 42/45 legacy and
+31/34 versioned development questions, and in the first five for both full sets.
+The reviewed baseline keeps its numerical floors and updates the changed fingerprints.
 
 ### DRN-095: Connect the drops to sends and soften pointer-driven fusion
 

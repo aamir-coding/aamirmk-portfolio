@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "review_reference": "docs/decisions.md#drn-089-refresh-resume-and-fact-provenance",
+  "review_reference": "docs/decisions.md#drn-096-keep-the-transcript-bounded-and-retrieve-evidence-for-the-current-question",
   "fingerprints": {
-    "prompts": "7c4cce85973091781db074874719d097246e3c612cf4ec1941ca4a99e9b6db1f",
+    "prompts": "8048b228e3a4ab66f31e6f32b0eb64fd0b6211589745a6d5d8ddfa5e383919ff",
     "checker": "fea1f310312046886410ea2c21eead8b9c273362f7b60f536f8bd1092532b0a6",
     "rubric": "135a8bfe0638e48d191bb75f1d05fca2b84b176e3bc5b6089875d79819beb4bb",
-    "recordings": "cad9ba56d716be1ae5eb4c99a4b4e3cce8b44f85f06626bf444444e546047747",
+    "recordings": "938257223acc9021ed2d759ebc4c248b6a025eb0b7554ee8b2335b66bc917941",
     "evaluator": "da6e8173a14ac55153df3b3f526016c2ba67adec66d8b2db0c9c95d0b8ab596e",
-    "application": "755445f3e69ec2f784ee8f927f22adfc9abc31bbb6a1c9a3ac33ad2cdc2c13a6",
+    "application": "3a13c178815e8c6754cb29abd739ea7b1daa01fc5403b839ec542fda428c2b71",
     "cases": "132aa0aa5f602dbaf149fdb605125aa7cc688f7be3da46ce2b48a9ce97f0e51a",
     "safety_assets": "126e81937a7ad8f022a03da4449813aeb15fa865a7c54f86826c77ac927a05e3",
     "corpus": "fc34200d35a49287a7ec5431f1260c64b06f328d51497f49783f23fbb67dc0b5",
     "index": "b1a5b1c85e885822f70a55eb1509dc19ed04b10b516396d5c1297784e02e366b",
     "dataset": "8885c79b59d72d8ac95fa9bf7caafc97321718d08c2a0c875623782b891f4f42",
     "dependencies": "b238016f0e31c2593b0c483f0f7d9be5e51b7a3bef643cfdb8d7740f00f96929",
-    "retrieval": "ddf217e4bf14ab395b77a4946a934387e2af4dcf2204138d0292a0711ba72767"
+    "retrieval": "d5d58995709a1e2484ff4f1b479818dac76c5464166898bc301941d0ed050f93"
   },
   "scores": {
     "replay": 1.0,
