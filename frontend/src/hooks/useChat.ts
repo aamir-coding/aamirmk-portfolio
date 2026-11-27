@@ -1,6 +1,7 @@
 import type { RequestTelemetry } from "../lib/contracts";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { streamChat } from "../lib/sse";
+import { answerProse } from "../lib/answerProse";
 import type {
   ChatMessage,
   ProjectCardData,
@@ -38,7 +39,11 @@ function loadPersistedChat(): {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed?.messages)) {
           return {
-            messages: parsed.messages,
+            messages: parsed.messages.map((message: ChatMessage) =>
+              message?.role === "assistant" && typeof message.content === "string"
+                ? { ...message, content: answerProse(message.content) }
+                : message
+            ),
             conversationId: parsed.conversationId || null,
           };
         }
@@ -72,7 +77,7 @@ function savePersistedChat(
 }
 
 export function useChat(companySlug?: string): UseChatReturn {
-  const initial = loadPersistedChat();
+  const [initial] = useState(loadPersistedChat);
   const [messages, setMessages] = useState<ChatMessage[]>(initial.messages);
   const [isStreaming, setIsStreaming] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(
@@ -151,7 +156,7 @@ export function useChat(companySlug?: string): UseChatReturn {
       const assistantMessage: ChatMessage = {
         id: assistantMessageId,
         role: "assistant",
-        content: answer.reply,
+        content: answerProse(answer.reply),
         delivery: "instant",
         status: "done",
         timestamp,
@@ -210,6 +215,7 @@ export function useChat(companySlug?: string): UseChatReturn {
 
       const controller = new AbortController();
       abortControllerRef.current = controller;
+      let rawReply = "";
 
       await streamChat({
         message: trimmed,
@@ -239,16 +245,19 @@ export function useChat(companySlug?: string): UseChatReturn {
           },
           onToken: (token: string) => {
             if (controller.signal.aborted) return;
+            rawReply += token;
+            const content = answerProse(rawReply, true);
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === assistantMessageId
-                  ? { ...msg, content: msg.content + token }
+                  ? { ...msg, content }
                   : msg
               )
             );
           },
           onDone: (data) => {
             if (controller.signal.aborted) return;
+            const content = answerProse(rawReply);
             setIsResting(false);
             const handoffId = data.handoff ? crypto.randomUUID() : undefined;
             let activeConvId = conversationId;
@@ -261,6 +270,7 @@ export function useChat(companySlug?: string): UseChatReturn {
                 msg.id === assistantMessageId
                   ? {
                       ...msg,
+                      content,
                       status: "done" as const,
                       handoffId,
                       feedbackId: data.feedback_id,

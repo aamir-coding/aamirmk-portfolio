@@ -11,6 +11,7 @@ import asyncio
 from app.retrieval.bm25 import BM25Index
 from app.retrieval.dense import DenseIndex
 from app.retrieval.models import FactChunk, RetrievedChunk
+from app.retrieval.overview import overview_for
 
 
 def reciprocal_rank_fusion(
@@ -105,10 +106,18 @@ class HybridRetriever:
         # Retrieve a wider candidate pool from both indexes to ensure overlap
         candidate_k = max(top_k * self.candidates_multiplier, 20)
 
-        bm25_results = self.bm25.search(query, top_k=candidate_k)
-        dense_results = self.dense.search(query, top_k=candidate_k)
+        overview = overview_for(query)
+        search = overview.value if overview else query
+        bm25_results = self.bm25.search(search, top_k=candidate_k)
+        dense_results = self.dense.search(search, top_k=candidate_k)
 
         fused = reciprocal_rank_fusion([bm25_results, dense_results], rrf_k=self.rrf_k)
+        if overview:
+            scoped = [hit for hit in fused if overview.includes(hit.chunk)]
+            return [
+                hit.model_copy(update={"rank": rank})
+                for rank, hit in enumerate(scoped[:top_k], 1)
+            ]
         return fused[:top_k]
 
     async def retrieve(self, query: str, top_k: int = 5) -> list[RetrievedChunk]:
